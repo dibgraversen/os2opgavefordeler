@@ -1,0 +1,13 @@
+{
+  "name": "angular-ui-alias",
+  "homepage": "https://github.com/angular-ui/alias",
+  "_release": "475bd76159",
+  "_resolution": {
+    "type": "branch",
+    "branch": "master",
+    "commit": "475bd761590697f9f8a370dd8c9cb7f74d37490b"
+  },
+  "_source": "git://github.com/angular-ui/alias.git",
+  "_target": "*",
+  "_originalSource": "angular-ui-alias"
+}
