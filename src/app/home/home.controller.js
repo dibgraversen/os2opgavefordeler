@@ -3,10 +3,10 @@
 
     angular.module('topicRouter').controller('HomeCtrl', HomeCtrl);
 
-    HomeCtrl.$inject = ['$scope', 'topicRouterApi', '$state'];
+    HomeCtrl.$inject = ['$scope', 'topicRouterApi', '$state', 'flash'];
 
     /* @ngInject */
-    function HomeCtrl($scope, topicRouterApi, $state) {
+    function HomeCtrl($scope, topicRouterApi, $state, flash) {
         /* jshint validthis: true */
         var vm = this;
         vm.notesCollapsed = true;
@@ -16,6 +16,9 @@
         $scope.topicRoutes = getTopicRoutes();
 
         activate();
+
+        // API
+        vm.save = save;
 
         ////////////////
 
@@ -32,6 +35,13 @@
             return topicRouterApi.getTopicRoutes();
         }
 
+        function save(){
+            flash.addMessage({
+                level: 'success',
+                text: "Dine ændringer er gemt"
+            });
+
+        }
 
     }
 })();

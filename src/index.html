@@ -12,12 +12,12 @@
 </head>
 <body>
 	
-	<div id="applicationHost" class="container body-content admin-appHost">
+	<div id="applicationHost" class="body-content admin-appHost">
 	    <div data-ng-include="'/app/layout/shell.html'"></div>
 	</div>
 
 	<div id="footer">
-	    <div class="container">
+	    <div class="container-fluid">
 	        <span class="pull-right text-info credit">OS2 OpgaveFordeler - &copy; TBA</span>
 	    </div>
 	</div>
@@ -52,11 +52,13 @@
 
 <script src="app/home/home.controller.js"></script>
 
+<script src="app/services/flash.service.js"></script>
+
 <script src="app/services/topic-router-api.service.js"></script>
 
-<script src="app/settings/settings.controller.js"></script>
-
 <script src="app/layout/shell.controller.js"></script>
+
+<script src="app/settings/settings.controller.js"></script>
 
 <!-- endinject -->
 </body>

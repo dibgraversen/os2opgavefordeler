@@ -32,7 +32,7 @@ gulp.task('watch', ['serve'], function () {
         console.log('File changed: ' + file.path);
         server.changed(file.path);
     });
-
+    gulp.watch('src/styles/less/*.less', ['css']);
     gulp.watch(paths.appScripts, ['scripts']);
 });
 
@@ -46,7 +46,7 @@ gulp.task('injectjs', function(){
 });
 
 gulp.task('serve', ['connect'], function () {
-    require('opn')('http://localhost:9000');
+    //require('opn')('http://localhost:9000');
 });
 
 gulp.task('connect', function () {

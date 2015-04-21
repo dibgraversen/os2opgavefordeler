@@ -1,6 +1,6 @@
 <div ng-controller="ShellCtrl as vm">
-    <div id="adminNavBar" class="navbar navbar-default navbar-fixed-top">
-        <div class="container-fluid">
+    <div id="adminNavBar" class="navbar navbar-inverse navbar-default">
+        <div class="container">
             <div class="navbar-header">
                 <button type="button" ng-init="navCollapsed = true" ng-click="navCollapsed = !navCollapsed" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
                     <span class="icon-bar"></span>
@@ -14,7 +14,7 @@
             </div>
             <div class="collapse navbar-collapse" ng-class="{'in': !navCollapsed}">
                 <ul class="nav navbar-nav">
-                    <li><a data-toggle="collapse" data-target=".navbar-collapse" ui-sref="home">Home</a></li>
+                    <li><a data-toggle="collapse" data-target=".navbar-collapse" ui-sref="home">Fordelinger</a></li>
                     <li><a data-toggle="collapse" data-target=".navbar-collapse" ui-sref="settings">Indstillinger</a></li>
                     <!--<li><a data-toggle="collapse" data-target=".navbar-collapse" href="#/locations">Locations</a></li>-->
                 </ul>
@@ -28,6 +28,34 @@
         <div class="page-splash-message page-splash-message-subtle">{{vm.spinnerMessage}}</div>
     </div>
 
-    <div ui-view id="ng-view" class="container slide-animation admin-content"></div>
+    <div id="ng-view" class="container-fluid slide-animation admin-content main-content">
+        <div class="row">
+            <div class="{{  }}col-md-2">
+                <div data-ng-include="'/app/layout/side-menu.html'"></div>
+            </div>
+            <div class="col-md-10">
+                <div id="messages" style="margin-top:20px">
+                    <div class="message" ng-repeat="message in flash.getMessages">
+                        <div class="alert alert dismissable alert-{{ message.level }}" ng-animate="'fade'">
+                            <button type="button" class="close" ng-click="vm.deleteMessage(message)"><span>&times;</span></button>
+                            <div ng-show="message.title"><strong>{{ message.title }}</strong></div>
+                            {{ message.text }}
+                        </div>
+
+                    </div>
+                    <div class="message" ng-repeat="message in vm.messages">
+                        <div class="alert alert dismissable alert-{{ message.level }}" ng-animate="'fade'">
+                            <button type="button" class="close" ng-click="vm.deleteMessage(message)"><span>&times;</span></button>
+                            <div ng-show="message.title"><strong>{{ message.title }}</strong></div>
+                            {{ message.text }}
+                        </div>
+                    </div>
+                </div>
+                <div ui-view>
+
+                </div>
+            </div>
+        </div>
+    </div>
 
 </div>

@@ -3,11 +3,13 @@
 
     angular.module('topicRouter').controller('ShellCtrl', ShellCtrl);
 
-    ShellCtrl.$inject = ['$rootScope'];
+    ShellCtrl.$inject = ['$rootScope', 'flash'];
 
-    function ShellCtrl($rootScope) {
+    function ShellCtrl($rootScope, flash) {
         /* jshint validthis:true */
         var vm = this;
+
+        vm.deleteMessage = deleteMessage;
 
         vm.showSpinner = false;
         vm.spinnerMessage = 'Retrieving data...';
@@ -23,9 +25,13 @@
             color: '#428bca'
         };
 
+        vm.messages = flash.messages;
+
         activate();
 
-        function activate() { }
+        function activate() {
+
+        }
 
         $rootScope.$on('spinner.toggle', function (event, args) {
             vm.showSpinner = args.show;
@@ -33,5 +39,9 @@
                 vm.spinnerMessage = args.message;
             }
         });
+
+        function deleteMessage(message){
+            flash.deleteMessage(message);
+        }
     }
 })();

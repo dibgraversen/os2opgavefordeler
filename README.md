@@ -3,6 +3,16 @@ README for TopicRouter frontend
 This project is the frontend project for OS2 Topic Router (Opgavefordeler). 
 
 It is based on Angular and built with npm, Bower and Gulp.
+
+
+Dependencies and VCS
+---
+Npm and Bower dependencies have been checked into git for availability. Compiled stylesheets, though generated source, 
+has been checked in as well so that there is no dependency to run a compile task. 
+
+Npm
+---
+Npm defines basic Node dependencies.
  
 Bower
 ---

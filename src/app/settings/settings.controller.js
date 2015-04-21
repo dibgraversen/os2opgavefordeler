@@ -4,7 +4,7 @@
 	angular.module('topicRouter').controller('SettingsCtrl', SettingsCtrl);
 
 	/* @ngInject */
-	function SettingsCtrl($state) {
+	function SettingsCtrl() {
 		/* jshint validthis: true */
 		var vm = this;
 		vm.notesCollapsed = true;
@@ -16,12 +16,10 @@
 		////////////////
 
 		function activate() {
-			//console.log('current state data', $state.current.data);
-			console.log('settings controller')
+			console.log('settings controller');
 		}
 
 		function navigate(){
-			//$state.go('leagues');
 		}
 
 	}
