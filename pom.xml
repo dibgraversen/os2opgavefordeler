@@ -2,15 +2,17 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
    <modelVersion>4.0.0</modelVersion>
 
-   <groupId>dk.osto</groupId>
-   <artifactId>TaskRouter</artifactId>
+   <groupId>dk.os2opgavefordeler</groupId>
+   <artifactId>TopicRouter</artifactId>
    <version>1.0-SNAPSHOT</version>
    <packaging>war</packaging>
 
-   <name>OS2 Task Router</name>
+   <name>OS2 KLE Topic Router</name>
    <description>TODO</description>
 
    <properties>
+      <maven.compiler.source>1.7</maven.compiler.source>
+      <maven.compiler.target>1.7</maven.compiler.target>
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
       <maven.build.timestamp.format>yyyyMMdd'T'HHmmss</maven.build.timestamp.format>
 
@@ -143,7 +145,12 @@
          <artifactId>resteasy-jaxrs</artifactId>
       </dependency>
       -->
-
+      <dependency>
+         <groupId>com.google.guava</groupId>
+         <artifactId>guava</artifactId>
+         <version>18.0</version>
+         <scope>compile</scope>
+      </dependency>
    </dependencies>
    <build>
       <!-- Maven will append the version to the finalName (which is the name 
@@ -155,10 +162,6 @@
          <plugin>
             <artifactId>maven-compiler-plugin</artifactId>
             <version>2.3.1</version>
-            <configuration>
-               <source>1.6</source>
-               <target>1.6</target>
-            </configuration>
          </plugin>
          <plugin>
             <artifactId>maven-war-plugin</artifactId>
