@@ -57,6 +57,7 @@ public class KleImportMapper {
 	}
 
 	public static String buildDescription(VejledningKomponent vejledning) {
+		//TODO: implement!
 		return "To be implemented";
 	}
 

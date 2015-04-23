@@ -19,6 +19,7 @@
       <!-- versions for EAP 6.3.0 -->
       <version.jboss.maven.plugin>7.4.Final</version.jboss.maven.plugin>
       <version.jboss.spec.javaee.6.0>3.0.2.Final<!---redhat-13--></version.jboss.spec.javaee.6.0>
+      <version.slf4j>1.7.2</version.slf4j>
    </properties>
 
    <dependencyManagement>
@@ -150,6 +151,25 @@
          <artifactId>guava</artifactId>
          <version>18.0</version>
          <scope>compile</scope>
+      </dependency>
+
+      <dependency>
+         <groupId>org.slf4j</groupId>
+         <artifactId>slf4j-api</artifactId>
+         <version>${version.slf4j}</version>
+         <!--<scope>provided</scope>-->
+      </dependency>
+      <dependency>
+         <groupId>org.slf4j</groupId>
+         <artifactId>slf4j-simple</artifactId>
+         <version>${version.slf4j}</version>
+      </dependency>
+
+      <dependency>
+         <groupId>org.mockito</groupId>
+         <artifactId>mockito-core</artifactId>
+         <version>2.0.7-beta</version>
+         <scope>test</scope>
       </dependency>
    </dependencies>
    <build>
