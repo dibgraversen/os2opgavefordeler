@@ -1,12 +1,39 @@
 package dk.os2opgavefordeler.model.kle;
 
+import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Date;
 
-public class KleTopic {
+@Entity
+public class KleTopic implements Serializable {
+	private static final long serialVersionUID = 1L;
+
+	@ManyToOne
+	private KleGroup group;
+
+	@Id
+	@Column(nullable = false, updatable = false)
 	private final String number;
+
+	@Column(nullable = false)
 	private final String title;
+
+	@Column(nullable = false)
 	private final String description;
+
+	@Column(nullable = false)
+	@Temporal(TemporalType.DATE)
 	private final Date dateCreated;
+
+
+
+	private KleTopic() {
+		//for JPA
+		this.number = null;
+		this.title = null;
+		this.description = null;
+		this.dateCreated = null;
+	}
 
 	public KleTopic(String number, String title, String description, Date dateCreated) {
 		this.number = number;
@@ -30,7 +57,7 @@ public class KleTopic {
 	}
 
 	public Date getDateCreated() {
-		return dateCreated;
+		return new Date(dateCreated.getTime());
 	}
 
 

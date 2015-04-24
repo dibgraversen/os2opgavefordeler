@@ -73,7 +73,6 @@ public class KleImportServiceImpl implements KleImportService {
 			return groups;
 		}
 		catch(JAXBException|SAXException ex) {
-			log.error("internalImport: Error unmarshalling XML", ex);
 			//TODO: proper exception of our own
 			throw ex;
 		}

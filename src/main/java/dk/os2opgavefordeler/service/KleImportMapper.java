@@ -11,6 +11,8 @@ import dk.os2opgavefordeler.model.kle.*;
 import dk.os2opgavefordeler.model.kle_import.*;
 
 public class KleImportMapper {
+	//TODO: should we drop entries with a non-empty 'Udgaaet' date, or should we add dateExpired to the model?
+
 	public static List<KleMainGroup> mapMainGroupList(KLEEmneplanKomponent input) {
 		return Lists.transform(input.getHovedgruppe(), new Function<HovedgruppeKomponent, KleMainGroup>() {
 			public KleMainGroup apply(HovedgruppeKomponent item) {

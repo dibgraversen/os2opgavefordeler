@@ -2,17 +2,45 @@ package dk.os2opgavefordeler.model.kle;
 
 import com.google.common.collect.ImmutableList;
 
+import javax.persistence.*;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class KleGroup {
+@Entity
+public class KleGroup implements Serializable {
+	private static final long serialVersionUID = 1L;
+
+	@ManyToOne
+	private KleMainGroup mainGroup;
+
+	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	private final List<KleTopic> topics = new ArrayList<>();
 
+	@Id
+	@Column(nullable = false, updatable = false)
 	private final String number;
+
+	@Column(nullable = false)
 	private final String title;
+
+	@Column(nullable = false)
 	private final String description;
+
+	@Column(nullable = false)
+	@Temporal(TemporalType.DATE)
 	private final Date dateCreated;
+
+
+
+	private KleGroup() {
+		//for JPA
+		this.number = null;
+		this.title = null;
+		this.description = null;
+		this.dateCreated = null;
+	}
 
 	public KleGroup(String number, String title, String description, Date dateCreated) {
 		this.number = number;
@@ -51,7 +79,7 @@ public class KleGroup {
 	}
 
 	public Date getDateCreated() {
-		return dateCreated;
+		return new Date(dateCreated.getTime());
 	}
 
 
