@@ -9,13 +9,13 @@ import javax.persistence.Query;
 import java.util.List;
 
 @Stateless
-public class PersistanceServiceImpl implements PersistanceService {
+public class PersistenceServiceImpl implements PersistenceService {
 	@PersistenceContext(unitName = "OS2TopicRouter")
 	private EntityManager em;
 
 	@Override
 	public List<KleMainGroup> fetchAllKleMainGroups() {
-		final Query query = em.createQuery("SELECT e FROM Professor e");
+		final Query query = em.createQuery("SELECT e FROM KleMainGroup e");
 		final List<KleMainGroup> result = query.getResultList();
 
 		return result;

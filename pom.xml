@@ -16,30 +16,31 @@
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
       <maven.build.timestamp.format>yyyyMMdd'T'HHmmss</maven.build.timestamp.format>
 
-      <!-- versions for EAP 6.3.0 -->
-      <version.jboss.maven.plugin>7.4.Final</version.jboss.maven.plugin>
-      <version.jboss.spec.javaee.6.0>3.0.2.Final<!---redhat-13--></version.jboss.spec.javaee.6.0>
+      <version.jboss.eap>6.3.0.GA</version.jboss.eap>
       <version.slf4j>1.7.2</version.slf4j>
       <version.junit>4.11</version.junit>
    </properties>
 
    <dependencyManagement>
       <dependencies>
-         <!-- Define the version of JBoss' Java EE 6 APIs we want to import. 
-            Any dependencies from org.jboss.spec will have their version defined by this 
-            BOM -->
-         <!-- JBoss distributes a complete set of Java EE 6 APIs including 
-            a Bill of Materials (BOM). A BOM specifies the versions of a "stack" (or 
-            a collection) of artifacts. We use this here so that we always get the correct 
-            versions of artifacts. Here we use the jboss-javaee-web-6.0 stack (you can 
-            read this as the JBoss stack of the Java EE Web Profile 6 APIs), and we use 
-            version 2.0.0.Beta1 which is the latest release of the stack. You can actually 
-            use this stack with any version of JBoss AS that implements Java EE 6, not 
-            just JBoss AS 7! -->
          <dependency>
-            <groupId>org.jboss.spec</groupId>
-            <artifactId>jboss-javaee-web-6.0</artifactId>
-            <version>${version.jboss.spec.javaee.6.0}</version>
+            <groupId>org.jboss.bom.eap</groupId>
+            <artifactId>jboss-javaee-6.0-with-tools</artifactId>
+            <version>${version.jboss.eap}</version>
+            <type>pom</type>
+            <scope>import</scope>
+         </dependency>
+         <dependency>
+            <groupId>org.jboss.bom.eap</groupId>
+            <artifactId>jboss-javaee-6.0-with-resteasy</artifactId>
+            <version>${version.jboss.eap}</version>
+            <type>pom</type>
+            <scope>import</scope>
+         </dependency>
+         <dependency>
+            <groupId>org.jboss.bom.eap</groupId>
+            <artifactId>jboss-javaee-6.0-with-logging</artifactId>
+            <version>${version.jboss.eap}</version>
             <type>pom</type>
             <scope>import</scope>
          </dependency>
@@ -63,14 +64,6 @@
       <dependency>
          <groupId>org.jboss.spec.javax.annotation</groupId>
          <artifactId>jboss-annotations-api_1.1_spec</artifactId>
-         <scope>provided</scope>
-      </dependency>
-
-      <!-- Import the JAX-RS API, we use provided scope as the API is included 
-         in JBoss AS 7 -->
-      <dependency>
-         <groupId>org.jboss.spec.javax.ws.rs</groupId>
-         <artifactId>jboss-jaxrs-api_1.1_spec</artifactId>
          <scope>provided</scope>
       </dependency>
 
@@ -148,12 +141,29 @@
       </dependency>
       -->
       <dependency>
+         <groupId>org.jboss.resteasy</groupId>
+         <artifactId>resteasy-jaxrs</artifactId>
+         <scope>provided</scope>
+      </dependency>
+      <dependency>
+         <groupId>org.jboss.resteasy</groupId>
+         <artifactId>resteasy-jaxb-provider</artifactId>
+         <scope>provided</scope>
+      </dependency>
+      <dependency>
+         <groupId>org.jboss.resteasy</groupId>
+         <artifactId>resteasy-multipart-provider</artifactId>
+         <scope>provided</scope>
+      </dependency>
+
+      <dependency>
          <groupId>com.google.guava</groupId>
          <artifactId>guava</artifactId>
          <version>18.0</version>
          <scope>compile</scope>
       </dependency>
 
+      <!-- TODO: slf4j-in-jboss, how? -->
       <dependency>
          <groupId>org.slf4j</groupId>
          <artifactId>slf4j-api</artifactId>
@@ -199,7 +209,6 @@
          <plugin>
             <groupId>org.jboss.as.plugins</groupId>
             <artifactId>jboss-as-maven-plugin</artifactId>
-            <version>${version.jboss.maven.plugin}</version>
          </plugin>
       </plugins>
    </build>
@@ -241,15 +250,24 @@
          <!-- We add the JBoss repository as we need the JBoss AS connectors 
             for Arquillian -->
          <repositories>
-            <!-- The JBoss Community public repository is a composite repository 
+<repository>
+<id>jboss-ga-repository</id>
+<url>http://maven.repository.redhat.com/techpreview/all</url>
+<releases>
+<enabled>true</enabled>
+</releases>
+<snapshots>
+<enabled>false</enabled>
+</snapshots>
+</repository>
+
+            <!-- The JBoss Community public repository is a composite repository
                of several major repositories -->
             <!-- see http://community.jboss.org/wiki/MavenGettingStarted-Users -->
             <repository>
                <id>jboss-public-repository</id>
                <name>JBoss Repository</name>
                <url>http://repository.jboss.org/nexus/content/groups/public</url>
-               <!-- These optional flags are designed to speed up your builds 
-                  by reducing remote server calls -->
                <releases>
                </releases>
                <snapshots>
@@ -259,6 +277,18 @@
          </repositories>
 
          <pluginRepositories>
+<pluginRepository>
+<id>jboss-ga-plugin-repository</id>
+<url>http://maven.repository.redhat.com/techpreview/all</url>
+<releases>
+<enabled>true</enabled>
+</releases>
+<snapshots>
+<enabled>false</enabled>
+</snapshots>
+</pluginRepository>
+
+
             <pluginRepository>
                <id>jboss-public-repository</id>
                <name>JBoss Repository</name>
@@ -266,9 +296,9 @@
                <releases>
                </releases>
                <snapshots>
-                  <enabled>false</enabled>
+               <enabled>false</enabled>
                </snapshots>
-            </pluginRepository>
+               </pluginRepository>
          </pluginRepositories>
 
          <!-- An optional Arquillian testing profile that executes tests 
