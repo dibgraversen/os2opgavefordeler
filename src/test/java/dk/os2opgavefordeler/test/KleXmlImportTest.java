@@ -13,7 +13,9 @@ import dk.os2opgavefordeler.service.KleImportServiceImpl;
 import static org.junit.Assert.*;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
+@Category(UnitTest.class)
 public class KleXmlImportTest {
 	private static List<KleMainGroup> groups;
 

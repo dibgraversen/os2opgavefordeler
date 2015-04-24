@@ -20,6 +20,7 @@
       <version.jboss.maven.plugin>7.4.Final</version.jboss.maven.plugin>
       <version.jboss.spec.javaee.6.0>3.0.2.Final<!---redhat-13--></version.jboss.spec.javaee.6.0>
       <version.slf4j>1.7.2</version.slf4j>
+      <version.junit>4.11</version.junit>
    </properties>
 
    <dependencyManagement>
@@ -120,7 +121,7 @@
       <dependency>
          <groupId>junit</groupId>
          <artifactId>junit</artifactId>
-         <version>4.11</version>
+         <version>${version.junit}</version>
          <scope>test</scope>
       </dependency>
 
@@ -203,6 +204,8 @@
       </plugins>
    </build>
 
+
+
    <profiles>
       <profile>
          <!-- The default profile skips all tests, though you can tune it 
@@ -216,10 +219,18 @@
          <build>
             <plugins>
                <plugin>
+                  <groupId>org.apache.maven.plugins</groupId>
                   <artifactId>maven-surefire-plugin</artifactId>
-                  <version>2.4.3</version>
+                  <version>2.11</version>
+                  <dependencies>
+                     <dependency>
+                        <groupId>org.apache.maven.surefire</groupId>
+                        <artifactId>surefire-junit47</artifactId>
+                        <version>2.12</version>
+                     </dependency>
+                  </dependencies>
                   <configuration>
-                     <skip>true</skip>
+                     <groups>dk.os2opgavefordeler.test.UnitTest</groups>
                   </configuration>
                </plugin>
             </plugins>
@@ -323,6 +334,5 @@
             </dependency>
          </dependencies>
       </profile>
-
    </profiles>
 </project>
