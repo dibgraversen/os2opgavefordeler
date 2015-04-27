@@ -18,6 +18,7 @@
 		<maven.build.timestamp.format>yyyyMMdd'T'HHmmss</maven.build.timestamp.format>
 
 		<version.jboss.eap>6.3.0.GA</version.jboss.eap>
+		<version.org.jboss.as.plugins.maven.plugin>7.4.Final</version.org.jboss.as.plugins.maven.plugin><!-- pluginManagement versions not im -->
 		<version.slf4j>1.7.2</version.slf4j>
 		<version.junit>4.11</version.junit>
 	</properties>
@@ -123,17 +124,12 @@
 		</dependency>
 
 		<!--
-		  <dependency>
-			 <groupId>com.wordnik</groupId>
-			 <artifactId>swagger-jaxrs_2.10</artifactId>
-			 <version>1.3.12</version>
-		  </dependency>
-
-		  <dependency>
-			 <groupId>org.jboss.resteasy</groupId>
-			 <artifactId>resteasy-jaxrs</artifactId>
-		  </dependency>
-		  -->
+		<dependency>
+			<groupId>com.wordnik</groupId>
+			<artifactId>swagger-jaxrs_2.10</artifactId>
+			<version>1.3.12</version>
+		</dependency>
+		-->
 		<dependency>
 			<groupId>org.jboss.resteasy</groupId>
 			<artifactId>resteasy-jaxrs</artifactId>
@@ -200,6 +196,7 @@
 			<plugin>
 				<groupId>org.jboss.as.plugins</groupId>
 				<artifactId>jboss-as-maven-plugin</artifactId>
+				<version>${version.org.jboss.as.plugins.maven.plugin}</version>
 			</plugin>
 		</plugins>
 	</build>
@@ -215,6 +212,33 @@
 			<activation>
 				<activeByDefault>true</activeByDefault>
 			</activation>
+
+			<repositories>
+				<repository>
+					<id>jboss-ga-repository</id>
+					<url>http://maven.repository.redhat.com/techpreview/all</url>
+					<releases>
+						<enabled>true</enabled>
+					</releases>
+					<snapshots>
+						<enabled>false</enabled>
+					</snapshots>
+				</repository>
+			</repositories>
+
+			<pluginRepositories>
+				<pluginRepository>
+					<id>jboss-ga-plugin-repository</id>
+					<url>http://maven.repository.redhat.com/techpreview/all</url>
+					<releases>
+						<enabled>true</enabled>
+					</releases>
+					<snapshots>
+						<enabled>false</enabled>
+					</snapshots>
+				</pluginRepository>
+			</pluginRepositories>
+
 			<build>
 				<plugins>
 					<plugin>
@@ -237,19 +261,12 @@
 		</profile>
 
 		<profile>
+			<id>arq-jbossas-managed</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
 			<!-- We add the JBoss repository as we need the JBoss AS connectors for Arquillian -->
 			<repositories>
-				<repository>
-					<id>jboss-ga-repository</id>
-					<url>http://maven.repository.redhat.com/techpreview/all</url>
-					<releases>
-						<enabled>true</enabled>
-					</releases>
-					<snapshots>
-						<enabled>false</enabled>
-					</snapshots>
-				</repository>
-
 				<!-- The JBoss Community public repository is a composite repository of several major repositories -->
 				<!-- see http://community.jboss.org/wiki/MavenGettingStarted-Users -->
 				<repository>
@@ -266,18 +283,6 @@
 
 			<pluginRepositories>
 				<pluginRepository>
-					<id>jboss-ga-plugin-repository</id>
-					<url>http://maven.repository.redhat.com/techpreview/all</url>
-					<releases>
-						<enabled>true</enabled>
-					</releases>
-					<snapshots>
-						<enabled>false</enabled>
-					</snapshots>
-				</pluginRepository>
-
-
-				<pluginRepository>
 					<id>jboss-public-repository</id>
 					<name>JBoss Repository</name>
 					<url>http://repository.jboss.org/nexus/content/groups/public</url>
@@ -292,7 +297,6 @@
 			<!-- An optional Arquillian testing profile that executes tests in your JBoss AS instance -->
 			<!-- This profile will start a new JBoss AS instance, and execute the test, shutting it down when done -->
 			<!-- Run with: mvn clean test -Parq-jbossas-managed -->
-			<id>arq-jbossas-managed</id>
 			<dependencies>
 				<dependency>
 					<groupId>org.jboss.as</groupId>
@@ -304,6 +308,11 @@
 		</profile>
 
 		<profile>
+			<id>arq-jbossas-remote</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+
 			<!-- We add the JBoss repository as we need the JBoss AS connectors for Arquillian -->
 			<repositories>
 				<!-- The JBoss Community public repository is a composite repository of several major repositories -->
@@ -335,7 +344,6 @@
 
 			<!-- An optional Arquillian testing profile that executes tests in a remote JBoss AS instance -->
 			<!-- Run with: mvn clean test -Parq-jbossas-remote -->
-			<id>arq-jbossas-remote</id>
 			<dependencies>
 				<dependency>
 					<groupId>org.jboss.as</groupId>
