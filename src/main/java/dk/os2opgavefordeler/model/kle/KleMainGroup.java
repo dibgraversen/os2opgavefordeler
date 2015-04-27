@@ -7,12 +7,15 @@ import java.util.List;
 import com.google.common.collect.*;
 
 import javax.persistence.*;
+import javax.persistence.Table;
 
 @Entity
+@Table(name = KleMainGroup.TABLE_NAME)
 public class KleMainGroup implements Serializable {
 	private static final long serialVersionUID = 1L;
+	public static final String TABLE_NAME = "KleMainGroup";
 
-	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "parent")
 	private final List<KleGroup> groups = new ArrayList<>();
 
 	@Id
@@ -48,12 +51,15 @@ public class KleMainGroup implements Serializable {
 
 	public KleMainGroup(String number, String title, String description, Date dateCreated, List<KleGroup> groups) {
 		this(number, title, description, dateCreated);
-		this.groups.addAll(groups);
+		for (KleGroup group : groups) {
+			addGroup(group);
+		}
 	}
 
 
 
 	public void addGroup(KleGroup group) {
+		group.setParent(this);
 		groups.add(group);
 	}
 

@@ -38,11 +38,14 @@ public class KleRestEndpoint {
 		StringBuilder out = new StringBuilder();
 
 		out.append(String.format("List of %d groups: ", groups.size()));
+		int totalGroups = 0, totalTopics = 0;
 		for (KleMainGroup group : groups) {
-			out.append(String.format("Group %s/%s {'n\n", group.getNumber(), group.getTitle()));
+			out.append(String.format("Group %s/%s {\n", group.getNumber(), group.getTitle()));
+			totalGroups += group.getGroups().size();
 			for (KleGroup sub : group.getGroups()) {
 				out.append(String.format("\tSubgroup %s/%s {\n", sub.getNumber(), sub.getTitle()));
 
+				totalTopics += sub.getTopics().size();
 				for (KleTopic topic : sub.getTopics()) {
 					out.append(String.format("\t\tTopic %s/%s\n", topic.getNumber(), topic.getTitle()));
 				}
@@ -50,6 +53,7 @@ public class KleRestEndpoint {
 			}
 			out.append("}\n");
 		}
+		out.append(String.format("Total groups: %d, subgroups: %s, topics %d", groups.size(), totalGroups, totalTopics));
 
 		return Response.status(Response.Status.OK).entity(out.toString()).build();
 	}

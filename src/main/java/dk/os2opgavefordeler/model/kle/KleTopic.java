@@ -5,11 +5,14 @@ import java.io.Serializable;
 import java.util.Date;
 
 @Entity
+@Table(name = KleTopic.TABLE_NAME)
 public class KleTopic implements Serializable {
 	private static final long serialVersionUID = 1L;
+	public static final String TABLE_NAME = "KleTopic";
 
 	@ManyToOne
-	private KleGroup group;
+	@JoinColumn(name = "parent")
+	private KleGroup parent;
 
 	@Id
 	@Column(nullable = false, updatable = false)
@@ -58,6 +61,12 @@ public class KleTopic implements Serializable {
 
 	public Date getDateCreated() {
 		return new Date(dateCreated.getTime());
+	}
+
+
+
+	protected void setParent(KleGroup parent) {
+		this.parent = parent;
 	}
 
 

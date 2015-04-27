@@ -9,13 +9,16 @@ import java.util.Date;
 import java.util.List;
 
 @Entity
+@Table(name = KleGroup.TABLE_NAME)
 public class KleGroup implements Serializable {
 	private static final long serialVersionUID = 1L;
+	public static final String TABLE_NAME = "KleGroup";
 
 	@ManyToOne
-	private KleMainGroup mainGroup;
+	@JoinColumn(name = "parent")
+	private KleMainGroup parent;
 
-	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "parent")
 	private final List<KleTopic> topics = new ArrayList<>();
 
 	@Id
@@ -51,12 +54,15 @@ public class KleGroup implements Serializable {
 
 	public KleGroup(String number, String title, String description, Date dateCreated, List<KleTopic> topics) {
 		this(number, title, description, dateCreated);
-		this.topics.addAll(topics);
+		for (KleTopic topic : topics) {
+			addTopic(topic);
+		}
 	}
 
 
 
 	public void addTopic(KleTopic topic) {
+		topic.setParent(this);
 		topics.add(topic);
 	}
 
@@ -80,6 +86,12 @@ public class KleGroup implements Serializable {
 
 	public Date getDateCreated() {
 		return new Date(dateCreated.getTime());
+	}
+
+
+
+	protected void setParent(KleMainGroup parent) {
+		this.parent = parent;
 	}
 
 
