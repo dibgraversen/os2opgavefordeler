@@ -3,9 +3,9 @@
 
 	angular.module('topicRouter').factory('topicRouterApi', topicRouterApi);
 
-	topicRouterApi.$inject = ['$http']; // TODO add appSpinner
+	topicRouterApi.$inject = ['$http', '$q']; // TODO add appSpinner
 
-	function topicRouterApi($http) { // TODO add appSpinner
+	function topicRouterApi($http, $q) { // TODO add appSpinner
 		var service = {
 			getTopicRoutes: getTopicRoutes
 		};
@@ -20,7 +20,9 @@
 		return service;
 
 		function getTopicRoutes(){
-			return mockTopicRoutes();
+			var deferred = $q.defer();
+			deferred.resolve(mockTopicRoutes());
+			return deferred.promise;
 		}
 
 
@@ -47,93 +49,153 @@
 		// mock functions
 
 		function mockTopicRoutes(){
+
 			var digiJon = {
 				id: 1,
 				name: 'Digitalisering (Jon Badstue Pedersen)'
+			};
+
+			var allan = {
+				id: 2,
+				name: 'Allan Gyldendal Frederiksen'
+			};
+
+			var jon = {
+				id: 3,
+				name: 'Jon Badstue Pedersen'
 			};
 
 
 			return [
 				{
 					id: 1,
-					topic: '01 Fysisk planlægning og naturbeskyttelse',
-					orgUnit: 'Udvikling',
-					externalUnit: 'Plan, udvikling og kultur',
-					employee: '',
-					owner: {
+					kle: {
+						number: '01',
+						name: 'Fysisk planlægning og naturbeskyttelse',
+						type: 'main',
+						serviceText: 'Dette er en servicetekst til 01.'
+					},
+					rule: {
+						orgUnit: 'Udvikling',
+						externalUnit: 'Plan, udvikling og kultur'
+					},
+					responsible: {
 						id: 2,
 						name: 'Kultur Planlægning og Erhverv (Kenneth Jensen)'
 					},
+					children: [2],
 					open: true,
 					visible: true
-				},{
+				}, {
 					id: 2,
-					topic: '01.06 Geografiske informationssystemer',
-					orgUnit: 'It',
-					externalUnit: 'Digitalisering og It',
-					employee: 'Allan Gyldendal Frederiksen',
-					owner: {
+					kle: {
+						number: '01.06',
+						name: 'Geografiske informationssystemer',
+						type: 'group',
+						serviceText: 'Dette er en servicetekst til 01.06.'
+					},
+					rule: {
+						orgUnit: 'It',
+						externalUnit: 'Digitalisering og It',
+						employee: allan
+					},
+					responsible: {
 						id: 2,
 						name: 'Kultur Planlægning og Erhverv (Kenneth Jensen)'
 					},
+					children: [3,4],
 					open: true,
 					visible: true
 				},{
 					id: 3,
-					topic: '01.06.00 Geografiske informationssystemer i almindelighed',
-					orgUnit: 'Digitalisering',
-					externalUnit: 'Digitalisering og It',
-					employee: 'Allan Gyldendal Frederiksen',
-					owner: digiJon,
-					open: true,
+					kle: {
+						number: '01.06.00',
+						name: 'Geografiske informationssystemer i almindelighed',
+						type: 'topic'
+					},
+					rule: {
+						orgUnit: 'Digitalisering',
+						externalUnit: 'Digitalisering og It',
+						employee: allan
+					},
+					responsible: digiJon,
 					visible: true
 				},{
 					id: 4,
-					topic: '01.06.01 Fikspunkter',
-					orgUnit: 'Digitalisering',
-					externalUnit: 'Digitalisering og It',
-					employee: 'Allan Gyldendal Frederiksen',
-					owner: digiJon,
-					open: true,
+					kle: {
+						number: '01.06.01',
+						name: 'Fikspunkter',
+						type: 'topic'
+					},
+					rule: {
+						orgUnit: 'Digitalisering',
+						externalUnit: 'Digitalisering og It',
+						employee: allan
+					},
+					responsible: digiJon,
 					visible: true
 				},{
 					id: 5,
-					topic: '85 Kommunens administrative systemer',
-					orgUnit: 'Digitalisering',
-					externalUnit: 'Digitalisering og It',
-					employee: 'Jon Badstue Pedersen',
-					owner: {
+					kle: {
+						number: '85',
+						name: 'Kommunens administrative systemer',
+						type: 'main',
+						serviceText: 'Dette er en servicetekst til 85.'
+					},
+					rule: {
+						orgUnit: 'Digitalisering',
+						externalUnit: 'Digitalisering og It',
+						employee: jon
+					},
+					responsible: {
 						id: 3,
 						name: 'HR og Digitalisering (Eva Due)'
 					},
+					children: [6],
 					open: true,
 					visible: true
 				},{
 					id: 6,
-					topic: '85.04 Blanketter og formularer',
-					orgUnit: 'Digitalisering',
-					externalUnit: 'Digitalisering og It',
-					employee: 'Jon Badstue Pedersen',
-					owner: digiJon,
+					kle: {
+						number: '85.04',
+						name: 'Blanketter og formularer',
+						type: 'group'
+					},
+					rule: {
+						orgUnit: 'Digitalisering',
+						externalUnit: 'Digitalisering og It',
+						employee: jon
+					},
+					responsible: digiJon,
+					children: [7,8],
 					open: true,
 					visible: true
 				},{
 					id: 7,
-					topic: '85.04.00 Blanketter og formularer i almindelighed',
-					orgUnit: 'Digitalisering',
-					externalUnit: 'Digitalisering og It',
-					employee: 'Jon Badstue Pedersen',
-					owner: digiJon,
-					open: true,
+					kle: {
+						number: '85.04.00',
+						name: 'Blanketter og formularer i almindelighed',
+						type: 'topic'
+					},
+					rule: {
+						orgUnit: 'Digitalisering',
+						externalUnit: 'Digitalisering og It',
+						employee: jon
+					},
+					responsible: digiJon,
 					visible: true
 				},{
 					id: 8,
-					topic: '85.04.02 KL autoriserede standardblanketter',
-					orgUnit: 'Direktionssekretariatet',
-					externalUnit: 'Ledelsessekretariatet',
-					employee: '',
-					owner: digiJon ,
-					open: true,
+					kle: {
+						number: '85.04.02',
+						name: 'KL autoriserede standardblanketter',
+						type: 'topic'
+					},
+					rule: {
+						orgUnit: 'Direktionssekretariatet',
+						externalUnit: 'Ledelsessekretariatet'
+					},
+					responsible: digiJon ,
 					visible: true
 				}
 			];

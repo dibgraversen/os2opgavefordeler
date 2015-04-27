@@ -15,11 +15,14 @@
             <div class="collapse navbar-collapse" ng-class="{'in': !navCollapsed}">
                 <ul class="nav navbar-nav">
                     <li><a data-toggle="collapse" data-target=".navbar-collapse" ui-sref="home">Fordelinger</a></li>
-                    <li><a data-toggle="collapse" data-target=".navbar-collapse" ui-sref="settings">Indstillinger</a></li>
+                    <li><a data-toggle="collapse" data-target=".navbar-collapse" ui-sref="settings">Admin</a></li>
                     <!--<li><a data-toggle="collapse" data-target=".navbar-collapse" href="#/locations">Locations</a></li>-->
                 </ul>
+                <!--<div class="btn-group navbar-right">-->
+                    <!--<button type="button" class="btn btn-default navbar-btn" ng-click="sidemenuVisible = true" ng-class="sidemenuVisible ? 'active' : ''"><span class="glyphicon glyphicon-list"></span></button>-->
+                    <!--<button type="button" class="btn btn-default navbar-btn" ng-click="sidemenuVisible = false" ng-class="sidemenuVisible ? '' : 'active'"><span class="glyphicon glyphicon-align-justify"></span></button>-->
+                <!--</div>-->
             </div>
-
         </div>
     </div>
 
@@ -30,29 +33,24 @@
 
     <div id="ng-view" class="container-fluid slide-animation admin-content main-content">
         <div class="row">
-            <div class="{{  }}col-md-2">
+            <div class="col-md-2" ng-show="sidemenuVisible">
                 <div data-ng-include="'/app/layout/side-menu.html'"></div>
             </div>
-            <div class="col-md-10">
-                <div id="messages" style="margin-top:20px">
-                    <div class="message" ng-repeat="message in flash.getMessages">
-                        <div class="alert alert dismissable alert-{{ message.level }}" ng-animate="'fade'">
-                            <button type="button" class="close" ng-click="vm.deleteMessage(message)"><span>&times;</span></button>
-                            <div ng-show="message.title"><strong>{{ message.title }}</strong></div>
-                            {{ message.text }}
-                        </div>
-
-                    </div>
-                    <div class="message" ng-repeat="message in vm.messages">
-                        <div class="alert alert dismissable alert-{{ message.level }}" ng-animate="'fade'">
-                            <button type="button" class="close" ng-click="vm.deleteMessage(message)"><span>&times;</span></button>
-                            <div ng-show="message.title"><strong>{{ message.title }}</strong></div>
-                            {{ message.text }}
-                        </div>
-                    </div>
+            <div ng-class="sidemenuVisible ? 'col-md-10' : 'col-md-12' ">
+                <div class="pull-left" style="margin-top: 20px; margin-right: 30px">
+                    <button class="btn btn-default toggle-side" popover="Fold ud for at se sidemenu"
+                            popover-placement="right" popover-trigger="mouseenter" popover-animation="false"
+                            popover-popup-delay="1000"
+                        ng-click="sidemenuVisible = !sidemenuVisible">
+                        <span class="glyphicon" ng-class="sidemenuVisible ? 'glyphicon-arrow-left' : 'glyphicon-arrow-right'"></span>
+                    </button>
                 </div>
-                <div ui-view>
-
+                <div id="messages" style="margin-top:20px;padding-left: 70px">
+                    <alert ng-repeat="alert in alerts" type="{{alert.type}}"
+                           close="closeAlert($index)" class="animate-fade"
+                        style="width: 100%">{{alert.msg}}</alert>
+                </div>
+                <div ui-view class=""></div>
                 </div>
             </div>
         </div>

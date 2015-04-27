@@ -1,4 +1,37 @@
-td {
+/*
+  We're using CSS transitions for when
+  the enter and move events are triggered
+  for the element that has the .animate-fade
+  class
+*/
+.animate-fade.ng-enter,
+.animate-fade.ng-move,
+.animate-fade.ng-leave {
+  transition: 250ms linear all;
+}
+.animate-fade.ng-enter.ng-enter-active,
+.animate-fade.ng-move.ng-move-active,
+.animate-fade.ng-leave {
+  opacity: 1;
+}
+.animate-fade.ng-leave.ng-leave-active,
+.animate-fade.ng-enter,
+.animate-fade.ng-move {
+  opacity: 0;
+}
+.animate-show {
+  opacity: 1;
+}
+.animate-show.ng-hide-add.ng-hide-add-active,
+.animate-show.ng-hide-remove.ng-hide-remove-active {
+  transition: all linear 250ms;
+}
+.animate-show.ng-hide {
+  line-height: 0;
+  opacity: 0;
+}
+td,
+th {
   white-space: nowrap;
 }
 .padded-top {
@@ -10,4 +43,26 @@ td {
 .navbar {
   border-radius: 0;
   margin-bottom: 0;
+}
+.group > td.indent {
+  padding-left: 1.4em;
+}
+.topic > td.indent {
+  padding-left: 2.4em;
+}
+button.btn.btn-default.toggle-side {
+  height: 87vh;
+  border-radius: 5px;
+}
+button.btn.btn-default.toggle-side:hover,
+button.btn.btn-default.toggle-side.active:hover,
+button.btn.btn-default.toggle-side:active,
+button.btn.btn-default.toggle-side:focus {
+  background-color: #FFF;
+}
+.btn:focus,
+.btn:active:focus,
+.btn.active:focus {
+  outline: none;
+  box-shadow: none;
 }

@@ -3,14 +3,21 @@
 
     angular.module('topicRouter').controller('ShellCtrl', ShellCtrl);
 
-    ShellCtrl.$inject = ['$rootScope', 'flash'];
-
-    function ShellCtrl($rootScope, flash) {
+    ShellCtrl.$inject = ['$scope', '$rootScope'];
+    function ShellCtrl($scope, $rootScope) {
         /* jshint validthis:true */
         var vm = this;
 
-        vm.deleteMessage = deleteMessage;
-
+        $scope.messages = [];
+        $scope.addMessage = addMessage;
+        $scope.deleteMessage = deleteMessage;
+        $scope.alerts = [];
+        $scope.addAlert = addAlert;
+        $scope.closeAlert = closeAlert;
+        $scope.sidemenuVisible = false;
+        $scope.viewSettings = {
+            showResponsible: false
+        };
         vm.showSpinner = false;
         vm.spinnerMessage = 'Retrieving data...';
 
@@ -25,8 +32,6 @@
             color: '#428bca'
         };
 
-        vm.messages = flash.messages;
-
         activate();
 
         function activate() {
@@ -40,8 +45,22 @@
             }
         });
 
+        function addMessage(message){
+            $scope.messages.push(message);
+        }
+
         function deleteMessage(message){
-            flash.deleteMessage(message);
+            _.remove($scope.messages, {
+                text: message.text
+            });
+        }
+
+        function addAlert(alert){
+            $scope.alerts.push(alert);
+        }
+
+        function closeAlert(index){
+            $scope.alerts.splice(index, 1);
         }
     }
 })();

@@ -5,33 +5,34 @@
 	<title>OS2 OpgaveFordeler</title>
 	<meta name="description" content="">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	
+
 	<link rel="stylesheet" href="lib/bootstrap/dist/css/bootstrap.min.css">
 	<link rel="stylesheet" href="styles/app.css"/>
-	
+
 </head>
 <body>
-	
-	<div id="applicationHost" class="body-content admin-appHost">
-	    <div data-ng-include="'/app/layout/shell.html'"></div>
-	</div>
 
-	<div id="footer">
-	    <div class="container-fluid">
-	        <span class="pull-right text-info credit">OS2 OpgaveFordeler - &copy; TBA</span>
-	    </div>
-	</div>
-	
+<div id="applicationHost" class="body-content admin-appHost">
+	<div data-ng-include="'/app/layout/shell.html'"></div>
+</div>
 
-<!-- Vendor Scripts -->	
+<div id="footer">
+	<div class="container-fluid">
+		<span class="pull-right text-info credit">OS2 OpgaveFordeler - &copy; OS2</span>
+	</div>
+</div>
+
+
+<!-- Vendor Scripts -->
 <script src="lib/angular/angular.js"></script>
+<script src="lib/angular-animate/angular-animate.min.js"></script>
 <script src="lib/angular-sanitize/angular-sanitize.min.js"></script>
-<!--<script src="lib/angular-route/angular-route.min.js"></script>-->
 <script src="lib/angular-ui-router/release/angular-ui-router.min.js"></script>
-<script src="lib/lodash/lodash.min.js"></script>
-<!-- <script src="lib/moment/min/moment.min.js"></script>-->
-<script src="lib/spin.js/spin.js"></script>
 <script src="lib/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
+<!--<script src="lib/angular-route/angular-route.min.js"></script>-->
+<script src="lib/lodash/lodash.min.js"></script>
+<script src="lib/spin.js/spin.js"></script>
+<!-- <script src="lib/moment/min/moment.min.js"></script>-->
 
 <!--<script src="lib/angular-ui-calendar/src/calendar.js"></script>
 <script src="lib/fullcalendar/fullcalendar.min.js"></script>
@@ -51,8 +52,6 @@
 <script src="app/constants.js"></script>
 
 <script src="app/home/home.controller.js"></script>
-
-<script src="app/services/flash.service.js"></script>
 
 <script src="app/services/topic-router-api.service.js"></script>
 

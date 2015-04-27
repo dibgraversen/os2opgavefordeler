@@ -1,24 +1,38 @@
-<div>
+<div id="topics">
     <h2 class="page-title">Opgavefordelinger</h2>
     <div style="overflow: auto">
         <table class="table table-stripez table-hover">
             <tr>
+                <th></th>
                 <th>Opgave</th>
                 <th>Organisationsenhed</th>
-                <th>Ekstern enhed</th>
                 <th>Medarbejder</th>
-                <th>Ansvarlig organisationsenhed</th>
+                <th></th>
+                <th ng-show="viewSettings.showResponsible">Ansvarlig organisationsenhed</th>
             </tr>
-            <tr ng-repeat="topicRoute in topicRoutes">
-                <td>{{ topicRoute.topic}}</td>
-                <td>{{ topicRoute.orgUnit}}</td>
-                <td>{{ topicRoute.externalUnit}}</td>
-                <td>{{ topicRoute.employee}}</td>
-                <td>{{ topicRoute.owner.name}}</td>
+
+            <tr ng-repeat="topic in topicRoutes" ng-show="topic.visible"
+                class="{{ topic.kle.type }} animate-show" ng-class="">
+                <td class="indent">
+                    <span class="glyphicon" ng-click="toggle(topic)" ng-show="topic.children"
+                          ng-class="topic.open ? 'glyphicon-chevron-down' : 'glyphicon-chevron-right' "></span>
+                </td>
+                <td class="indent">
+                    {{ topic.kle.number }} {{ topic.kle.name }}
+                    <span ng-hide="topic.responsible" class="glyphicon glyphicon-exclamation-sign" style="color:red"></span>
+                    <span ng-show="topic.kle.serviceText"
+                          class="glyphicon glyphicon-info-sign" popover-trigger="mouseenter"
+                          popover="{{ topic.kle.serviceText }}"></span>
+                </td>
+                <td>{{ topic.rule.orgUnit }}</td>
+                <td>{{ topic.rule.employee.name }}</td>
+                <td><a href="#" class="btn btn-primary">Fordeling</a></td>
+                <td ng-show="viewSettings.showResponsible">{{ topic.responsible.name }}</td>
+
             </tr>
         </table>
     </div>
     <div class="text-right padded-top padded-bottom">
-        <button class="btn btn-primary" ng-click="vm.save()">Gem</button>
+        <button class="btn btn-primary" ng-click="save()">Gem</button>
     </div>
 </div>

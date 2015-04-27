@@ -3,7 +3,7 @@
   "version": "0.0.1-alpha",
   "authors": [
     "Henrik Loevborg <hlo@miracle.dk>",
-	"Sune Marcher <sum@miracle.dk"
+    "Sune Marcher <sum@miracle.dk"
   ],
   "private": true,
   "ignore": [
@@ -15,13 +15,14 @@
     "tests"
   ],
   "dependencies": {
-  "angular": "~1.3.15",
-	"angular-bootstrap": "~0.12.0",
-  "angular-sanitize": "~1.3.3",
-  "angular-ui-alias": "*",
-  "angular-ui-router": "~0.2.13",
-	"bootstrap": "~3.3.4",
-	"lodash": "~3.6.0",
-	"spin.js": "~2.0.2"
+    "angular": "~1.3.15",
+    "angular-animate": "~1.3.15",
+    "angular-bootstrap": "~0.12.0",
+    "angular-sanitize": "~1.3.3",
+    "angular-ui-alias": "*",
+    "angular-ui-router": "~0.2.13",
+    "bootstrap": "~3.3.4",
+    "lodash": "~3.6.0",
+    "spin.js": "~2.0.2"
   }
 }

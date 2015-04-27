@@ -22,7 +22,7 @@
 
 <div class="panel panel-default" style="margin-top:30px">
 	<div class="panel-heading">
-		Visning
+		Filtrering
 	</div>
 	<div class="panel-body">
 		<form action="">
@@ -43,6 +43,16 @@
 					<input type="radio" name="optionsRadios" id="visning3" value="option2">
 					Vis alle opgaver
 				</label>
+			</div>
+			<div class="checkbox">
+				<label>
+					<input type="checkbox" ng-model="viewSettings.showResponsible"	/> Vis ansvarlig
+				</label>
+			</div>
+			<div>
+				<input type="text" class="form-control" placeholder="Medarbejder" />
+				<div>
+				</div>
 			</div>
 		</form>
 	</div>

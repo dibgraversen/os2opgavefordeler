@@ -3,16 +3,17 @@
   var app = angular.module('topicRouter', [
     // Angular modules
     'ngSanitize',
-    
+    'ngAnimate',
+
     // 3rd Party Modules
     'ui.bootstrap',
     'ui.router',
     'ui.alias'
   ]);
-  
+
   //app.config(['$routeProvider', configRoutes]);
   app.config(['$stateProvider', '$urlRouterProvider', configRoutes]);
-  
+
   function configRoutes($stateProvider, $urlRouterProvider){
     $stateProvider
         .state('home', {
@@ -29,9 +30,9 @@
         });
     $urlRouterProvider.otherwise('/');
   }
-  
+
   app.run(['$state', function($state){
     // Include $route to kick start the router.
   }]);
-  
+
 })();

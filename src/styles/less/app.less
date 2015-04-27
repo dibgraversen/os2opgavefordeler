@@ -1,8 +1,11 @@
+@import 'animations';
+@import '../../lib/bootstrap/less/mixins/border-radius';
+
 .main-content {
 	//margin-top: 50px;
 }
 
-td {
+td, th {
 	white-space: nowrap;
 }
 
@@ -18,3 +21,27 @@ td {
 	border-radius: 0;
 	margin-bottom: 0;
 }
+
+.group > td.indent {
+	padding-left: 1.4em
+}
+
+.topic> td.indent {
+	padding-left: 2.4em
+}
+
+button.btn.btn-default.toggle-side {
+	height: 87vh;
+	border-radius: 5px;
+	&:hover, &.active:hover, &:active, &:focus {
+		background-color: #FFF;
+	}
+}
+
+.btn {
+	&:focus, &:active:focus, &.active:focus {
+		outline:none;
+		box-shadow:none;
+	}
+}
+

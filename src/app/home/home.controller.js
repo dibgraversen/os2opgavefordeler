@@ -3,28 +3,40 @@
 
     angular.module('topicRouter').controller('HomeCtrl', HomeCtrl);
 
-    HomeCtrl.$inject = ['$scope', 'topicRouterApi', '$state', 'flash'];
+    HomeCtrl.$inject = ['$scope', 'topicRouterApi', '$state', '$q'];
 
     /* @ngInject */
-    function HomeCtrl($scope, topicRouterApi, $state, flash) {
+    function HomeCtrl($scope, topicRouterApi, $state, $q) {
         /* jshint validthis: true */
-        var vm = this;
-        vm.notesCollapsed = true;
-        vm.navigate = navigate;
-        vm.activate = activate;
+        //var vm = this;
+        //vm.notesCollapsed = true;
+        //vm.navigate = navigate;
+        //vm.activate = activate;
 
-        $scope.topicRoutes = getTopicRoutes();
+        $scope.filterText = '';
+        $scope.topicRoutes = null;
+        var nodes = {};
 
         activate();
 
         // API
-        vm.save = save;
+        $scope.save = save;
+        $scope.toggle = toggle;
 
         ////////////////
 
         function activate() {
             console.log('home controller init');
-            //console.log('current state data', $state.current.data);
+            // TODO byg nodes map;
+
+            getTopicRoutes().then(function(data){
+                $scope.topicRoutes = data;
+                _.each(data, function(item){
+                    nodes[item.id] = item;
+                });
+            });
+
+            // TODO $q this.
         }
 
         function navigate(){
@@ -36,11 +48,26 @@
         }
 
         function save(){
-            flash.addMessage({
-                level: 'success',
-                text: "Dine ændringer er gemt"
+            $scope.addAlert({
+                type: 'success',
+                msg: "Dine ændringer er gemt"
             });
+        }
 
+        function toggle(node){
+            node.open = !node.open;
+            toggleChildren(node.children, node.open);
+        }
+
+
+        function toggleChildren(children, visible){
+            if(children){
+                _.each(children, function(childId){
+                    var child = nodes[childId];
+                    child.visible = visible;
+                    toggleChildren(child.children, child.open && visible);
+                });
+            }
         }
 
     }
