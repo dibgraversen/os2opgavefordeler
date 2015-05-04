@@ -1,0 +1,74 @@
+@startuml
+title SOFD Domain
+
+class Kommune {
+  String navn
+}
+
+class Regel {
+  Date aktivFra
+  Date aktivTil
+  String mærke
+}
+
+class KLE {
+  String nummer
+  String navn
+  Date udgået
+  String serviceText
+  Date oprettet
+  Organisation ansvarlig
+  String emne
+}
+
+class OrganisationsProperty {
+  String nøgle?
+  String navn
+  String id
+  String beskrivelse
+  boolean præsentér
+}
+
+class OpgaveFordeling {
+  String name
+  KLE KLE
+  Medarbejder medarbejder
+  String ESDHId
+  Organisation organisationsEnhed
+  EksternOrganisation eksternOrganisation
+}
+
+class Medarbejder {
+  String name
+  String initialer
+  String email
+  String ESDHId
+  EksternOrganisation eksternOrganisation
+  String stillingsBetegnelse
+  boolean aktiv
+  boolean erLeder()
+  
+}
+
+class Organisation {
+  Medarbejder leder
+  Organisation parent
+  String name
+  String ESDHId
+  boolean aktiv
+  
+}
+
+Kommune -- Medarbejder
+Kommune -- Organisation
+Organisation - Organisation
+Organisation - OrganisationsProperty
+Organisation -- OpgaveFordeling
+Organisation -- KLE
+Medarbejder -- OpgaveFordeling
+OpgaveFordeling - KLE
+Bruger - Medarbejder
+Medarbejder - Organisation
+OpgaveFordeling -- Regel
+
+@enduml
