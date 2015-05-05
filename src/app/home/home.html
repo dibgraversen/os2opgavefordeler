@@ -8,10 +8,11 @@
                 <th>Organisationsenhed</th>
                 <th>Medarbejder</th>
                 <th></th>
-                <th ng-show="viewSettings.showResponsible">Ansvarlig organisationsenhed</th>
+                <th ng-show="settings.showResponsible">Ansvarlig organisationsenhed</th>
+                <th ng-show="settings.showResponsible"></th>
             </tr>
 
-            <tr ng-repeat="topic in topicRoutes" ng-show="topic.visible"
+            <tr ng-repeat="topic in topicRoutes | filter:filter.text" ng-show="topic.visible"
                 class="{{ topic.kle.type }} animate-show" ng-class="">
                 <td class="indent">
                     <span class="glyphicon" ng-click="toggle(topic)" ng-show="topic.children"
@@ -22,17 +23,22 @@
                     <span ng-hide="topic.responsible" class="glyphicon glyphicon-exclamation-sign" style="color:red"></span>
                     <span ng-show="topic.kle.serviceText"
                           class="glyphicon glyphicon-info-sign" popover-trigger="mouseenter"
-                          popover="{{ topic.kle.serviceText }}"></span>
+                          popover="{{ topic.kle.serviceText }}" popover-placement="right"></span>
                 </td>
                 <td>{{ topic.rule.orgUnit }}</td>
                 <td>{{ topic.rule.employee.name }}</td>
-                <td><a href="#" class="btn btn-primary">Fordeling</a></td>
-                <td ng-show="viewSettings.showResponsible">{{ topic.responsible.name }}</td>
+                <td class="button"><button class="btn btn-default" popover-placement="left"
+                                           popover="klik her for at vedligholde fordelingsregler"
+                    popover-trigger="mouseenter" popover-popup-delay="1000" ng-click="editRule(topic)">Fordeling</button></td>
+                <td ng-show="settings.showResponsible">{{ topic.responsible.name }}</td>
+                <td class="button" ng-show="settings.showResponsible">
+                    <button class="btn btn-default">Ansvar</button>
+                </td>
 
             </tr>
         </table>
     </div>
     <div class="text-right padded-top padded-bottom">
-        <button class="btn btn-primary" ng-click="save()">Gem</button>
+        <button class="btn btn-default" ng-click="save()">Gem</button>
     </div>
 </div>

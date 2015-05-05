@@ -3,21 +3,31 @@
 
     angular.module('topicRouter').controller('ShellCtrl', ShellCtrl);
 
-    ShellCtrl.$inject = ['$scope', '$rootScope'];
-    function ShellCtrl($scope, $rootScope) {
+    ShellCtrl.$inject = ['$scope', '$rootScope', '$state', 'topicRouterApi'];
+
+    function ShellCtrl($scope, $rootScope, $state, topicRouterApi) {
         /* jshint validthis:true */
         var vm = this;
+        $scope.$state = $state;
 
-        $scope.messages = [];
-        $scope.addMessage = addMessage;
-        $scope.deleteMessage = deleteMessage;
         $scope.alerts = [];
         $scope.addAlert = addAlert;
         $scope.closeAlert = closeAlert;
-        $scope.sidemenuVisible = false;
-        $scope.viewSettings = {
+
+        $scope.sidemenuVisible = true;
+        $scope.settings = {
             showResponsible: false
         };
+
+        $scope.roles = [];
+        $scope.changeRole = changeRole;
+
+        $scope.filter = {
+            text: '',
+            whichTasks: 'all'
+        };
+        $scope.updateFilter = updateFilter;
+
         vm.showSpinner = false;
         vm.spinnerMessage = 'Retrieving data...';
 
@@ -35,7 +45,10 @@
         activate();
 
         function activate() {
-
+            topicRouterApi.getRoles().then(function(data){
+                $scope.roles = data;
+                $scope.settings.currentUser = data[0];
+            });
         }
 
         $rootScope.$on('spinner.toggle', function (event, args) {
@@ -45,22 +58,22 @@
             }
         });
 
-        function addMessage(message){
-            $scope.messages.push(message);
-        }
-
-        function deleteMessage(message){
-            _.remove($scope.messages, {
-                text: message.text
-            });
-        }
-
         function addAlert(alert){
             $scope.alerts.push(alert);
         }
 
         function closeAlert(index){
             $scope.alerts.splice(index, 1);
+        }
+
+        function changeRole(){
+            console.log('switching user');
+            console.log($scope.settings.currentUser);
+            console.log($state);
+        }
+
+        function updateFilter(){
+            console.log($scope.filter);
         }
     }
 })();

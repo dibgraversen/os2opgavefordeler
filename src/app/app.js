@@ -8,7 +8,8 @@
     // 3rd Party Modules
     'ui.bootstrap',
     'ui.router',
-    'ui.alias'
+    'ui.alias',
+    'app.config'
   ]);
 
   //app.config(['$routeProvider', configRoutes]);
@@ -27,8 +28,14 @@
           templateUrl: 'app/settings/settings.html',
           controller: 'SettingsCtrl',
           controllerAs: 'vm'
+        })
+        .state('municipalityAdmin', {
+          url: '/municipalityAdmin',
+          templateUrl: 'app/municipality-admin/municipality-admin.html',
+          controller: 'MunicipalityAdminCtrl',
+          controllerAs: 'vm'
         });
-    $urlRouterProvider.otherwise('/');
+    $urlRouterProvider.otherwise('home');
   }
 
   app.run(['$state', function($state){

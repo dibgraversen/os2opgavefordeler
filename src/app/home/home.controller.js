@@ -1,20 +1,18 @@
 (function () {
     'use strict';
 
-    angular.module('topicRouter').controller('HomeCtrl', HomeCtrl);
+    var app = angular.module('topicRouter');
 
-    HomeCtrl.$inject = ['$scope', 'topicRouterApi', '$state', '$q'];
+    app.controller('HomeCtrl', HomeCtrl);
+
+    HomeCtrl.$inject = ['$scope', 'topicRouterApi', '$state', '$q', '$modal', 'serverUrl'];
 
     /* @ngInject */
-    function HomeCtrl($scope, topicRouterApi, $state, $q) {
+    function HomeCtrl($scope, topicRouterApi, $state, $q, $modal, serverUrl) {
         /* jshint validthis: true */
-        //var vm = this;
-        //vm.notesCollapsed = true;
-        //vm.navigate = navigate;
-        //vm.activate = activate;
 
-        $scope.filterText = '';
-        $scope.topicRoutes = null;
+        $scope.topicRoutes = [];
+        $scope.filteredTopicRoutes = [];
         var nodes = {};
 
         activate();
@@ -22,21 +20,19 @@
         // API
         $scope.save = save;
         $scope.toggle = toggle;
+        $scope.editRule = editRule;
 
         ////////////////
 
         function activate() {
-            console.log('home controller init');
-            // TODO byg nodes map;
-
+            console.log(serverUrl);
             getTopicRoutes().then(function(data){
                 $scope.topicRoutes = data;
+                $scope.filteredTopicRoutes = data;
                 _.each(data, function(item){
                     nodes[item.id] = item;
                 });
             });
-
-            // TODO $q this.
         }
 
         function navigate(){
@@ -70,5 +66,18 @@
             }
         }
 
+        function editRule(topic){
+            $modal.open({
+                //scope: $scope,
+                resolve: {
+                    topic: function(){
+                        return topic;
+                    }
+                },
+                templateUrl: 'app/home/edit-rule-modal.html',
+                controller: 'EditRuleModalInstanceCtrl',
+                size: 'lg'
+            });
+        }
     }
 })();

@@ -13,10 +13,12 @@
     "gulp-less": "^3.0.2",
     "gulp-livereload": "^2.1.1",
     "gulp-load-plugins": "^0.7.1",
+    "gulp-ng-constant": "^0.3.0",
     "gulp-size": "^1.1.0",
     "gulp-util": "^2.2.20",
     "jshint-stylish": "^1.0.0",
-    "opn": "^1.0.0"
+    "opn": "^1.0.0",
+    "yargs": "^3.8.0"
   },
   "engines": {
     "node": ">=0.10.0"

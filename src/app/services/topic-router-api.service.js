@@ -7,7 +7,8 @@
 
 	function topicRouterApi($http, $q) { // TODO add appSpinner
 		var service = {
-			getTopicRoutes: getTopicRoutes
+			getTopicRoutes: getTopicRoutes,
+			getRoles: getRoles
 		};
 
 		var baseUrl = ''; // TODO add server base url
@@ -22,6 +23,12 @@
 		function getTopicRoutes(){
 			var deferred = $q.defer();
 			deferred.resolve(mockTopicRoutes());
+			return deferred.promise;
+		}
+
+		function getRoles(){
+			var deferred = $q.defer();
+			deferred.resolve(getMockRoles());
 			return deferred.promise;
 		}
 
@@ -56,12 +63,12 @@
 			};
 
 			var allan = {
-				id: 2,
+				id: 4,
 				name: 'Allan Gyldendal Frederiksen'
 			};
 
 			var jon = {
-				id: 3,
+				id: 5,
 				name: 'Jon Badstue Pedersen'
 			};
 
@@ -69,12 +76,9 @@
 			return [
 				{
 					id: 1,
-					kle: {
-						number: '01',
-						name: 'Fysisk planlægning og naturbeskyttelse',
-						type: 'main',
-						serviceText: 'Dette er en servicetekst til 01.'
-					},
+					kle: createKLE('01', 'Fysisk planlægning og naturbeskyttelse',
+							'main', 'Dette er en servicetekst til 01.'
+					),
 					rule: {
 						orgUnit: 'Udvikling',
 						externalUnit: 'Plan, udvikling og kultur'
@@ -199,6 +203,46 @@
 					visible: true
 				}
 			];
+		}
+
+		function getMockRoles(){
+			return [
+				{
+					id: 1,
+					employment: 1,
+					name: 'Henrik (dig)',
+					admin: false,
+					municipalityAdmin: false,
+					substitute: false
+				},{
+					id: 2,
+				  name: 'Admin',
+					admin: true,
+					municipalityAdmin: false,
+					substitute: false
+				},{
+					id: 3,
+					name: 'Jørgen Jensen',
+					admin: false,
+					municipalityAdmin: true,
+					substitute: true
+				}, {
+					id: 4,
+					name: 'Hans Jørgensen',
+					admin: true,
+					municipalityAdmin: true,
+					substitute: true
+				}
+			];
+		}
+
+		function createKLE(number, name, type, serviceText){
+			return {
+				number: number,
+				name: name,
+				type: type,
+				serviceText: serviceText
+			};
 		}
 	}
 })();

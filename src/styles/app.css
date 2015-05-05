@@ -30,9 +30,13 @@
   line-height: 0;
   opacity: 0;
 }
-td,
-th {
+.table td,
+.table th {
   white-space: nowrap;
+}
+.table td.button,
+.table th.button {
+  padding: 4px;
 }
 .padded-top {
   padding-top: 20px;

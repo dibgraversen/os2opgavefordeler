@@ -1,0 +1,30 @@
+<div>
+	<div class="modal-header">
+		<h3 class="modal-title">Vedlighold fordelingsregel</h3>
+	</div>
+	<div class="modal-body">
+		<div>Vedlighold af regel for: '{{ topic.kle.number }} {{ topic.kle.name }}'</div>
+		<dl class="dl-horizontal">
+			<dt>Ansvarlig enhed:</dt>
+			<dd>{{ topic.rule.orgUnit }}</dd>
+			<dt>Ansvarlig person: </dt>
+			<dd>{{ topic.rule.employee.name }}</dd>
+		</dl>
+		<div>
+			<tabset justified="true">
+				<tab heading="Vælg ny enhed">
+					Her kan du vælge en ny enhed.
+				</tab>
+				<tab heading="Vælg ny medarbejder">
+					Her kan du vælge en ny medarbejder.
+				</tab>
+			</tabset>
+
+
+		</div>
+	</div>
+	<div class="modal-footer">
+		<button class="btn btn-primary" ng-click="ok()">Gem</button>
+		<button class="btn btn-warning" ng-click="cancel()">Annuller</button>
+	</div>
+</div>

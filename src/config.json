@@ -1,0 +1,8 @@
+{
+  "dev": {
+    "serverUrl": "localhost:8080/topicRouter/rest/"
+  },
+  "prod": {
+    "serverUrl": "someserver.dk/topicRouter/rest/"
+  }
+}

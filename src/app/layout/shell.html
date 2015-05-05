@@ -7,15 +7,24 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="/">
+                <a class="navbar-brand" ui-sref="home">
                     <i class="icon-home"></i>
                     <span>OS2 OpgaveFordeler</span>
                 </a>
             </div>
             <div class="collapse navbar-collapse" ng-class="{'in': !navCollapsed}">
                 <ul class="nav navbar-nav">
-                    <li><a data-toggle="collapse" data-target=".navbar-collapse" ui-sref="home">Fordelinger</a></li>
-                    <li><a data-toggle="collapse" data-target=".navbar-collapse" ui-sref="settings">Admin</a></li>
+                    <li ng-class="{ active: $state.is('home') }">
+                        <a data-toggle="collapse" data-target=".navbar-collapse" ui-sref="home">
+                            Fordelinger
+                        </a>
+                    </li>
+                    <li ng-show="settings.currentUser.admin"  ng-class="{ active: $state.is('settings') }">
+                        <a data-toggle="collapse" data-target=".navbar-collapse" ui-sref="settings">Admin</a>
+                    </li>
+                    <li ng-show="settings.currentUser.municipalityAdmin"  ng-class="{ active: $state.is('municipalityAdmin') }">
+                        <a data-toggle="collapse" data-target=".navbar-collapse" ui-sref="municipalityAdmin">Administrer kommune</a>
+                    </li>
                     <!--<li><a data-toggle="collapse" data-target=".navbar-collapse" href="#/locations">Locations</a></li>-->
                 </ul>
                 <!--<div class="btn-group navbar-right">-->

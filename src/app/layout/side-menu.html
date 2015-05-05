@@ -4,16 +4,11 @@
 	</div>
 	<div class="panel-body">
 		<form action="">
-			<div class="radio">
+			<div class="radio" ng-repeat="role in roles">
 				<label>
-					<input type="radio" name="optionsRadios" id="optionsRadios1" value="option1" checked>
-					Admin
-				</label>
-			</div>
-			<div class="radio">
-				<label>
-					<input type="radio" name="optionsRadios" id="optionsRadios2" value="option2">
-					Jørgen Jensen
+					<input type="radio" name="roleRadios" ng-model="settings.currentUser"
+								 ng-value="role" ng-change="changeRole()" />
+					{{ role.name }}
 				</label>
 			</div>
 		</form>
@@ -28,31 +23,33 @@
 		<form action="">
 			<div class="radio">
 				<label>
-					<input type="radio" name="optionsRadios" id="visning1" value="option1" checked>
+					<input type="radio" name="filterByResponsibility" id="visning1"
+							ng-model="filter.whichTasks" value="mine">
 					Vis kun opgaver jeg selv er ansvarlig for
 				</label>
 			</div>
 			<div class="radio">
 				<label>
-					<input type="radio" name="optionsRadios" id="visning2" value="option2">
+					<input type="radio" name="filterByResponsibility" id="visning2"
+							 ng-model="filter.whichTasks" value="allMy">
 					Vis også opgaver jeg er indirekte ansvarlig for
 				</label>
 			</div>
 			<div class="radio">
 				<label>
-					<input type="radio" name="optionsRadios" id="visning3" value="option2">
+					<input type="radio" name="filterByResponsibility" id="visning3"
+							ng-model="filter.whichTasks" value="all">
 					Vis alle opgaver
 				</label>
 			</div>
 			<div class="checkbox">
 				<label>
-					<input type="checkbox" ng-model="viewSettings.showResponsible"	/> Vis ansvarlig
+					<input type="checkbox" ng-model="settings.showResponsible"	/> Vis ansvarlig
 				</label>
 			</div>
 			<div>
-				<input type="text" class="form-control" placeholder="Medarbejder" />
-				<div>
-				</div>
+				<input type="text" class="form-control" placeholder="Filter"
+							 ng-model="filter.text" />
 			</div>
 		</form>
 	</div>
