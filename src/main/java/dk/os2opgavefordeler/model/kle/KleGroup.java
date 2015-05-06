@@ -10,7 +10,7 @@ import java.util.List;
 
 @Entity
 @Table(name = KleGroup.TABLE_NAME)
-public class KleGroup implements Serializable {
+public class KleGroup implements Serializable, KleParent {
 	private static final long serialVersionUID = 1L;
 	public static final String TABLE_NAME = "KleGroup";
 

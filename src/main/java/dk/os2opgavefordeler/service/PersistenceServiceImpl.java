@@ -8,12 +8,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import java.util.List;
 
 @Stateless
+@TransactionAttribute(value = TransactionAttributeType.REQUIRES_NEW)
 public class PersistenceServiceImpl implements PersistenceService {
 	private final Logger log = LoggerFactory.getLogger(getClass());
 
@@ -32,6 +36,20 @@ public class PersistenceServiceImpl implements PersistenceService {
 		log.info("Returning result");
 
 		return result;
+	}
+
+	@Override
+	public KleMainGroup fetchMainGroup(String number) {
+		final Query query = em.createQuery("SELECT e FROM KleMainGroup e where e.number = :number");
+		query.setParameter("number", number);
+		try {
+			return (KleMainGroup) query.getSingleResult();
+		}
+		catch(NoResultException ex) {
+			log.warn("fetchMainGroup: no results for [{}]", number, ex);
+			//TODO: Java8 Optional?
+			return null;
+		}
 	}
 
 	@Override

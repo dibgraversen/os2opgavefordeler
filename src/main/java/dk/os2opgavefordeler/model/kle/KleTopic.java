@@ -6,7 +6,7 @@ import java.util.Date;
 
 @Entity
 @Table(name = KleTopic.TABLE_NAME)
-public class KleTopic implements Serializable {
+public class KleTopic implements Serializable, KleParent {
 	private static final long serialVersionUID = 1L;
 	public static final String TABLE_NAME = "KleTopic";
 

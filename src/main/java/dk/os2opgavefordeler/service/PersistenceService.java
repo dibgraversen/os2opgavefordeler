@@ -6,5 +6,8 @@ import java.util.List;
 
 public interface PersistenceService {
 	List<KleMainGroup> fetchAllKleMainGroups();
+	KleMainGroup fetchMainGroup(String number);
+
 	void storeAllKleMainGroups(List<KleMainGroup> groups);
+
 }

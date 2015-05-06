@@ -58,6 +58,21 @@ public class KleRestEndpoint {
 		return Response.status(Response.Status.OK).entity(out.toString()).build();
 	}
 
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	@Path("/groups/{number}")
+	public Response getGroup(@PathParam("number") String number)
+	{
+		KleMainGroup group = persistence.fetchMainGroup(number);
+		if(group != null) {
+			log.info("returning group");
+			return Response.status(Response.Status.OK).entity(group).build();
+		} else {
+			return Response.status(Response.Status.NOT_FOUND).build();
+		}
+	}
+
+
 
 	@POST @NoCache
 	@Path("/import")
