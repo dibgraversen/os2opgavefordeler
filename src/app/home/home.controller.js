@@ -25,7 +25,6 @@
         ////////////////
 
         function activate() {
-            console.log(serverUrl);
             getTopicRoutes().then(function(data){
                 $scope.topicRoutes = data;
                 $scope.filteredTopicRoutes = data;
