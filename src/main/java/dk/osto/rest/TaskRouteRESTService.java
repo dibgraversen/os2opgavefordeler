@@ -5,11 +5,12 @@ import dk.osto.data.TopicRouteMockProvider;
 import dk.osto.model.TaskRoute;
 import dk.osto.model.presentation.TopicRoutePO;
 
-import javax.jws.WebParam;
 import javax.ws.rs.GET;
+import javax.ws.rs.OPTIONS;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Response;
 import java.util.List;
 
 /**
@@ -32,6 +33,33 @@ public class TaskRouteRESTService {
 	public List<TopicRoutePO> employmentRoutes(@QueryParam("employment")int employment, @QueryParam("scope")String scope){
 		return new TopicRouteMockProvider().employmentRoutes(employment, scope);
 	}
+
+	@OPTIONS
+	@Produces("application/json")
+	public Response getOptions(){
+		Response response = Response.ok().build();
+//		response.getMetadata().putSingle("Access-Control-Allow-Origin", "*");
+//		response.getMetadata().putSingle("Access-Control-Allow-Headers", "Content-Type, X-Requested-With");
+//		response.getMetadata().putSingle("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+		return response;
+	}
+
+	// ret distribution rule.
+	  // liste af orgs.
+	  // liste af brugere.
+	// ret ansvar
+	  // liste af orgs.
+
+	// REST interface
+	  // enkelt opslag baseret på KLE men scopet af kommune.
+
+	// settings
+	// kommune interface.
+	  // CRUD org.
+	// sysadm interface.
+	  // CRUD kommuner.
+	  // Upload KLE struktur.
+
 
 	/**
 	 * Example endpoint
