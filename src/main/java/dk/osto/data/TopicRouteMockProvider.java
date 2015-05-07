@@ -4,7 +4,6 @@ import dk.osto.model.KLE;
 import dk.osto.model.presentation.TopicRoutePO;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
