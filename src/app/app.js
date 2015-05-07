@@ -38,6 +38,13 @@
     $urlRouterProvider.otherwise('home');
   }
 
+  app.config(['$httpProvider', setupCors]);
+
+  function setupCors($httpProvider){
+    //$httpProvider.defaults.useXDomain = true;
+    //delete $httpProvider.defaults.headers.common['X-Requested-With'];
+  }
+
   app.run(['$state', function($state){
     // Include $route to kick start the router.
   }]);
