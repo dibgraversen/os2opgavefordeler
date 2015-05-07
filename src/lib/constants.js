@@ -2,6 +2,6 @@
 	'use strict';
 	angular.module("app.config", [])
 
-.constant("serverUrl", "localhost:8080/topicRouter/rest/")
+.constant("serverUrl", "http://127.0.0.1:8080/TopicRouter/rest")
 
 ;})();

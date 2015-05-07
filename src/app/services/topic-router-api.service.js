@@ -3,26 +3,49 @@
 
 	angular.module('topicRouter').factory('topicRouterApi', topicRouterApi);
 
-	topicRouterApi.$inject = ['$http', '$q']; // TODO add appSpinner
+	topicRouterApi.$inject = ['$http', '$q', 'serverUrl']; // TODO add appSpinner
 
-	function topicRouterApi($http, $q) { // TODO add appSpinner
+	function topicRouterApi($http, $q, serverUrl) { // TODO add appSpinner
 		var service = {
 			getTopicRoutes: getTopicRoutes,
 			getRoles: getRoles
 		};
 
-		var baseUrl = ''; // TODO add server base url
+		var baseUrl = serverUrl;
 		var requestConfig = {
 			headers: {
-				'SOME-HEADER': 'ASDFASDFASDFASDF'
+				//'SOME-HEADER': 'ASDFASDFASDFASDF'
 			}
 		};
 
 		return service;
 
 		function getTopicRoutes(){
+			//MOCK
+			//var deferred = $q.defer();
+			//deferred.resolve(mockTopicRoutes());
+			//return deferred.promise;
+			//MOCK
 			var deferred = $q.defer();
-			deferred.resolve(mockTopicRoutes());
+
+			var users = getUsers();
+			var orgs = getOrganisations();
+
+			httpGet('/taskRoutes', {
+				params: {
+					employment: '1',
+					scope: 'all'
+				}
+			}).then(function(data){
+				_.each(data, function(rule){
+					// TODO children.
+					rule.employee = users[rule.employee];
+					rule.org = orgs[rule.org];
+					rule.open = true;
+					rule.visible = true;
+				});
+				deferred.resolve(data);
+			});
 			return deferred.promise;
 		}
 
@@ -47,7 +70,7 @@
 				data: data,
 				headers: requestConfig.headers }).then(function(response){
 
-				appSpinner.hideSpinner();
+				//appSpinner.hideSpinner();
 				console.log('**response from EXECUTE', response);
 				return response.data;
 			});
@@ -56,21 +79,10 @@
 		// mock functions
 
 		function mockTopicRoutes(){
-
-			var digiJon = {
-				id: 1,
-				name: 'Digitalisering (Jon Badstue Pedersen)'
-			};
-
-			var allan = {
-				id: 4,
-				name: 'Allan Gyldendal Frederiksen'
-			};
-
-			var jon = {
-				id: 5,
-				name: 'Jon Badstue Pedersen'
-			};
+			var users = getUsers();
+			var digiJon = users[4];
+			var allan = users[1];
+			var jon = users[5];
 
 
 			return [
@@ -98,11 +110,9 @@
 						type: 'group',
 						serviceText: 'Dette er en servicetekst til 01.06.'
 					},
-					rule: {
-						orgUnit: 'It',
-						externalUnit: 'Digitalisering og It',
-						employee: allan
-					},
+					orgUnit: 'It',
+					externalUnit: 'Digitalisering og It',
+					employee: allan,
 					responsible: {
 						id: 2,
 						name: 'Kultur Planlægning og Erhverv (Kenneth Jensen)'
@@ -117,11 +127,9 @@
 						name: 'Geografiske informationssystemer i almindelighed',
 						type: 'topic'
 					},
-					rule: {
-						orgUnit: 'Digitalisering',
-						externalUnit: 'Digitalisering og It',
-						employee: allan
-					},
+					orgUnit: 'Digitalisering',
+					externalUnit: 'Digitalisering og It',
+					employee: allan,
 					responsible: digiJon,
 					visible: true
 				},{
@@ -131,11 +139,9 @@
 						name: 'Fikspunkter',
 						type: 'topic'
 					},
-					rule: {
-						orgUnit: 'Digitalisering',
-						externalUnit: 'Digitalisering og It',
-						employee: allan
-					},
+					orgUnit: 'Digitalisering',
+					externalUnit: 'Digitalisering og It',
+					employee: allan,
 					responsible: digiJon,
 					visible: true
 				},{
@@ -146,11 +152,9 @@
 						type: 'main',
 						serviceText: 'Dette er en servicetekst til 85.'
 					},
-					rule: {
-						orgUnit: 'Digitalisering',
-						externalUnit: 'Digitalisering og It',
-						employee: jon
-					},
+					orgUnit: 'Digitalisering',
+					externalUnit: 'Digitalisering og It',
+					employee: jon,
 					responsible: {
 						id: 3,
 						name: 'HR og Digitalisering (Eva Due)'
@@ -165,11 +169,9 @@
 						name: 'Blanketter og formularer',
 						type: 'group'
 					},
-					rule: {
-						orgUnit: 'Digitalisering',
-						externalUnit: 'Digitalisering og It',
-						employee: jon
-					},
+					orgUnit: 'Digitalisering',
+					externalUnit: 'Digitalisering og It',
+					employee: jon,
 					responsible: digiJon,
 					children: [7,8],
 					open: true,
@@ -181,11 +183,9 @@
 						name: 'Blanketter og formularer i almindelighed',
 						type: 'topic'
 					},
-					rule: {
-						orgUnit: 'Digitalisering',
-						externalUnit: 'Digitalisering og It',
-						employee: jon
-					},
+					orgUnit: 'Digitalisering',
+					externalUnit: 'Digitalisering og It',
+					employee: jon,
 					responsible: digiJon,
 					visible: true
 				},{
@@ -195,10 +195,8 @@
 						name: 'KL autoriserede standardblanketter',
 						type: 'topic'
 					},
-					rule: {
-						orgUnit: 'Direktionssekretariatet',
-						externalUnit: 'Ledelsessekretariatet'
-					},
+					orgUnit: 'Direktionssekretariatet',
+					externalUnit: 'Ledelsessekretariatet',
 					responsible: digiJon ,
 					visible: true
 				}
@@ -216,7 +214,7 @@
 					substitute: false
 				},{
 					id: 2,
-				  name: 'Admin',
+					name: 'Admin',
 					admin: true,
 					municipalityAdmin: false,
 					substitute: false
@@ -234,6 +232,32 @@
 					substitute: true
 				}
 			];
+		}
+
+		function getUsers() {
+			return {
+				4: {
+					id: 1,
+					name: 'Digitalisering (Jon Badstue Pedersen)'
+				},
+				1: {
+					id: 4,
+					name: 'Allan Gyldendal Frederiksen'
+				},
+				5: {
+					id: 5,
+					name: 'Jon Badstue Pedersen'
+				}
+			};
+		}
+
+		function getOrganisations(){
+			return {
+				1: "Udvikling",
+				2: "Direktionssekretariatet",
+				3: "It",
+				4: "Digitalisering"
+			};
 		}
 
 		function createKLE(number, name, type, serviceText){

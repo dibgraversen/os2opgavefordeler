@@ -25,8 +25,8 @@
                           class="glyphicon glyphicon-info-sign" popover-trigger="mouseenter"
                           popover="{{ topic.kle.serviceText }}" popover-placement="right"></span>
                 </td>
-                <td>{{ topic.rule.orgUnit }}</td>
-                <td>{{ topic.rule.employee.name }}</td>
+                <td>{{ topic.org }}</td>
+                <td>{{ topic.employee.name }}</td>
                 <td class="button"><button class="btn btn-default" popover-placement="left"
                                            popover="klik her for at vedligholde fordelingsregler"
                     popover-trigger="mouseenter" popover-popup-delay="1000" ng-click="editRule(topic)">Fordeling</button></td>
