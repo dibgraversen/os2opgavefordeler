@@ -15,7 +15,7 @@
             <tr ng-repeat="topic in topicRoutes | filter:filter.text" ng-show="topic.visible"
                 class="{{ topic.kle.type }} animate-show" ng-class="">
                 <td class="indent">
-                    <span class="glyphicon" ng-click="toggle(topic)" ng-show="topic.children"
+                    <span class="glyphicon" ng-click="toggle(topic)" ng-show="topic.children.length > 0"
                           ng-class="topic.open ? 'glyphicon-chevron-down' : 'glyphicon-chevron-right' "></span>
                 </td>
                 <td class="indent">

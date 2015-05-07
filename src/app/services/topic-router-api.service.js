@@ -37,8 +37,17 @@
 					scope: 'all'
 				}
 			}).then(function(data){
+				var objectMap = {};
 				_.each(data, function(rule){
-					// TODO children.
+					objectMap[rule.id] = rule;
+					rule.children = [];
+					if(rule.parent){
+						var parent = objectMap[rule.parent];
+						// TODO consider putting object itself here.
+						// TODO consider adding parent as object.
+						parent.children.push(rule.id);
+						//console.log('rule has parent: '+rule.parent);
+					}
 					rule.employee = users[rule.employee];
 					rule.org = orgs[rule.org];
 					rule.open = true;
