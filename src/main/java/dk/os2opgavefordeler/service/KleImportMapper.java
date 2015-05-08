@@ -1,14 +1,23 @@
 package dk.os2opgavefordeler.service;
 
-import javax.xml.datatype.XMLGregorianCalendar;
-import java.util.Date;
-import java.util.List;
-
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
-
-import dk.os2opgavefordeler.model.kle.*;
+import dk.os2opgavefordeler.model.kle.KleGroup;
+import dk.os2opgavefordeler.model.kle.KleMainGroup;
+import dk.os2opgavefordeler.model.kle.KleTopic;
 import dk.os2opgavefordeler.model.kle_import.*;
+import dk.os2opgavefordeler.util.FilteringXMLStreamWriter;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.datatype.XMLGregorianCalendar;
+import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamException;
+import java.io.StringWriter;
+import java.util.Date;
+import java.util.List;
 
 public class KleImportMapper {
 	//TODO: should we drop entries with a non-empty 'Udgaaet' date, or should we add dateExpired to the model?
@@ -58,9 +67,37 @@ public class KleImportMapper {
 		return new KleTopic(number, title, description, dateCreated);
 	}
 
-	public static String buildDescription(VejledningKomponent vejledning) {
-		//TODO: implement!
-		return "To be implemented";
+	public static String buildDescription(VejledningKomponent vejledning)
+	{
+		if(vejledning == null) {
+			return "";
+		}
+		try {
+			// Instead of walking the somewhat ugly object graph, we cheat and marshal it with JAXB and gentle massage.
+
+			final JAXBContext jContext = JAXBContext.newInstance(VejledningKomponent.class);
+			final Marshaller marshaller = jContext.createMarshaller();
+
+			// Avoid XML header in output.
+			marshaller.setProperty(Marshaller.JAXB_FRAGMENT, true);
+
+			// We can't directly marshal VejledningKomponent since it's not annotated with @XmlRootElement, so we wrap
+			// it with the "FakeRoot" element, which we then remove with the FilteringXMLStreamWriter.
+			JAXBElement<VejledningKomponent> root = new JAXBElement<>(
+				new QName("FakeRoot"), VejledningKomponent.class, vejledning
+			);
+
+			// Finally, marshal to string through our filter.
+			final StringWriter stringWriter = new StringWriter();
+			marshaller.marshal(root,
+				FilteringXMLStreamWriter.wrap(stringWriter, true, true, "FakeRoot", "VejledningTekst")
+			);
+			return stringWriter.toString();
+		}
+		catch(JAXBException|XMLStreamException ex) {
+			System.err.println("Error building description! " + ex);
+			return "";
+		}
 	}
 
 	public static Date dateFrom(XMLGregorianCalendar input) {
