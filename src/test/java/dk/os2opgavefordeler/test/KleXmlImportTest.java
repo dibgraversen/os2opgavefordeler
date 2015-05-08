@@ -94,40 +94,41 @@ public class KleXmlImportTest {
 		assertEquals("Wrong description", description, topic.getDescription());
 	}
 
-	public static KleTopic findTopic(String topicNum) {
-		final String[] parts = topicNum.split("\\.");
+	public static KleTopic findTopic(final String topicNum) {
+		final String mainNum = topicNum.substring(0, 2);
+		final String subNum = topicNum.substring(0, 5);
 
 		return FluentIterable.from(groups)
-		.firstMatch(new Predicate<KleMainGroup>() {
-			@Override
-			public boolean apply(KleMainGroup kleMainGroup) {
-				return kleMainGroup.getNumber().equals(parts[0]);
-			}
-		})
-		.transform(new Function<KleMainGroup, FluentIterable<KleGroup>>() {
-			@Override
-			public FluentIterable<KleGroup> apply(KleMainGroup mainGroup) {
-				return FluentIterable.from(mainGroup.getGroups());
-			}
-		}).get()
-		.firstMatch(new Predicate<KleGroup>() {
-			@Override
-			public boolean apply(KleGroup group) {
-				return group.getNumber().substring(3).equals(parts[1]);
-			}
-		})
-		.transform(new Function<KleGroup, FluentIterable<KleTopic>>() {
-			@Override
-			public FluentIterable<KleTopic> apply(KleGroup kleGroup) {
-				return FluentIterable.from(kleGroup.getTopics());
-			}
-		}).get()
-		.firstMatch(new Predicate<KleTopic>() {
-			@Override
-			public boolean apply(KleTopic topic) {
-				return topic.getNumber().substring(6).equals(parts[2]);
-			}
-		})
-		.orNull();
+			.filter(new Predicate<KleMainGroup>() {
+				@Override
+				public boolean apply(KleMainGroup kleMainGroup) {
+					return kleMainGroup.getNumber().equals(mainNum);
+				}
+			})
+			.transformAndConcat(new Function<KleMainGroup, FluentIterable<KleGroup>>() {
+				@Override
+				public FluentIterable<KleGroup> apply(KleMainGroup mainGroup) {
+					return FluentIterable.from(mainGroup.getGroups());
+				}
+			})
+			.filter(new Predicate<KleGroup>() {
+				@Override
+				public boolean apply(KleGroup group) {
+					return group.getNumber().equals(subNum);
+				}
+			})
+			.transformAndConcat(new Function<KleGroup, FluentIterable<KleTopic>>() {
+				@Override
+				public FluentIterable<KleTopic> apply(KleGroup kleGroup) {
+					return FluentIterable.from(kleGroup.getTopics());
+				}
+			})
+			.firstMatch(new Predicate<KleTopic>() {
+				@Override
+				public boolean apply(KleTopic topic) {
+					return topic.getNumber().equals(topicNum);
+				}
+			})
+			.orNull();
 	}
 }
