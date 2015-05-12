@@ -4,6 +4,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.util.List;
 
+import com.google.common.base.Function;
+import com.google.common.base.Predicate;
+import com.google.common.collect.FluentIterable;
 import dk.os2opgavefordeler.model.kle.KleGroup;
 import dk.os2opgavefordeler.model.kle.KleMainGroup;
 import dk.os2opgavefordeler.model.kle.KleTopic;
@@ -74,5 +77,58 @@ public class KleXmlImportTest {
 			final KleImportService is = new KleImportServiceImpl();
 			is.importFromXml(kleXml, kleXsd);
 		}
+	}
+
+	@Test
+	public void testKleDescription() {
+		final String description =
+		"<p>Her journaliseres sager vedrørende:</p>" +
+		"<p>" +
+			"<ul>" +
+				"<li>internationale organisationer som fx: FN, UNESCO og Røde Kors, som ikke kan knyttes nærmere til et konkret emne</li>" +
+				"<li>organisering og udvikling af hjælpeorganisationer</li>" +
+			"</ul>" +
+		"</p>";
+
+		final KleTopic topic = findTopic("00.03.02");
+		assertEquals("Wrong description", description, topic.getDescription());
+	}
+
+	public static KleTopic findTopic(final String topicNum) {
+		final String mainNum = topicNum.substring(0, 2);
+		final String subNum = topicNum.substring(0, 5);
+
+		return FluentIterable.from(groups)
+			.filter(new Predicate<KleMainGroup>() {
+				@Override
+				public boolean apply(KleMainGroup kleMainGroup) {
+					return kleMainGroup.getNumber().equals(mainNum);
+				}
+			})
+			.transformAndConcat(new Function<KleMainGroup, FluentIterable<KleGroup>>() {
+				@Override
+				public FluentIterable<KleGroup> apply(KleMainGroup mainGroup) {
+					return FluentIterable.from(mainGroup.getGroups());
+				}
+			})
+			.filter(new Predicate<KleGroup>() {
+				@Override
+				public boolean apply(KleGroup group) {
+					return group.getNumber().equals(subNum);
+				}
+			})
+			.transformAndConcat(new Function<KleGroup, FluentIterable<KleTopic>>() {
+				@Override
+				public FluentIterable<KleTopic> apply(KleGroup kleGroup) {
+					return FluentIterable.from(kleGroup.getTopics());
+				}
+			})
+			.firstMatch(new Predicate<KleTopic>() {
+				@Override
+				public boolean apply(KleTopic topic) {
+					return topic.getNumber().equals(topicNum);
+				}
+			})
+			.orNull();
 	}
 }
