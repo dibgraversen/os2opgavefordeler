@@ -5,11 +5,11 @@ import dk.os2opgavefordeler.model.kle.KleGroup;
 import dk.os2opgavefordeler.model.kle.KleMainGroup;
 import dk.os2opgavefordeler.model.kle.KleTopic;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
+import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
@@ -19,7 +19,8 @@ import java.util.List;
 @Stateless
 @TransactionAttribute(value = TransactionAttributeType.REQUIRES_NEW)
 public class PersistenceServiceImpl implements PersistenceService {
-	private final Logger log = LoggerFactory.getLogger(getClass());
+	@Inject
+	private Logger log;
 
 	@PersistenceContext(unitName = "OS2TopicRouter")
 	private EntityManager em;
