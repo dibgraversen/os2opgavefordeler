@@ -6,7 +6,7 @@
 		<form action="">
 			<div class="radio" ng-repeat="role in roles">
 				<label>
-					<input type="radio" name="roleRadios" ng-model="settings.currentUser"
+					<input type="radio" name="roleRadios" ng-model="currentUser"
 								 ng-value="role" ng-change="changeRole()" />
 					{{ role.name }}
 				</label>
@@ -24,27 +24,27 @@
 			<div class="radio">
 				<label>
 					<input type="radio" name="filterByResponsibility" id="visning1"
-							ng-model="filter.whichTasks" value="mine">
+							ng-model="settings.scope" value="RESPONSIBLE">
 					Vis kun opgaver jeg selv er ansvarlig for
 				</label>
 			</div>
 			<div class="radio">
 				<label>
 					<input type="radio" name="filterByResponsibility" id="visning2"
-							 ng-model="filter.whichTasks" value="allMy">
+							 ng-model="settings.scope" value="INHERITED">
 					Vis også opgaver jeg er indirekte ansvarlig for
 				</label>
 			</div>
 			<div class="radio">
 				<label>
 					<input type="radio" name="filterByResponsibility" id="visning3"
-							ng-model="filter.whichTasks" value="all">
+							ng-model="settings.scope" value="ALL">
 					Vis alle opgaver
 				</label>
 			</div>
 			<div class="checkbox">
 				<label>
-					<input type="checkbox" ng-model="settings.showResponsible"	/> Vis ansvarlig
+					<input type="checkbox" ng-model="settings.showResponsible" ng-click="updateSettings()"	/> Vis ansvarlig
 				</label>
 			</div>
 			<div>

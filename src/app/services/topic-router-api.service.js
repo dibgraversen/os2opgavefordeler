@@ -3,22 +3,33 @@
 
 	angular.module('topicRouter').factory('topicRouterApi', topicRouterApi);
 
-	topicRouterApi.$inject = ['$http', '$q', 'serverUrl']; // TODO add appSpinner
+	topicRouterApi.$inject = ['$http', '$q', '$timeout', 'serverUrl', 'appSpinner'];
 
-	function topicRouterApi($http, $q, serverUrl) { // TODO add appSpinner
+	function topicRouterApi($http, $q, $timeout, serverUrl, appSpinner) {
 		var service = {
 			getTopicRoutes: getTopicRoutes,
-			getRoles: getRoles
+			getRoles: getRoles,
+			getSettings: getSettings,
+			updateSettings: updateSettings
 		};
+
 
 		var baseUrl = serverUrl;
 		var requestConfig = {
 			headers: {
-				//'SOME-HEADER': 'ASDFASDFASDFASDF'
+				'Content-Type': 'application/json'
 			}
 		};
 
 		return service;
+
+		function getSettings(userId){
+			return httpGet('/settings/'+userId);
+		}
+
+		function updateSettings(userId, settings){
+			return httpPost('/settings/'+userId, settings);
+		}
 
 		function getTopicRoutes(){
 			//MOCK
@@ -71,15 +82,19 @@
 			return httpExecute(url, 'GET');
 		}
 
+		function httpPost(url, data){
+			return httpExecute(url, 'POST', data);
+		}
+
 		function httpExecute(requestUrl, method, data){
-			//appSpinner.showSpinner(); // TODO enable
+			appSpinner.showSpinner(); // TODO enable
 			return $http({
 				url: baseUrl + requestUrl,
 				method: method,
 				data: data,
 				headers: requestConfig.headers }).then(function(response){
 
-				//appSpinner.hideSpinner();
+				appSpinner.hideSpinner();
 				console.log('**response from EXECUTE', response);
 				return response.data;
 			});
@@ -91,7 +106,7 @@
 			var users = getUsers();
 			var digiJon = users[4];
 			var allan = users[1];
-			var jon = users[5];
+			var jon = users[2];
 
 
 			return [
@@ -253,7 +268,7 @@
 					id: 4,
 					name: 'Allan Gyldendal Frederiksen'
 				},
-				5: {
+				2: {
 					id: 5,
 					name: 'Jon Badstue Pedersen'
 				}

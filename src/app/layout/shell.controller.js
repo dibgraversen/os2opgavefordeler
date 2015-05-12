@@ -3,9 +3,9 @@
 
     angular.module('topicRouter').controller('ShellCtrl', ShellCtrl);
 
-    ShellCtrl.$inject = ['$scope', '$rootScope', '$state', 'topicRouterApi'];
+    ShellCtrl.$inject = ['$scope', '$rootScope', '$state', '$timeout', 'topicRouterApi'];
 
-    function ShellCtrl($scope, $rootScope, $state, topicRouterApi) {
+    function ShellCtrl($scope, $rootScope, $state, $timeout, topicRouterApi) {
         /* jshint validthis:true */
         var vm = this;
         $scope.$state = $state;
@@ -15,9 +15,8 @@
         $scope.closeAlert = closeAlert;
 
         $scope.sidemenuVisible = true;
-        $scope.settings = {
-            showResponsible: false
-        };
+        $scope.settings = {};
+        $scope.updateSettings = updateSettings;
 
         $scope.roles = [];
         $scope.changeRole = changeRole;
@@ -29,7 +28,7 @@
         $scope.updateFilter = updateFilter;
 
         vm.showSpinner = false;
-        vm.spinnerMessage = 'Retrieving data...';
+        vm.spinnerMessage = 'Henter data...';
 
         vm.spinnerOptions = {
             radius: 40,
@@ -45,9 +44,13 @@
         activate();
 
         function activate() {
+            topicRouterApi.getSettings(1).then(function(data){
+                $scope.settings = data;
+            });
+
             topicRouterApi.getRoles().then(function(data){
                 $scope.roles = data;
-                $scope.settings.currentUser = data[0];
+                $scope.currentUser = data[0];
             });
         }
 
@@ -68,12 +71,28 @@
 
         function changeRole(){
             console.log('switching user');
-            console.log($scope.settings.currentUser);
-            console.log($state);
+            console.log($scope.currentUser);
         }
 
         function updateFilter(){
             console.log($scope.filter);
+        }
+
+        function updateSettings(){
+            topicRouterApi.updateSettings(1, $scope.settings).then(
+                function(data){
+                    var alert = {
+                        msg: "Indstillinger gemt",
+                        type: 'success'
+                    };
+                    addAlert(alert);
+                    $timeout(closeAlert, 2000, alert);
+                }, function(reason){
+                    addAlert({
+                        msg: 'Indstillinger kunne ikke gemmes. Prøv igen senere...',
+                        type: 'danger'
+                    });
+                });
         }
     }
 })();

@@ -41,8 +41,8 @@
   app.config(['$httpProvider', setupCors]);
 
   function setupCors($httpProvider){
-    //$httpProvider.defaults.useXDomain = true;
-    //delete $httpProvider.defaults.headers.common['X-Requested-With'];
+    $httpProvider.defaults.useXDomain = true;
+    delete $httpProvider.defaults.headers.common['X-Requested-With'];
   }
 
   app.run(['$state', function($state){
