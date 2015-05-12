@@ -14,8 +14,12 @@ import java.util.Stack;
  * - trimming namespace definitions
  * - trimming whitespace in writeCharacters()
  * - ignoring certain XML elements
+ *
  */
-public class FilteringXMLStreamWriter extends DelegatingXMLStreamWriter {
+public class FilteringXMLStreamWriter
+	extends DelegatingXMLStreamWriter
+	implements AutoCloseable
+{
 	private final boolean trimNamespace;
 	private final boolean trimWhitespace;
 	private final Set<String> ignoredElements;
@@ -41,6 +45,9 @@ public class FilteringXMLStreamWriter extends DelegatingXMLStreamWriter {
 	 * @throws XMLStreamException
 	 */
 	public static FilteringXMLStreamWriter wrap(Writer writer, boolean trimNamespace, boolean trimWhitespace, String... ignoredElements) throws XMLStreamException {
+		// A note about implementation: there's no guarantees that a JAXB implementation won't wrap our Writer, so we
+		// can't do anything creative that way (e.g. filtering out tags with a custom SuppressingWriter instead of
+		// avoiding writeStart/EndElement calls and requiring the ignoredElements stack).
 		final XMLStreamWriter xmlWriter = XMLOutputFactory.newInstance().createXMLStreamWriter(writer);
 		return new FilteringXMLStreamWriter(xmlWriter, trimNamespace, trimWhitespace, ignoredElements);
 	}
@@ -85,6 +92,8 @@ public class FilteringXMLStreamWriter extends DelegatingXMLStreamWriter {
 
 	@Override
 	public void writeEndElement() throws XMLStreamException {
+		// writeStartElement(...) and writeEndElement() calls must be balanced, have to do that with a stack since
+		// there aren't any arguments to writeEndElement() we can use.
 		final String element = elemStack.pop();
 		if(!ignoredElements.contains(element)) {
 			super.writeEndElement();
@@ -94,5 +103,10 @@ public class FilteringXMLStreamWriter extends DelegatingXMLStreamWriter {
 	@Override
 	public void writeCharacters(String text) throws XMLStreamException {
 		super.writeCharacters(trimWhitespace ? text.trim() : text);
+	}
+
+	@Override
+	public void close() throws XMLStreamException {
+		super.close();
 	}
 }

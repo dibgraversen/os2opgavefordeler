@@ -20,6 +20,8 @@ import java.util.Date;
 import java.util.List;
 
 public class KleImportMapper {
+	public static final String FAKE_ROOT = "FakeRoot";
+	public static final String REAL_ROOT = "VejledningTekst";
 	//TODO: should we drop entries with a non-empty 'Udgaaet' date, or should we add dateExpired to the model?
 
 	public static List<KleMainGroup> mapMainGroupList(KLEEmneplanKomponent input) {
@@ -70,11 +72,11 @@ public class KleImportMapper {
 	public static String buildDescription(VejledningKomponent vejledning)
 	{
 		if(vejledning == null) {
+			//TODO: should we allow description to be nullable in the db instead of this?
 			return "";
 		}
 		try {
 			// Instead of walking the somewhat ugly object graph, we cheat and marshal it with JAXB and gentle massage.
-
 			final JAXBContext jContext = JAXBContext.newInstance(VejledningKomponent.class);
 			final Marshaller marshaller = jContext.createMarshaller();
 
@@ -82,22 +84,31 @@ public class KleImportMapper {
 			marshaller.setProperty(Marshaller.JAXB_FRAGMENT, true);
 
 			// We can't directly marshal VejledningKomponent since it's not annotated with @XmlRootElement, so we wrap
-			// it with the "FakeRoot" element, which we then remove with the FilteringXMLStreamWriter.
+			// it with the "FakeRoot" element, which we *unfortunately can't* remove with the FilteringXMLStreamWriter.
+			// Why? Because the underlying XMLOutputStream, not the JAXB marshaller, verifies that there's only one
+			// root element... and we can have multiple <p> elements in our VejledningKomponent.
+			// So we have to keep either the FakeRoot or the VejledningTekst element. We could use an innocuous <div>
+			// or <p> instead of <FakeRoot>, but opted for <FakeRoot> + removal.
 			JAXBElement<VejledningKomponent> root = new JAXBElement<>(
-				new QName("FakeRoot"), VejledningKomponent.class, vejledning
+				new QName(FAKE_ROOT), VejledningKomponent.class, vejledning
 			);
 
-			// Finally, marshal to string through our filter.
-			final StringWriter stringWriter = new StringWriter();
-			marshaller.marshal(root,
-				FilteringXMLStreamWriter.wrap(stringWriter, true, true, "FakeRoot", "VejledningTekst")
-			);
-			return stringWriter.toString();
+			// Marshal to string through our filter - strip namespaces and whitespace.
+			final StringWriter result = new StringWriter();
+			try(FilteringXMLStreamWriter fxsw = FilteringXMLStreamWriter.wrap(result, true, true, REAL_ROOT)) {
+				marshaller.marshal(root, fxsw);
+			}
+
+			return removeTag(result.toString(), FAKE_ROOT);
 		}
-		catch(JAXBException|XMLStreamException ex) {
-			System.err.println("Error building description! " + ex);
-			return "";
+		catch(JAXBException|XMLStreamException|StringIndexOutOfBoundsException ex) {
+			throw new RuntimeException("Error building KLE description", ex);
 		}
+	}
+
+	private static String removeTag(String text, String tag) {
+		// +2 for open+close brackets, +3 for brackets and tag-termination-slash.
+		return text.substring(tag.length() + 2, text.length() - tag.length() - 3);
 	}
 
 	public static Date dateFrom(XMLGregorianCalendar input) {

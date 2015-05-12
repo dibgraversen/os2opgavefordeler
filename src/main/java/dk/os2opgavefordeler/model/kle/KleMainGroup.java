@@ -26,6 +26,7 @@ public class KleMainGroup implements Serializable, KleParent {
 	private final String title;
 
 	@Column(nullable = false)
+	@Lob
 	private final String description;
 
 	@Column(nullable = false)
