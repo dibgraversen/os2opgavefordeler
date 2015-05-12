@@ -1,6 +1,10 @@
 @startuml
 title SOFD Domain
 
+class Bruger {
+  boolean admin
+}
+
 class Kommune {
   String navn
 }
@@ -55,10 +59,20 @@ class Organisation {
   Organisation parent
   String name
   String ESDHId
+  String email
+  String telefonnummer
   boolean aktiv
   
 }
 
+class Settings {
+  boolean showExpandedOrg
+  boolean showResponsible
+  Enum scope
+}
+
+Stedfortraeder -- Medarbejder
+Stedfortraeder -- Bruger
 Kommune -- Medarbejder
 Kommune -- Organisation
 Organisation - Organisation
@@ -68,6 +82,7 @@ Organisation -- KLE
 Medarbejder -- OpgaveFordeling
 OpgaveFordeling - KLE
 Bruger - Medarbejder
+Bruger -- Settings
 Medarbejder - Organisation
 OpgaveFordeling -- Regel
 
