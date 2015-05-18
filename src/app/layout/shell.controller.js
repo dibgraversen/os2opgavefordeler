@@ -16,9 +16,9 @@
 
         $scope.sidemenuVisible = true;
         $scope.settings = {};
+        $scope.user = {};
         $scope.updateSettings = updateSettings;
 
-        $scope.roles = [];
         $scope.changeRole = changeRole;
 
         $scope.filter = {
@@ -49,8 +49,8 @@
             });
 
             topicRouterApi.getRoles().then(function(data){
-                $scope.roles = data;
-                $scope.currentUser = data[0];
+                $scope.user.roles = data;
+                $scope.user.currentRole = data[0];
             });
         }
 
@@ -69,9 +69,10 @@
             $scope.alerts.splice(index, 1);
         }
 
-        function changeRole(){
+        function changeRole(role){
             console.log('switching user');
-            console.log($scope.currentUser);
+            //$scope.user.currentRole = role;
+            console.log($scope.user);
         }
 
         function updateFilter(){

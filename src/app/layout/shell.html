@@ -19,10 +19,10 @@
                             Fordelinger
                         </a>
                     </li>
-                    <li ng-show="settings.currentUser.admin"  ng-class="{ active: $state.is('settings') }">
+                    <li ng-show="user.currentRole.admin"  ng-class="{ active: $state.is('settings') }">
                         <a data-toggle="collapse" data-target=".navbar-collapse" ui-sref="settings">Admin</a>
                     </li>
-                    <li ng-show="settings.currentUser.municipalityAdmin"  ng-class="{ active: $state.is('municipalityAdmin') }">
+                    <li ng-show="user.currentRole.municipalityAdmin"  ng-class="{ active: $state.is('municipalityAdmin') }">
                         <a data-toggle="collapse" data-target=".navbar-collapse" ui-sref="municipalityAdmin">Administrer kommune</a>
                     </li>
                     <!--<li><a data-toggle="collapse" data-target=".navbar-collapse" href="#/locations">Locations</a></li>-->

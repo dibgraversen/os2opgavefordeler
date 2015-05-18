@@ -4,10 +4,10 @@
 	</div>
 	<div class="panel-body">
 		<form action="">
-			<div class="radio" ng-repeat="role in roles">
+			<div class="radio" ng-repeat="role in user.roles">
 				<label>
-					<input type="radio" name="roleRadios" ng-model="currentUser"
-								 ng-value="role" ng-change="changeRole()" />
+					<input type="radio" name="roleRadios" ng-model="user.currentRole"
+								 ng-value="role" ng-change="changeRole(role)" />
 					{{ role.name }}
 				</label>
 			</div>
@@ -24,21 +24,21 @@
 			<div class="radio">
 				<label>
 					<input type="radio" name="filterByResponsibility" id="visning1"
-							ng-model="settings.scope" value="RESPONSIBLE">
+							ng-model="settings.scope" ng-click="updateSettings()" value="RESPONSIBLE">
 					Vis kun opgaver jeg selv er ansvarlig for
 				</label>
 			</div>
 			<div class="radio">
 				<label>
 					<input type="radio" name="filterByResponsibility" id="visning2"
-							 ng-model="settings.scope" value="INHERITED">
+							 ng-model="settings.scope" ng-click="updateSettings()" value="INHERITED">
 					Vis også opgaver jeg er indirekte ansvarlig for
 				</label>
 			</div>
 			<div class="radio">
 				<label>
 					<input type="radio" name="filterByResponsibility" id="visning3"
-							ng-model="settings.scope" value="ALL">
+							ng-model="settings.scope" ng-click="updateSettings()" value="ALL">
 					Vis alle opgaver
 				</label>
 			</div>
