@@ -70,9 +70,10 @@
 		}
 
 		function getRoles(){
-			var deferred = $q.defer();
-			deferred.resolve(getMockRoles());
-			return deferred.promise;
+			//var deferred = $q.defer();
+			return httpGet('/user/1/roles');
+			//deferred.resolve(getMockRoles());
+			//return deferred.promise;
 		}
 
 
