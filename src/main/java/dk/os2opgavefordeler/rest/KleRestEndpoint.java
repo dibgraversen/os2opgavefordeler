@@ -17,12 +17,12 @@ import dk.os2opgavefordeler.model.kle.KleMainGroup;
 import dk.os2opgavefordeler.service.KleImportService;
 import dk.os2opgavefordeler.service.PersistenceService;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Path("/kle")
 @RequestScoped
 public class KleRestEndpoint {
-	private final Logger log = LoggerFactory.getLogger(getClass());
+	@Inject
+	private Logger log;
 
 	@Inject
 	private KleImportService importer;
