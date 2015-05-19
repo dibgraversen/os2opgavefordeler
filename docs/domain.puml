@@ -1,31 +1,39 @@
 @startuml
 title SOFD Domain
 
-class Bruger {
+class User {
   boolean admin
 }
 
-class Kommune {
-  String navn
+class Role {
+  User user
+  Employment employment
+  boolean admin
+  boolean municipalityAdmin
+  boolean manager
+  boolean substitute
+}
+
+class Municipality {
+  String name
 }
 
 class Regel {
-  Date aktivFra
-  Date aktivTil
-  String mærke
+  Date from
+  Date to
+  String filter
 }
 
 class KLE {
-  String nummer
-  String navn
-  Date udgået
+  String number
+  String name
+  Date expired
   String serviceText
-  Date oprettet
-  Organisation ansvarlig
-  String emne
+  Date created
+  OrgUnit responsible
 }
 
-class OrganisationsProperty {
+class OrgUnitsProperty {
   String nøgle?
   String navn
   String id
@@ -33,34 +41,32 @@ class OrganisationsProperty {
   boolean præsentér
 }
 
-class OpgaveFordeling {
+class DistributionRule {
   String name
   KLE KLE
-  Medarbejder medarbejder
+  Employment medarbejder
   String ESDHId
-  Organisation organisationsEnhed
-  EksternOrganisation eksternOrganisation
+  OrgUnit organisationsEnhed
+  EksternOrgUnit eksternOrgUnit
 }
 
-class Medarbejder {
+class Employment {
   String name
-  String initialer
+  String initials
   String email
   String ESDHId
-  EksternOrganisation eksternOrganisation
+  EksternOrgUnit eksternOrgUnit
   String stillingsBetegnelse
-  boolean aktiv
-  boolean erLeder()
-  
+  boolean active
 }
 
-class Organisation {
-  Medarbejder leder
-  Organisation parent
+class OrgUnit {
+  Employment manager
+  OrgUnit parent
   String name
   String ESDHId
   String email
-  String telefonnummer
+  String phoneNumber
   boolean aktiv
   
 }
@@ -71,19 +77,18 @@ class Settings {
   Enum scope
 }
 
-Stedfortraeder -- Medarbejder
-Stedfortraeder -- Bruger
-Kommune -- Medarbejder
-Kommune -- Organisation
-Organisation - Organisation
-Organisation - OrganisationsProperty
-Organisation -- OpgaveFordeling
-Organisation -- KLE
-Medarbejder -- OpgaveFordeling
-OpgaveFordeling - KLE
-Bruger - Medarbejder
-Bruger -- Settings
-Medarbejder - Organisation
-OpgaveFordeling -- Regel
+Role -- Employment
+Role -- User
+Municipality -- Employment
+Municipality -- OrgUnit
+OrgUnit - OrgUnit
+OrgUnit - OrgUnitsProperty
+OrgUnit -- DistributionRule
+OrgUnit -- KLE
+Employment -- DistributionRule
+DistributionRule - KLE
+User -- Settings
+Employment - OrgUnit
+DistributionRule -- Regel
 
 @enduml
