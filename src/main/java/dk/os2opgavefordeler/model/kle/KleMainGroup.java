@@ -15,7 +15,8 @@ public class KleMainGroup implements Serializable, KleParent {
 	private static final long serialVersionUID = 1L;
 	public static final String TABLE_NAME = "KleMainGroup";
 
-	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "parent")
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@JoinColumn
 	private final List<KleGroup> groups = new ArrayList<>();
 
 	@Id
@@ -35,7 +36,7 @@ public class KleMainGroup implements Serializable, KleParent {
 
 
 
-	private KleMainGroup() {
+	public KleMainGroup() {
 		//for JPA
 		this.number = null;
 		this.title = null;

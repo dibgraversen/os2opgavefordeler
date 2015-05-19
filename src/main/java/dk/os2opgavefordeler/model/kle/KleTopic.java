@@ -11,7 +11,7 @@ public class KleTopic implements Serializable, KleParent {
 	public static final String TABLE_NAME = "KleTopic";
 
 	@ManyToOne
-	@JoinColumn(name = "parent")
+	@JoinColumn
 	private KleGroup parent;
 
 	@Id
@@ -31,7 +31,7 @@ public class KleTopic implements Serializable, KleParent {
 
 
 
-	private KleTopic() {
+	public KleTopic() {
 		//for JPA
 		this.number = null;
 		this.title = null;

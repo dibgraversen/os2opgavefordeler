@@ -15,10 +15,11 @@ public class KleGroup implements Serializable, KleParent {
 	public static final String TABLE_NAME = "KleGroup";
 
 	@ManyToOne
-	@JoinColumn(name = "parent")
+	@JoinColumn
 	private KleMainGroup parent;
 
-	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "parent")
+	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@JoinColumn
 	private final List<KleTopic> topics = new ArrayList<>();
 
 	@Id
@@ -38,7 +39,7 @@ public class KleGroup implements Serializable, KleParent {
 
 
 
-	private KleGroup() {
+	public KleGroup() {
 		//for JPA
 		this.number = null;
 		this.title = null;

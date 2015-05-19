@@ -22,6 +22,8 @@ import java.util.List;
 public class KleImportMapper {
 	public static final String FAKE_ROOT = "FakeRoot";
 	public static final String REAL_ROOT = "VejledningTekst";
+	public static final int DESC_LEN = 6000; 	// Description stringwriter buffer size,a bit larger than max in current dataset.
+
 	//TODO: should we drop entries with a non-empty 'Udgaaet' date, or should we add dateExpired to the model?
 
 	public static List<KleMainGroup> mapMainGroupList(KLEEmneplanKomponent input) {
@@ -94,7 +96,7 @@ public class KleImportMapper {
 			);
 
 			// Marshal to string through our filter - strip namespaces and whitespace.
-			final StringWriter result = new StringWriter();
+			final StringWriter result = new StringWriter(DESC_LEN);
 			try(FilteringXMLStreamWriter fxsw = FilteringXMLStreamWriter.wrap(result, true, true, REAL_ROOT)) {
 				marshaller.marshal(root, fxsw);
 			}
