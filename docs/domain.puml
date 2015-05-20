@@ -18,7 +18,7 @@ class Municipality {
   String name
 }
 
-class Regel {
+class FilterRule {
   Date from
   Date to
   String filter
@@ -78,17 +78,15 @@ class Settings {
 }
 
 Role -- Employment
-Role -- User
-Municipality -- Employment
+User - Role
 Municipality -- OrgUnit
 OrgUnit - OrgUnit
 OrgUnit - OrgUnitsProperty
 OrgUnit -- DistributionRule
-OrgUnit -- KLE
 Employment -- DistributionRule
 DistributionRule - KLE
 User -- Settings
 Employment - OrgUnit
-DistributionRule -- Regel
+DistributionRule -- FilterRule
 
 @enduml
