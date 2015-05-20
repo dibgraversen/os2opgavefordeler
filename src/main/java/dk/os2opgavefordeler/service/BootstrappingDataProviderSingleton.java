@@ -1,6 +1,8 @@
 package dk.os2opgavefordeler.service;
 
 import dk.os2opgavefordeler.model.Role;
+import dk.os2opgavefordeler.model.UserSettings;
+import dk.os2opgavefordeler.model.presentation.FilterScope;
 import dk.os2opgavefordeler.model.presentation.RolePO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.PostConstruct;
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
-import javax.enterprise.inject.Default;
 import javax.inject.Inject;
 
 /**
@@ -24,8 +25,18 @@ public class BootstrappingDataProviderSingleton {
 	UsersService usersService;
 
 	@PostConstruct
-	public void buildRoles(){
+	private void init(){
+		buildRoles();
+		buildUserSettings();
+	}
+
+	private void buildRoles(){
 		log.warn("Starting Singleton - loading mock roles");
+		buildForUserOne();
+		buildForUserTwo();
+	}
+
+	private void buildForUserOne(){
 		UsersServiceMock mock = new UsersServiceMock();
 		RolePO rolePO1 = mock.buildRolePO(1, 1, "Henrik(dig)", 1, false, false, false, false);
 		Role role = rolePO1.toRole();
@@ -38,5 +49,43 @@ public class BootstrappingDataProviderSingleton {
 		usersService.createRole(rolePO4.toRole());
 	}
 
+	private void buildForUserTwo(){
+		UsersServiceMock mock = new UsersServiceMock();
+		RolePO rolePO1 = mock.buildRolePO(5, 2, "Joe(dig)", 4, false, false, false, false);
+		Role role = rolePO1.toRole();
+		usersService.createRole(role);
+		RolePO rolePO2 = mock.buildRolePO(6, 2, "Admin", 0, false, true, false, false);
+		usersService.createRole(rolePO2.toRole());
+		RolePO rolePO3 = mock.buildRolePO(7, 2, "Adam Savage", 5, false, false, true, false);
+		usersService.createRole(rolePO3.toRole());
+		RolePO rolePO4 = mock.buildRolePO(8, 2, "Homer Simpson", 6, false, false, false, true);
+		usersService.createRole(rolePO4.toRole());
+	}
 
+	private void buildUserSettings(){
+		buildUserSettingsForUserOne();
+		buildUserSettingsForUserTwo();
+	}
+
+	private void buildUserSettingsForUserOne(){
+		log.warn("Starting Singleton - loading mock user settings");
+		UserSettings settings = new UserSettings();
+		settings.setId(1);
+		settings.setUserId(1);
+		settings.setScope(FilterScope.INHERITED);
+		settings.setShowResponsible(false);
+		settings.setShowExpandedOrg(false);
+		usersService.createUserSettings(settings);
+	}
+
+	private void buildUserSettingsForUserTwo(){
+		log.warn("Starting Singleton - loading mock user settings");
+		UserSettings settings = new UserSettings();
+		settings.setId(2);
+		settings.setUserId(2);
+		settings.setScope(FilterScope.ALL);
+		settings.setShowResponsible(true);
+		settings.setShowExpandedOrg(false);
+		usersService.createUserSettings(settings);
+	}
 }

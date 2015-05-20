@@ -1,42 +1,31 @@
-package dk.os2opgavefordeler.model.presentation;
+package dk.os2opgavefordeler.model;
 
-import dk.os2opgavefordeler.model.UserSettings;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import dk.os2opgavefordeler.model.presentation.FilterScope;
+
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.Id;
+import java.io.Serializable;
 
 /**
  * @author hlo@miracle.dk
  */
-public class UserSettingsPO {
-	private final Logger log = LoggerFactory.getLogger(getClass());
+@Entity
+public class UserSettings implements Serializable {
+	@Id
 	private long id;
+
 	private long userId;
+
+	@Enumerated(EnumType.STRING)
 	private FilterScope scope;
+
 	private boolean showResponsible;
+
 	private boolean showExpandedOrg;
 
-	public UserSettingsPO() {
-	}
-
-	public UserSettingsPO(UserSettings settings) {
-		log.warn("in PO class");
-		log.warn(settings.toString());
-		id = settings.getId();
-		userId = settings.getUserId();
-		scope = settings.getScope();
-		showResponsible = settings.isShowResponsible();
-		showExpandedOrg = settings.isShowExpandedOrg();
-		log.warn(this.toString());
-	}
-
-	public UserSettings asUserSettings(){
-		UserSettings result = new UserSettings();
-		result.setId(id);
-		result.setUserId(userId);
-		result.setScope(scope);
-		result.setShowResponsible(showResponsible);
-		result.setShowExpandedOrg(showExpandedOrg);
-		return result;
+	public UserSettings() {
 	}
 
 	public long getId() {
@@ -81,7 +70,7 @@ public class UserSettingsPO {
 
 	@Override
 	public String toString() {
-		return "UserSettingsPO{" +
+		return "UserSettings{" +
 				"id=" + id +
 				", userId=" + userId +
 				", scope=" + scope +

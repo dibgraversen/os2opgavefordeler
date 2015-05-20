@@ -1,7 +1,9 @@
 package dk.os2opgavefordeler.service;
 
 import dk.os2opgavefordeler.model.Role;
+import dk.os2opgavefordeler.model.UserSettings;
 import dk.os2opgavefordeler.model.presentation.RolePO;
+import dk.os2opgavefordeler.model.presentation.UserSettingsPO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,6 +39,29 @@ public class UsersServiceImpl implements UsersService {
 	@Override
 	public void createRole(Role role) {
 		em.persist(role);
+	}
+
+	@Override
+	public UserSettingsPO getSettings(long userId) {
+		// TODO what if not created?
+		Query query = em.createQuery("SELECT u FROM UserSettings u WHERE userId = :userId");
+		query.setParameter("userId", userId);
+		UserSettings settings = (UserSettings) query.getSingleResult();
+		return new UserSettingsPO(settings);
+	}
+
+	@Override
+	public void createUserSettings(UserSettings userSettings) {
+		em.persist(userSettings);
+	}
+
+	@Override
+	public void updateSettings(UserSettingsPO updatedsettings) {
+		UserSettings settings = em.find(UserSettings.class, updatedsettings.getId());
+		settings.setScope(updatedsettings.getScope());
+		settings.setShowResponsible(updatedsettings.isShowResponsible());
+		settings.setShowExpandedOrg(updatedsettings.isShowExpandedOrg());
+		em.merge(settings);
 	}
 
 }

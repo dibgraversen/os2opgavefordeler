@@ -19,6 +19,7 @@ import javax.ws.rs.core.Response;
  * @author hlo@miracle.dk
  */
 @Path("/settings")
+@Deprecated
 public class SettingsEndpoint {
 	private final Logger log = LoggerFactory.getLogger(getClass());
 
