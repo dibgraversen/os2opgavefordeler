@@ -44,11 +44,15 @@
         activate();
 
         function activate() {
-            topicRouterApi.getSettings(1).then(function(data){
+            $scope.user = {
+                name: 'Henrik',
+                id: 1
+            };
+            topicRouterApi.getSettings($scope.user.id).then(function(data){
                 $scope.settings = data;
             });
 
-            topicRouterApi.getRoles().then(function(data){
+            topicRouterApi.getRoles($scope.user.id).then(function(data){
                 $scope.user.roles = data;
                 $scope.user.currentRole = data[0];
             });
@@ -80,7 +84,7 @@
         }
 
         function updateSettings(){
-            topicRouterApi.updateSettings(1, $scope.settings).then(
+            topicRouterApi.updateSettings($scope.user.id, $scope.settings).then(
                 function(data){
                     var alert = {
                         msg: "Indstillinger gemt",

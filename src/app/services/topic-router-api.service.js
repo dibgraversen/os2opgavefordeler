@@ -24,11 +24,11 @@
 		return service;
 
 		function getSettings(userId){
-			return httpGet('/settings/'+userId);
+			return httpGet('/user/'+userId+'/settings');
 		}
 
 		function updateSettings(userId, settings){
-			return httpPost('/settings/'+userId, settings);
+			return httpPost('/user/'+userId+'/settings', settings);
 		}
 
 		function getTopicRoutes(){
@@ -69,9 +69,9 @@
 			return deferred.promise;
 		}
 
-		function getRoles(){
+		function getRoles(userId){
 			//var deferred = $q.defer();
-			return httpGet('/user/1/roles');
+			return httpGet('/user/'+userId+'/roles');
 			//deferred.resolve(getMockRoles());
 			//return deferred.promise;
 		}
