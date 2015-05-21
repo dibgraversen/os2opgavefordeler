@@ -35,13 +35,9 @@ public class DistributionServiceImpl implements DistributionService {
 			public void apply(CriteriaBuilder cb, CriteriaQuery cq) {
 				final Root<DistributionRule> rule = cq.from(DistributionRule.class);
 
-				if (includeUnassigned) {
-					cq.where(cb.or(
-									cb.equal(rule.get(DistributionRule_.responsibleOrg), orgId),
-									rule.get(DistributionRule_.responsibleOrg).isNull())
-					);
-				} else {
-					cq.where(cb.equal(rule.get(DistributionRule_.responsibleOrg), orgId));
+				cq.where(cb.equal(rule.get(DistributionRule_.responsibleOrg), orgId));
+				if(includeUnassigned) {
+					cq.where(cb.or(rule.get(DistributionRule_.responsibleOrg).isNull()));
 				}
 			}
 		});
