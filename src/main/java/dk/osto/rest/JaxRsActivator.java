@@ -23,36 +23,4 @@ import java.util.List;
  */
 @ApplicationPath("/rest")
 public class JaxRsActivator extends Application {
-	@Inject
-	private Logger log;
-
-	@Inject
-	private KleImportService importer;
-
-	@Inject
-	PersistenceService ps;
-
-	@PostConstruct
-	private void init()
-	{
-		log.info("REST API initialized");
-
-		// During the development cycle, we have frequent application redeployments and non-persistent datastore.
-		// To avoid the hassle of importing data via the REST endpoints, let's load some bootstrap data here.
-		loadBootstrapKle();
-	}
-
-	private void loadBootstrapKle() {
-		log.info("Loading bootstrap KLE");
-		try(final InputStream resource = getResource("KLE-valid-data.xml")) {
-			final List<KleMainGroup> groups = importer.importFromXml(resource);
-			ps.storeAllKleMainGroups(groups);
-		} catch (Exception ex) {
-			log.error("Couldn't load KLE", ex);
-		}
-	}
-
-	private InputStream getResource(String name) {
-		return Thread.currentThread().getContextClassLoader().getResourceAsStream(name);
-	}
 }
