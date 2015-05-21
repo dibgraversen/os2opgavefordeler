@@ -22,8 +22,7 @@ public class Kle implements Serializable {
 	@JoinColumn
 	private Kle parent;
 
-	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	@JoinColumn
+	@OneToMany(mappedBy = "parent", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private final List<Kle> children = new ArrayList<>();
 
 
@@ -58,18 +57,20 @@ public class Kle implements Serializable {
 		this.dateCreated = dateCreated;
 	}
 
-	public Kle(String number, String title, String description, Date dateCreated, List<Kle> topics) {
+	public Kle(String number, String title, String description, Date dateCreated, List<Kle> children) {
 		this(number, title, description, dateCreated);
-		for (Kle topic : topics) {
-			addTopic(topic);
+		for (Kle topic : children) {
+			addChild(topic);
 		}
 	}
 
 
 
-	public void addTopic(Kle child) {
+	public void addChild(Kle child) {
 		child.setParent(this);
-		children.add(child);
+		if(!children.contains(child)) {
+			children.add(child);
+		}
 	}
 
 	public ImmutableList<Kle> getChildren() {
@@ -99,8 +100,8 @@ public class Kle implements Serializable {
 	protected void setParent(Kle parent) {
 		if(this.parent != null && this.parent != parent) {
 			this.parent.children.remove(this);
-			this.parent = parent;
 		}
+		this.parent = parent;
 	}
 
 
