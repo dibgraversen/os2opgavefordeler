@@ -1,9 +1,6 @@
 package dk.os2opgavefordeler.service;
 
-import com.google.common.collect.ImmutableList;
-import dk.os2opgavefordeler.model.kle.KleGroup;
-import dk.os2opgavefordeler.model.kle.KleMainGroup;
-import dk.os2opgavefordeler.model.kle.KleTopic;
+import dk.os2opgavefordeler.model.Kle;
 import org.slf4j.Logger;
 
 import javax.ejb.Stateless;
@@ -44,29 +41,29 @@ public class PersistenceServiceImpl implements PersistenceService {
 
 
 
-
+	private void touchChildren(List<Kle> kle) {
+		for (Kle k : kle) {
+			touchChildren(k.getChildren());
+		}
+	}
 
 	//TODO: move KLE specific stuff to a KLE service.
 	@Override
-	public List<KleMainGroup> fetchAllKleMainGroups() {
-		final Query query = em.createQuery("SELECT e FROM KleMainGroup e");
-		log.info("Executing query");
-		final List<KleMainGroup> result = query.getResultList();
+	public List<Kle> fetchAllKleMainGroups() {
+		final Query query = em.createQuery("SELECT e FROM Kle e");
+		final List<Kle> result = query.getResultList();
 		//FIXME: this is a workaround for EntityManager/session lifetime and lazyload...
-		for (KleMainGroup group : result) {
-			group.getGroups().size();
-		}
-		log.info("Returning result");
+		touchChildren(result);
 
 		return result;
 	}
 
 	@Override
-	public KleMainGroup fetchMainGroup(String number) {
-		final Query query = em.createQuery("SELECT e FROM KleMainGroup e where e.number = :number");
+	public Kle fetchMainGroup(String number) {
+		final Query query = em.createQuery("SELECT e FROM Kle e where e.number = :number");
 		query.setParameter("number", number);
 		try {
-			return (KleMainGroup) query.getSingleResult();
+			return (Kle) query.getSingleResult();
 		}
 		catch(NoResultException ex) {
 			log.warn("fetchMainGroup: no results for [{}]", number, ex);
@@ -76,19 +73,11 @@ public class PersistenceServiceImpl implements PersistenceService {
 	}
 
 	@Override
-	public void storeAllKleMainGroups(List<KleMainGroup> groups) {
+	public void storeAllKleMainGroups(List<Kle> groups) {
 		log.info("Deleting existing KLE");
-		final ImmutableList<String> tables = ImmutableList.of(
-				KleTopic.TABLE_NAME, KleGroup.TABLE_NAME, KleMainGroup.TABLE_NAME
-		);
-		for (String table : tables) {
-			//Named parameters don't seem to be supported for table named - this feels slightly dirty, but we'll live
-			// since there's no user-controlled data involved.
-			em.createQuery(String.format("DELETE FROM %s", table)).executeUpdate();
-		}
-
+		em.createQuery(String.format("DELETE FROM %s", Kle.TABLE_NAME)).executeUpdate();
 		log.info("Persisting new KLE");
-		for (KleMainGroup group : groups) {
+		for (Kle group : groups) {
 			em.persist(group);
 		}
 	}

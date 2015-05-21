@@ -1,5 +1,7 @@
 package dk.os2opgavefordeler.rest;
 
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.ws.rs.*;
@@ -8,12 +10,10 @@ import javax.ws.rs.core.Response;
 import java.io.InputStream;
 import java.util.List;
 
-import dk.os2opgavefordeler.model.kle.KleGroup;
-import dk.os2opgavefordeler.model.kle.KleTopic;
+import dk.os2opgavefordeler.model.Kle;
 import org.jboss.resteasy.annotations.cache.NoCache;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 
-import dk.os2opgavefordeler.model.kle.KleMainGroup;
 import dk.os2opgavefordeler.service.KleImportService;
 import dk.os2opgavefordeler.service.PersistenceService;
 import org.slf4j.Logger;
@@ -33,20 +33,20 @@ public class KleRestEndpoint {
 	@GET
 	@Produces(MediaType.TEXT_PLAIN)
 	public Response list() {
-		List<KleMainGroup> groups = persistence.fetchAllKleMainGroups();
+		List<Kle> groups = persistence.fetchAllKleMainGroups();
 
 		StringBuilder out = new StringBuilder();
 
 		out.append(String.format("List of %d groups: ", groups.size()));
 		int totalGroups = 0, totalTopics = 0;
-		for (KleMainGroup group : groups) {
+		for (Kle group : groups) {
 			out.append(String.format("Group %s/%s {\n", group.getNumber(), group.getTitle()));
-			totalGroups += group.getGroups().size();
-			for (KleGroup sub : group.getGroups()) {
+			totalGroups += group.getChildren().size();
+			for (Kle sub : group.getChildren()) {
 				out.append(String.format("\tSubgroup %s/%s {\n", sub.getNumber(), sub.getTitle()));
 
-				totalTopics += sub.getTopics().size();
-				for (KleTopic topic : sub.getTopics()) {
+				totalTopics += sub.getChildren().size();
+				for (Kle topic : sub.getChildren()) {
 					out.append(String.format("\t\tTopic %s/%s\n", topic.getNumber(), topic.getTitle()));
 				}
 				out.append("}\n");
@@ -63,7 +63,7 @@ public class KleRestEndpoint {
 	@Path("/groups/{number}")
 	public Response getGroup(@PathParam("number") String number)
 	{
-		KleMainGroup group = persistence.fetchMainGroup(number);
+		Kle group = persistence.fetchMainGroup(number);
 		if(group != null) {
 			log.info("returning group");
 			return Response.status(Response.Status.OK).entity(group).build();
@@ -87,7 +87,7 @@ public class KleRestEndpoint {
 			return Response.status(Response.Status.BAD_REQUEST).entity("Missing MXL").build();
 		}
 
-		final List<KleMainGroup> groups;
+		final List<Kle> groups;
 		try {
 			groups = (xsd == null) ?
 					importer.importFromXml(xml) :
@@ -109,13 +109,13 @@ public class KleRestEndpoint {
 	}
 
 
-	private void reportsStats(List<KleMainGroup> groups) {
+	private void reportsStats(List<Kle> groups) {
 		int max = 0, num = 0, numNonZero = 0;
 		long tlen = 0;
 		String desc;
 
 		log.info("reportStats: counting");
-		for (KleMainGroup main : groups) {
+		for (Kle main : groups) {
 			num++;
 
 			desc = main.getDescription();
@@ -126,7 +126,7 @@ public class KleRestEndpoint {
 				tlen += len;
 			}
 
-			for (KleGroup group : main.getGroups()) {
+			for (Kle group : main.getChildren()) {
 				num++;
 				desc = group.getDescription();
 				if(!desc.isEmpty()) {
@@ -136,7 +136,7 @@ public class KleRestEndpoint {
 					tlen += len;
 				}
 
-				for (KleTopic topic : group.getTopics()) {
+				for (Kle topic : group.getChildren()) {
 					num++;
 					desc = topic.getDescription();
 					if(!desc.isEmpty()) {

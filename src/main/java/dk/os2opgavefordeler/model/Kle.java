@@ -1,4 +1,4 @@
-package dk.os2opgavefordeler.model.kle;
+package dk.os2opgavefordeler.model;
 
 import com.google.common.collect.ImmutableList;
 
@@ -9,20 +9,24 @@ import java.util.Date;
 import java.util.List;
 
 @Entity
-@Table(name = KleGroup.TABLE_NAME)
-public class KleGroup implements Serializable, KleParent {
+@Table(name = Kle.TABLE_NAME)
+public class Kle implements Serializable {
 	private static final long serialVersionUID = 1L;
-	public static final String TABLE_NAME = "KleGroup";
+	public static final String TABLE_NAME = "Kle";
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	int id;
 
 	@ManyToOne
 	@JoinColumn
-	private KleMainGroup parent;
+	private Kle parent;
 
-	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@JoinColumn
-	private final List<KleTopic> topics = new ArrayList<>();
+	private final List<Kle> children = new ArrayList<>();
 
-	@Id
+
 	@Column(nullable = false, updatable = false)
 	private final String number;
 
@@ -39,7 +43,7 @@ public class KleGroup implements Serializable, KleParent {
 
 
 
-	public KleGroup() {
+	public Kle() {
 		//for JPA
 		this.number = null;
 		this.title = null;
@@ -47,29 +51,29 @@ public class KleGroup implements Serializable, KleParent {
 		this.dateCreated = null;
 	}
 
-	public KleGroup(String number, String title, String description, Date dateCreated) {
+	public Kle(String number, String title, String description, Date dateCreated) {
 		this.number = number;
 		this.title = title;
 		this.description = description;
 		this.dateCreated = dateCreated;
 	}
 
-	public KleGroup(String number, String title, String description, Date dateCreated, List<KleTopic> topics) {
+	public Kle(String number, String title, String description, Date dateCreated, List<Kle> topics) {
 		this(number, title, description, dateCreated);
-		for (KleTopic topic : topics) {
+		for (Kle topic : topics) {
 			addTopic(topic);
 		}
 	}
 
 
 
-	public void addTopic(KleTopic topic) {
-		topic.setParent(this);
-		topics.add(topic);
+	public void addTopic(Kle child) {
+		child.setParent(this);
+		children.add(child);
 	}
 
-	public ImmutableList<KleTopic> getTopics() {
-		return ImmutableList.copyOf(topics);
+	public ImmutableList<Kle> getChildren() {
+		return ImmutableList.copyOf(children);
 	}
 
 
@@ -92,14 +96,17 @@ public class KleGroup implements Serializable, KleParent {
 
 
 
-	protected void setParent(KleMainGroup parent) {
-		this.parent = parent;
+	protected void setParent(Kle parent) {
+		if(this.parent != null && this.parent != parent) {
+			this.parent.children.remove(this);
+			this.parent = parent;
+		}
 	}
 
 
 
 	@Override
 	public String toString() {
-		return String.format("KleGroup<%s,%s> - %d topics", number, title, topics.size());
+		return String.format("Kle<%s,%s>", number, title);
 	}
 }

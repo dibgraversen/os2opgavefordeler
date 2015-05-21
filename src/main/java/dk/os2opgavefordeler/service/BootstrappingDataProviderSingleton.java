@@ -1,8 +1,8 @@
 package dk.os2opgavefordeler.service;
 
 import dk.os2opgavefordeler.model.Role;
-import dk.os2opgavefordeler.model.kle.KleMainGroup;
 import dk.os2opgavefordeler.model.UserSettings;
+import dk.os2opgavefordeler.model.Kle;
 import dk.os2opgavefordeler.model.presentation.FilterScope;
 import dk.os2opgavefordeler.model.presentation.RolePO;
 import org.slf4j.Logger;
@@ -42,7 +42,7 @@ public class BootstrappingDataProviderSingleton {
 		buildRoles();
 		buildUserSettings();
 
-		loadBootstrapKle();
+		final List<Kle> groups = loadBootstrapKle();
 	}
 
 	public void buildRoles(){
@@ -104,10 +104,10 @@ public class BootstrappingDataProviderSingleton {
 		usersService.createUserSettings(settings);
 	}
 
-	private List<KleMainGroup> loadBootstrapKle() {
+	private List<Kle> loadBootstrapKle() {
 		log.info("Loading bootstrap KLE");
 		try(final InputStream resource = getResource("KLE-valid-data.xml")) {
-			final List<KleMainGroup> groups = importer.importFromXml(resource);
+			final List<Kle> groups = importer.importFromXml(resource);
 			ps.storeAllKleMainGroups(groups);
 			return groups;
 		} catch (Exception ex) {

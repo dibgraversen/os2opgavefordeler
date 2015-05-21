@@ -2,10 +2,7 @@ package dk.os2opgavefordeler.rest;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Range;
-import dk.os2opgavefordeler.model.kle.KleGroup;
-import dk.os2opgavefordeler.model.kle.KleMainGroup;
-import dk.os2opgavefordeler.model.kle.KleParent;
-import dk.os2opgavefordeler.model.kle.KleTopic;
+import dk.os2opgavefordeler.model.Kle;
 import dk.os2opgavefordeler.model.presentation.DistributionRulePO;
 import dk.os2opgavefordeler.service.PersistenceService;
 import dk.osto.model.KLE;
@@ -57,7 +54,7 @@ public class DistributionRuleEndpoint {
 			return Response.noContent().build();
 		}
 
-		final List<KleMainGroup> groups = persistence.fetchAllKleMainGroups();
+		final List<Kle> groups = persistence.fetchAllKleMainGroups();
 		if(groups.isEmpty()) {
 			log.info("persistence.fetchAllKleMainGroups: empty, returning NO_CONTENT");
 			return Response.noContent().build();
@@ -66,15 +63,15 @@ public class DistributionRuleEndpoint {
 
 		final List<DistributionRulePO> result = new ArrayList<>();
 		int currentPoId = 1;
-		for(KleMainGroup main : Lists.partition(groups, 3).get(employment-1)) {
+		for(Kle main : Lists.partition(groups, 3).get(employment-1)) {
 			addPo(result, main, employment, currentPoId);
 			++currentPoId;
 
-			for (KleGroup group : main.getGroups()) {
+			for (Kle group : main.getChildren()) {
 				addPo(result, group, employment, currentPoId);
 				++currentPoId;
 
-				for (KleTopic topic : group.getTopics()) {
+				for (Kle topic : group.getChildren()) {
 					addPo(result, topic, employment, currentPoId);
 					++currentPoId;
 				}
@@ -84,7 +81,7 @@ public class DistributionRuleEndpoint {
 		return Response.ok(result).build();
 	}
 
-	private void addPo(List<DistributionRulePO> result, KleParent kle, Integer employment, int id) {
+	private void addPo(List<DistributionRulePO> result, Kle kle, Integer employment, int id) {
 		final DistributionRulePO po = new DistributionRulePO();
 
 		po.setId(id);
@@ -97,13 +94,15 @@ public class DistributionRuleEndpoint {
 		result.add(po);
 	}
 
-	private static KLE kleFrom(KleParent in) {
+	private static KLE kleFrom(Kle in) {
 		KLE kle = new KLE();
 
 		kle.setNumber(in.getNumber());
 		kle.setName(in.getTitle());
 		kle.setServiceText(in.getDescription());
 
+		/*
+		//TODO: need to track type
 		if(in instanceof KleMainGroup) {
 			kle.setType("main");
 		} else if(in instanceof KleGroup) {
@@ -111,8 +110,8 @@ public class DistributionRuleEndpoint {
 		} else if(in instanceof KleTopic) {
 			kle.setType("topic");
 		} else {
+		*/
 			kle.setType("<unknown>");
-		}
 
 		return kle;
 	}

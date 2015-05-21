@@ -2,9 +2,7 @@ package dk.os2opgavefordeler.service;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
-import dk.os2opgavefordeler.model.kle.KleGroup;
-import dk.os2opgavefordeler.model.kle.KleMainGroup;
-import dk.os2opgavefordeler.model.kle.KleTopic;
+import dk.os2opgavefordeler.model.Kle;
 import dk.os2opgavefordeler.model.kle_import.*;
 import dk.os2opgavefordeler.util.FilteringXMLStreamWriter;
 
@@ -26,49 +24,49 @@ public class KleImportMapper {
 
 	//TODO: should we drop entries with a non-empty 'Udgaaet' date, or should we add dateExpired to the model?
 
-	public static List<KleMainGroup> mapMainGroupList(KLEEmneplanKomponent input) {
-		return Lists.transform(input.getHovedgruppe(), new Function<HovedgruppeKomponent, KleMainGroup>() {
-			public KleMainGroup apply(HovedgruppeKomponent item) {
+	public static List<Kle> mapMainGroupList(KLEEmneplanKomponent input) {
+		return Lists.transform(input.getHovedgruppe(), new Function<HovedgruppeKomponent, Kle>() {
+			public Kle apply(HovedgruppeKomponent item) {
 				return mapMainGroup(item);
 			}
 		});
 	}
 
-	public static KleMainGroup mapMainGroup(HovedgruppeKomponent input) {
+	public static Kle mapMainGroup(HovedgruppeKomponent input) {
 		final String number = input.getHovedgruppeNr();
 		final String title = input.getHovedgruppeTitel();
 		final String description = buildDescription(input.getHovedgruppeVejledning());
 		final Date dateCreated = dateFrom(input.getHovedgruppeAdministrativInfo().getOprettetDato());
 
-		final List<KleGroup> groups = Lists.transform(input.getGruppe(), new Function<GruppeKomponent, KleGroup>() {
-			public KleGroup apply(GruppeKomponent item) {
+		final List<Kle> groups = Lists.transform(input.getGruppe(), new Function<GruppeKomponent, Kle>() {
+			public Kle apply(GruppeKomponent item) {
 				return mapGroup(item);
 			}
 		});
-		return new KleMainGroup(number, title, description, dateCreated, groups);
+		return new Kle(number, title, description, dateCreated, groups);
 	}
 
-	public static KleGroup mapGroup(GruppeKomponent input) {
+	public static Kle mapGroup(GruppeKomponent input) {
 		final String number = input.getGruppeNr();
 		final String title = input.getGruppeTitel();
 		final String description = buildDescription(input.getGruppeVejledning());
 		final Date dateCreated = dateFrom(input.getGruppeAdministrativInfo().getOprettetDato());
 
-		final List<KleTopic> topics = Lists.transform(input.getEmne(), new Function<EmneKomponent, KleTopic>() {
-			public KleTopic apply(EmneKomponent item) {
+		final List<Kle> topics = Lists.transform(input.getEmne(), new Function<EmneKomponent, Kle>() {
+			public Kle apply(EmneKomponent item) {
 				return mapTopic(item);
 			}
 		});
-		return new KleGroup(number, title, description, dateCreated, topics);
+		return new Kle(number, title, description, dateCreated, topics);
 	}
 
-	public static KleTopic mapTopic(EmneKomponent input) {
+	public static Kle mapTopic(EmneKomponent input) {
 		final String number = input.getEmneNr();
 		final String title = input.getEmneTitel();
 		final String description = buildDescription(input.getEmneVejledning());
 		final Date dateCreated = dateFrom(input.getEmneAdministrativInfo().getOprettetDato());
 
-		return new KleTopic(number, title, description, dateCreated);
+		return new Kle(number, title, description, dateCreated);
 	}
 
 	public static String buildDescription(VejledningKomponent vejledning)

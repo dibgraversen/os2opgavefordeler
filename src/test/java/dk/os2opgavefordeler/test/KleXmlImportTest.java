@@ -7,9 +7,7 @@ import java.util.List;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.FluentIterable;
-import dk.os2opgavefordeler.model.kle.KleGroup;
-import dk.os2opgavefordeler.model.kle.KleMainGroup;
-import dk.os2opgavefordeler.model.kle.KleTopic;
+import dk.os2opgavefordeler.model.Kle;
 import dk.os2opgavefordeler.service.KleImportService;
 import dk.os2opgavefordeler.service.KleImportServiceImpl;
 
@@ -20,7 +18,7 @@ import org.junit.experimental.categories.Category;
 
 @Category(UnitTest.class)
 public class KleXmlImportTest {
-	private static List<KleMainGroup> groups;
+	private static List<Kle> groups;
 
 	@BeforeClass
 	public static void importValidXml()
@@ -39,28 +37,28 @@ public class KleXmlImportTest {
 	@Test
 	public void testKleMainGroup() {
 		assertEquals("Incorrect number of main groups", 3, groups.size());
-		final KleMainGroup mgroup = groups.get(1);
+		final Kle mgroup = groups.get(1);
 		assertEquals("Incorrect KLE-number", "13", mgroup.getNumber());
 		assertEquals("Incorrect title", "Forsyning", mgroup.getTitle());
 	}
 
 	@Test
 	public void testKleGroup() {
-		final KleMainGroup mgroup = groups.get(1);
+		final Kle mgroup = groups.get(1);
 
-		assertEquals("Incorrect number of groups", 5, mgroup.getGroups().size(), 5);
-		final KleGroup group = mgroup.getGroups().get(3);
+		assertEquals("Incorrect number of groups", 5, mgroup.getChildren().size(), 5);
+		final Kle group = mgroup.getChildren().get(3);
 		assertEquals("Incorrect KLE-number", "13.03", group.getNumber());
 		assertEquals("Incorrect title", "Varmeforsyning", group.getTitle());
 	}
 
 	@Test
 	public void testKleTopic() {
-		final KleMainGroup mgroup = groups.get(1);
-		final KleGroup group = mgroup.getGroups().get(3);
+		final Kle mgroup = groups.get(1);
+		final Kle group = mgroup.getChildren().get(3);
 
-		assertEquals("Incorrect number of topics", 13, group.getTopics().size());
-		final KleTopic topic = group.getTopics().get(11);
+		assertEquals("Incorrect number of topics", 13, group.getChildren().size());
+		final Kle topic = group.getChildren().get(11);
 		assertEquals("Incorrect KLE-number", "13.03.24", topic.getNumber());
 		assertEquals("Incorrect title", "Ekspropriation til varmeforsyning", topic.getTitle());
 	}
@@ -90,43 +88,43 @@ public class KleXmlImportTest {
 			"</ul>" +
 		"</p>";
 
-		final KleTopic topic = findTopic("00.03.02");
+		final Kle topic = findTopic("00.03.02");
 		assertEquals("Wrong description", description, topic.getDescription());
 	}
 
-	public static KleTopic findTopic(final String topicNum) {
+	public static Kle findTopic(final String topicNum) {
 		final String mainNum = topicNum.substring(0, 2);
 		final String subNum = topicNum.substring(0, 5);
 
 		return FluentIterable.from(groups)
-			.filter(new Predicate<KleMainGroup>() {
+			.filter(new Predicate<Kle>() {
 				@Override
-				public boolean apply(KleMainGroup kleMainGroup) {
-					return kleMainGroup.getNumber().equals(mainNum);
+				public boolean apply(Kle kleMainGroup) {
+					return mainNum.equals(kleMainGroup.getNumber());
 				}
 			})
-			.transformAndConcat(new Function<KleMainGroup, FluentIterable<KleGroup>>() {
+			.transformAndConcat(new Function<Kle, FluentIterable<Kle>>() {
 				@Override
-				public FluentIterable<KleGroup> apply(KleMainGroup mainGroup) {
-					return FluentIterable.from(mainGroup.getGroups());
+				public FluentIterable<Kle> apply(Kle mainGroup) {
+					return FluentIterable.from(mainGroup.getChildren());
 				}
 			})
-			.filter(new Predicate<KleGroup>() {
+			.filter(new Predicate<Kle>() {
 				@Override
-				public boolean apply(KleGroup group) {
-					return group.getNumber().equals(subNum);
+				public boolean apply(Kle group) {
+					return subNum.equals(group.getNumber());
 				}
 			})
-			.transformAndConcat(new Function<KleGroup, FluentIterable<KleTopic>>() {
+			.transformAndConcat(new Function<Kle, FluentIterable<Kle>>() {
 				@Override
-				public FluentIterable<KleTopic> apply(KleGroup kleGroup) {
-					return FluentIterable.from(kleGroup.getTopics());
+				public FluentIterable<Kle> apply(Kle kleGroup) {
+					return FluentIterable.from(kleGroup.getChildren());
 				}
 			})
-			.firstMatch(new Predicate<KleTopic>() {
+			.firstMatch(new Predicate<Kle>() {
 				@Override
-				public boolean apply(KleTopic topic) {
-					return topic.getNumber().equals(topicNum);
+				public boolean apply(Kle topic) {
+					return topicNum.equals(topic.getNumber());
 				}
 			})
 			.orNull();
