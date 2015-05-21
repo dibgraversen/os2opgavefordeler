@@ -14,10 +14,12 @@ import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
 import java.util.List;
 
 @Stateless
-@TransactionAttribute(value = TransactionAttributeType.REQUIRES_NEW)
+@TransactionAttribute(value = TransactionAttributeType.REQUIRED)
 public class PersistenceServiceImpl implements PersistenceService {
 	@Inject
 	private Logger log;
@@ -25,6 +27,26 @@ public class PersistenceServiceImpl implements PersistenceService {
 	@PersistenceContext(unitName = "OS2TopicRouter")
 	private EntityManager em;
 
+	@Override
+	public <T> void persist(T entity) {
+		em.persist(entity);
+	}
+
+	@Override
+	public <T> List<T> criteriaFind(Class clazz, CriteriaOp op) {
+		final CriteriaBuilder cb = em.getCriteriaBuilder();
+		final CriteriaQuery<T> cq = cb.createQuery(clazz);
+
+		op.apply(cb, cq);
+
+		return em.createQuery(cq).getResultList();
+	}
+
+
+
+
+
+	//TODO: move KLE specific stuff to a KLE service.
 	@Override
 	public List<KleMainGroup> fetchAllKleMainGroups() {
 		final Query query = em.createQuery("SELECT e FROM KleMainGroup e");
@@ -57,7 +79,7 @@ public class PersistenceServiceImpl implements PersistenceService {
 	public void storeAllKleMainGroups(List<KleMainGroup> groups) {
 		log.info("Deleting existing KLE");
 		final ImmutableList<String> tables = ImmutableList.of(
-			KleTopic.TABLE_NAME, KleGroup.TABLE_NAME, KleMainGroup.TABLE_NAME
+				KleTopic.TABLE_NAME, KleGroup.TABLE_NAME, KleMainGroup.TABLE_NAME
 		);
 		for (String table : tables) {
 			//Named parameters don't seem to be supported for table named - this feels slightly dirty, but we'll live
