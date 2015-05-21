@@ -1,6 +1,7 @@
 package dk.os2opgavefordeler.service;
 
 import com.google.common.base.Function;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import dk.os2opgavefordeler.model.Kle;
 import dk.os2opgavefordeler.model.kle_import.*;
@@ -17,59 +18,73 @@ import java.io.StringWriter;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * Maps the unmarshalled object model (jxc compiled from .xsd) to our own, simpler, domain model.
+ *
+ * A couple of *important* notes with regards to performance:
+ * 1) Guava Lists.transform is a *computed view* - it works by applying the transform on every access.
+ *    To avoid the constant computations, we instantiate the transforms to a concrete list in mapMainGroupList().
+ *
+ * 2) JAXB Context creation is very expensive. Moving context creation from buildDescription() to mapMainGroupList()
+ *    reduced mapping time from ~25s down to ~1s.
+ */
 public class KleImportMapper {
 	public static final String FAKE_ROOT = "FakeRoot";
 	public static final String REAL_ROOT = "VejledningTekst";
-	public static final int DESC_LEN = 6000; 	// Description stringwriter buffer size,a bit larger than max in current dataset.
+	public static final int DESC_LEN = 6000; 	// Description stringwriter buffer size, a bit larger than max in current dataset.
 
 	//TODO: should we drop entries with a non-empty 'Udgaaet' date, or should we add dateExpired to the model?
 
-	public static List<Kle> mapMainGroupList(KLEEmneplanKomponent input) {
-		return Lists.transform(input.getHovedgruppe(), new Function<HovedgruppeKomponent, Kle>() {
+	public static List<Kle> mapMainGroupList(KLEEmneplanKomponent input) throws JAXBException {
+		final JAXBContext jc = JAXBContext.newInstance(VejledningKomponent.class);
+
+		List<Kle> mainGroups = Lists.transform(input.getHovedgruppe(), new Function<HovedgruppeKomponent, Kle>() {
 			public Kle apply(HovedgruppeKomponent item) {
-				return mapMainGroup(item);
+				return mapMainGroup(item, jc);
 			}
 		});
+
+		return ImmutableList.copyOf(mainGroups);
 	}
 
-	public static Kle mapMainGroup(HovedgruppeKomponent input) {
+	public static Kle mapMainGroup(HovedgruppeKomponent input, final JAXBContext jc) {
 		final String number = input.getHovedgruppeNr();
 		final String title = input.getHovedgruppeTitel();
-		final String description = buildDescription(input.getHovedgruppeVejledning());
+		final String description = buildDescription(jc, input.getHovedgruppeVejledning());
 		final Date dateCreated = dateFrom(input.getHovedgruppeAdministrativInfo().getOprettetDato());
 
 		final List<Kle> groups = Lists.transform(input.getGruppe(), new Function<GruppeKomponent, Kle>() {
 			public Kle apply(GruppeKomponent item) {
-				return mapGroup(item);
+				return mapGroup(item, jc);
 			}
 		});
 		return new Kle(number, title, description, dateCreated, groups);
 	}
 
-	public static Kle mapGroup(GruppeKomponent input) {
+	public static Kle mapGroup(GruppeKomponent input, final JAXBContext jc) {
 		final String number = input.getGruppeNr();
 		final String title = input.getGruppeTitel();
-		final String description = buildDescription(input.getGruppeVejledning());
+		final String description = buildDescription(jc, input.getGruppeVejledning());
 		final Date dateCreated = dateFrom(input.getGruppeAdministrativInfo().getOprettetDato());
 
 		final List<Kle> topics = Lists.transform(input.getEmne(), new Function<EmneKomponent, Kle>() {
 			public Kle apply(EmneKomponent item) {
-				return mapTopic(item);
+				return mapTopic(item, jc);
 			}
 		});
 		return new Kle(number, title, description, dateCreated, topics);
 	}
 
-	public static Kle mapTopic(EmneKomponent input) {
+	public static Kle mapTopic(EmneKomponent input, final JAXBContext jc) {
 		final String number = input.getEmneNr();
 		final String title = input.getEmneTitel();
-		final String description = buildDescription(input.getEmneVejledning());
+		final String description = buildDescription(jc, input.getEmneVejledning());
 		final Date dateCreated = dateFrom(input.getEmneAdministrativInfo().getOprettetDato());
 
 		return new Kle(number, title, description, dateCreated);
 	}
 
-	public static String buildDescription(VejledningKomponent vejledning)
+	public static String buildDescription(JAXBContext jContext, VejledningKomponent vejledning)
 	{
 		if(vejledning == null) {
 			//TODO: should we allow description to be nullable in the db instead of this?
@@ -77,7 +92,6 @@ public class KleImportMapper {
 		}
 		try {
 			// Instead of walking the somewhat ugly object graph, we cheat and marshal it with JAXB and gentle massage.
-			final JAXBContext jContext = JAXBContext.newInstance(VejledningKomponent.class);
 			final Marshaller marshaller = jContext.createMarshaller();
 
 			// Avoid XML header in output.

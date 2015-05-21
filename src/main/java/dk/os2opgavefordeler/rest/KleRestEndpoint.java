@@ -107,77 +107,39 @@ public class KleRestEndpoint {
 	}
 
 
-	private void reportsStats(List<Kle> groups) {
-		int max = 0, num = 0, numNonZero = 0;
+	private interface Visitor<T> {
+		void visit(T object);
+	}
+	static private class Stats {
+		public int max = 0, num = 0, numNonZero = 0;
 		long tlen = 0;
-		String desc;
+	}
+	private void visit(List<Kle> kle, Visitor<Kle> visitor) {
+		for(Kle k : kle) {
+			visitor.visit(k);
+			visit(k.getChildren(), visitor);
+		}
+	}
+	private void reportsStats(List<Kle> groups) {
+		final Stats stats = new Stats();
 
 		log.info("reportStats: counting");
-		for (Kle main : groups) {
-			num++;
+		visit(groups, new Visitor<Kle>() {
+			@Override
+			public void visit(Kle kle) {
+			stats.num++;
 
-			desc = main.getDescription();
+			final String desc = kle.getDescription();
 			if(!desc.isEmpty()) {
 				int len = desc.length();
-				max = Math.max(max, len);
-				numNonZero++;
-				tlen += len;
+				stats.max = Math.max(stats.max, len);
+				stats.numNonZero++;
+				stats.tlen += len;
 			}
-
-			for (Kle group : main.getChildren()) {
-				num++;
-				desc = group.getDescription();
-				if(!desc.isEmpty()) {
-					int len = desc.length();
-					max = Math.max(max, len);
-					numNonZero++;
-					tlen += len;
-				}
-
-				for (Kle topic : group.getChildren()) {
-					num++;
-					desc = topic.getDescription();
-					if(!desc.isEmpty()) {
-						int len = desc.length();
-						max = Math.max(max, len);
-						numNonZero++;
-						tlen += len;
-					}
-				}
 			}
-		}
-
-		/*
-		// this is cute, but only reports stats for the leaf nodes... doh.
-
-		List<KleTopic> topics = FluentIterable
-				.from(groups)
-				.transformAndConcat(new Function<KleMainGroup, FluentIterable<KleGroup>>() {
-					@Override
-					public FluentIterable<KleGroup> apply(KleMainGroup kleMainGroup) {
-						return FluentIterable.from(kleMainGroup.getGroups());
-					}
-				})
-				.transformAndConcat(new Function<KleGroup, FluentIterable<KleTopic>>() {
-					@Override
-					public FluentIterable<KleTopic> apply(KleGroup kleGroup) {
-						return FluentIterable.from(kleGroup.getTopics());
-					}
-				})
-				.toList();
-
-		for (KleTopic topic : topics) {
-			if(!topic.getDescription().isEmpty()) {
-				int len = topic.getDescription().length();
-				max = Math.max(max, len);
-				numNonZero++;
-				tlen += len;
-			}
-		}
-		*/
+		});
 
 		log.info(String.format("%d topics, %d nonzero, %d maxlen, %.3f avglen",
-				num, numNonZero, max, (double) tlen / numNonZero));
+				stats.num, stats.numNonZero, stats.max, (double) stats.tlen / stats.numNonZero));
 	}
-
 }
