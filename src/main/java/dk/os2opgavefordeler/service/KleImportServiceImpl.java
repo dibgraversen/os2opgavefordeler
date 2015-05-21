@@ -69,7 +69,7 @@ public class KleImportServiceImpl implements KleImportService {
 					unmarshaller.unmarshal(new StreamSource(xml), KLEEmneplanKomponent.class);
 
 			log.info("internalImport: Mapping to entity models");
-			final List<Kle> groups = KleImportMapper.mapMainGroupList(plan.getValue());
+			final List<Kle> groups = KleImportMapperImpl.mapMainGroupList(plan.getValue());
 			return groups;
 		}
 		catch(JAXBException|SAXException ex) {
