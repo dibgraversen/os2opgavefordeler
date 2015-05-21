@@ -1,6 +1,5 @@
 package dk.os2opgavefordeler.service;
 
-import dk.os2opgavefordeler.model.Kle;
 import org.slf4j.Logger;
 
 import javax.ejb.Stateless;
@@ -8,11 +7,10 @@ import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 import java.util.List;
 
 @Stateless
@@ -30,55 +28,23 @@ public class PersistenceServiceImpl implements PersistenceService {
 	}
 
 	@Override
-	public <T> List<T> criteriaFind(Class clazz, CriteriaOp op) {
+	public <T> List<T> criteriaFind(Class<T> clazz, CriteriaOp op) {
 		final CriteriaBuilder cb = em.getCriteriaBuilder();
 		final CriteriaQuery<T> cq = cb.createQuery(clazz);
+		final Root<T> ent = cq.from(clazz);
 
-		op.apply(cb, cq);
+		op.apply(cb, cq, ent);
 
 		return em.createQuery(cq).getResultList();
 	}
 
-
-
-	private void touchChildren(List<Kle> kle) {
-		for (Kle k : kle) {
-			touchChildren(k.getChildren());
-		}
-	}
-
-	//TODO: move KLE specific stuff to a KLE service.
 	@Override
-	public List<Kle> fetchAllKleMainGroups() {
-		final Query query = em.createQuery("SELECT e FROM Kle e");
-		final List<Kle> result = query.getResultList();
-		//FIXME: this is a workaround for EntityManager/session lifetime and lazyload...
-		touchChildren(result);
-
-		return result;
-	}
-
-	@Override
-	public Kle fetchMainGroup(String number) {
-		final Query query = em.createQuery("SELECT e FROM Kle e where e.number = :number");
-		query.setParameter("number", number);
-		try {
-			return (Kle) query.getSingleResult();
-		}
-		catch(NoResultException ex) {
-			log.warn("fetchMainGroup: no results for [{}]", number, ex);
-			//TODO: Java8 Optional?
-			return null;
-		}
-	}
-
-	@Override
-	public void storeAllKleMainGroups(List<Kle> groups) {
-		log.info("Deleting existing KLE");
-		em.createQuery(String.format("DELETE FROM %s", Kle.TABLE_NAME)).executeUpdate();
-		log.info("Persisting new KLE");
-		for (Kle group : groups) {
-			em.persist(group);
-		}
+	public <T> List<T> findAll(final Class<T> clazz) {
+		return criteriaFind(clazz, new CriteriaOp() {
+			@Override
+			public void apply(CriteriaBuilder cb, CriteriaQuery cq, Root ent) {
+				cq.select( cq.from(clazz));
+			}
+		});
 	}
 }

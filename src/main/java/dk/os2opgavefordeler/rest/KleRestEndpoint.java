@@ -1,7 +1,5 @@
 package dk.os2opgavefordeler.rest;
 
-import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionAttributeType;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.ws.rs.*;
@@ -11,11 +9,11 @@ import java.io.InputStream;
 import java.util.List;
 
 import dk.os2opgavefordeler.model.Kle;
+import dk.os2opgavefordeler.service.KleService;
 import org.jboss.resteasy.annotations.cache.NoCache;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 
 import dk.os2opgavefordeler.service.KleImportService;
-import dk.os2opgavefordeler.service.PersistenceService;
 import org.slf4j.Logger;
 
 @Path("/kle")
@@ -28,12 +26,12 @@ public class KleRestEndpoint {
 	private KleImportService importer;
 
 	@Inject
-	private PersistenceService persistence;
+	private KleService kleService;
 
 	@GET
 	@Produces(MediaType.TEXT_PLAIN)
 	public Response list() {
-		List<Kle> groups = persistence.fetchAllKleMainGroups();
+		List<Kle> groups = kleService.fetchAllKleMainGroups();
 
 		StringBuilder out = new StringBuilder();
 
@@ -63,7 +61,7 @@ public class KleRestEndpoint {
 	@Path("/groups/{number}")
 	public Response getGroup(@PathParam("number") String number)
 	{
-		Kle group = persistence.fetchMainGroup(number);
+		Kle group = kleService.fetchMainGroup(number);
 		if(group != null) {
 			log.info("returning group");
 			return Response.status(Response.Status.OK).entity(group).build();
@@ -93,7 +91,7 @@ public class KleRestEndpoint {
 					importer.importFromXml(xml) :
 					importer.importFromXml(xml, xsd);
 
-			persistence.storeAllKleMainGroups(groups);
+			kleService.storeAllKleMainGroups(groups);
 		}
 		catch (Exception ex) {
 			log.error("Error importing KLE XML", ex);

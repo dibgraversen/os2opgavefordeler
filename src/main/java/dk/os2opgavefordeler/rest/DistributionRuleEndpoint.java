@@ -4,7 +4,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Range;
 import dk.os2opgavefordeler.model.Kle;
 import dk.os2opgavefordeler.model.presentation.DistributionRulePO;
-import dk.os2opgavefordeler.service.PersistenceService;
+import dk.os2opgavefordeler.service.KleService;
 import dk.osto.model.KLE;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +26,7 @@ public class DistributionRuleEndpoint {
 	private final Logger log = LoggerFactory.getLogger(getClass());
 
 	@Inject
-	PersistenceService persistence;
+	KleService kleService;
 
 	/**
 	 *
@@ -54,7 +54,7 @@ public class DistributionRuleEndpoint {
 			return Response.noContent().build();
 		}
 
-		final List<Kle> groups = persistence.fetchAllKleMainGroups();
+		final List<Kle> groups = kleService.fetchAllKleMainGroups();
 		if(groups.isEmpty()) {
 			log.info("persistence.fetchAllKleMainGroups: empty, returning NO_CONTENT");
 			return Response.noContent().build();

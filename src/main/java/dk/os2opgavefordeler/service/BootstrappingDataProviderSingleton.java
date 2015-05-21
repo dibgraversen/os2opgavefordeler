@@ -1,5 +1,6 @@
 package dk.os2opgavefordeler.service;
 
+import dk.os2opgavefordeler.model.DistributionRule;
 import dk.os2opgavefordeler.model.Role;
 import dk.os2opgavefordeler.model.UserSettings;
 import dk.os2opgavefordeler.model.Kle;
@@ -32,7 +33,7 @@ public class BootstrappingDataProviderSingleton {
 	private KleImportService importer;
 
 	@Inject
-	PersistenceService ps;
+	KleService kleService;
 
 	@Inject
 	DistributionService distService;
@@ -108,7 +109,7 @@ public class BootstrappingDataProviderSingleton {
 		log.info("Loading bootstrap KLE");
 		try(final InputStream resource = getResource("KLE-valid-data.xml")) {
 			final List<Kle> groups = importer.importFromXml(resource);
-			ps.storeAllKleMainGroups(groups);
+			kleService.storeAllKleMainGroups(groups);
 			return groups;
 		} catch (Exception ex) {
 			log.error("Couldn't load KLE", ex);

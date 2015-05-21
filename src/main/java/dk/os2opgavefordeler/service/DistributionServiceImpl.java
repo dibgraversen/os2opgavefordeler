@@ -30,11 +30,9 @@ public class DistributionServiceImpl implements DistributionService {
 
 	@Override
 	public List<DistributionRule> getDistributionsForOrg(final long orgId, final boolean includeUnassigned) {
-		return persistence.criteriaFind(DistributionRule.class, new PersistenceService.CriteriaOp() {
+		return persistence.criteriaFind(DistributionRule.class, new PersistenceService.CriteriaOp<DistributionRule>() {
 			@Override
-			public void apply(CriteriaBuilder cb, CriteriaQuery cq) {
-				final Root<DistributionRule> rule = cq.from(DistributionRule.class);
-
+			public void apply(CriteriaBuilder cb, CriteriaQuery<DistributionRule> cq, Root<DistributionRule> rule) {
 				cq.where(cb.equal(rule.get(DistributionRule_.responsibleOrg), orgId));
 				if(includeUnassigned) {
 					cq.where(cb.or(rule.get(DistributionRule_.responsibleOrg).isNull()));
