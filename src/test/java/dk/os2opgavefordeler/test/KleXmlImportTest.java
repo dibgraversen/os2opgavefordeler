@@ -7,30 +7,47 @@ import java.util.List;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.FluentIterable;
+import dk.os2opgavefordeler.LoggerProducer;
 import dk.os2opgavefordeler.model.Kle;
+import dk.os2opgavefordeler.service.KleImportMapperImpl;
 import dk.os2opgavefordeler.service.KleImportService;
 import dk.os2opgavefordeler.service.KleImportServiceImpl;
 
 import static org.junit.Assert.*;
-import org.junit.BeforeClass;
+
+import org.jglue.cdiunit.AdditionalClasses;
+import org.jglue.cdiunit.CdiRunner;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.junit.runner.RunWith;
+
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
 
 @Category(UnitTest.class)
+@RunWith(CdiRunner.class)
+@AdditionalClasses({KleImportServiceImpl.class, KleImportMapperImpl.class, LoggerProducer.class})
 public class KleXmlImportTest {
 	private static List<Kle> groups;
 
-	@BeforeClass
-	public static void importValidXml()
+	@Inject
+	KleImportService kleImport;
+
+	@PostConstruct
+	public void importValidXml()
 	throws Exception
 	{
+		if(groups != null) {
+			// only load the test KLE once.
+			return;
+		}
+
 		final File folder = new File("src/test/resources");
 		try(
 				FileInputStream kleXsd = new FileInputStream(new File(folder, "KLE-Emneplan-version-2-0.xsd"));
 				FileInputStream kleXml = new FileInputStream(new File(folder, "KLE-valid-data.xml"))
 		) {
-			final KleImportService is = new KleImportServiceImpl();
-			groups = is.importFromXml(kleXml, kleXsd);
+			groups = kleImport.importFromXml(kleXml, kleXsd);
 		}
 	}
 
@@ -92,7 +109,7 @@ public class KleXmlImportTest {
 		assertEquals("Wrong description", description, topic.getDescription());
 	}
 
-	public static Kle findTopic(final String topicNum) {
+	public Kle findTopic(final String topicNum) {
 		final String mainNum = topicNum.substring(0, 2);
 		final String subNum = topicNum.substring(0, 5);
 

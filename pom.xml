@@ -21,6 +21,7 @@
 		<version.org.jboss.as.plugins.maven.plugin>7.4.Final</version.org.jboss.as.plugins.maven.plugin><!-- pluginManagement versions not im -->
 		<version.slf4j>1.7.2</version.slf4j>
 		<version.junit>4.11</version.junit>
+		<version.weld-for-test>1.1.23.Final</version.weld-for-test>
 	</properties>
 
 	<dependencyManagement>
@@ -110,6 +111,26 @@
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>${version.junit}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<!-- JUnit CDI support -->
+			<groupId>org.jglue.cdi-unit</groupId>
+			<artifactId>cdi-unit</artifactId>
+			<version>3.1.2</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.jboss.weld.se</groupId>
+					<artifactId>weld-se-core</artifactId>
+				</exclusion>
+			</exclusions>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.weld.se</groupId>
+			<artifactId>weld-se-core</artifactId>
+			<version>${version.weld-for-test}</version>
 			<scope>test</scope>
 		</dependency>
 
