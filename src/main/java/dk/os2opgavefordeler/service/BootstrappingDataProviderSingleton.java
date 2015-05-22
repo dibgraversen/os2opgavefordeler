@@ -44,6 +44,7 @@ public class BootstrappingDataProviderSingleton {
 		buildUserSettings();
 
 		final List<Kle> groups = loadBootstrapKle();
+		buildDistributionRules(groups);
 	}
 
 	public void buildRoles(){
@@ -114,6 +115,30 @@ public class BootstrappingDataProviderSingleton {
 		} catch (Exception ex) {
 			log.error("Couldn't load KLE", ex);
 			return Collections.emptyList();
+		}
+	}
+
+	private void buildDistributionRules(List<Kle> groups) {
+		for (Kle group : groups) {
+			DistributionRule dr = new DistributionRule();
+			dr.setKle(group);
+
+			if("00".equals(group.getNumber()) || "13".equals(group.getNumber())) {
+				dr.setResponsibleOrg(42);
+			}
+
+			distService.createDistributionRule(dr);
+
+			buildDistributionRules(group.getChildren());
+		}
+	}
+
+	// =================================================================================================================
+	//	Helpers
+	// =================================================================================================================
+	private <T> void print(Iterable<T> items) {
+		for(T i :items) {
+			System.out.println(i);
 		}
 	}
 

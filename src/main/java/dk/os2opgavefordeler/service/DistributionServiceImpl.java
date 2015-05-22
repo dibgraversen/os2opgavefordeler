@@ -1,7 +1,11 @@
 package dk.os2opgavefordeler.service;
 
+import com.google.common.base.Function;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import dk.os2opgavefordeler.model.DistributionRule;
 import dk.os2opgavefordeler.model.DistributionRule_;
+import dk.os2opgavefordeler.model.presentation.DistributionRulePO;
 import org.slf4j.Logger;
 
 import javax.ejb.Stateless;
@@ -35,9 +39,26 @@ public class DistributionServiceImpl implements DistributionService {
 			public void apply(CriteriaBuilder cb, CriteriaQuery<DistributionRule> cq, Root<DistributionRule> rule) {
 				cq.where(cb.equal(rule.get(DistributionRule_.responsibleOrg), orgId));
 				if(includeUnassigned) {
-					cq.where(cb.or(rule.get(DistributionRule_.responsibleOrg).isNull()));
+//					cq.where(cb.or(rule.get(DistributionRule_.responsibleOrg).isNull()));	// when we move from int -> reference.
+					cq.where(cb.or(
+						cb.equal( rule.get(DistributionRule_.responsibleOrg), 0) )
+					);
 				}
 			}
 		});
+	}
+
+	@Override
+	public List<DistributionRulePO> getPoDistributions(long orgId, boolean includeUnassigned) {
+		List<DistributionRulePO> result = Lists.transform(getDistributionsForOrg(orgId, includeUnassigned),
+				new Function<DistributionRule, DistributionRulePO>() {
+					@Override
+					public DistributionRulePO apply(DistributionRule rule) {
+						return DistributionRulePO.from(rule);
+					}
+				}
+		);
+
+		return ImmutableList.copyOf(result);
 	}
 }
