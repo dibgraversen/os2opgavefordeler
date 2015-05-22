@@ -1,5 +1,7 @@
 package dk.os2opgavefordeler.model.presentation;
 
+import dk.os2opgavefordeler.model.DistributionRule;
+import dk.os2opgavefordeler.model.Kle;
 import dk.osto.model.KLE;
 
 /**
@@ -34,11 +36,23 @@ public class DistributionRulePO {
 	private int employee;
 
 	/**
-	 * The owner of the topic, who can decide who handles the topic.
+	 * OrgUnit with responsibility for (ownership of) the topic, who can decide who handles the topic.
 	 */
 	private int responsible;
 
 	public DistributionRulePO() {
+	}
+
+	public DistributionRulePO(DistributionRule source) {
+		this.kle = kleFrom(source.getKle());
+		this.id = source.getId();
+		this.responsible = source.getResponsibleOrg();
+		this.employee = source.getAssignedEmp();
+		this.org = source.getAssignedOrg();
+	}
+
+	static public DistributionRulePO from(DistributionRule source) {
+		return new DistributionRulePO(source);
 	}
 
 	public int getId() {
@@ -87,5 +101,27 @@ public class DistributionRulePO {
 
 	public void setResponsible(int responsible) {
 		this.responsible = responsible;
+	}
+
+
+
+	private static KLE kleFrom(Kle in) {
+		KLE kle = new KLE();
+
+		kle.setNumber(in.getNumber());
+		kle.setName(in.getTitle());
+		kle.setServiceText(in.getDescription());
+
+		//TODO: need to track type
+//		if(in instanceof KleMainGroup) {
+//			kle.setType("main");
+//		} else if(in instanceof KleGroup) {
+//			kle.setType("group");
+//		} else if(in instanceof KleTopic) {
+//			kle.setType("topic");
+//		} else {
+		kle.setType("<unknown>");
+
+		return kle;
 	}
 }
