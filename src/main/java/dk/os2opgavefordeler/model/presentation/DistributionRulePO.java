@@ -44,19 +44,13 @@ public class DistributionRulePO {
 	}
 
 	public DistributionRulePO(DistributionRule source) {
-		// Java8 Optional.map + orElse would be nice here...
-		this.parent = source.getParent().isPresent() ?
-				source.getParent().get().getId() : 0;
+		this.parent = source.getParent().map(rule -> rule.getId()).orElse(0);
 		this.id = source.getId();
 
 		this.kle = kleFrom(source.getKle());
 		this.responsible = source.getResponsibleOrg();
 		this.employee = source.getAssignedEmp();
 		this.org = source.getAssignedOrg();
-	}
-
-	static public DistributionRulePO from(DistributionRule source) {
-		return new DistributionRulePO(source);
 	}
 
 	public int getId() {

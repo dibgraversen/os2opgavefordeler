@@ -106,7 +106,7 @@ public class KleRestEndpoint {
 		return Response.status(Response.Status.OK).entity(response).build();
 	}
 
-
+	@FunctionalInterface
 	private interface Visitor<T> {
 		void visit(T object);
 	}
@@ -124,9 +124,7 @@ public class KleRestEndpoint {
 		final Stats stats = new Stats();
 
 		log.info("reportStats: counting");
-		visit(groups, new Visitor<Kle>() {
-			@Override
-			public void visit(Kle kle) {
+		visit(groups, kle -> {
 			stats.num++;
 
 			final String desc = kle.getDescription();
@@ -135,7 +133,6 @@ public class KleRestEndpoint {
 				stats.max = Math.max(stats.max, len);
 				stats.numNonZero++;
 				stats.tlen += len;
-			}
 			}
 		});
 

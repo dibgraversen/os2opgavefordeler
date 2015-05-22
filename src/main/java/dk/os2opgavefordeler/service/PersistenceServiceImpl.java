@@ -40,11 +40,8 @@ public class PersistenceServiceImpl implements PersistenceService {
 
 	@Override
 	public <T> List<T> findAll(final Class<T> clazz) {
-		return criteriaFind(clazz, new CriteriaOp() {
-			@Override
-			public void apply(CriteriaBuilder cb, CriteriaQuery cq, Root ent) {
-				cq.select( cq.from(clazz));
-			}
-		});
+		return criteriaFind(clazz,
+			(cb, cq, ent) -> cq.select(cq.from(clazz))
+		);
 	}
 }

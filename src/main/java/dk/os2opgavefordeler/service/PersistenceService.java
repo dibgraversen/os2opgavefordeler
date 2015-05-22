@@ -10,6 +10,7 @@ public interface PersistenceService {
 	<T> List<T> criteriaFind(Class<T> clazz, CriteriaOp op);
 	<T> List<T> findAll(Class<T> clazz);
 
+	@FunctionalInterface
 	interface CriteriaOp<T> {
 		void apply(CriteriaBuilder cb, CriteriaQuery<T> cq, Root<T> ent);
 	}

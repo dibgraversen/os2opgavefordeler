@@ -1,11 +1,11 @@
 package dk.os2opgavefordeler.model;
 
 import com.google.common.base.MoreObjects;
-import com.google.common.base.Optional;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Defines ownership of / responsibility for a part of the KLE distribution tree + assignments.
@@ -79,7 +79,7 @@ public class DistributionRule implements Serializable {
 	}
 
 	public Optional<DistributionRule> getParent() {
-		return Optional.fromNullable(parent);
+		return Optional.ofNullable(parent);
 	}
 
 	public int getId() {

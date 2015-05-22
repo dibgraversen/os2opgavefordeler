@@ -1,6 +1,5 @@
 package dk.os2opgavefordeler.service;
 
-import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import dk.os2opgavefordeler.model.Kle;
@@ -49,11 +48,7 @@ public class KleImportMapperImpl implements KleImportMapper {
 
 	@Override
 	public List<Kle> mapMainGroupList(KLEEmneplanKomponent input) {
-		List<Kle> mainGroups = Lists.transform(input.getHovedgruppe(), new Function<HovedgruppeKomponent, Kle>() {
-			public Kle apply(HovedgruppeKomponent item) {
-				return mapMainGroup(item);
-			}
-		});
+		List<Kle> mainGroups = Lists.transform(input.getHovedgruppe(), this::mapMainGroup);
 
 		return ImmutableList.copyOf(mainGroups);
 	}
@@ -64,11 +59,7 @@ public class KleImportMapperImpl implements KleImportMapper {
 		final String description = buildDescription(input.getHovedgruppeVejledning());
 		final Date dateCreated = dateFrom(input.getHovedgruppeAdministrativInfo().getOprettetDato());
 
-		final List<Kle> groups = Lists.transform(input.getGruppe(), new Function<GruppeKomponent, Kle>() {
-			public Kle apply(GruppeKomponent item) {
-				return mapGroup(item);
-			}
-		});
+		final List<Kle> groups = Lists.transform(input.getGruppe(), this::mapGroup);
 		return new Kle(number, title, description, dateCreated, groups);
 	}
 
@@ -78,11 +69,7 @@ public class KleImportMapperImpl implements KleImportMapper {
 		final String description = buildDescription(input.getGruppeVejledning());
 		final Date dateCreated = dateFrom(input.getGruppeAdministrativInfo().getOprettetDato());
 
-		final List<Kle> topics = Lists.transform(input.getEmne(), new Function<EmneKomponent, Kle>() {
-			public Kle apply(EmneKomponent item) {
-				return mapTopic(item);
-			}
-		});
+		final List<Kle> topics = Lists.transform(input.getEmne(), this::mapTopic);
 		return new Kle(number, title, description, dateCreated, topics);
 	}
 
