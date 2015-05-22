@@ -77,7 +77,9 @@ public class Kle implements Serializable {
 		return ImmutableList.copyOf(children);
 	}
 
-
+	public int getId() {
+		return id;
+	}
 
 	public String getNumber() {
 		return number;

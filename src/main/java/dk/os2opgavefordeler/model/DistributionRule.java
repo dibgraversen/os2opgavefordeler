@@ -1,6 +1,7 @@
 package dk.os2opgavefordeler.model;
 
 import com.google.common.base.MoreObjects;
+import com.google.common.base.Optional;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -75,6 +76,10 @@ public class DistributionRule implements Serializable {
 
 	public DistributionRule() {
 
+	}
+
+	public Optional<DistributionRule> getParent() {
+		return Optional.fromNullable(parent);
 	}
 
 	public int getId() {

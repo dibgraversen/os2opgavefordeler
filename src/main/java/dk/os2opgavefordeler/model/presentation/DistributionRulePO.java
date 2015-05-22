@@ -44,8 +44,12 @@ public class DistributionRulePO {
 	}
 
 	public DistributionRulePO(DistributionRule source) {
-		this.kle = kleFrom(source.getKle());
+		// Java8 Optional.map + orElse would be nice here...
+		this.parent = source.getParent().isPresent() ?
+				source.getParent().get().getId() : 0;
 		this.id = source.getId();
+
+		this.kle = kleFrom(source.getKle());
 		this.responsible = source.getResponsibleOrg();
 		this.employee = source.getAssignedEmp();
 		this.org = source.getAssignedOrg();
@@ -108,6 +112,7 @@ public class DistributionRulePO {
 	private static KLE kleFrom(Kle in) {
 		KLE kle = new KLE();
 
+		kle.setId(in.getId());
 		kle.setNumber(in.getNumber());
 		kle.setName(in.getTitle());
 		kle.setServiceText(in.getDescription());
