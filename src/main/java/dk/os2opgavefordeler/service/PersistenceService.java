@@ -1,13 +1,16 @@
 package dk.os2opgavefordeler.service;
 
-import dk.os2opgavefordeler.model.kle.KleMainGroup;
-
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 import java.util.List;
 
 public interface PersistenceService {
-	List<KleMainGroup> fetchAllKleMainGroups();
-	KleMainGroup fetchMainGroup(String number);
+	<T> void persist(T entity);
+	<T> List<T> criteriaFind(Class<T> clazz, CriteriaOp op);
+	<T> List<T> findAll(Class<T> clazz);
 
-	void storeAllKleMainGroups(List<KleMainGroup> groups);
-
+	interface CriteriaOp<T> {
+		void apply(CriteriaBuilder cb, CriteriaQuery<T> cq, Root<T> ent);
+	}
 }

@@ -1,16 +1,20 @@
 package dk.os2opgavefordeler.service;
 
+import dk.os2opgavefordeler.model.DistributionRule;
 import dk.os2opgavefordeler.model.Role;
 import dk.os2opgavefordeler.model.UserSettings;
+import dk.os2opgavefordeler.model.Kle;
 import dk.os2opgavefordeler.model.presentation.FilterScope;
 import dk.os2opgavefordeler.model.presentation.RolePO;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
 import javax.inject.Inject;
+import java.io.InputStream;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * This class serves the sole purpose of providing bootstrap data to work on, while in development.
@@ -19,18 +23,31 @@ import javax.inject.Inject;
 @Singleton
 @Startup
 public class BootstrappingDataProviderSingleton {
-	private final Logger log = LoggerFactory.getLogger(getClass());
+	@Inject
+	private Logger log;
 
 	@Inject
 	UsersService usersService;
 
+	@Inject
+	private KleImportService importer;
+
+	@Inject
+	KleService kleService;
+
+	@Inject
+	DistributionService distService;
+
 	@PostConstruct
-	private void init(){
+	public void bootstrap() {
 		buildRoles();
 		buildUserSettings();
+
+		final List<Kle> groups = loadBootstrapKle();
+		buildDistributionRules(groups);
 	}
 
-	private void buildRoles(){
+	public void buildRoles(){
 		log.warn("Starting Singleton - loading mock roles");
 		buildForUserOne();
 		buildForUserTwo();
@@ -101,5 +118,45 @@ public class BootstrappingDataProviderSingleton {
 		settings.setShowResponsible(true);
 		settings.setShowExpandedOrg(false);
 		usersService.createUserSettings(settings);
+	}
+
+	private List<Kle> loadBootstrapKle() {
+		log.info("Loading bootstrap KLE");
+		try(final InputStream resource = getResource("KLE-valid-data.xml")) {
+			final List<Kle> groups = importer.importFromXml(resource);
+			kleService.storeAllKleMainGroups(groups);
+			return groups;
+		} catch (Exception ex) {
+			log.error("Couldn't load KLE", ex);
+			return Collections.emptyList();
+		}
+	}
+
+	private void buildDistributionRules(List<Kle> groups) {
+		for (Kle group : groups) {
+			DistributionRule dr = new DistributionRule();
+			dr.setKle(group);
+
+			if("00".equals(group.getNumber()) || "13".equals(group.getNumber())) {
+				dr.setResponsibleOrg(42);
+			}
+
+			distService.createDistributionRule(dr);
+
+			buildDistributionRules(group.getChildren());
+		}
+	}
+
+	// =================================================================================================================
+	//	Helpers
+	// =================================================================================================================
+	private <T> void print(Iterable<T> items) {
+		for(T i :items) {
+			System.out.println(i);
+		}
+	}
+
+	private InputStream getResource(String name) {
+		return Thread.currentThread().getContextClassLoader().getResourceAsStream(name);
 	}
 }

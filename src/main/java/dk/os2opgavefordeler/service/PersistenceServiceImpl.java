@@ -1,9 +1,5 @@
 package dk.os2opgavefordeler.service;
 
-import com.google.common.collect.ImmutableList;
-import dk.os2opgavefordeler.model.kle.KleGroup;
-import dk.os2opgavefordeler.model.kle.KleMainGroup;
-import dk.os2opgavefordeler.model.kle.KleTopic;
 import org.slf4j.Logger;
 
 import javax.ejb.Stateless;
@@ -11,13 +7,14 @@ import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 import java.util.List;
 
 @Stateless
-@TransactionAttribute(value = TransactionAttributeType.REQUIRES_NEW)
+@TransactionAttribute(value = TransactionAttributeType.REQUIRED)
 public class PersistenceServiceImpl implements PersistenceService {
 	@Inject
 	private Logger log;
@@ -26,48 +23,28 @@ public class PersistenceServiceImpl implements PersistenceService {
 	private EntityManager em;
 
 	@Override
-	public List<KleMainGroup> fetchAllKleMainGroups() {
-		final Query query = em.createQuery("SELECT e FROM KleMainGroup e");
-		log.info("Executing query");
-		final List<KleMainGroup> result = query.getResultList();
-		//FIXME: this is a workaround for EntityManager/session lifetime and lazyload...
-		for (KleMainGroup group : result) {
-			group.getGroups().size();
-		}
-		log.info("Returning result");
-
-		return result;
+	public <T> void persist(T entity) {
+		em.persist(entity);
 	}
 
 	@Override
-	public KleMainGroup fetchMainGroup(String number) {
-		final Query query = em.createQuery("SELECT e FROM KleMainGroup e where e.number = :number");
-		query.setParameter("number", number);
-		try {
-			return (KleMainGroup) query.getSingleResult();
-		}
-		catch(NoResultException ex) {
-			log.warn("fetchMainGroup: no results for [{}]", number, ex);
-			//TODO: Java8 Optional?
-			return null;
-		}
+	public <T> List<T> criteriaFind(Class<T> clazz, CriteriaOp op) {
+		final CriteriaBuilder cb = em.getCriteriaBuilder();
+		final CriteriaQuery<T> cq = cb.createQuery(clazz);
+		final Root<T> ent = cq.from(clazz);
+
+		op.apply(cb, cq, ent);
+
+		return em.createQuery(cq).getResultList();
 	}
 
 	@Override
-	public void storeAllKleMainGroups(List<KleMainGroup> groups) {
-		log.info("Deleting existing KLE");
-		final ImmutableList<String> tables = ImmutableList.of(
-			KleTopic.TABLE_NAME, KleGroup.TABLE_NAME, KleMainGroup.TABLE_NAME
-		);
-		for (String table : tables) {
-			//Named parameters don't seem to be supported for table named - this feels slightly dirty, but we'll live
-			// since there's no user-controlled data involved.
-			em.createQuery(String.format("DELETE FROM %s", table)).executeUpdate();
-		}
-
-		log.info("Persisting new KLE");
-		for (KleMainGroup group : groups) {
-			em.persist(group);
-		}
+	public <T> List<T> findAll(final Class<T> clazz) {
+		return criteriaFind(clazz, new CriteriaOp() {
+			@Override
+			public void apply(CriteriaBuilder cb, CriteriaQuery cq, Root ent) {
+				cq.select( cq.from(clazz));
+			}
+		});
 	}
 }

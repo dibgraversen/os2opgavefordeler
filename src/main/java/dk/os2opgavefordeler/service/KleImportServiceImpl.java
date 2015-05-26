@@ -3,6 +3,9 @@ package dk.os2opgavefordeler.service;
 import java.io.InputStream;
 import java.util.List;
 
+import javax.ejb.Stateless;
+import javax.enterprise.context.Dependent;
+import javax.inject.Inject;
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -12,19 +15,24 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
+import dk.os2opgavefordeler.model.Kle;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
-import dk.os2opgavefordeler.model.kle.KleMainGroup;
 import dk.os2opgavefordeler.model.kle_import.KLEEmneplanKomponent;
 import dk.os2opgavefordeler.model.kle_import.ObjectFactory;
 
+@Stateless
+@Dependent
 public class KleImportServiceImpl implements KleImportService {
-	private final Logger log = LoggerFactory.getLogger(getClass());
+	@Inject
+	Logger log;
+
+	@Inject
+	KleImportMapper kleMapper;
 
 	@Override
-	public List<KleMainGroup> importFromXml(InputStream xml)
+	public List<Kle> importFromXml(InputStream xml)
 	throws Exception
 	{
 		if(xml == null) {
@@ -35,7 +43,7 @@ public class KleImportServiceImpl implements KleImportService {
 	}
 
 	@Override
-	public List<KleMainGroup> importFromXml(InputStream xml, InputStream xsd)
+	public List<Kle> importFromXml(InputStream xml, InputStream xsd)
 	throws Exception
 	{
 		if(xml == null) {
@@ -49,7 +57,7 @@ public class KleImportServiceImpl implements KleImportService {
 
 
 
-	private List<KleMainGroup> internalImport(InputStream xml, InputStream xsd)
+	private List<Kle> internalImport(InputStream xml, InputStream xsd)
 	throws Exception
 	{
 		try {
@@ -69,7 +77,7 @@ public class KleImportServiceImpl implements KleImportService {
 					unmarshaller.unmarshal(new StreamSource(xml), KLEEmneplanKomponent.class);
 
 			log.info("internalImport: Mapping to entity models");
-			final List<KleMainGroup> groups = KleImportMapper.mapMainGroupList(plan.getValue());
+			final List<Kle> groups = kleMapper.mapMainGroupList(plan.getValue());
 			return groups;
 		}
 		catch(JAXBException|SAXException ex) {
