@@ -24,7 +24,8 @@
 		return service;
 
 		function getSettings(userId){
-			return httpGet('/user/'+userId+'/settings');
+			var settings = { scope: 'ALL', showResponsible: true };
+			return httpGet('/user/'+userId+'/settings', settings);
 		}
 
 		function updateSettings(userId, settings){
@@ -79,22 +80,24 @@
 
 		// private methods
 
-		function httpGet(url){
-			return httpExecute(url, 'GET');
+		function httpGet(url, params){
+			return httpExecute(url, 'GET', { params: params });
 		}
 
 		function httpPost(url, data){
-			return httpExecute(url, 'POST', data);
+			return httpExecute(url, 'POST', { data: data });
 		}
 
-		function httpExecute(requestUrl, method, data){
-			appSpinner.showSpinner(); // TODO enable
-			return $http({
+		function httpExecute(requestUrl, method, options){
+			var defaults = {
 				url: baseUrl + requestUrl,
 				method: method,
-				data: data,
-				headers: requestConfig.headers }).then(function(response){
+				headers: requestConfig.headers
+			};
+			angular.extend(options, defaults); // merge defaults into options.
 
+			appSpinner.showSpinner(); // TODO enable
+			return $http(options).then(function(response){
 				appSpinner.hideSpinner();
 				console.log('**response from EXECUTE', response);
 				return response.data;

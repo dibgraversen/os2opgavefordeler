@@ -1,6 +1,9 @@
-<div id="topics">
+<div id="topics" style="margin-left: 70px">
     <h2 class="page-title">Opgavefordelinger</h2>
-    <div style="overflow: auto">
+    <div ng-hide="topicRoutes.length > 0" class="alert alert-warning">
+        Der kan ikke læses fordelinger for valgte rolle...
+    </div>
+    <div ng-show='topicRoutes.length > 0' style="overflow: auto">
         <table class="table table-stripez table-hover">
             <tr>
                 <th></th>

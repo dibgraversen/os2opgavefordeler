@@ -1,68 +1,100 @@
 <div ng-controller="ShellCtrl as vm">
-    <div id="adminNavBar" class="navbar navbar-inverse navbar-default">
-        <div class="container">
-            <div class="navbar-header">
-                <button type="button" ng-init="navCollapsed = true" ng-click="navCollapsed = !navCollapsed" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                <a class="navbar-brand" ui-sref="home">
-                    <i class="icon-home"></i>
-                    <span>OS2 OpgaveFordeler</span>
-                </a>
-            </div>
-            <div class="collapse navbar-collapse" ng-class="{'in': !navCollapsed}">
-                <ul class="nav navbar-nav">
-                    <li ng-class="{ active: $state.is('home') }">
-                        <a data-toggle="collapse" data-target=".navbar-collapse" ui-sref="home">
-                            Fordelinger
-                        </a>
-                    </li>
-                    <li ng-show="user.currentRole.admin"  ng-class="{ active: $state.is('settings') }">
-                        <a data-toggle="collapse" data-target=".navbar-collapse" ui-sref="settings">Admin</a>
-                    </li>
-                    <li ng-show="user.currentRole.municipalityAdmin"  ng-class="{ active: $state.is('municipalityAdmin') }">
-                        <a data-toggle="collapse" data-target=".navbar-collapse" ui-sref="municipalityAdmin">Administrer kommune</a>
-                    </li>
-                    <!--<li><a data-toggle="collapse" data-target=".navbar-collapse" href="#/locations">Locations</a></li>-->
-                </ul>
-                <!--<div class="btn-group navbar-right">-->
-                    <!--<button type="button" class="btn btn-default navbar-btn" ng-click="sidemenuVisible = true" ng-class="sidemenuVisible ? 'active' : ''"><span class="glyphicon glyphicon-list"></span></button>-->
-                    <!--<button type="button" class="btn btn-default navbar-btn" ng-click="sidemenuVisible = false" ng-class="sidemenuVisible ? '' : 'active'"><span class="glyphicon glyphicon-align-justify"></span></button>-->
-                <!--</div>-->
-            </div>
-        </div>
-    </div>
+	<div id="adminNavBar" class="navbar navbar-inverse navbar-default">
+		<div class="container">
+			<div class="navbar-header">
+				<button type="button" ng-init="navCollapsed = true"
+								ng-click="navCollapsed = !navCollapsed" class="navbar-toggle"
+								data-toggle="collapse" data-target=".navbar-collapse">
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+				<a class="navbar-brand" ui-sref="home">
+					<i class="icon-home"></i>
+					<span>OS2 OpgaveFordeler</span>
+				</a>
+			</div>
+			<div class="collapse navbar-collapse" ng-class="{'in': !navCollapsed}">
+				<ul class="nav navbar-nav">
+					<li ng-class="{ active: $state.is('home') }">
+						<a data-toggle="collapse" data-target=".navbar-collapse"
+							 ui-sref="home">
+							Fordelinger
+						</a>
+					</li>
+					<li ng-show="user.currentRole.admin"
+							ng-class="{ active: $state.is('settings') }">
+						<a data-toggle="collapse" data-target=".navbar-collapse"
+							 ui-sref="settings">Admin</a>
+					</li>
+					<li ng-show="user.currentRole.municipalityAdmin"
+							ng-class="{ active: $state.is('municipalityAdmin') }">
+						<a data-toggle="collapse" data-target=".navbar-collapse"
+							 ui-sref="municipalityAdmin">Administrer kommune</a>
+					</li>
+					<!--<li><a data-toggle="collapse" data-target=".navbar-collapse" href="#/locations">Locations</a></li>-->
+				</ul>
+				<!--<div class="btn-group navbar-right">-->
+				<!--<button type="button" class="btn btn-default navbar-btn" ng-click="sidemenuVisible = true" ng-class="sidemenuVisible ? 'active' : ''"><span class="glyphicon glyphicon-list"></span></button>-->
+				<!--<button type="button" class="btn btn-default navbar-btn" ng-click="sidemenuVisible = false" ng-class="sidemenuVisible ? '' : 'active'"><span class="glyphicon glyphicon-align-justify"></span></button>-->
+				<!--</div>-->
+				<ul class="nav navbar-nav navbar-right">
+					<li class="active dropdown" dropdown>
+						<a href="#" class="dropdown-toggle" dropdown-toggle>
+							<span class="glyphicon glyphicon-user"></span> {{ user.name }}
+							<span class="caret"></span>
+						</a>
+						<ul class="dropdown-menu">
+							<li ng-hide="user.id === 1"><a href="" ng-click='changeUser({ id: 1, name:"Henrik" })'>Skift
+								til Henrik</a></li>
+							<li ng-hide="user.id === 2"><a href="" ng-click='changeUser({ id: 2, name:"Sune" })'>Skift
+								til Sune</a></li>
+							<li ng-hide="user.id === 3"><a href="" ng-click='changeUser({ id: 3, name:"Helle" })'>Skift
+								til Helle</a></li>
+						</ul>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</div>
 
-    <div ng-show="vm.showSpinner" class="page-splash dissolve-animation">
-        <div data-spinner="vm.spinnerOptions"></div>
-        <div class="page-splash-message page-splash-message-subtle">{{vm.spinnerMessage}}</div>
-    </div>
+	<div ng-show="vm.showSpinner" class="page-splash dissolve-animation">
+		<div data-spinner="vm.spinnerOptions"></div>
+		<div class="page-splash-message page-splash-message-subtle">
+			{{vm.spinnerMessage}}
+		</div>
+	</div>
 
-    <div id="ng-view" class="container-fluid slide-animation admin-content main-content">
-        <div class="row">
-            <div class="col-md-2" ng-show="sidemenuVisible">
-                <div data-ng-include="'/app/layout/side-menu.html'"></div>
-            </div>
-            <div ng-class="sidemenuVisible ? 'col-md-10' : 'col-md-12' ">
-                <div class="pull-left" style="margin-top: 20px; margin-right: 30px">
-                    <button class="btn btn-default toggle-side" popover="Fold ud for at se sidemenu"
-                            popover-placement="right" popover-trigger="mouseenter" popover-animation="false"
-                            popover-popup-delay="1000"
-                        ng-click="sidemenuVisible = !sidemenuVisible">
-                        <span class="glyphicon" ng-class="sidemenuVisible ? 'glyphicon-arrow-left' : 'glyphicon-arrow-right'"></span>
-                    </button>
-                </div>
-                <div id="messages" style="margin-top:20px;padding-left: 70px">
-                    <alert ng-repeat="alert in alerts" type="{{alert.type}}"
-                           close="closeAlert($index)" class="animate-fade"
-                        style="width: 100%">{{alert.msg}}</alert>
-                </div>
-                <div ui-view class=""></div>
-                </div>
-            </div>
-        </div>
-    </div>
+	<div id="ng-view"
+			 class="container-fluid slide-animation admin-content main-content">
+		<div class="row">
+			<div class="col-md-2" ng-show="sidemenuVisible">
+				<div data-ng-include="'/app/layout/side-menu.html'"></div>
+			</div>
+			<div ng-class="sidemenuVisible ? 'col-md-10' : 'col-md-12' ">
+				<div class="pull-left" style="margin-top: 20px; margin-right: 30px">
+					<button class="btn btn-default toggle-side"
+									popover="Fold ud for at se sidemenu"
+									popover-placement="right" popover-trigger="mouseenter"
+									popover-animation="false"
+									popover-popup-delay="1000"
+									ng-click="sidemenuVisible = !sidemenuVisible">
+						<span class="glyphicon"
+									ng-class="sidemenuVisible ? 'glyphicon-arrow-left' : 'glyphicon-arrow-right'"></span>
+					</button>
+				</div>
+				<div style="padding-top:20px">
+					<div id="messages" style="padding-left:70px">
+						<alert ng-repeat="alert in alerts" type="{{alert.type}}"
+									 close="closeAlert($index)" class="animate-fade"
+									 style="width: 100%">{{alert.msg}}
+						</alert>
+					</div>
+					<div ui-view class=""></div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
 
 </div>
