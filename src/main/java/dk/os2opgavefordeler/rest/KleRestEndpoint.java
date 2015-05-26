@@ -7,6 +7,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 import dk.os2opgavefordeler.model.Kle;
@@ -62,13 +63,10 @@ public class KleRestEndpoint {
 	@Path("/groups/{number}")
 	public Response getGroup(@PathParam("number") String number)
 	{
-		Kle group = kleService.fetchMainGroup(number);
-		if(group != null) {
-			log.info("returning group");
-			return Response.status(Response.Status.OK).entity(group).build();
-		} else {
-			return Response.status(Response.Status.NOT_FOUND).build();
-		}
+		Optional<Kle> group = kleService.fetchMainGroup(number);
+		return group.isPresent() ?
+			Response.status(Response.Status.OK).entity(group.get()).build() :
+			Response.status(Response.Status.NOT_FOUND).build();
 	}
 
 
