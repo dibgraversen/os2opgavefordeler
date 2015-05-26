@@ -9,6 +9,7 @@ import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
+import javax.persistence.criteria.Predicate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,13 +32,12 @@ public class DistributionServiceImpl implements DistributionService {
 	public List<DistributionRule> getDistributionsForOrg(final long orgId, final boolean includeUnassigned) {
 		return persistence.criteriaFind(DistributionRule.class, (cb, cq, rule) ->
 		{
-			cq.where(cb.equal(rule.get(DistributionRule_.responsibleOrg), orgId));
-			if(includeUnassigned) {
-//					cq.where(cb.or(rule.get(DistributionRule_.responsibleOrg).isNull()));	// when we move from int -> reference.
-				cq.where(cb.or(
-					cb.equal( rule.get(DistributionRule_.responsibleOrg), 0) )
-				);
-			}
+			final Predicate main = cb.equal(rule.get(DistributionRule_.responsibleOrg), orgId);
+			final Predicate pred = includeUnassigned ?
+				cb.or(main, cb.equal(rule.get(DistributionRule_.responsibleOrg), 0)) :
+				main;
+
+			cq.where(pred);
 		});
 	}
 
