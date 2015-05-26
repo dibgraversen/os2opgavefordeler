@@ -34,6 +34,7 @@ public class BootstrappingDataProviderSingleton {
 		log.warn("Starting Singleton - loading mock roles");
 		buildForUserOne();
 		buildForUserTwo();
+		buildForUserThree();
 	}
 
 	private void buildForUserOne(){
@@ -51,14 +52,27 @@ public class BootstrappingDataProviderSingleton {
 
 	private void buildForUserTwo(){
 		UsersServiceMock mock = new UsersServiceMock();
-		RolePO rolePO1 = mock.buildRolePO(5, 2, "Joe(dig)", 4, false, false, false, false);
+		RolePO rolePO1 = mock.buildRolePO(5, 2, "Sune(dig)", 4, false, false, false, false);
 		Role role = rolePO1.toRole();
 		usersService.createRole(role);
-		RolePO rolePO2 = mock.buildRolePO(6, 2, "Admin", 0, false, true, false, false);
+//		RolePO rolePO2 = mock.buildRolePO(6, 2, "Admin", 0, false, true, false, false);
+//		usersService.createRole(rolePO2.toRole());
+//		RolePO rolePO3 = mock.buildRolePO(7, 2, "Adam Savage", 5, false, false, true, false);
+//		usersService.createRole(rolePO3.toRole());
+//		RolePO rolePO4 = mock.buildRolePO(8, 2, "Homer Simpson", 6, false, false, false, true);
+//		usersService.createRole(rolePO4.toRole());
+	}
+
+	private void buildForUserThree(){
+		UsersServiceMock mock = new UsersServiceMock();
+		RolePO rolePO1 = mock.buildRolePO(9, 3, "Helle(dig)", 7, false, false, false, false);
+		Role role = rolePO1.toRole();
+		usersService.createRole(role);
+		RolePO rolePO2 = mock.buildRolePO(10, 3, "Admin", 0, false, true, false, false);
 		usersService.createRole(rolePO2.toRole());
-		RolePO rolePO3 = mock.buildRolePO(7, 2, "Adam Savage", 5, false, false, true, false);
+		RolePO rolePO3 = mock.buildRolePO(11, 3, "Adam Savage", 5, false, false, true, false);
 		usersService.createRole(rolePO3.toRole());
-		RolePO rolePO4 = mock.buildRolePO(8, 2, "Homer Simpson", 6, false, false, false, true);
+		RolePO rolePO4 = mock.buildRolePO(12, 3, "Linus Thorvalds", 6, false, false, false, true);
 		usersService.createRole(rolePO4.toRole());
 	}
 

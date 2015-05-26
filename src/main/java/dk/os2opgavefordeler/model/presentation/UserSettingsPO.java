@@ -19,14 +19,11 @@ public class UserSettingsPO {
 	}
 
 	public UserSettingsPO(UserSettings settings) {
-		log.warn("in PO class");
-		log.warn(settings.toString());
 		id = settings.getId();
 		userId = settings.getUserId();
 		scope = settings.getScope();
 		showResponsible = settings.isShowResponsible();
 		showExpandedOrg = settings.isShowExpandedOrg();
-		log.warn(this.toString());
 	}
 
 	public UserSettings asUserSettings(){

@@ -38,8 +38,12 @@ public class UsersEndpoint {
 	@GET
 	@Path("/{userId}/settings")
 	@Produces(MediaType.APPLICATION_JSON)
-	public UserSettingsPO getSettingsForUser(@PathParam("userId") long userId){
-		return usersService.getSettings(userId);
+	public Response getSettingsForUser(@PathParam("userId") long userId){
+		if(userId == 0){
+			log.warn("invalid userId");
+			return Response.status(Response.Status.BAD_REQUEST).entity("invalid userId").build();
+		}
+		return Response.ok(usersService.getSettings(userId)).build();
 	}
 
 	@POST
@@ -51,6 +55,12 @@ public class UsersEndpoint {
 
 	@OPTIONS
 	public Response getOptions(){
+		return Response.ok().build();
+	}
+
+	@OPTIONS
+	@Path("/{userId}/settings")
+	public Response getOptionsForSettings(){
 		return Response.ok().build();
 	}
 }
