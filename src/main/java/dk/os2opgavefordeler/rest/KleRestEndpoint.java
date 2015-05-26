@@ -7,6 +7,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Consumer;
 
 import dk.os2opgavefordeler.model.Kle;
 import dk.os2opgavefordeler.service.KleService;
@@ -61,13 +63,10 @@ public class KleRestEndpoint {
 	@Path("/groups/{number}")
 	public Response getGroup(@PathParam("number") String number)
 	{
-		Kle group = kleService.fetchMainGroup(number);
-		if(group != null) {
-			log.info("returning group");
-			return Response.status(Response.Status.OK).entity(group).build();
-		} else {
-			return Response.status(Response.Status.NOT_FOUND).build();
-		}
+		Optional<Kle> group = kleService.fetchMainGroup(number);
+		return group.isPresent() ?
+			Response.status(Response.Status.OK).entity(group.get()).build() :
+			Response.status(Response.Status.NOT_FOUND).build();
 	}
 
 
@@ -106,17 +105,13 @@ public class KleRestEndpoint {
 		return Response.status(Response.Status.OK).entity(response).build();
 	}
 
-
-	private interface Visitor<T> {
-		void visit(T object);
-	}
 	static private class Stats {
 		public int max = 0, num = 0, numNonZero = 0;
 		long tlen = 0;
 	}
-	private void visit(List<Kle> kle, Visitor<Kle> visitor) {
+	private void visit(List<Kle> kle, Consumer<Kle> visitor) {
 		for(Kle k : kle) {
-			visitor.visit(k);
+			visitor.accept(k);
 			visit(k.getChildren(), visitor);
 		}
 	}
@@ -124,9 +119,7 @@ public class KleRestEndpoint {
 		final Stats stats = new Stats();
 
 		log.info("reportStats: counting");
-		visit(groups, new Visitor<Kle>() {
-			@Override
-			public void visit(Kle kle) {
+		visit(groups, kle -> {
 			stats.num++;
 
 			final String desc = kle.getDescription();
@@ -135,7 +128,6 @@ public class KleRestEndpoint {
 				stats.max = Math.max(stats.max, len);
 				stats.numNonZero++;
 				stats.tlen += len;
-			}
 			}
 		});
 

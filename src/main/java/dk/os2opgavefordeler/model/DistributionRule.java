@@ -1,11 +1,11 @@
 package dk.os2opgavefordeler.model;
 
 import com.google.common.base.MoreObjects;
-import com.google.common.base.Optional;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Defines ownership of / responsibility for a part of the KLE distribution tree + assignments.
@@ -14,7 +14,8 @@ import java.util.List;
  */
 @Entity
 public class DistributionRule implements Serializable {
-	@Id @GeneratedValue(strategy = GenerationType.AUTO)
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	private int id;
 
 	@ManyToOne
@@ -78,8 +79,14 @@ public class DistributionRule implements Serializable {
 
 	}
 
+	public DistributionRule(Builder builder) {
+		this();
+		this.responsibleOrg = builder.responsibleOrg;
+		this.kle = builder.kle;
+	}
+
 	public Optional<DistributionRule> getParent() {
-		return Optional.fromNullable(parent);
+		return Optional.ofNullable(parent);
 	}
 
 	public int getId() {
@@ -102,5 +109,33 @@ public class DistributionRule implements Serializable {
 			.add("kle", kle)
 
 			.toString();
+	}
+
+	//--------------------------------------------------------------------------
+	// Builder
+	//--------------------------------------------------------------------------
+	public static Builder builder() {
+		return new Builder();
+	}
+
+	public static class Builder {
+		private int responsibleOrg = -1;
+		private Kle kle = null;
+
+
+
+		public DistributionRule build() {
+			return new DistributionRule(this);
+		}
+
+		public Builder responsibleOrg(int responsibleOrg) {
+			this.responsibleOrg = responsibleOrg;
+			return this;
+		}
+
+		public Builder kle(Kle kle) {
+			this.kle = kle;
+			return this;
+		}
 	}
 }
