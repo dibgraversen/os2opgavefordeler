@@ -14,7 +14,8 @@ import java.util.Optional;
  */
 @Entity
 public class DistributionRule implements Serializable {
-	@Id @GeneratedValue(strategy = GenerationType.AUTO)
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	private int id;
 
 	@ManyToOne
@@ -78,6 +79,12 @@ public class DistributionRule implements Serializable {
 
 	}
 
+	public DistributionRule(Builder builder) {
+		this();
+		this.responsibleOrg = builder.responsibleOrg;
+		this.kle = builder.kle;
+	}
+
 	public Optional<DistributionRule> getParent() {
 		return Optional.ofNullable(parent);
 	}
@@ -102,5 +109,33 @@ public class DistributionRule implements Serializable {
 			.add("kle", kle)
 
 			.toString();
+	}
+
+	//--------------------------------------------------------------------------
+	// Builder
+	//--------------------------------------------------------------------------
+	public static Builder builder() {
+		return new Builder();
+	}
+
+	public static class Builder {
+		private int responsibleOrg = -1;
+		private Kle kle = null;
+
+
+
+		public DistributionRule build() {
+			return new DistributionRule(this);
+		}
+
+		public Builder responsibleOrg(int responsibleOrg) {
+			this.responsibleOrg = responsibleOrg;
+			return this;
+		}
+
+		public Builder kle(Kle kle) {
+			this.kle = kle;
+			return this;
+		}
 	}
 }

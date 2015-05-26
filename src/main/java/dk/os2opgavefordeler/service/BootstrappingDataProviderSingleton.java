@@ -15,6 +15,7 @@ import javax.inject.Inject;
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * This class serves the sole purpose of providing bootstrap data to work on, while in development.
@@ -44,7 +45,7 @@ public class BootstrappingDataProviderSingleton {
 		buildUserSettings();
 
 		final List<Kle> groups = loadBootstrapKle();
-		buildDistributionRules(groups);
+		buildDistributionRules();
 	}
 
 	public void buildRoles(){
@@ -118,24 +119,59 @@ public class BootstrappingDataProviderSingleton {
 		}
 	}
 
-	private void buildDistributionRules(List<Kle> groups) {
-		for (Kle group : groups) {
-			DistributionRule dr = new DistributionRule();
-			dr.setKle(group);
+	private void buildDistributionRules() {
+		createRules(
+			// === Fully unassigned group
+			DistributionRule.builder()
+				.responsibleOrg(0)
+				.kle(kleService.fetchMainGroup("00").get())
+				.build(),
+			DistributionRule.builder()
+				.responsibleOrg(0)
+				.kle(kleService.fetchMainGroup("00.01").get())
+				.build(),
+			DistributionRule.builder()
+				.responsibleOrg(0)
+				.kle(kleService.fetchMainGroup("00.01.00").get())
+				.build(),
 
-			if("00".equals(group.getNumber()) || "13".equals(group.getNumber())) {
-				dr.setResponsibleOrg(42);
-			}
+			// === Group with assigned toplevel
+			DistributionRule.builder()
+				.responsibleOrg(1)
+				.kle(kleService.fetchMainGroup("13").get())
+				.build(),
+			DistributionRule.builder()
+				.responsibleOrg(0)
+				.kle(kleService.fetchMainGroup("13.00").get())
+				.build(),
+			DistributionRule.builder()
+				.responsibleOrg(0)
+				.kle(kleService.fetchMainGroup("13.00.00").get())
+				.build(),
 
-			distService.createDistributionRule(dr);
-
-			buildDistributionRules(group.getChildren());
-		}
+			// Group with two assigned levels
+			DistributionRule.builder()
+				.responsibleOrg(2)
+				.kle(kleService.fetchMainGroup("14").get())
+				.build(),
+			DistributionRule.builder()
+				.responsibleOrg(2)
+				.kle(kleService.fetchMainGroup("14.00").get())
+				.build(),
+			DistributionRule.builder()
+				.responsibleOrg(0)
+				.kle(kleService.fetchMainGroup("14.00.01").get())
+				.build()
+		);
 	}
 
 	// =================================================================================================================
 	//	Helpers
 	// =================================================================================================================
+	private void createRules(DistributionRule... rules) {
+		Stream.of(rules).forEach(distService::createDistributionRule);
+	}
+
 	private <T> void print(Iterable<T> items) {
 		for(T i :items) {
 			System.out.println(i);
