@@ -139,43 +139,55 @@ public class BootstrappingDataProviderSingleton {
 			DistributionRule.builder()
 				.responsibleOrg(0)
 				.kle(kleService.fetchMainGroup("00").get())
-				.build(),
-			DistributionRule.builder()
-				.responsibleOrg(0)
-				.kle(kleService.fetchMainGroup("00.01").get())
-				.build(),
-			DistributionRule.builder()
-				.responsibleOrg(0)
-				.kle(kleService.fetchMainGroup("00.01.00").get())
-				.build(),
+				.children(
+					DistributionRule.builder()
+						.responsibleOrg(0)
+						.kle(kleService.fetchMainGroup("00.01").get())
+						.children(
+							DistributionRule.builder()
+								.responsibleOrg(0)
+								.kle(kleService.fetchMainGroup("00.01.00").get())
+							.build()
+						)
+					.build()
+				)
+			.build(),
 
 			// === Group with assigned toplevel
 			DistributionRule.builder()
 				.responsibleOrg(1)
 				.kle(kleService.fetchMainGroup("13").get())
-				.build(),
-			DistributionRule.builder()
-				.responsibleOrg(0)
-				.kle(kleService.fetchMainGroup("13.00").get())
-				.build(),
-			DistributionRule.builder()
-				.responsibleOrg(0)
-				.kle(kleService.fetchMainGroup("13.00.00").get())
-				.build(),
+				.children(
+					DistributionRule.builder()
+						.responsibleOrg(0)
+						.kle(kleService.fetchMainGroup("13.00").get())
+						.children(
+							DistributionRule.builder()
+								.responsibleOrg(0)
+								.kle(kleService.fetchMainGroup("13.00.00").get())
+							.build()
+						)
+					.build()
+				)
+			.build(),
 
 			// Group with two assigned levels
 			DistributionRule.builder()
 				.responsibleOrg(2)
 				.kle(kleService.fetchMainGroup("14").get())
-				.build(),
-			DistributionRule.builder()
-				.responsibleOrg(2)
-				.kle(kleService.fetchMainGroup("14.00").get())
-				.build(),
-			DistributionRule.builder()
-				.responsibleOrg(0)
-				.kle(kleService.fetchMainGroup("14.00.01").get())
-				.build()
+				.children(
+					DistributionRule.builder()
+						.responsibleOrg(2)
+						.kle(kleService.fetchMainGroup("14.00").get())
+						.children(
+							DistributionRule.builder()
+								.responsibleOrg(0)
+								.kle(kleService.fetchMainGroup("14.00.01").get())
+								.build()
+						)
+						.build()
+				)
+			.build()
 		);
 	}
 
@@ -184,12 +196,6 @@ public class BootstrappingDataProviderSingleton {
 	// =================================================================================================================
 	private void createRules(DistributionRule... rules) {
 		Stream.of(rules).forEach(distService::createDistributionRule);
-	}
-
-	private <T> void print(Iterable<T> items) {
-		for(T i :items) {
-			System.out.println(i);
-		}
 	}
 
 	private InputStream getResource(String name) {

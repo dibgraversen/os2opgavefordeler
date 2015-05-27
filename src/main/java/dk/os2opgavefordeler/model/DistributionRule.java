@@ -4,6 +4,8 @@ import com.google.common.base.MoreObjects;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -83,6 +85,10 @@ public class DistributionRule implements Serializable {
 		this();
 		this.responsibleOrg = builder.responsibleOrg;
 		this.kle = builder.kle;
+		if(!builder.children.isEmpty()) {
+			this.children = builder.children;
+			children.stream().forEach(child -> child.parent = this);
+		}
 	}
 
 	public Optional<DistributionRule> getParent() {
@@ -121,7 +127,7 @@ public class DistributionRule implements Serializable {
 	public static class Builder {
 		private int responsibleOrg = -1;
 		private Kle kle = null;
-
+		private List<DistributionRule> children = new ArrayList<>();
 
 
 		public DistributionRule build() {
@@ -135,6 +141,11 @@ public class DistributionRule implements Serializable {
 
 		public Builder kle(Kle kle) {
 			this.kle = kle;
+			return this;
+		}
+
+		public Builder children(DistributionRule... children) {
+			Collections.addAll(this.children, children);
 			return this;
 		}
 	}
