@@ -3,10 +3,8 @@ package dk.os2opgavefordeler.test;
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.List;
+import java.util.Optional;
 
-import com.google.common.base.Function;
-import com.google.common.base.Predicate;
-import com.google.common.collect.FluentIterable;
 import dk.os2opgavefordeler.LoggerProducer;
 import dk.os2opgavefordeler.model.Kle;
 import dk.os2opgavefordeler.service.KleImportMapperImpl;
@@ -105,45 +103,20 @@ public class KleXmlImportTest {
 			"</ul>" +
 		"</p>";
 
-		final Kle topic = findTopic("00.03.02");
-		assertEquals("Wrong description", description, topic.getDescription());
+		final Optional<Kle> topic = findTopic("00.03.02");
+		assertEquals("Wrong description", description, topic.map(Kle::getDescription).orElse("<KLE not found>"));
 	}
 
-	public Kle findTopic(final String topicNum) {
+	public Optional<Kle> findTopic(final String topicNum) {
 		final String mainNum = topicNum.substring(0, 2);
 		final String subNum = topicNum.substring(0, 5);
 
-		return FluentIterable.from(groups)
-			.filter(new Predicate<Kle>() {
-				@Override
-				public boolean apply(Kle kleMainGroup) {
-					return mainNum.equals(kleMainGroup.getNumber());
-				}
-			})
-			.transformAndConcat(new Function<Kle, FluentIterable<Kle>>() {
-				@Override
-				public FluentIterable<Kle> apply(Kle mainGroup) {
-					return FluentIterable.from(mainGroup.getChildren());
-				}
-			})
-			.filter(new Predicate<Kle>() {
-				@Override
-				public boolean apply(Kle group) {
-					return subNum.equals(group.getNumber());
-				}
-			})
-			.transformAndConcat(new Function<Kle, FluentIterable<Kle>>() {
-				@Override
-				public FluentIterable<Kle> apply(Kle kleGroup) {
-					return FluentIterable.from(kleGroup.getChildren());
-				}
-			})
-			.firstMatch(new Predicate<Kle>() {
-				@Override
-				public boolean apply(Kle topic) {
-					return topicNum.equals(topic.getNumber());
-				}
-			})
-			.orNull();
+		return groups.stream()
+			.filter(main -> mainNum.equals(main.getNumber()))
+			.flatMap(main -> main.getChildren().stream())
+			.filter(sub -> subNum.equals(sub.getNumber()))
+			.flatMap(sub -> sub.getChildren().stream())
+			.filter(topic -> topicNum.equals(topic.getNumber()))
+			.findFirst();
 	}
 }

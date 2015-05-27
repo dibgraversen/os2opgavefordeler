@@ -59,9 +59,7 @@ public class Kle implements Serializable {
 
 	public Kle(String number, String title, String description, Date dateCreated, List<Kle> children) {
 		this(number, title, description, dateCreated);
-		for (Kle topic : children) {
-			addChild(topic);
-		}
+		children.forEach(this::addChild);
 	}
 
 
