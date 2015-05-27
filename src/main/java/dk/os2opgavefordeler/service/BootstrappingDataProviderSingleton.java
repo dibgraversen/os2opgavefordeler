@@ -1,9 +1,6 @@
 package dk.os2opgavefordeler.service;
 
-import dk.os2opgavefordeler.model.DistributionRule;
-import dk.os2opgavefordeler.model.Role;
-import dk.os2opgavefordeler.model.UserSettings;
-import dk.os2opgavefordeler.model.Kle;
+import dk.os2opgavefordeler.model.*;
 import dk.os2opgavefordeler.model.presentation.FilterScope;
 import dk.os2opgavefordeler.model.presentation.RolePO;
 import org.slf4j.Logger;
@@ -31,6 +28,9 @@ public class BootstrappingDataProviderSingleton {
 	UsersService usersService;
 
 	@Inject
+	OrgUnitService orgUnitService;
+
+	@Inject
 	private KleImportService importer;
 
 	@Inject
@@ -43,6 +43,8 @@ public class BootstrappingDataProviderSingleton {
 	public void bootstrap() {
 		buildRoles();
 		buildUserSettings();
+
+		buildOrgUnits();
 
 		final List<Kle> groups = loadBootstrapKle();
 		buildDistributionRules();
@@ -97,6 +99,30 @@ public class BootstrappingDataProviderSingleton {
 	private void buildUserSettings(){
 		buildUserSettingsForUserOne();
 		buildUserSettingsForUserTwo();
+	}
+
+	private void buildOrgUnits() {
+		final OrgUnit rootOrg = OrgUnit.builder()
+			.name("Fantastisk Kommune")
+			.children(
+				OrgUnit.builder()
+					.name("Administration")
+					.manager(1)
+				.build(),
+
+				OrgUnit.builder()
+					.name("Digitalisering")
+					.manager(2)
+				.build(),
+
+				OrgUnit.builder()
+					.name("Kultur")
+					.manager(3)
+				.build()
+			)
+		.build();
+
+		orgUnitService.createOrgUnit(rootOrg);
 	}
 
 	private void buildUserSettingsForUserOne(){
