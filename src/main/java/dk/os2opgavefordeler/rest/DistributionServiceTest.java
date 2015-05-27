@@ -28,6 +28,10 @@ import java.util.stream.Stream;
 @Path("/test")
 @RequestScoped
 public class DistributionServiceTest {
+	public static final int ORG_NONEXISTING = 42;
+	public static final int ORG_1 = 1;
+	public static final int ORG_2 = 2;
+
 	@Inject
 	Logger log;
 
@@ -53,6 +57,8 @@ public class DistributionServiceTest {
 			with("Has no assignments", this::dist_hasNone),
 			with("Has directly owned, 1 assignment", this::dist_hasDirectlyOwnedOne),
 			with("Has directly owned, 2 assignments", this::dist_hasDirectlyOwnedTwo),
+			with("Has implicitly owned, 1 assignment", this::dist_hasImplicitlyOwnedOne),
+			with("Has implicitly owned, 2 assignments", this::dist_hasImplicitlyOwnedTwo),
 			with("Has direct and unowned", this::dist_hasDirectAndUnowned),
 			with("Has only unowned", this::dist_hasOnlyUnowned)
 		);
@@ -63,32 +69,55 @@ public class DistributionServiceTest {
 	@Test
 	private void dist_hasNone(StringBuilder result) {
 		assertTrue(result,
-			!getKleIds(42, false).findAny().isPresent());
+			!getKleIds(ORG_NONEXISTING, false, false).findAny().isPresent());
 	}
 
 	@Test
 	private void dist_hasDirectlyOwnedOne(StringBuilder result) {
 		assertMembership(result,
 			Stream.of("13"),
-			getKleIds(1, false)
+			getKleIds(ORG_1, false, false)
 		);
-		result.append("\n");
 	}
 
 	@Test
 	private void dist_hasDirectlyOwnedTwo(StringBuilder result) {
 		assertMembership(result,
 			Stream.of("14", "14.00"),
-			getKleIds(2, false)
+			getKleIds(ORG_2, false, false)
 		);
-		result.append("\n");
 	}
+
+	@Test
+	private void dist_hasImplicitlyOwnedOne(StringBuilder result) {
+		assertMembership(result,
+			Stream.of(
+				"13",							// directly owned
+				"13.00", "13.00.00"				// implicitly owned
+			),
+			getKleIds(ORG_1, false, true)
+		);
+	}
+
+	@Test
+	private void dist_hasImplicitlyOwnedTwo(StringBuilder result) {
+		assertMembership(result,
+			Stream.of(
+				"14", "14.00",					// directly owned
+				"14.00.01"),					// implicitly owned
+			getKleIds(ORG_2, false, true)
+		);
+	}
+
+	//TODO: has implicitly and unowned
 
 	@Test
 	private void dist_hasDirectAndUnowned(StringBuilder result) {
 		assertMembership(result,
-			Stream.of("13", "00", "00.01", "00.01.00"),
-			getKleIds(1, true)
+			Stream.of(
+				"13",							// directly owned
+				"00", "00.01", "00.01.00"),		// unowned
+			getKleIds(ORG_1, true, false)
 		);
 	}
 
@@ -96,7 +125,7 @@ public class DistributionServiceTest {
 	private void dist_hasOnlyUnowned(StringBuilder result) {
 		assertMembership(result,
 			Stream.of("00", "00.01", "00.01.00"),
-			getKleIds(42, true)
+			getKleIds(ORG_NONEXISTING, true, false)
 		);
 	}
 
@@ -107,28 +136,28 @@ public class DistributionServiceTest {
 	// -------------------------------------------------------------------------
 	@interface Test {}	// Temporary annotation until we're running under Arquillian.
 
-	class Zest {
+	class TestCase {
 		public final String name;
 		public final Consumer<StringBuilder> method;
-		Zest(String name, Consumer<StringBuilder> method) {
+		TestCase(String name, Consumer<StringBuilder> method) {
 			this.name = name;
 			this.method = method;
 		}
 	}
-	public Zest with(String name, Consumer<StringBuilder> method) {
-		return new Zest(name, method);
+	public TestCase with(String name, Consumer<StringBuilder> method) {
+		return new TestCase(name, method);
 	}
 
-	private void runSuite(StringBuilder output, Zest... testsToRun) {
-		for (Zest test : testsToRun) {
-			output.append("Test of '").append(test.name).append("': [\n");
+	private void runSuite(StringBuilder output, TestCase... testsToRun) {
+		for (TestCase test : testsToRun) {
+			output.append("Test of '").append(test.name).append("': ");
 			test.method.accept(output);
-			output.append("]\n");
+			output.append("\n\n");
 		}
 	}
 
 	private void assertTrue(StringBuilder out, boolean value) {
-		out.append("\t[").append(value ? "PASS" : "FAIL").append("]\n");
+		out.append("[").append(value ? "PASS" : "FAIL").append(']');
 	}
 
 	private void assertMembership(StringBuilder out, Stream<String> expectedIn, Stream<String> valuesIn) {
@@ -136,20 +165,17 @@ public class DistributionServiceTest {
 		Set<String> values = valuesIn.collect(Collectors.toSet());
 
 		if(values.equals(expected)) {
-			out.append("\t[PASS]");
+			out.append("[PASS]");
 		} else {
-			log.info("EXPECTED: {}", expected);
-			log.info("ACTUALLY: {}", values);
-
-			out.append("\t[FAIL] {\n");
-			out.append("\t\t=").append(Sets.intersection(values, expected)).append("\n");
-			out.append("\t\t+").append(Sets.difference(values, expected)).append("\n");
-			out.append("\t\t-").append(Sets.difference(expected, values)).append("\n\t}\n");
+			out.append("[FAIL] {\n");
+			out.append("\t=").append(Sets.intersection(values, expected)).append("\n");
+			out.append("\t+").append(Sets.difference(values, expected)).append("\n");
+			out.append("\t-").append(Sets.difference(expected, values)).append("\n}");
 		}
 	}
 
-	private Stream<String> getKleIds(int orgId, boolean include) {
-		return distributionService.getDistributionsForOrg(orgId, include)
+	private Stream<String> getKleIds(int orgId, boolean includeUnowned, boolean includeImplicit) {
+		return distributionService.getDistributionsForOrg(orgId, includeUnowned, includeImplicit)
 			.stream()
 			.map(d -> d.getKle().getNumber());
 	}
