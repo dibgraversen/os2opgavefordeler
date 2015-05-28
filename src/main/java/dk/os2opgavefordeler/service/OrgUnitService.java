@@ -18,4 +18,8 @@ public interface OrgUnitService {
 	 * @return fetched orgUnit, or Optional.empty if not found.
 	 */
 	Optional<OrgUnit> getOrgUnit(int id);
+
+
+	Optional<OrgUnit> getToplevelOrgUnit();
+	Optional<OrgUnit> getToplevelOrgUnitPO();
 }

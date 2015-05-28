@@ -1,6 +1,7 @@
 package dk.os2opgavefordeler.model;
 
 import com.google.common.base.MoreObjects;
+import com.google.common.collect.ImmutableList;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -17,6 +18,8 @@ public class OrgUnit implements Serializable {
 	private boolean isActive;
 	private String name;
 	private String esdhId;
+	private String email;
+	private String phone;
 
 	@ManyToOne
 	private OrgUnit parent;
@@ -53,6 +56,10 @@ public class OrgUnit implements Serializable {
 		return Optional.ofNullable(parent);
 	}
 
+	public ImmutableList<OrgUnit> getChildren() {
+		return ImmutableList.copyOf(children);
+	}
+
 	@Override
 	public String toString() {
 		return MoreObjects.toStringHelper(this)
@@ -72,6 +79,9 @@ public class OrgUnit implements Serializable {
 		private boolean isActive;
 		private String name;
 		private String esdhId;
+		private String email;
+		private String phone;
+
 		private int manager;
 		private List<Employment> employees;
 		private List<OrgUnit> children = new ArrayList<>();
@@ -102,6 +112,14 @@ public class OrgUnit implements Serializable {
 		}
 		public Builder children(OrgUnit... children) {
 			Collections.addAll(this.children, children);
+			return this;
+		}
+		public Builder email(String email) {
+			this.email = email;
+			return this;
+		}
+		public Builder phone(String phone) {
+			this.phone = phone;
 			return this;
 		}
 	}
