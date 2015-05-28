@@ -38,6 +38,11 @@ public class DistributionServiceImpl implements DistributionService {
 	}
 
 	@Override
+	public List<DistributionRule> getDistributionsAll() {
+		return persistence.findAll(DistributionRule.class);
+	}
+
+	@Override
 	public List<DistributionRule> getDistributionsForOrg(int orgId, boolean includeUnassigned) {
 		return getDistributionsForOrg(orgId, includeUnassigned, false);
 	}
@@ -60,6 +65,13 @@ public class DistributionServiceImpl implements DistributionService {
 
 		return results.stream()
 			.filter(getFilter(orgId, includeUnassigned, includeImplicit))
+			.collect(Collectors.toList());
+	}
+
+	@Override
+	public List<DistributionRulePO> getPoDistributionsAll() {
+		return getDistributionsAll().stream()
+			.map(DistributionRulePO::new)
 			.collect(Collectors.toList());
 	}
 

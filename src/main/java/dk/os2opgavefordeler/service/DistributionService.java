@@ -8,8 +8,10 @@ import java.util.List;
 public interface DistributionService {
 	DistributionRule createDistributionRule(DistributionRule rule);
 
+	List<DistributionRule> getDistributionsAll();
 	List<DistributionRule> getDistributionsForOrg(final int orgId, final boolean includeUnassigned);
 	List<DistributionRule> getDistributionsForOrg(final int orgId, final boolean includeUnassigned, final boolean includeImplicit);
 
+	List<DistributionRulePO> getPoDistributionsAll();
 	List<DistributionRulePO> getPoDistributions(final int orgId, final boolean includeUnassigned);
 }

@@ -24,26 +24,53 @@ public class DistributionRuleEndpoint {
 	DistributionService distributionService;
 
 	/**
-	 * @param employment The employment for whom to look up TopicRoutes
+	 * @param employmentId The employment for whom to look up TopicRoutes
 	 * @param scope      The scope for which to get the TopicRoutes. Can be ALL, MINE or ALL_MINE.
 	 * @return a list of TopicRoutePO's matching the employment and scope.
 	 */
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response routesForEmployment(@QueryParam("employment") Integer employment, @QueryParam("scope") String scope) {
-		//TODO: should we perform a lookup(employment -> orgunit), or should the Angular frontend pass OU instead of Emp?
+	public Response routesForEmployment(@QueryParam("employment") Integer employmentId, @QueryParam("scope") String scope) {
 		//TODO: define scopes properly, define Enum.
 
-		log.info("routesForEmployment[{},{}]", employment, scope);
+		log.info("routesForEmployment[{},{}]", employmentId, scope);
 
-		if (employment == null || scope == null) {
+		if (employmentId == null || scope == null) {
 			return Response.status(Response.Status.BAD_REQUEST).build();
 		}
 
-		boolean unassigned = "ALL".equals(scope);
+		//TODO: what if employment != orgUnit.manager ?
+		int orgUnitId = getOrgUnitFromEmploymentId(employmentId);
 
-		final List<DistributionRulePO> result = distributionService.getPoDistributions(employment, unassigned);
+
+		final List<DistributionRulePO> result;
+		if("ALL".equals(scope)) {
+			result = distributionService.getPoDistributionsAll();
+		} else {
+			result = distributionService.getPoDistributions(orgUnitId, true);
+		}
 
 		return Response.ok(result).build();
+	}
+
+	private int getOrgUnitFromEmploymentId(int employmentId) {
+		//TODO: perform proper lookup(employment -> orgunit)
+		switch(employmentId) {
+			case 1:
+				return 1;
+
+			case 2:
+			case 3:
+				return 2;
+			case 4:
+			case 5:
+				return 3;
+			case 6:
+			case 7:
+				return 4;
+
+			default:
+				return -1;
+		}
 	}
 }
