@@ -1,7 +1,9 @@
 package dk.os2opgavefordeler.service;
 
 import dk.os2opgavefordeler.model.OrgUnit;
+import dk.os2opgavefordeler.model.presentation.OrgUnitPO;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface OrgUnitService {
@@ -18,8 +20,8 @@ public interface OrgUnitService {
 	 * @return fetched orgUnit, or Optional.empty if not found.
 	 */
 	Optional<OrgUnit> getOrgUnit(int id);
-
-
 	Optional<OrgUnit> getToplevelOrgUnit();
-	Optional<OrgUnit> getToplevelOrgUnitPO();
+
+	List<OrgUnitPO> getToplevelOrgUnitPO();
+	Optional<OrgUnitPO> getOrgUnitPO(int id);
 }

@@ -11,11 +11,13 @@ import java.util.List;
 import java.util.Optional;
 
 @Entity
-public class OrgUnit implements Serializable {
+public class OrgUnit implements Serializable, IHasChildren<OrgUnit>
+{
 	@Id @GeneratedValue(strategy = GenerationType.AUTO)
-	private long id;
+	private int id;
 
 	private boolean isActive;
+
 	private String name;
 	private String esdhId;
 	private String email;
@@ -51,6 +53,31 @@ public class OrgUnit implements Serializable {
 			children.stream().forEach(child -> child.parent = this);
 		}
 	}
+
+	public int getId() {
+		return id;
+	}
+
+	public int getManager() {
+		return manager;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public String getPhone() {
+		return phone;
+	}
+
+	public String getEsdhId() {
+		return esdhId;
+	}
+
 
 	public Optional<OrgUnit> getParent() {
 		return Optional.ofNullable(parent);
