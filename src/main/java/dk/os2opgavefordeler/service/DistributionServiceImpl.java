@@ -70,14 +70,16 @@ public class DistributionServiceImpl implements DistributionService {
 
 	@Override
 	public List<DistributionRulePO> getPoDistributionsAll() {
-		return getDistributionsAll().stream()
+		List<DistributionRule> distributions = getDistributionsAll();
+		return distributions.stream()
 			.map(DistributionRulePO::new)
 			.collect(Collectors.toList());
 	}
 
 	@Override
-	public List<DistributionRulePO> getPoDistributions(int orgId, boolean includeUnassigned) {
-		return getDistributionsForOrg(orgId, includeUnassigned).stream()
+	public List<DistributionRulePO> getPoDistributions(int orgId, boolean includeUnassigned, boolean includeImplicit) {
+		List<DistributionRule> distributions = getDistributionsForOrg(orgId, includeUnassigned, includeImplicit);
+		return distributions.stream()
 			.map(DistributionRulePO::new)
 			.collect(Collectors.toList());
 	}

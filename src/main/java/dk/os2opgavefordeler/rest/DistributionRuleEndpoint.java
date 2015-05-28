@@ -47,7 +47,7 @@ public class DistributionRuleEndpoint {
 		if("ALL".equals(scope)) {
 			result = distributionService.getPoDistributionsAll();
 		} else {
-			result = distributionService.getPoDistributions(orgUnitId, true);
+			result = distributionService.getPoDistributions(orgUnitId, false, true);
 		}
 
 		return Response.ok(result).build();
