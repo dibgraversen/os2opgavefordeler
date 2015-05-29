@@ -1,0 +1,86 @@
+{
+	"name": "Fantastisk Kommune",
+	"manager": {
+		"name": "Borge Meister"
+	},
+
+	"children": [
+		{
+			"name": "Administration",
+			"manager": {
+				"name": "Amin Stratah"
+			},
+			"children": [
+				{
+					"name": "Personale",
+					"manager": {
+						"name": "Jette Jensen"
+					}
+				},
+				{
+					"name": "Kaffebestyrer",
+					"manager": {
+						"name": "Rune Nielsen"
+					}
+				}
+			]
+		},
+		{
+			"name": "Digitalisering",
+			"manager": {
+				"name": "David Hilbert"	
+			},
+
+			"children": [
+				{
+					"name": "Services",
+					"manager": {
+						"name": "Laila Leander"
+					}
+				},
+				{
+					"name": "Udvikling",
+					"manager": {
+						"name": "Karl Kodah"
+					},
+
+					"children": [
+						{
+							"name": "Backend",
+							"manager": {
+								"name": "Tyge Tordenskjold"
+							}
+						},
+						{
+							"name": "Borgervendt",
+							"manager": {
+								"name": "Søren Dines"
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Kultur",
+			"manager": {
+				"name": "Hemet Nesingwary"
+			},
+
+			"children": [
+				{
+					"name": "Berigelse",
+					"manager": {
+						"name": "Olfert Kvium"
+					}
+				},
+				{
+					"name": "Moderne kunst",
+					"manager": {
+						"name": "Picasso Monetsen"
+					} 
+				}
+			]
+		}
+	]
+}

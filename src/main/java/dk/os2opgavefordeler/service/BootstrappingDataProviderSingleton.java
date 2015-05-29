@@ -1,5 +1,6 @@
 package dk.os2opgavefordeler.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import dk.os2opgavefordeler.model.*;
 import dk.os2opgavefordeler.model.presentation.FilterScope;
 import dk.os2opgavefordeler.model.presentation.RolePO;
@@ -9,6 +10,7 @@ import javax.annotation.PostConstruct;
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
 import javax.inject.Inject;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
@@ -102,7 +104,9 @@ public class BootstrappingDataProviderSingleton {
 	}
 
 	private void buildOrgUnits() {
-		//TODO: deserialize JSON, pass to OrgUnitEndpoint.
+		log.info("Loading bootstrap organization");
+		final OrgUnit rootOrg = loadBootstrapOrgUnit();
+		orgUnitService.importOrganization(rootOrg);
 	}
 
 	private void buildUserSettingsForUserOne(){
@@ -138,6 +142,19 @@ public class BootstrappingDataProviderSingleton {
 			return Collections.emptyList();
 		}
 	}
+
+	private OrgUnit loadBootstrapOrgUnit() {
+		final ObjectMapper mapper = new ObjectMapper();
+
+		try (final InputStream resource = getResource("KLE-valid-data.xml")){
+			return mapper.readValue(getResource("bootstrap-organization.json"), OrgUnit.class);
+		} catch (IOException e) {
+			log.error("Couldn't deserialize bootstrap org", e);
+		}
+
+		return null;
+	}
+
 
 	private void buildDistributionRules() {
 		createRules(

@@ -54,21 +54,10 @@ public class OrgUnitEndpoint {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response importOrg(OrgUnit input) {
-		fixRelations(input);
+		orgUnitService.importOrganization(input);
 		printOrg(input);
 
-		orgUnitService.createOrgUnit(input);
-
 		return Response.ok().build();
-	}
-
-
-
-	private void fixRelations(OrgUnit input) {
-		input.getChildren().forEach(child -> {
-			child.setParent(input);
-			fixRelations(child);
-		});
 	}
 
 	int indent = 0;

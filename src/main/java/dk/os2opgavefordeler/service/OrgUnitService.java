@@ -15,6 +15,12 @@ public interface OrgUnitService {
 	OrgUnit createOrgUnit(OrgUnit orgUnit);
 
 	/**
+	 * Imports an organization tree.
+	 * @param orgUnit
+	 */
+	void importOrganization(OrgUnit orgUnit);
+
+	/**
 	 * Looks up an orgUnit by id.
 	 * @param id
 	 * @return fetched orgUnit, or Optional.empty if not found.

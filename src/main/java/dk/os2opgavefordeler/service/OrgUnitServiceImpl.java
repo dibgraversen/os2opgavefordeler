@@ -26,6 +26,12 @@ public class OrgUnitServiceImpl implements OrgUnitService {
 	}
 
 	@Override
+	public void importOrganization(OrgUnit orgUnit) {
+		fixRelations(orgUnit);
+		createOrgUnit(orgUnit);
+	}
+
+	@Override
 	public Optional<OrgUnit> getOrgUnit(int id) {
 		final List<OrgUnit> results = persistence.criteriaFind(OrgUnit.class,
 			(cb, cq, ou) -> cq.where(cb.equal(ou.get(OrgUnit_.id), id)
@@ -68,5 +74,12 @@ public class OrgUnitServiceImpl implements OrgUnitService {
 	private List<OrgUnit> touchChildren(List<OrgUnit> ou) {
 		ou.forEach(k -> touchChildren(k.getChildren()));
 		return ou;
+	}
+
+	private void fixRelations(OrgUnit input) {
+		input.getChildren().forEach(child -> {
+			child.setParent(input);
+			fixRelations(child);
+		});
 	}
 }
