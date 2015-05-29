@@ -102,28 +102,7 @@ public class BootstrappingDataProviderSingleton {
 	}
 
 	private void buildOrgUnits() {
-		final OrgUnit rootOrg = OrgUnit.builder()
-			.name("Fantastisk Kommune")
-			.manager(1)
-			.children(
-				OrgUnit.builder()
-					.name("Administration")
-					.manager(2)
-				.build(),
-
-				OrgUnit.builder()
-					.name("Digitalisering")
-					.manager(3)
-				.build(),
-
-				OrgUnit.builder()
-					.name("Kultur")
-					.manager(4)
-				.build()
-			)
-		.build();
-
-		orgUnitService.createOrgUnit(rootOrg);
+		//TODO: deserialize JSON, pass to OrgUnitEndpoint.
 	}
 
 	private void buildUserSettingsForUserOne(){

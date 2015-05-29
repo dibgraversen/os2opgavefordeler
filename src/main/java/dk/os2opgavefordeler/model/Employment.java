@@ -1,5 +1,8 @@
 package dk.os2opgavefordeler.model;
 
+import com.google.common.base.MoreObjects;
+import com.google.common.base.Objects;
+
 import javax.persistence.*;
 import java.io.Serializable;
 
@@ -10,7 +13,7 @@ import java.io.Serializable;
 @Entity
 public class Employment implements Serializable {
 	@Id @GeneratedValue(strategy = GenerationType.AUTO)
-	private long id;
+	private int id;
 
 	private boolean isActive;
 
@@ -39,8 +42,36 @@ public class Employment implements Serializable {
 		this.jobTitle = builder.jobTitle;
 	}
 
+	//--------------------------------------------------------------------------
+	// Getter/setters
+	//--------------------------------------------------------------------------
+	public int getId() {
+		return id;
+	}
 
+	public String getName() {
+		return name;
+	}
 
+	public String getEmail() {
+		return email;
+	}
+
+	public String getEsdhId() {
+		return esdhId;
+	}
+
+	public String getInitials() {
+		return initials;
+	}
+
+	public String getJobTitle() {
+		return jobTitle;
+	}
+
+	//--------------------------------------------------------------------------
+	// Builder
+	//--------------------------------------------------------------------------
 	public static Builder builder() {
 		return new Builder();
 	}
@@ -83,15 +114,11 @@ public class Employment implements Serializable {
 		}
 	}
 
-	/*
-	final Employment emp =
-			Employment.builder()
-					.isActive(true)
-					.name("Jens Hansen")
-					.initials("JH")
-					.email("jh@test.dk")
-					.esdhId("10243")
-					.jobTitle("Clerk")
-					.build();
-	*/
+	@Override
+	public String toString() {
+		return MoreObjects.toStringHelper(this)
+			.add("id", id)
+			.add("name", name)
+			.toString();
+	}
 }

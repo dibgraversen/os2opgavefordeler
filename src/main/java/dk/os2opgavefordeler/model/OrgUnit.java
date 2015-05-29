@@ -29,15 +29,15 @@ public class OrgUnit implements Serializable, IHasChildren<OrgUnit>
 	@OneToMany(mappedBy = "parent", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private List<OrgUnit> children;
 
-//	@OneToOne
-//	private Employment manager;			// OneToOne since a person who's manager in multiple OrgUnits will result in multiple Employments.
-	private int manager;
+	@OneToOne(cascade = CascadeType.ALL)
+	private Employment manager;			// OneToOne since a person who's manager in multiple OrgUnits will result in multiple Employments.
 
-//	@OneToMany
+//	@OneToMany(cascade = CascadeType.ALL)
 //	private List<Employment> employees;
 
 
 	public OrgUnit() {
+		children = new ArrayList<>();
 	}
 
 	private OrgUnit(Builder builder) {
@@ -58,7 +58,7 @@ public class OrgUnit implements Serializable, IHasChildren<OrgUnit>
 		return id;
 	}
 
-	public int getManager() {
+	public Employment getManager() {
 		return manager;
 	}
 
@@ -81,6 +81,13 @@ public class OrgUnit implements Serializable, IHasChildren<OrgUnit>
 
 	public Optional<OrgUnit> getParent() {
 		return Optional.ofNullable(parent);
+	}
+
+	public void setParent(OrgUnit parent) {
+		if(this.parent != null && this.parent != parent) {
+			this.parent.children.remove(this);
+		}
+		this.parent = parent;
 	}
 
 	public ImmutableList<OrgUnit> getChildren() {
@@ -109,7 +116,7 @@ public class OrgUnit implements Serializable, IHasChildren<OrgUnit>
 		private String email;
 		private String phone;
 
-		private int manager;
+		private Employment manager;
 		private List<Employment> employees;
 		private List<OrgUnit> children = new ArrayList<>();
 
@@ -129,7 +136,7 @@ public class OrgUnit implements Serializable, IHasChildren<OrgUnit>
 			this.esdhId = esdhId;
 			return this;
 		}
-		public Builder manager(int manager) {
+		public Builder manager(Employment manager) {
 			this.manager = manager;
 			return this;
 		}
