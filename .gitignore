@@ -2,4 +2,3 @@
 .idea
 *.iml
 dist.dev
-node_modules
