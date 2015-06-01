@@ -24,5 +24,21 @@
     "bootstrap": "~3.3.4",
     "lodash": "~3.6.0",
     "spin.js": "~2.0.2"
+  },
+  // for bower-main-files
+  "overrides": {
+    "angular-ui-alias": {
+      "main": "src/alias.js"
+    },
+    "bootstrap": {
+      "main": [
+        "dist/css/bootstrap.css",
+        "dist/fonts/glyphicons-halflings-regular.eot",
+        "dist/fonts/glyphicons-halflings-regular.svg",
+        "dist/fonts/glyphicons-halflings-regular.ttf",
+        "dist/fonts/glyphicons-halflings-regular.woff",
+        "dist/fonts/glyphicons-halflings-regular.woff2"
+      ]
+    }
   }
 }
