@@ -1,44 +1,57 @@
 <div id="topics" style="margin-left: 70px">
-    <h2 class="page-title">Opgavefordelinger</h2>
-    <div ng-hide="topicRoutes.length > 0" class="alert alert-warning">
-        Der kan ikke læses fordelinger for valgte rolle...
-    </div>
-    <div ng-show='topicRoutes.length > 0' style="overflow: auto">
-        <table class="table table-stripez table-hover">
-            <tr>
-                <th></th>
-                <th>Opgave</th>
-                <th>Organisationsenhed</th>
-                <th>Medarbejder</th>
-                <th></th>
-                <th ng-show="settings.showResponsible">Ansvarlig organisationsenhed</th>
-                <th ng-show="settings.showResponsible"></th>
-            </tr>
+	<h2 class="page-title">Opgavefordelinger</h2>
 
-            <tr ng-repeat="topic in topicRoutes | filter:filter.text" ng-show="topic.visible"
-                class="{{ topic.kle.type }} animate-show" ng-class="">
-                <td class="indent">
-                    <span class="glyphicon" ng-click="toggle(topic)" ng-show="topic.children.length > 0"
-                          ng-class="topic.open ? 'glyphicon-chevron-down' : 'glyphicon-chevron-right' "></span>
-                </td>
-                <td class="indent">
-                    {{ topic.kle.number }} {{ topic.kle.name }}
-                    <span ng-hide="topic.responsible" class="glyphicon glyphicon-exclamation-sign" style="color:red"></span>
+	<div ng-hide="topicRoutes.length > 0" class="alert alert-warning">
+		Der kan ikke læses fordelinger for valgte rolle...
+	</div>
+	<div ng-show="topicRoutes.length > 0" style="overflow: auto">
+		<table class="table table-stripez table-hover">
+			<tr>
+				<th></th>
+				<th>Opgave</th>
+				<th>Organisationsenhed</th>
+				<th>Medarbejder</th>
+				<th></th>
+				<th ng-show="settings.showResponsible">Ansvarlig organisationsenhed</th>
+				<th ng-show="settings.showResponsible"></th>
+			</tr>
+
+			<tr ng-repeat="topic in topicRoutes | filter:filter.text"
+					ng-show="topic.visible"
+					class="{{ topic.kle.type }} animate-show" ng-class="">
+				<td class="indent">
+                    <span class="glyphicon" ng-click="toggle(topic)"
+													ng-show="topic.children.length > 0"
+													ng-class="topic.open ? 'glyphicon-chevron-down' : 'glyphicon-chevron-right' "></span>
+				</td>
+				<td class="indent">
+					{{ topic.kle.number }} {{ topic.kle.name }}
+                    <span ng-hide="topic.responsible"
+													class="glyphicon glyphicon-exclamation-sign"
+													style="color:red"
+													popover-trigger="mouseenter"
+													popover="Der er ikke taget ansvar for denne opgave"></span>
                     <span ng-show="topic.kle.serviceText"
-                          class="glyphicon glyphicon-info-sign" popover-trigger="mouseenter"
-                          popover="{{ topic.kle.serviceText }}" popover-placement="right"></span>
-                </td>
-                <td>{{ topic.org }}</td>
-                <td>{{ topic.employee.name }}</td>
-                <td class="button"><button class="btn btn-default" popover-placement="left"
-                                           popover="klik her for at vedligholde fordelingsregler"
-                    popover-trigger="mouseenter" popover-popup-delay="1000" ng-click="editRule(topic)">Fordeling</button></td>
-                <td ng-show="settings.showResponsible">{{ topic.responsible.name }}</td>
-                <td class="button" ng-show="settings.showResponsible">
-                    <button class="btn btn-default">Ansvar</button>
-                </td>
+													class="glyphicon glyphicon-info-sign"
+													popover-trigger="mouseenter"
+													popover="{{ topic.kle.serviceText }}"
+													popover-placement="right"></span>
+				</td>
+				<td>{{ topic.org }}</td>
+				<td>{{ topic.employee.name }}</td>
+				<td class="button">
+					<button class="btn btn-default" popover-placement="left"
+									popover="klik her for at vedligholde fordelingsregler"
+									popover-trigger="mouseenter" popover-popup-delay="1000"
+									ng-click="editRule(topic)">Fordeling
+					</button>
+				</td>
+				<td ng-show="settings.showResponsible">{{ topic.responsible.name }}</td>
+				<td class="button" ng-show="settings.showResponsible">
+					<button class="btn btn-default">Ansvar</button>
+				</td>
 
-            </tr>
-        </table>
-    </div>
+			</tr>
+		</table>
+	</div>
 </div>

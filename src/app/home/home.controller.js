@@ -25,6 +25,23 @@
         ////////////////
 
         function activate() {
+            $scope.$watch("user.currentRole", function(newValue, oldValue){
+                if(newValue && newValue.employment > 0){
+                    refreshTopicRoutes();
+                } else {
+                    $scope.topicRoutes = [];
+                }
+            });
+
+            $scope.$watch("settings.scope", function(){
+                if($scope.user.currentRole && $scope.user.currentRole.employment)
+                    refreshTopicRoutes();
+            });
+
+
+        }
+
+        function refreshTopicRoutes(){
             getTopicRoutes().then(function(data){
                 $scope.topicRoutes = data;
                 $scope.filteredTopicRoutes = data;
@@ -39,7 +56,7 @@
         }
 
         function getTopicRoutes(){
-            return topicRouterApi.getTopicRoutes();
+            return topicRouterApi.getTopicRoutes($scope.user.currentRole.employment, $scope.settings.scope);
         }
 
         function save(){

@@ -1,10 +1,11 @@
-(function(){
+(function () {
 	'use strict';
 
 	angular.module('topicRouter').factory('topicRouterApi', topicRouterApi);
 
 	topicRouterApi.$inject = ['$http', '$q', '$timeout', 'serverUrl', 'appSpinner'];
 
+	// NOTE consider implementing ngResource to manage RESTful resource endpoints.
 	function topicRouterApi($http, $q, $timeout, serverUrl, appSpinner) {
 		var service = {
 			getTopicRoutes: getTopicRoutes,
@@ -23,16 +24,15 @@
 
 		return service;
 
-		function getSettings(userId){
-			var settings = { scope: 'ALL', showResponsible: true };
-			return httpGet('/user/'+userId+'/settings', settings);
+		function getSettings(userId) {
+			return httpGet('/user/' + userId + '/settings');
 		}
 
-		function updateSettings(userId, settings){
-			return httpPost('/user/'+userId+'/settings', settings);
+		function updateSettings(userId, settings) {
+			return httpPost('/user/' + userId + '/settings', settings);
 		}
 
-		function getTopicRoutes(){
+		function getTopicRoutes(employment, scope) {
 			//MOCK
 			//var deferred = $q.defer();
 			//deferred.resolve(mockTopicRoutes());
@@ -43,17 +43,15 @@
 			var users = getUsers();
 			var orgs = getOrganisations();
 
-			httpGet('/taskRoutes', {
-				params: {
-					employment: '1',
-					scope: 'all'
-				}
-			}).then(function(data){
+			httpGet('/distribution-rules', {
+				"employment": employment,
+				"scope": scope
+			}).then(function (data) {
 				var objectMap = {};
-				_.each(data, function(rule){
+				_.each(data, function (rule) {
 					objectMap[rule.id] = rule;
 					rule.children = [];
-					if(rule.parent){
+					if (rule.parent) {
 						var parent = objectMap[rule.parent];
 						// TODO consider putting object itself here.
 						// TODO consider adding parent as object.
@@ -70,9 +68,9 @@
 			return deferred.promise;
 		}
 
-		function getRoles(userId){
+		function getRoles(userId) {
 			//var deferred = $q.defer();
-			return httpGet('/user/'+userId+'/roles');
+			return httpGet('/user/' + userId + '/roles');
 			//deferred.resolve(getMockRoles());
 			//return deferred.promise;
 		}
@@ -80,33 +78,37 @@
 
 		// private methods
 
-		function httpGet(url, params){
-			return httpExecute(url, 'GET', { params: params });
+		function httpGet(url, params) {
+			var options = {};
+			if (params) {
+				//options.params = encodeURIComponent( JSON.stringify(params) );
+				options.params = params;
+			}
+			return httpExecute(url, 'GET', options);
 		}
 
-		function httpPost(url, data){
-			return httpExecute(url, 'POST', { data: data });
+		function httpPost(url, data) {
+			return httpExecute(url, 'POST', {data: data});
 		}
 
-		function httpExecute(requestUrl, method, options){
+		function httpExecute(requestUrl, method, options) {
 			var defaults = {
 				url: baseUrl + requestUrl,
 				method: method,
 				headers: requestConfig.headers
 			};
 			angular.extend(options, defaults); // merge defaults into options.
-
-			appSpinner.showSpinner(); // TODO enable
-			return $http(options).then(function(response){
-				appSpinner.hideSpinner();
-				console.log('**response from EXECUTE', response);
-				return response.data;
-			});
+			appSpinner.showSpinner();
+			return $http(options).then(function (response) {
+						appSpinner.hideSpinner();
+						console.log('**response from EXECUTE', response);
+						return response.data;
+					});
 		}
 
 		// mock functions
 
-		function mockTopicRoutes(){
+		function mockTopicRoutes() {
 			var users = getUsers();
 			var digiJon = users[4];
 			var allan = users[1];
@@ -145,10 +147,10 @@
 						id: 2,
 						name: 'Kultur Planlægning og Erhverv (Kenneth Jensen)'
 					},
-					children: [3,4],
+					children: [3, 4],
 					open: true,
 					visible: true
-				},{
+				}, {
 					id: 3,
 					kle: {
 						number: '01.06.00',
@@ -160,7 +162,7 @@
 					employee: allan,
 					responsible: digiJon,
 					visible: true
-				},{
+				}, {
 					id: 4,
 					kle: {
 						number: '01.06.01',
@@ -172,7 +174,7 @@
 					employee: allan,
 					responsible: digiJon,
 					visible: true
-				},{
+				}, {
 					id: 5,
 					kle: {
 						number: '85',
@@ -190,7 +192,7 @@
 					children: [6],
 					open: true,
 					visible: true
-				},{
+				}, {
 					id: 6,
 					kle: {
 						number: '85.04',
@@ -201,10 +203,10 @@
 					externalUnit: 'Digitalisering og It',
 					employee: jon,
 					responsible: digiJon,
-					children: [7,8],
+					children: [7, 8],
 					open: true,
 					visible: true
-				},{
+				}, {
 					id: 7,
 					kle: {
 						number: '85.04.00',
@@ -216,7 +218,7 @@
 					employee: jon,
 					responsible: digiJon,
 					visible: true
-				},{
+				}, {
 					id: 8,
 					kle: {
 						number: '85.04.02',
@@ -225,13 +227,13 @@
 					},
 					orgUnit: 'Direktionssekretariatet',
 					externalUnit: 'Ledelsessekretariatet',
-					responsible: digiJon ,
+					responsible: digiJon,
 					visible: true
 				}
 			];
 		}
 
-		function getMockRoles(){
+		function getMockRoles() {
 			return [
 				{
 					id: 1,
@@ -240,13 +242,13 @@
 					admin: false,
 					municipalityAdmin: false,
 					substitute: false
-				},{
+				}, {
 					id: 2,
 					name: 'Admin',
 					admin: true,
 					municipalityAdmin: false,
 					substitute: false
-				},{
+				}, {
 					id: 3,
 					name: 'Jørgen Jensen',
 					admin: false,
@@ -279,7 +281,7 @@
 			};
 		}
 
-		function getOrganisations(){
+		function getOrganisations() {
 			return {
 				1: "Udvikling",
 				2: "Direktionssekretariatet",
@@ -288,7 +290,7 @@
 			};
 		}
 
-		function createKLE(number, name, type, serviceText){
+		function createKLE(number, name, type, serviceText) {
 			return {
 				number: number,
 				name: name,

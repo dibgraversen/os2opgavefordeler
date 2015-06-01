@@ -3,9 +3,9 @@
 
 	angular.module('topicRouter').controller('ShellCtrl', ShellCtrl);
 
-	ShellCtrl.$inject = ['$scope', '$rootScope', '$state', '$timeout', 'topicRouterApi'];
+	ShellCtrl.$inject = ['$scope', '$rootScope', '$state', '$timeout', '$q', 'topicRouterApi'];
 
-	function ShellCtrl($scope, $rootScope, $state, $timeout, topicRouterApi) {
+	function ShellCtrl($scope, $rootScope, $state, $timeout, $q, topicRouterApi) {
 
 		/* jshint validthis:true */
 		var vm = this;
@@ -30,7 +30,7 @@
 		$scope.updateFilter = updateFilter;
 
 		vm.showSpinner = false;
-		vm.spinnerMessage = 'Henter data...';
+		vm.spinnerMessage = 'Opdaterer...';
 
 		vm.spinnerOptions = {
 			radius: 40,
@@ -48,10 +48,10 @@
 		function activate() {
 			//user = getUser();
 			//if(user){
-				changeUser({
-					name: 'Henrik',
-					id: 1
-				});
+			changeUser({
+				name: 'Henrik',
+				id: 1
+			});
 			//}
 			//getSettings($scope.user.id);
 			//getRoles($scope.user);
@@ -95,10 +95,15 @@
 		}
 
 		function getRoles(user) {
-			topicRouterApi.getRoles($scope.user.id).then(function (data) {
-				$scope.user.roles = data;
-				$scope.user.currentRole = data[0];
+			var deferred = $q.defer();
+			topicRouterApi.getRoles(user.id).then(function (data) {
+				if(data){
+					$scope.user.roles = data;
+					$scope.user.currentRole = data[0];
+				}
+				deferred.resolve();
 			});
+			return deferred.promise;
 		}
 
 		function changeRole(role) {
