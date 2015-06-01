@@ -1,8 +1,11 @@
 {
   "dev": {
-    "serverUrl": "http://localhost:8080/TopicRouter/rest"
+    "serverUrl": "http://127.0.0.1:8080/TopicRouter/rest"
+  },
+  "test": {
+    "serverUrl": "http://os2-test.miracle.local:80/TopicRouter/rest"
   },
   "prod": {
-    "serverUrl": "someserver.dk/topicRouter/rest"
+    "serverUrl": "someserver.dk/TopicRouter/rest"
   }
 }
