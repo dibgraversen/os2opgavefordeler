@@ -38,6 +38,17 @@ public class DistributionServiceImpl implements DistributionService {
 	}
 
 	@Override
+	public Optional<DistributionRule> getDistribution(int id) {
+		final List<DistributionRule> result = persistence.criteriaFind(DistributionRule.class,
+			(cb, cq, ent) -> cq.where(cb.equal(ent.get(DistributionRule_.id), id))
+		);
+
+		return result.isEmpty() ?
+			Optional.empty() :
+			Optional.of(result.get(0));
+	}
+
+	@Override
 	public List<DistributionRule> getDistributionsAll() {
 		return persistence.findAll(DistributionRule.class);
 	}

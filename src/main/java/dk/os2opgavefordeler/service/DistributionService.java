@@ -4,11 +4,14 @@ import dk.os2opgavefordeler.model.DistributionRule;
 import dk.os2opgavefordeler.model.presentation.DistributionRulePO;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface DistributionService {
 	DistributionRule createDistributionRule(DistributionRule rule);
 
+	Optional<DistributionRule> getDistribution(int id);
 	List<DistributionRule> getDistributionsAll();
+
 	List<DistributionRule> getDistributionsForOrg(int orgId, boolean includeUnassigned);
 	List<DistributionRule> getDistributionsForOrg(int orgId, boolean includeUnassigned, boolean includeImplicit);
 
