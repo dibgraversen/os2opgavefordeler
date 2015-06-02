@@ -44,4 +44,9 @@ public class PersistenceServiceImpl implements PersistenceService {
 			(cb, cq, root) -> cq.select(root)
 		);
 	}
+
+	@Override
+	public void rollbackTransaction() {
+		em.getTransaction().rollback();
+	}
 }

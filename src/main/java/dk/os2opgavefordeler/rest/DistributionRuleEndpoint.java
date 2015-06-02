@@ -3,6 +3,8 @@ package dk.os2opgavefordeler.rest;
 import dk.os2opgavefordeler.model.DistributionRule;
 import dk.os2opgavefordeler.model.presentation.DistributionRulePO;
 import dk.os2opgavefordeler.service.DistributionService;
+import dk.os2opgavefordeler.service.OrgUnitService;
+import dk.os2opgavefordeler.service.PersistenceService;
 import org.slf4j.Logger;
 
 import javax.enterprise.context.RequestScoped;
@@ -20,7 +22,13 @@ public class DistributionRuleEndpoint {
 	Logger log;
 
 	@Inject
+	PersistenceService persistenceService;
+
+	@Inject
 	DistributionService distributionService;
+
+	@Inject
+	OrgUnitService orgUnitService;
 
 	/**
 	 * @param employmentId The employment for whom to look up TopicRoutes
@@ -70,18 +78,35 @@ public class DistributionRuleEndpoint {
 		return distributionService.getDistribution(distId)
 			.map(existing -> doUpdateResponsibleOrganization(existing, distribution))
 			.orElseGet(() -> {
-					log.info("updateResponsibleOrganization - nonexisting distributionRule[{}]", distId);
-					return Response.status(Response.Status.NOT_FOUND).build();
-				}
-			);
+				log.info("updateResponsibleOrganization - nonexisting distributionRule[{}]", distId);
+				return Response.status(Response.Status.NOT_FOUND).build();
+			}
+		);
 	}
 
+	//TODO: code below this point should probably be refactored to service methods.
 	private Response doUpdateResponsibleOrganization(DistributionRule existing, DistributionRulePO updated) {
+		if(!allowedToUpdate(existing)) {
+			log.warn("User {} doesn't have permissions to update {}", "<WeDontHaveUsersYet>", existing);
+			return Response.status(Response.Status.FORBIDDEN).build();
+		}
+		try {
+			updateDistributionRule(existing, updated);
+		}
+		catch(IllegalArgumentException ex) {
+			log.warn("doUpdateResponsibleOrganization - invalid arguments in [{}]", updated);
+			persistenceService.rollbackTransaction();
+			return Response.serverError().build();
+		}
+
+		return Response.ok().build();
+	}
+
+	private boolean allowedToUpdate(DistributionRule existing) {
 		//RULE: if a DistributionRule currently has no responsible, any manager can assign.
 		//RULE: we can only change responsible if owned by <OrgUnit of logged-in user/role> or a subordinate.
 		//RULE: if we own the DR, we can release ownership (set null), or give to *any* OrgUnit, not just subordinates.
-
-		/*
+	/*
 		int currentUserOrgId = 1;									//TODO: get from logged-in user/role
 		boolean isAdmin = false;									//TODO: get from logged-in user/role. Both municipality- and sysadmin qualify.
 		boolean isManager = false;									//TODO: get from logged-in user/role
@@ -91,24 +116,29 @@ public class DistributionRuleEndpoint {
 		boolean canChange = isAdmin || (isManager && (unowned || currentUserOrgId == implicitOwner || subordinates.contains(currentUserOrgId)));
 		//TODO: simplify 'canChange' expression - possible factor out authorization checks to service.
 		//TODO: early-out if !isManager? Probably best to do all checks, and  do full logging of available information.
-*/
-		boolean canChange = true;									//TODO: when we have logged-in users, actually do checks.
-		if(!canChange) {
-			log.warn("User {} doesn't have permissions to update {}", "<WeDontHaveUsersYet>", existing);
-			return Response.status(Response.Status.FORBIDDEN).build();
-		}
+	*/
+		//TODO: when we have logged-in users, actually do checks.
+		return true;
+	}
 
-		//TODO: verify that updated fields are valid. Should this be done up-front, or in the Consumer lambdas?
-		//If in the lambdas, how do we handle invalid values? We'll need to either rollback transaction, or work on
-		//a detached entity?
-
+	private void updateDistributionRule(DistributionRule existing, DistributionRulePO updated) {
 		//TODO: these updates should probably call service methods instead of setters. At some point, we might want to
 		//calculate stuff and stuff with stuff on.
-		possiblyUpdate(existing.getResponsibleOrg(),	updated.getResponsible(),	existing::setResponsibleOrg);
-		possiblyUpdate(existing.getAssignedOrg(),		updated.getOrg(),			existing::setAssignedOrg);
-		possiblyUpdate(existing.getAssignedEmp(),		updated.getEmployee(),		existing::setAssignedEmp);
+		possiblyUpdate(existing.getResponsibleOrg(), updated.getResponsible(), newOwnerId -> {
+			/* OrgUnit newOwner = */ orgUnitService.getOrgUnit(newOwnerId).orElseThrow(IllegalArgumentException::new);
+			existing.setResponsibleOrg(newOwnerId);
+		});
 
-		return Response.serverError().build();
+		possiblyUpdate(existing.getAssignedOrg(), updated.getOrg(), newOrgId -> {
+			/* OrgUnit newOrg = */ orgUnitService.getOrgUnit(newOrgId).orElseThrow(IllegalArgumentException::new);
+			existing.setAssignedOrg(newOrgId);
+		});
+
+		possiblyUpdate(existing.getAssignedEmp(), updated.getEmployee(), newEmpId -> {
+			//TODO: validate once we add EmploymentService
+			//Employment emp = employmentService.getEmployment(newEmpId).orElseThrow(IllegalArgumentException::new);
+			existing.setAssignedEmp(newEmpId);
+		});
 	}
 
 	private<T extends Comparable<T>> void possiblyUpdate(T oldVal, T newVal, Consumer<T> updater) {
@@ -116,8 +146,6 @@ public class DistributionRuleEndpoint {
 			updater.accept(newVal);
 		}
 	}
-
-
 
 	private int getOrgUnitFromEmploymentId(int employmentId) {
 		//TODO: perform proper lookup(employment -> orgunit)
