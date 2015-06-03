@@ -13,7 +13,10 @@
 			getSettings: getSettings,
 			updateSettings: updateSettings,
 			getOrgUnitsForResponsibility: getOrgUnitsForResponsibility,
-			setResponsibleOrg: setResponsibleOrg
+			setResponsibleOrg: setResponsibleOrg,
+			getEmployments: getEmployments,
+		  getEmployment: getEmployment,
+			updateDistributionRule: updateDistributionRule
 		};
 
 		var baseUrl = serverUrl;
@@ -41,8 +44,6 @@
 			//MOCK
 			var deferred = $q.defer();
 
-			var users = getUsers();
-
 			httpGet('/distribution-rules', {
 				"employment": employment,
 				"scope": scope
@@ -57,7 +58,11 @@
 						parent.children.push(rule.id);
 						//console.log('rule has parent: '+rule.parent);
 					}
-					rule.employee = users[rule.employee];
+					if(rule.employee > 0){
+						getEmployment(rule.employee).then(function(employee){
+							rule.employee = employee;
+						});
+					}
 					if(rule.org > 0){
 						getOrgUnit(rule.org).then(function(orgUnit){
 							rule.org = orgUnit;
@@ -66,7 +71,7 @@
 					rule.open = true;
 					rule.visible = true;
 					if(rule.responsible > 0){
-						if(rule.responsible === 2 ) rule.responsible = 3;
+						//if(rule.responsible === 2 ) rule.responsible = 3;
 						getOrgUnit(rule.responsible).then(function(orgUnit){
 							rule.responsible = orgUnit;
 						});
@@ -78,7 +83,14 @@
 		}
 
 		function getOrgUnit(orgId){
-			return httpGet('/org-unit/'+orgId);
+			return httpGet('/org-unit/'+orgId).then(function(orgUnit){
+				if(orgUnit.managerId > 0){
+					getEmployment(orgUnit.managerId).then(function(employment){
+						orgUnit.manager = employment;
+					});
+				}
+				return orgUnit;
+			});
 		}
 
 		function getRoles(userId) {
@@ -90,12 +102,32 @@
 		 * @returns {Object[]} OrgUnit - A list of all OrgUnits.
 		 */
 		function getOrgUnitsForResponsibility(){
-			// TODO cache requests.
-			return httpGet('/org-unit');
+			return httpGet('/org-unit').then(function(orgUnits){
+				_.each(orgUnits, function(orgUnit){
+					if(orgUnit.managerId > 0){
+						getEmployment(orgUnit.managerId).then(function(employment){
+							orgUnit.manager = employment;
+						});
+					}
+				});
+				return orgUnits;
+			});
 		}
 
 		function setResponsibleOrg(topic){
 			//return httpPost('/distribution-rules/'+topic.id, topic);
+		}
+
+		function getEmployments(){
+			return httpGet('/employments');
+		}
+
+		function getEmployment(empId){
+			return httpGet('/employments/'+empId);
+		}
+
+		function updateDistributionRule(distributionRule){
+			//return httpPost('/distributionRules/'+distributionRule.id, distributionRule);
 		}
 
 		// classes

@@ -13,19 +13,57 @@
 		</dl>
 		<div>
 			<tabset justified="true">
-				<tab heading="Vælg ny enhed">
-					Her kan du vælge en ny enhed.
+				<tab heading="Vælg organisatorisk enhed">
+					<div class="row">
+						<div class="padded-top col-md-4">
+							<input type="text" class="form-control" placeholder="filter" ng-model="orgFilter" />
+						</div>
+					</div>
+					<table class="table table-hover">
+						<thead>
+						<tr>
+							<th>Afdelingsnavn</th>
+							<th>Leder</th>
+						</tr>
+						</thead>
+						<tbody ng-repeat="orgUnit in orgUnits | filter:orgFilter">
+						<tr ng-class="selectedOrgUnit === orgUnit ? 'success' : ''" ng-click="setSelectedOrgUnit(orgUnit)">
+							<td>{{ orgUnit.name }}</td>
+							<td>{{ orgUnit.manager.name }}</td>
+						</tr>
+						</tbody>
+					</table>
 				</tab>
 				<tab heading="Vælg ny medarbejder">
-					Her kan du vælge en ny medarbejder.
+					<div class="row">
+						<div class="padded-top col-md-4">
+							<input type="text" class="form-control" placeholder="filter" ng-model="empFilter" />
+						</div>
+					</div>
+					<table class="table table-hover">
+						<thead>
+						<tr>
+							<th>Navn</th>
+						</tr>
+						</thead>
+						<tbody ng-repeat="emp in employments | filter:empFilter">
+						<tr ng-class="selectedEmp === emp ? 'success' : ''" ng-click="setSelectedEmp(emp)">
+							<td>{{ emp.name }}</td>
+						</tr>
+						</tbody>
+					</table>
 				</tab>
 			</tabset>
+			<alert ng-repeat="alert in ruleAlerts" type="{{alert.type}}"
+						 close="closeAlert($index)" class="animate-fade"
+						 style="width: 100%">{{alert.msg}}
+			</alert>
 
 
 		</div>
 	</div>
 	<div class="modal-footer">
 		<button class="btn btn-primary" ng-click="ok()">Gem</button>
-		<button class="btn btn-warning" ng-click="cancel()">Annuller</button>
+		<button class="btn btn-default" ng-click="cancel()">Annuller</button>
 	</div>
 </div>
