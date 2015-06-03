@@ -107,6 +107,7 @@
 		}
 
 		function changeRole(role) {
+			// functionality happens by ng-modal and radiobuttons.
 			console.log('switching user');
 			//$scope.user.currentRole = role;
 			console.log($scope.user);
