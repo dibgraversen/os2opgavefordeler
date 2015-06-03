@@ -5,6 +5,8 @@
 
 	topicRouterApi.$inject = ['$http', '$q', '$timeout', 'serverUrl', 'appSpinner'];
 
+	var maxPopoverLength = 150;
+
 	// NOTE consider implementing ngResource to manage RESTful resource endpoints.
 	function topicRouterApi($http, $q, $timeout, serverUrl, appSpinner) {
 		var service = {
@@ -76,6 +78,7 @@
 							rule.responsible = orgUnit;
 						});
 					}
+					rule.kle.serviceTextPopover = htmlsave.truncate(rule.kle.serviceText, maxPopoverLength, { breakword:false });
 				});
 				deferred.resolve(data);
 			});
