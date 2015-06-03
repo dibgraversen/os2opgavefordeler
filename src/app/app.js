@@ -35,7 +35,7 @@
           controller: 'MunicipalityAdminCtrl',
           controllerAs: 'vm'
         });
-    $urlRouterProvider.otherwise('home');
+    $urlRouterProvider.otherwise('/');
   }
 
   app.config(['$httpProvider', setupCors]);
