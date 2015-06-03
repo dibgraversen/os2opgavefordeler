@@ -27,6 +27,7 @@ public interface OrgUnitService {
 	 */
 	Optional<OrgUnit> getOrgUnit(int id);
 	Optional<OrgUnit> getToplevelOrgUnit();
+	List<OrgUnit> findByName(String name);
 
 	List<OrgUnitPO> getToplevelOrgUnitPO();
 	Optional<OrgUnitPO> getOrgUnitPO(int id);

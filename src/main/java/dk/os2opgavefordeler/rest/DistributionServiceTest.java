@@ -1,8 +1,10 @@
 package dk.os2opgavefordeler.rest;
 
 import com.google.common.collect.Sets;
+import dk.os2opgavefordeler.model.OrgUnit;
 import dk.os2opgavefordeler.service.DistributionService;
 import dk.os2opgavefordeler.service.KleService;
+import dk.os2opgavefordeler.service.OrgUnitService;
 import org.slf4j.Logger;
 
 import javax.annotation.PostConstruct;
@@ -34,6 +36,9 @@ public class DistributionServiceTest {
 
 	@Inject
 	Logger log;
+
+	@Inject
+	OrgUnitService orgUnitService;
 
 	@Inject
 	KleService kleService;
@@ -175,6 +180,18 @@ public class DistributionServiceTest {
 	}
 
 	private Stream<String> getKleIds(int orgId, boolean includeUnowned, boolean includeImplicit) {
+		OrgUnit org;
+		if(orgId == ORG_1) {
+			org = orgUnitService.findByName("Digitalisering").get(0);
+		} else if(orgId == ORG_2) {
+			org = orgUnitService.findByName("Moderne kunst").get(0);
+		} else {
+			org = null;
+		}
+		if(org != null) {
+			orgId = org.getId();
+		}
+
 		return distributionService.getDistributionsForOrg(orgId, includeUnowned, includeImplicit)
 			.stream()
 			.map(d -> d.getKle().getNumber());

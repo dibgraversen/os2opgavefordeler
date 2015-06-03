@@ -28,9 +28,8 @@ public class DistributionRule implements Serializable {
 	private List<DistributionRule> children;
 
 
-	//	@ManyToOne
-//	private OrgUnit responsibleOrg;
-	int responsibleOrg;
+	@ManyToOne
+	private OrgUnit responsibleOrg;
 
 
 	// Optimization: instead of having a null responsibleOrg and having to look at parent(s), manage responsibleOrg and
@@ -43,27 +42,26 @@ public class DistributionRule implements Serializable {
 	private Kle kle;	// this can be a main group, subgroup or topic. Remodel model.kle, or "stringly typed" ref?
 
 	// default assignment
-//	@ManyToOne
-//	private OrgUnit assignedOrg;
-	private int assignedOrg;
+	@ManyToOne
+	private OrgUnit assignedOrg;
 
 //	@ManyToOne
 //	private Employment assignedEmp;
 	private int assignedEmp;
 
-	public int getResponsibleOrg() {
+	public OrgUnit getResponsibleOrg() {
 		return responsibleOrg;
 	}
 
-	public void setResponsibleOrg(int responsibleOrg) {
+	public void setResponsibleOrg(OrgUnit responsibleOrg) {
 		this.responsibleOrg = responsibleOrg;
 	}
 
-	public int getAssignedOrg() {
+	public OrgUnit getAssignedOrg() {
 		return assignedOrg;
 	}
 
-	public void setAssignedOrg(int assignedOrg) {
+	public void setAssignedOrg(OrgUnit assignedOrg) {
 		this.assignedOrg = assignedOrg;
 	}
 
@@ -125,7 +123,7 @@ public class DistributionRule implements Serializable {
 	}
 
 	public static class Builder {
-		private int responsibleOrg = -1;
+		private OrgUnit responsibleOrg = null;
 		private Kle kle = null;
 		private List<DistributionRule> children = new ArrayList<>();
 
@@ -134,7 +132,7 @@ public class DistributionRule implements Serializable {
 			return new DistributionRule(this);
 		}
 
-		public Builder responsibleOrg(int responsibleOrg) {
+		public Builder responsibleOrg(OrgUnit responsibleOrg) {
 			this.responsibleOrg = responsibleOrg;
 			return this;
 		}

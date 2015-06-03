@@ -160,15 +160,15 @@ public class BootstrappingDataProviderSingleton {
 		createRules(
 			// === Fully unassigned group
 			DistributionRule.builder()
-				.responsibleOrg(0)
+				.responsibleOrg(null)
 				.kle(kleService.fetchMainGroup("00").get())
 				.children(
 					DistributionRule.builder()
-						.responsibleOrg(0)
+						.responsibleOrg(null)
 						.kle(kleService.fetchMainGroup("00.01").get())
 						.children(
 							DistributionRule.builder()
-								.responsibleOrg(0)
+								.responsibleOrg(null)
 								.kle(kleService.fetchMainGroup("00.01.00").get())
 							.build()
 						)
@@ -178,15 +178,15 @@ public class BootstrappingDataProviderSingleton {
 
 			// === Group with assigned toplevel
 			DistributionRule.builder()
-				.responsibleOrg(1)
+				.responsibleOrg(findOrg("Digitalisering"))
 				.kle(kleService.fetchMainGroup("13").get())
 				.children(
 					DistributionRule.builder()
-						.responsibleOrg(0)
+						.responsibleOrg(null)
 						.kle(kleService.fetchMainGroup("13.00").get())
 						.children(
 							DistributionRule.builder()
-								.responsibleOrg(0)
+								.responsibleOrg(null)
 								.kle(kleService.fetchMainGroup("13.00.00").get())
 							.build()
 						)
@@ -196,15 +196,15 @@ public class BootstrappingDataProviderSingleton {
 
 			// Group with two assigned levels
 			DistributionRule.builder()
-				.responsibleOrg(2)
+				.responsibleOrg(findOrg("Moderne kunst"))
 				.kle(kleService.fetchMainGroup("14").get())
 				.children(
 					DistributionRule.builder()
-						.responsibleOrg(2)
+						.responsibleOrg(findOrg("Moderne kunst"))
 						.kle(kleService.fetchMainGroup("14.00").get())
 						.children(
 							DistributionRule.builder()
-								.responsibleOrg(0)
+								.responsibleOrg(null)
 								.kle(kleService.fetchMainGroup("14.00.01").get())
 								.build()
 						)
@@ -217,6 +217,10 @@ public class BootstrappingDataProviderSingleton {
 	// =================================================================================================================
 	//	Helpers
 	// =================================================================================================================
+	private OrgUnit findOrg(String name) {
+		return orgUnitService.findByName(name).get(0);
+	}
+
 	private void createRules(DistributionRule... rules) {
 		Stream.of(rules).forEach(distService::createDistributionRule);
 	}

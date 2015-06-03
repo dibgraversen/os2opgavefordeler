@@ -68,7 +68,7 @@ public class DistributionServiceImpl implements DistributionService {
 			// ownership will be determined by Java code.
 			final Predicate main = cb.equal(rule.get(DistributionRule_.responsibleOrg), orgId);
 			final Predicate pred = (includeUnassigned || includeImplicit) ?
-				cb.or(main, cb.equal(rule.get(DistributionRule_.responsibleOrg), 0)) :
+				cb.or(main, cb.isNull( rule.get(DistributionRule_.responsibleOrg))) :
 				main;
 
 			cq.where(pred);
@@ -112,7 +112,7 @@ public class DistributionServiceImpl implements DistributionService {
 			return dr -> getImplicitOwner(dr).map(id -> id == orgId).orElse(includeUnassigned);
 		} else {
 			// Include if explicitly owned by orgId, filter out implicitly owned, leave root-unowned.
-			return dr -> (orgId == dr.getResponsibleOrg()) || !getImplicitOwner(dr).isPresent();
+			return dr -> ( (dr.getResponsibleOrg() != null && orgId == dr.getResponsibleOrg().getId())) || !getImplicitOwner(dr).isPresent();
 		}
 	}
 
@@ -124,8 +124,8 @@ public class DistributionServiceImpl implements DistributionService {
 	private Optional<Integer> getImplicitOwner(DistributionRule dr) {
 		if(dr == null) {
 			return Optional.empty();
-		} else if(dr.getResponsibleOrg() != 0) {
-			return Optional.of(dr.getResponsibleOrg());
+		} else if(dr.getResponsibleOrg() != null) {
+			return Optional.of(dr.getResponsibleOrg().getId());
 		} else {
 			return getImplicitOwner(dr.getParent().orElse(null));
 		}

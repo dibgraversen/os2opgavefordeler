@@ -48,9 +48,9 @@ public class DistributionRulePO {
 		this.id = source.getId();
 
 		this.kle = kleFrom(source.getKle());
-		this.responsible = source.getResponsibleOrg();
+		this.responsible = source.getResponsibleOrg().getId();
 		this.employee = source.getAssignedEmp();
-		this.org = source.getAssignedOrg();
+		this.org = source.getAssignedOrg().getId();
 	}
 
 	public int getId() {
