@@ -49,16 +49,16 @@ public class DistributionRule implements Serializable {
 //	private Employment assignedEmp;
 	private int assignedEmp;
 
-	public OrgUnit getResponsibleOrg() {
-		return responsibleOrg;
+	public Optional<OrgUnit> getResponsibleOrg() {
+		return Optional.ofNullable(responsibleOrg);
 	}
 
 	public void setResponsibleOrg(OrgUnit responsibleOrg) {
 		this.responsibleOrg = responsibleOrg;
 	}
 
-	public OrgUnit getAssignedOrg() {
-		return assignedOrg;
+	public Optional<OrgUnit> getAssignedOrg() {
+		return Optional.ofNullable(assignedOrg);
 	}
 
 	public void setAssignedOrg(OrgUnit assignedOrg) {

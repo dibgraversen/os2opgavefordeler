@@ -2,6 +2,7 @@ package dk.os2opgavefordeler.model.presentation;
 
 import dk.os2opgavefordeler.model.DistributionRule;
 import dk.os2opgavefordeler.model.Kle;
+import dk.os2opgavefordeler.model.OrgUnit;
 import dk.osto.model.KLE;
 
 /**
@@ -48,9 +49,9 @@ public class DistributionRulePO {
 		this.id = source.getId();
 
 		this.kle = kleFrom(source.getKle());
-		this.responsible = source.getResponsibleOrg().getId();
+		this.responsible = source.getResponsibleOrg().map(OrgUnit::getId).orElse(0);
 		this.employee = source.getAssignedEmp();
-		this.org = source.getAssignedOrg().getId();
+		this.org = source.getAssignedOrg().map(OrgUnit::getId).orElse(0);
 	}
 
 	public int getId() {

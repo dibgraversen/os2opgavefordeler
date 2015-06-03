@@ -2,6 +2,7 @@ package dk.os2opgavefordeler.service;
 
 import dk.os2opgavefordeler.model.DistributionRule;
 import dk.os2opgavefordeler.model.DistributionRule_;
+import dk.os2opgavefordeler.model.OrgUnit;
 import dk.os2opgavefordeler.model.presentation.DistributionRulePO;
 import org.slf4j.Logger;
 
@@ -112,7 +113,7 @@ public class DistributionServiceImpl implements DistributionService {
 			return dr -> getImplicitOwner(dr).map(id -> id == orgId).orElse(includeUnassigned);
 		} else {
 			// Include if explicitly owned by orgId, filter out implicitly owned, leave root-unowned.
-			return dr -> ( (dr.getResponsibleOrg() != null && orgId == dr.getResponsibleOrg().getId())) || !getImplicitOwner(dr).isPresent();
+			return dr -> ( orgId == dr.getResponsibleOrg().map(OrgUnit::getId).orElse(-1)) || !getImplicitOwner(dr).isPresent();
 		}
 	}
 
@@ -124,8 +125,8 @@ public class DistributionServiceImpl implements DistributionService {
 	private Optional<Integer> getImplicitOwner(DistributionRule dr) {
 		if(dr == null) {
 			return Optional.empty();
-		} else if(dr.getResponsibleOrg() != null) {
-			return Optional.of(dr.getResponsibleOrg().getId());
+		} else if(dr.getResponsibleOrg().isPresent()) {
+			return dr.getResponsibleOrg().map(OrgUnit::getId);
 		} else {
 			return getImplicitOwner(dr.getParent().orElse(null));
 		}
