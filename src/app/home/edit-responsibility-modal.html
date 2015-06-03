@@ -1,0 +1,47 @@
+<div id="responsible-modal">
+	<div class="modal-header">
+		<button type="button" class="close" ng-click="cancel()"><span aria-hidden="true">&times;</span></button>
+		<h4 class="modal-title">Vedlighold ansvar</h4>
+	</div>
+	<div class="modal-body">
+		<div>Vedlighold af ansvar for: '{{ topic.kle.number }} {{ topic.kle.name }}'</div>
+		<dl class="dl-horizontal">
+			<dt>Ansvarlig enhed:</dt>
+			<dd>{{ topic.responsible.name }}</dd>
+		</dl>
+		<div>
+			<form class="form-horizontal">
+				<div class="form-group">
+					<label class="control-label col-sm-4">Vælg ny ansvarlig enhed</label>
+					<div class="col-sm-8">
+						<input type="text" placeholder="filter" class="form-control"
+									 ng-model="orgUnitFilter" />
+					</div>
+				</div>
+			</form>
+			<table class="table table-hover">
+				<thead>
+				<tr>
+					<th>Name</th>
+					<th>Leder</th>
+				</tr>
+				</thead>
+				<tbody ng-repeat="orgUnit in orgUnits | filter:orgUnitFilter">
+				<tr ng-class="currentOrgUnit === orgUnit ? 'success' : ''" ng-click="setCurrentOrgUnit(orgUnit)">
+					<td>{{ orgUnit.name }}</td>
+					<td>{{ orgUnit.managerId }}</td>
+				</tr>
+				</tbody>
+			</table>
+			<alert ng-repeat="alert in modalAlerts" type="{{alert.type}}"
+						 close="closeAlert($index)" class="animate-fade"
+						 style="width: 100%">{{alert.msg}}
+			</alert>
+		</div>
+	</div>
+
+	<div class="modal-footer">
+		<button class="btn btn-primary" ng-click="ok()">Gem</button>
+		<button class="btn btn-warning" ng-click="cancel()">Annuller</button>
+	</div>
+</div>

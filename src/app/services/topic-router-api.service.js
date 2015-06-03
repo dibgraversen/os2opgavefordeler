@@ -11,9 +11,10 @@
 			getTopicRoutes: getTopicRoutes,
 			getRoles: getRoles,
 			getSettings: getSettings,
-			updateSettings: updateSettings
+			updateSettings: updateSettings,
+			getOrgUnitsForResponsibility: getOrgUnitsForResponsibility,
+			setResponsibleOrg: setResponsibleOrg
 		};
-
 
 		var baseUrl = serverUrl;
 		var requestConfig = {
@@ -41,7 +42,6 @@
 			var deferred = $q.defer();
 
 			var users = getUsers();
-			var orgs = getOrganisations();
 
 			httpGet('/distribution-rules', {
 				"employment": employment,
@@ -53,28 +53,76 @@
 					rule.children = [];
 					if (rule.parent) {
 						var parent = objectMap[rule.parent];
-						// TODO consider putting object itself here.
-						// TODO consider adding parent as object.
+						rule.parent = parent;
 						parent.children.push(rule.id);
 						//console.log('rule has parent: '+rule.parent);
 					}
 					rule.employee = users[rule.employee];
-					rule.org = orgs[rule.org];
+					if(rule.org > 0){
+						getOrgUnit(rule.org).then(function(orgUnit){
+							rule.org = orgUnit;
+						});
+					}
 					rule.open = true;
 					rule.visible = true;
+					if(rule.responsible > 0){
+						if(rule.responsible === 2 ) rule.responsible = 3;
+						getOrgUnit(rule.responsible).then(function(orgUnit){
+							rule.responsible = orgUnit;
+						});
+					}
 				});
 				deferred.resolve(data);
 			});
 			return deferred.promise;
 		}
 
-		function getRoles(userId) {
-			//var deferred = $q.defer();
-			return httpGet('/user/' + userId + '/roles');
-			//deferred.resolve(getMockRoles());
-			//return deferred.promise;
+		function getOrgUnit(orgId){
+			return httpGet('/org-unit/'+orgId);
 		}
 
+		function getRoles(userId) {
+			return httpGet('/user/' + userId + '/roles');
+		}
+
+		/**
+		 * Returns a list of orgUnits to choose from.
+		 * @returns {Object[]} OrgUnit - A list of all OrgUnits.
+		 */
+		function getOrgUnitsForResponsibility(){
+			// TODO cache requests.
+			return httpGet('/org-unit');
+		}
+
+		function setResponsibleOrg(topic){
+			//return httpPost('/distribution-rules/'+topic.id, topic);
+		}
+
+		// classes
+
+		/**
+		 @class OrgUnit
+		 @private
+		 @type {Object}
+		 @property {number} id The id from backend.
+		 @property {number} parentId The id of the OrgUnit parent.
+		 @property {number} managerId The id of the employment that is the manager.
+		 @property {string} name The name of the OrgUnit.
+		 @property {string} esdhId The id of the OrgUnit in a esdh system.
+		 @property {string} email The email address of the OrgUnit.
+		 @property {string} phone The phone number of the OrgUnit.
+		 */
+		function OrgUnit(id, parentId, managerId, name, esdhId, email, phone) {
+			return {
+				id:id,
+				parentId:parentId,
+				managerId:managerId,
+				name:name,
+				esdhId:esdhId,
+				email:email,
+				phone:phone
+			};
+		}
 
 		// private methods
 

@@ -26,7 +26,7 @@
 				</td>
 				<td class="indent">
 					{{ topic.kle.number }} {{ topic.kle.name }}
-                    <span ng-hide="topic.responsible"
+                    <span ng-hide="responsibility(topic)"
 													class="glyphicon glyphicon-exclamation-sign"
 													style="color:red"
 													popover-trigger="mouseenter"
@@ -37,7 +37,7 @@
 													popover="{{ topic.kle.serviceText }}"
 													popover-placement="right"></span>
 				</td>
-				<td>{{ topic.org }}</td>
+				<td>{{ topic.org.name }}</td>
 				<td>{{ topic.employee.name }}</td>
 				<td class="button">
 					<button class="btn btn-default" popover-placement="left"
@@ -48,7 +48,9 @@
 				</td>
 				<td ng-show="settings.showResponsible">{{ topic.responsible.name }}</td>
 				<td class="button" ng-show="settings.showResponsible">
-					<button class="btn btn-default">Ansvar</button>
+					<button class="btn btn-default" ng-click="editResponsibility(topic)">
+						Ansvar
+					</button>
 				</td>
 
 			</tr>
