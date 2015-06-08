@@ -31,13 +31,18 @@
 													style="color:red"
 													popover-trigger="mouseenter"
 													popover="Der er ikke taget ansvar for denne opgave"></span>
+                    <span ng-hide="distributed(topic)"
+													class="glyphicon glyphicon-exclamation-sign"
+													style="color:red"
+													popover-trigger="mouseenter"
+													popover="Der er ikke nogen fordeling for denne opgave"></span>
                     <span ng-show="topic.kle.serviceText"
 													class="glyphicon glyphicon-info-sign"
 													popover-trigger="mouseenter"
 													popover="{{ topic.kle.serviceText }}"
 													popover-placement="right"></span>
 				</td>
-				<td>{{ topic.org.name }}</td>
+				<td ng-class="topic.org ? '' : 'inherited'">{{ topic.org.name || distribution(topic) }}</td>
 				<td>{{ topic.employee.name }}</td>
 				<td>
 					<button class="btn btn-default" popover-placement="left"

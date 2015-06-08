@@ -25,6 +25,8 @@
 		$scope.editResponsibility = editResponsibility;
 		$scope.deleteResponsibility = deleteResponsibility;
 		$scope.responsible = responsible;
+		$scope.distributed = distributed;
+		$scope.distribution = distribution;
 
 		////////////////
 
@@ -137,6 +139,27 @@
 				return responsible(distributionRule.parent);
 			} else {
 				return '';
+			}
+		}
+
+		/**
+		 * Returns true if there is a distribution for current or parent node.
+		 * @param distributionRule
+		 */
+		function distributed(distributionRule){
+			return distributionRule.org || (distributionRule.parent && distributed(distributionRule.parent));
+		}
+
+		/**
+		 * Returns first org name for current or parent node.
+		 */
+		function distribution(distributionRule){
+			if(distributionRule.org.name){
+				return distributionRule.org.name;
+			} else if(distributionRule.parent){
+				return distribution(distributionRule.parent);
+			} else {
+				return  '';
 			}
 		}
 	}
