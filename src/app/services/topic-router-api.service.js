@@ -115,7 +115,9 @@
 		}
 
 		function setResponsibleOrg(topic){
-			//return httpPost('/distribution-rules/'+topic.id, topic);
+			var distRule = new DistributionRule(topic.id, topic.parent.id, topic.kle, topic.org.id,
+					topic.employee.id, topic.responsible.id);
+			return httpPost('/distribution-rules/'+topic.id, distRule);
 		}
 
 		function getEmployments(){
@@ -130,13 +132,13 @@
 			//return httpPost('/distributionRules/'+distributionRule.id, distributionRule);
 		}
 
-		// classes
+		// DTO classes.
 
 		/**
 		 @class OrgUnit
 		 @private
 		 @type {Object}
-		 @property {number} id The id from backend.
+		 @property {number} id The system id.
 		 @property {number} parentId The id of the OrgUnit parent.
 		 @property {number} managerId The id of the employment that is the manager.
 		 @property {string} name The name of the OrgUnit.
@@ -153,6 +155,68 @@
 				esdhId:esdhId,
 				email:email,
 				phone:phone
+			};
+		}
+
+		/**
+		 * @class KLE
+		 * @private
+		 * @type {Object}
+		 * @property {number} id The system id of the KLE.
+		 * @property {string} number The public number of the KLE in form nn.nn.nn where each KLE can have 1, 2 or all three parts.
+		 * @property {string} name The common name of the KLE topic.
+		 * @property {string} serviceText A description of the KLE including HTML formatting.
+		 */
+		function KLE(id, number, name, serviceText){
+			return {
+				id:id,
+				number:number,
+				name:name,
+				serviceText:serviceText
+			};
+		}
+
+		/**
+		 * @class DistributionRule
+		 * @private
+		 * @type {Object}
+		 * @property {number} id The system id.
+		 * @property {number} parent The system id of the parent rule.
+		 * @property {KLE} kle The KLE that this rule applies for.
+		 * @property {number} org The system id of the org that handles request on KLE.
+		 * @property {number} employee The system id of the employment that handles request on KLE.
+		 * @property {number} responsible The system id of the employment that manages this rule.
+		 */
+		function DistributionRule(id, parent, kle, org, employee, responsible){
+			return {
+				id:id,
+				parent: parent,
+				kle:kle,
+				org:org,
+				employee:employee,
+				responsible:responsible
+			};
+		}
+
+		/**
+		 * @class Employment
+		 * @private
+		 * @type Object
+		 * @property {number} id The system id.
+		 * @property {string} name The name of the employee.
+		 * @property {string} email The email of the employee.
+		 * @property {string} esdhId Reference to employee id in ESDH system.
+		 * @property {string} initials The initials of the employee.
+		 * @property {string} jobTitle The job title of the employee.
+		 */
+		function Employment(id, name, email, esdhId, initials, jobTitle){
+			return {
+				id:id,
+				name:name,
+				email:email,
+				esdhId:esdhId,
+				intitials:initials,
+				jobTitle: jobTitle
 			};
 		}
 
