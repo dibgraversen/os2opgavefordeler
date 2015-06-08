@@ -96,7 +96,7 @@ public class DistributionRuleEndpoint {
 		}
 		catch(IllegalArgumentException ex) {
 			log.warn("doUpdateResponsibleOrganization - invalid arguments in [{}]", updated);
-			persistenceService.rollbackTransaction();
+			// persistenceService.rollbackTransaction();	// if we move logic to DistributionService, perform rollback.
 			return Response.serverError().build();
 		}
 
@@ -126,12 +126,14 @@ public class DistributionRuleEndpoint {
 		//TODO: these updates should probably call service methods instead of setters. At some point, we might want to
 		//calculate stuff and stuff with stuff on.
 		possiblyUpdate(existing.getResponsibleOrg().map(OrgUnit::getId).orElse(0), updated.getResponsible(), newOwnerId -> {
-			OrgUnit newOwner = orgUnitService.getOrgUnit(newOwnerId).orElseThrow(IllegalArgumentException::new);
+			OrgUnit newOwner = (newOwnerId == 0) ? null :
+				orgUnitService.getOrgUnit(newOwnerId).orElseThrow(IllegalArgumentException::new);
 			existing.setResponsibleOrg(newOwner);
 		});
 
 		possiblyUpdate(existing.getAssignedOrg().map(OrgUnit::getId).orElse(0), updated.getOrg(), newOrgId -> {
-			OrgUnit newOrg = orgUnitService.getOrgUnit(newOrgId).orElseThrow(IllegalArgumentException::new);
+			OrgUnit newOrg = (newOrgId == 0) ? null :
+				orgUnitService.getOrgUnit(newOrgId).orElseThrow(IllegalArgumentException::new);
 			existing.setAssignedOrg(newOrg);
 		});
 
@@ -141,7 +143,7 @@ public class DistributionRuleEndpoint {
 			existing.setAssignedEmp(newEmpId);
 		});
 
-		distributionService.merge(existing);
+		distributionService.merge(existing); // if we move logic to DistributionService, 'existing' is managed and this shouldn't be necessary.
 	}
 
 	private<T extends Comparable<T>> void possiblyUpdate(T oldVal, T newVal, Consumer<T> updater) {
