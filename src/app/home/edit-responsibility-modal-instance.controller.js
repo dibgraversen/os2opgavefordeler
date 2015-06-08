@@ -29,7 +29,7 @@
 		function ok(){
 			if($scope.currentOrgUnit){
 				$scope.topic.responsible = $scope.currentOrgUnit;
-				topicRouterApi.setResponsibleOrg(topic);
+				topicRouterApi.updateDistributionRule(topic);
 				$modalInstance.close(/* pass some value? */);
 			} else {
 				addAlert({
