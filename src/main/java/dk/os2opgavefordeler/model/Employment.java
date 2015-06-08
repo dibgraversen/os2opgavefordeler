@@ -17,16 +17,16 @@ public class Employment implements Serializable {
 
 	private boolean isActive;
 
-//	@ManyToOne
-//	private OrgUnit employedIn;		// necessary?
-
+	@ManyToOne
+	private OrgUnit employedIn;		// necessary?
 
 	private String name;
 	private String email;
 	private String esdhId;
+	private String esdhLabel;
+	private String phone;
 	private String initials;
 	private String jobTitle;
-//	private String employeeNumber;	// present in SydDjurs - used?
 
 	public Employment() {
 	}
@@ -38,6 +38,8 @@ public class Employment implements Serializable {
 		this.name = builder.name;
 		this.email = builder.email;
 		this.esdhId = builder.esdhId;
+		this.esdhLabel = builder.esdhLabel;
+		this.phone = builder.phone;
 		this.initials = builder.initials;
 		this.jobTitle = builder.jobTitle;
 	}
@@ -47,6 +49,17 @@ public class Employment implements Serializable {
 	//--------------------------------------------------------------------------
 	public int getId() {
 		return id;
+	}
+
+	public OrgUnit getEmployedIn() {
+		return employedIn;
+	}
+
+	public void setEmployedIn(OrgUnit employedIn) {
+//		if(this.employedIn != null && this.employedIn != employedIn) {
+//			this.employedIn.getEmployees().remove(this);
+//		}
+		this.employedIn = employedIn;
 	}
 
 	public String getName() {
@@ -59,6 +72,14 @@ public class Employment implements Serializable {
 
 	public String getEsdhId() {
 		return esdhId;
+	}
+
+	public String getEsdhLabel() {
+		return esdhLabel;
+	}
+
+	public String getPhone() {
+		return phone;
 	}
 
 	public String getInitials() {
@@ -81,6 +102,8 @@ public class Employment implements Serializable {
 		private String name;
 		private String email;
 		private String esdhId;
+		private String esdhLabel;
+		private String phone;
 		private String initials;
 		private String jobTitle;
 
@@ -104,6 +127,14 @@ public class Employment implements Serializable {
 			this.esdhId = esdhId;
 			return this;
 		}
+		public Builder esdhLabel(String esdhLabel) {
+			this.esdhLabel = esdhLabel;
+			return this;
+		}
+		public Builder phone(String phone) {
+			this.phone = phone;
+			return this;
+		}
 		public Builder initials(String initials) {
 			this.initials = initials;
 			return this;
@@ -119,6 +150,7 @@ public class Employment implements Serializable {
 		return MoreObjects.toStringHelper(this)
 			.add("id", id)
 			.add("name", name)
+			.add("esdh", esdhLabel)
 			.toString();
 	}
 }

@@ -3,7 +3,14 @@
 	"manager": {
 		"name": "Borge Meister"
 	},
-
+	"employees": [
+		{
+			"name": "Jeanne Deij"
+		},
+		{
+			"name": "Menig Mand"
+		}
+	],
 	"children": [
 		{
 			"name": "Administration",
@@ -28,7 +35,7 @@
 		{
 			"name": "Digitalisering",
 			"manager": {
-				"name": "David Hilbert"	
+				"name": "David Hilbert"
 			},
 
 			"children": [

@@ -19,8 +19,9 @@ public class OrgUnit implements Serializable, IHasChildren<OrgUnit>
 	private boolean isActive;
 
 	private String name;
-	private String esdhId;
 	private String email;
+	private String esdhId;
+	private String esdhLabel;
 	private String phone;
 
 	@ManyToOne
@@ -32,12 +33,13 @@ public class OrgUnit implements Serializable, IHasChildren<OrgUnit>
 	@OneToOne(cascade = CascadeType.ALL)
 	private Employment manager;			// OneToOne since a person who's manager in multiple OrgUnits will result in multiple Employments.
 
-//	@OneToMany(cascade = CascadeType.ALL)
-//	private List<Employment> employees;
+	@OneToMany(mappedBy = "employedIn", cascade = CascadeType.ALL)
+	private List<Employment> employees;
 
 
 	public OrgUnit() {
 		children = new ArrayList<>();
+		employees = new ArrayList<>();
 	}
 
 	private OrgUnit(Builder builder) {
@@ -46,11 +48,14 @@ public class OrgUnit implements Serializable, IHasChildren<OrgUnit>
 		this.name = builder.name;
 		this.esdhId = builder.esdhId;
 		this.manager = builder.manager;
-//		this.employees = builder.employees;		//TODO: set employedIn if we end up needing that field.
+		if(builder.employees != null) {
+			this.employees = builder.employees;
+			this.employees.stream().forEach(emp -> emp.setEmployedIn(this));
+		}
 
 		if(builder.children != null) {
 			this.children = builder.children;
-			children.stream().forEach(child -> child.parent = this);
+			this.children.stream().forEach(child -> child.parent = this);
 		}
 	}
 
@@ -70,14 +75,17 @@ public class OrgUnit implements Serializable, IHasChildren<OrgUnit>
 		return email;
 	}
 
-	public String getPhone() {
-		return phone;
-	}
-
 	public String getEsdhId() {
 		return esdhId;
 	}
 
+	public String getEsdhLabel() {
+		return esdhLabel;
+	}
+
+	public String getPhone() {
+		return phone;
+	}
 
 	public Optional<OrgUnit> getParent() {
 		return Optional.ofNullable(parent);
@@ -92,6 +100,10 @@ public class OrgUnit implements Serializable, IHasChildren<OrgUnit>
 
 	public ImmutableList<OrgUnit> getChildren() {
 		return ImmutableList.copyOf(children);
+	}
+
+	public ImmutableList<Employment> getEmployees() {
+		return ImmutableList.copyOf(employees);
 	}
 
 	@Override
@@ -112,12 +124,13 @@ public class OrgUnit implements Serializable, IHasChildren<OrgUnit>
 	public static class Builder {
 		private boolean isActive;
 		private String name;
-		private String esdhId;
 		private String email;
+		private String esdhId;
+		private String esdhLabel;
 		private String phone;
 
 		private Employment manager;
-		private List<Employment> employees;
+		private List<Employment> employees = new ArrayList<>();
 		private List<OrgUnit> children = new ArrayList<>();
 
 		public OrgUnit build() {
@@ -132,28 +145,31 @@ public class OrgUnit implements Serializable, IHasChildren<OrgUnit>
 			this.name = name;
 			return this;
 		}
+		public Builder email(String email) {
+			this.email = email;
+			return this;
+		}
 		public Builder esdhId(String esdhId) {
 			this.esdhId = esdhId;
+			return this;
+		}
+		public Builder esdhLabel(String esdhLabel) {
+			return this;
+		}
+		public Builder phone(String phone) {
+			this.phone = phone;
 			return this;
 		}
 		public Builder manager(Employment manager) {
 			this.manager = manager;
 			return this;
 		}
-		public Builder employees(List<Employment> employees) {
-			this.employees = employees;
+		public Builder employees(Employment... employees) {
+			Collections.addAll(this.employees, employees);
 			return this;
 		}
 		public Builder children(OrgUnit... children) {
 			Collections.addAll(this.children, children);
-			return this;
-		}
-		public Builder email(String email) {
-			this.email = email;
-			return this;
-		}
-		public Builder phone(String phone) {
-			this.phone = phone;
 			return this;
 		}
 	}

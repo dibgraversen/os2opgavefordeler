@@ -53,7 +53,7 @@ public class OrgUnitServiceImpl implements OrgUnitService {
 		if(results.isEmpty()) {
 			return Optional.empty();
 		} else {
-			touchChildren(results.get(0).getChildren());
+			touchChildren(results);
 			return Optional.of(results.get(0));
 		}
 	}
@@ -87,11 +87,15 @@ public class OrgUnitServiceImpl implements OrgUnitService {
 	}
 
 	private List<OrgUnit> touchChildren(List<OrgUnit> ou) {
-		ou.forEach(k -> touchChildren(k.getChildren()));
+		ou.forEach(child -> {
+			child.getEmployees().size();
+			touchChildren(child.getChildren());
+		});
 		return ou;
 	}
 
 	private void fixRelations(OrgUnit input) {
+		input.getEmployees().forEach( emp -> emp.setEmployedIn(input) );
 		input.getChildren().forEach(child -> {
 			child.setParent(input);
 			fixRelations(child);

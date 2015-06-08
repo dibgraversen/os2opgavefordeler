@@ -37,6 +37,19 @@ public class OrgUnitEndpoint {
 	}
 
 	@GET
+	@Path("/display")
+	@Produces(MediaType.TEXT_PLAIN)
+	public Response listAllDisplay() {
+		final Optional<OrgUnit> result = orgUnitService.getToplevelOrgUnit();
+
+		return result.map(
+			ou -> Response.ok().entity( printOrg(new StringBuilder(), 0, ou) )
+		).orElseGet(
+			() -> Response.status(404)
+		).build();
+	}
+
+	@GET
 	@Path("/{orgId}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response get(@PathParam("orgId") Integer orgId) {
@@ -55,17 +68,21 @@ public class OrgUnitEndpoint {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response importOrg(OrgUnit input) {
 		orgUnitService.importOrganization(input);
-		printOrg(input);
 
 		return Response.ok().build();
 	}
 
-	int indent = 0;
-	private void printOrg(OrgUnit org) {
-		System.out.println(String.format("%s%s - %s", Strings.repeat("\t", indent), org, org.getManager()) );
-		++indent;
-		org.getChildren().
-			forEach(this::printOrg);
-		--indent;
+	StringBuilder printOrg(StringBuilder sb, int indent, OrgUnit org) {
+		final String tabs = Strings.repeat("\t", indent);
+
+		sb.append(tabs).append(String.format("%s - manager: %s\n", org, org.getManager()));
+
+		sb.append(tabs).append("\tEmployees:\n");
+		org.getEmployees().forEach( e -> sb.append(tabs).append("\t\t").append(e).append("\n") );
+
+		sb.append(tabs).append("\tChildren:\n");
+		org.getChildren().forEach(t -> printOrg(sb, indent + 2, t));
+
+		return sb;
 	}
 }
