@@ -38,6 +38,10 @@
 .table th.button {
   padding: 4px;
 }
+.table td.inherited {
+  font-style: italic;
+  color: #777777;
+}
 #footer {
   padding-bottom: 10px;
 }

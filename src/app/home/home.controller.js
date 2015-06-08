@@ -24,6 +24,7 @@
 		$scope.editRule = editRule;
 		$scope.editResponsibility = editResponsibility;
 		$scope.deleteResponsibility = deleteResponsibility;
+		$scope.responsible = responsible;
 
 		////////////////
 
@@ -122,6 +123,21 @@
 				controller: 'EditResponsibilityModalInstanceCtrl',
 				size: 'md'
 			});
+		}
+
+		/**
+		 * Used to find responsible among parent rules.
+		 * @param {object} distributionRule
+		 * @return {string} responsible
+		 */
+		function responsible(distributionRule){
+			if(distributionRule.responsible){
+				return distributionRule.responsible.name;
+			} else if(distributionRule.parent){
+				return responsible(distributionRule.parent);
+			} else {
+				return '';
+			}
 		}
 	}
 })();

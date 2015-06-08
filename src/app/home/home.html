@@ -46,7 +46,7 @@
 									ng-click="editRule(topic)">Fordeling
 					</button>
 				</td>
-				<td ng-show="settings.showResponsible">{{ topic.responsible.name }}</td>
+				<td ng-show="settings.showResponsible" ng-class=" topic.responsible ? '' : 'inherited' ">{{ topic.responsible.name || responsible(topic) }}</td>
 				<td ng-show="settings.showResponsible">
 					<div class="btn-group" style="width:100px" ng-class="{open: open}">
 						<button class="btn btn-default " ng-click="editResponsibility(topic)">
