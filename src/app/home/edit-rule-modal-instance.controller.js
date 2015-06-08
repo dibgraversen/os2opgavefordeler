@@ -35,19 +35,26 @@
 		}
 
 		function ok(){
-			if($scope.selectedOrgUnit || $scope.selectedEmp){
-				if($scope.selectedOrgUnit){
-					$scope.topic.org = $scope.selectedOrgUnit;
+			if($scope.topic.org || $scope.selectedOrgUnit){ // validate org unit either present or selected.
+				if($scope.selectedOrgUnit || $scope.selectedEmp){ // validate something has been selected.
+					if($scope.selectedOrgUnit){
+						$scope.topic.org = $scope.selectedOrgUnit;
+					}
+					if($scope.selectedEmp){
+						$scope.topic.employee = $scope.selectedEmp;
+					}
+					topicRouterApi.updateDistributionRule($scope.topic);
+					$modalInstance.close(/* pass some value? */);
+				} else {
+					addAlert({
+						type: 'warning',
+						msg: 'Du skal vælge organisatorisk enhed eller medarbejder.'
+					});
 				}
-				if($scope.selectedEmp){
-					$scope.topic.employee = $scope.selectedEmp;
-				}
-				topicRouterApi.updateDistributionRule($scope.topic);
-				$modalInstance.close(/* pass some value? */);
 			} else {
 				addAlert({
 					type: 'warning',
-					msg: 'Du skal vælge en organisatorisk enhed.'
+					msg: 'Du skal som minimum vælge en organisatorisk enhed.'
 				});
 			}
 		}
