@@ -13,7 +13,6 @@
 			getSettings: getSettings,
 			updateSettings: updateSettings,
 			getOrgUnitsForResponsibility: getOrgUnitsForResponsibility,
-			setResponsibleOrg: setResponsibleOrg,
 			getEmployments: getEmployments,
 		  getEmployment: getEmployment,
 			updateDistributionRule: updateDistributionRule
@@ -129,7 +128,9 @@
 		}
 
 		function updateDistributionRule(distributionRule){
-			//return httpPost('/distributionRules/'+distributionRule.id, distributionRule);
+			var distRule = new DistributionRule(distributionRule.id, distributionRule.parent.id, distributionRule.kle,
+			distributionRule.org.id, distributionRule.employee.id, distributionRule.responsible.id);
+			return httpPost('/distribution-rules/'+distributionRule.id, distRule);
 		}
 
 		// DTO classes.
