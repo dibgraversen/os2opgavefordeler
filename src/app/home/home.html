@@ -39,7 +39,7 @@
 				</td>
 				<td>{{ topic.org.name }}</td>
 				<td>{{ topic.employee.name }}</td>
-				<td class="button">
+				<td>
 					<button class="btn btn-default" popover-placement="left"
 									popover="klik her for at vedligeholde fordelingsregler"
 									popover-trigger="mouseenter" popover-popup-delay="1000"
@@ -47,10 +47,18 @@
 					</button>
 				</td>
 				<td ng-show="settings.showResponsible">{{ topic.responsible.name }}</td>
-				<td class="button" ng-show="settings.showResponsible">
-					<button class="btn btn-default" ng-click="editResponsibility(topic)">
-						Ansvar
-					</button>
+				<td ng-show="settings.showResponsible">
+					<div class="btn-group" style="width:100px" ng-class="{open: open}">
+						<button class="btn btn-default " ng-click="editResponsibility(topic)">
+							Ansvar
+						</button>
+						<button class="btn btn-default dropdown-toggle" type="button" ng-click="open=!open">
+							<span class="caret"></span>
+						</button>
+						<ul class="dropdown-menu">
+							<li><a href="#" class="danger" ng-click="deleteResponsibility(topic); open=false">Slip ansvar</a></li>
+						</ul>
+					</div>
 				</td>
 
 			</tr>

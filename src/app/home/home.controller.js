@@ -23,6 +23,7 @@
 		$scope.responsibility = responsibility;
 		$scope.editRule = editRule;
 		$scope.editResponsibility = editResponsibility;
+		$scope.deleteResponsibility = deleteResponsibility;
 
 		////////////////
 
@@ -79,6 +80,11 @@
 		 */
 		function responsibility(topic){
 			return topic.responsible || (topic.parent && responsibility(topic.parent));
+		}
+
+		function deleteResponsibility(topic){
+			topic.responsible = 0;
+			topicRouterApi.updateDistributionRule(topic);
 		}
 
 		function toggleChildren(children, visible){
