@@ -25,7 +25,6 @@
     "lodash": "~3.6.0",
     "spin.js": "~2.0.2"
   },
-  // for bower-main-files
   "overrides": {
     "angular-ui-alias": {
       "main": "src/alias.js"
