@@ -8,6 +8,7 @@ import java.util.Optional;
 
 public interface DistributionService {
 	DistributionRule createDistributionRule(DistributionRule rule);
+	DistributionRule merge(DistributionRule rule);
 
 	Optional<DistributionRule> getDistribution(int id);
 	List<DistributionRule> getDistributionsAll();

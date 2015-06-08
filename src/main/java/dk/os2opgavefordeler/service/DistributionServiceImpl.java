@@ -39,6 +39,11 @@ public class DistributionServiceImpl implements DistributionService {
 	}
 
 	@Override
+	public DistributionRule merge(DistributionRule rule) {
+		return persistence.merge(rule);
+	}
+
+	@Override
 	public Optional<DistributionRule> getDistribution(int id) {
 		final List<DistributionRule> result = persistence.criteriaFind(DistributionRule.class,
 			(cb, cq, ent) -> cq.where(cb.equal(ent.get(DistributionRule_.id), id))

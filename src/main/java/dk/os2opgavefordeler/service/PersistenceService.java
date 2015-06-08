@@ -7,6 +7,8 @@ import java.util.List;
 
 public interface PersistenceService {
 	<T> void persist(T entity);
+	<T> T merge(T entity);
+
 	<T> List<T> criteriaFind(Class<T> clazz, CriteriaOp op);
 	<T> List<T> findAll(Class<T> clazz);
 

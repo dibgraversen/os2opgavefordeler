@@ -140,6 +140,8 @@ public class DistributionRuleEndpoint {
 			//Employment emp = employmentService.getEmployment(newEmpId).orElseThrow(IllegalArgumentException::new);
 			existing.setAssignedEmp(newEmpId);
 		});
+
+		distributionService.merge(existing);
 	}
 
 	private<T extends Comparable<T>> void possiblyUpdate(T oldVal, T newVal, Consumer<T> updater) {

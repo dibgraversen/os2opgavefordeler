@@ -28,6 +28,11 @@ public class PersistenceServiceImpl implements PersistenceService {
 	}
 
 	@Override
+	public <T> T merge(T entity) {
+		return em.merge(entity);
+	}
+
+	@Override
 	public <T> List<T> criteriaFind(Class<T> clazz, CriteriaOp op) {
 		final CriteriaBuilder cb = em.getCriteriaBuilder();
 		final CriteriaQuery<T> cq = cb.createQuery(clazz);
@@ -35,7 +40,8 @@ public class PersistenceServiceImpl implements PersistenceService {
 
 		op.apply(cb, cq, ent);
 
-		return em.createQuery(cq).getResultList();
+		final List<T> results = em.createQuery(cq).getResultList();
+		return results;
 	}
 
 	@Override

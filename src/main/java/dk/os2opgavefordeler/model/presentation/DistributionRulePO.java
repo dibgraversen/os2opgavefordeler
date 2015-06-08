@@ -112,15 +112,17 @@ public class DistributionRulePO {
 		kle.setName(in.getTitle());
 		kle.setServiceText(in.getDescription());
 
-		//TODO: need to track type
-//		if(in instanceof KleMainGroup) {
-//			kle.setType("main");
-//		} else if(in instanceof KleGroup) {
-//			kle.setType("group");
-//		} else if(in instanceof KleTopic) {
-//			kle.setType("topic");
-//		} else {
-		kle.setType("<unknown>");
+		//TODO: need to track type in a cleaner way than this.
+		String num = kle.getNumber();
+		if(num.length() == 2) {
+			kle.setType("main");
+		} else if(num.length() == 5) {
+			kle.setType("group");
+		} else if(num.length() == 8) {
+			kle.setType("topic");
+		} else {
+			kle.setType("<unknown>");
+		}
 
 		return kle;
 	}
