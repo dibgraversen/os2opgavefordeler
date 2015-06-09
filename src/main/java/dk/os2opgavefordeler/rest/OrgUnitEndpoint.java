@@ -1,6 +1,7 @@
 package dk.os2opgavefordeler.rest;
 
 import com.google.common.base.Strings;
+import dk.os2opgavefordeler.model.Employment;
 import dk.os2opgavefordeler.model.OrgUnit;
 import dk.os2opgavefordeler.model.presentation.OrgUnitPO;
 import dk.os2opgavefordeler.service.OrgUnitService;
@@ -67,12 +68,46 @@ public class OrgUnitEndpoint {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response importOrg(OrgUnit input) {
+		fixupOrgUnit(input);
+
 		orgUnitService.importOrganization(input);
 
 		return Response.ok().build();
 	}
 
-	StringBuilder printOrg(StringBuilder sb, int indent, OrgUnit org) {
+	private void fixupOrgUnit(OrgUnit input) {
+		deduplicateManager(input);
+
+		input.getEmployees().stream().forEach(this::fixupEmployee);
+
+		for (OrgUnit orgUnit : input.getChildren()) {
+			fixupOrgUnit(orgUnit);
+		}
+	}
+
+	private void deduplicateManager(OrgUnit input) {
+		input.getManager().ifPresent(manager -> {
+			if (input.getEmployees().contains(manager)) {
+				// replace copy with reference
+				input.removeEmployee(manager);
+				input.addEmployee(manager);
+			}
+		});
+	}
+
+	private void fixupEmployee(Employment employee) {
+		if(Strings.isNullOrEmpty(employee.getInitials())) {
+			employee.setInitials("jdoe");
+		}
+		if(Strings.isNullOrEmpty(employee.getEmail())) {
+			employee.setEmail(employee.getInitials() + "@syddjurs.dk");
+		}
+		if(Strings.isNullOrEmpty(employee.getPhone())) {
+			employee.setPhone("12345678");
+		}
+	}
+
+	private StringBuilder printOrg(StringBuilder sb, int indent, OrgUnit org) {
 		final String tabs = Strings.repeat("\t", indent);
 
 		sb.append(tabs).append(String.format("%s - manager: %s\n", org, org.getManager()));

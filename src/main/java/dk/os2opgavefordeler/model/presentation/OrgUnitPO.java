@@ -15,7 +15,7 @@ public class OrgUnitPO {
 	public OrgUnitPO(OrgUnit from) {
 		this.id = from.getId();
 		this.parentId = from.getParent().map(OrgUnit::getId).orElse(-1);
-		this.managerId = from.getManager().getId();
+		this.managerId = from.getManager().map(m -> m.getId()).orElse(-1);
 
 		this.name = from.getName();
 		this.esdhId = from.getEsdhId();

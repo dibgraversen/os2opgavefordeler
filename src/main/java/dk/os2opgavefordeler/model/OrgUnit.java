@@ -18,6 +18,7 @@ public class OrgUnit implements Serializable, IHasChildren<OrgUnit>
 
 	private boolean isActive;
 
+	private String businessKey;
 	private String name;
 	private String email;
 	private String esdhId;
@@ -59,12 +60,36 @@ public class OrgUnit implements Serializable, IHasChildren<OrgUnit>
 		}
 	}
 
+	public void addEmployee(Employment employee) {
+		if(!employees.contains(employee)) {
+			employee.setEmployedIn(this);
+			employees.add(employee);
+		}
+	}
+
+	public void removeEmployee(Employment employee) {
+		final int index = employees.indexOf(employee);
+
+		if(index == -1) {
+			// throw
+		} else {
+			employees.remove(index);
+			employee.setEmployedIn(null);
+		}
+	}
+
+
+
 	public int getId() {
 		return id;
 	}
 
-	public Employment getManager() {
-		return manager;
+	public Optional<Employment> getManager() {
+		return Optional.ofNullable(manager);
+	}
+
+	public String getBusinessKey() {
+		return businessKey;
 	}
 
 	public String getName() {
@@ -123,6 +148,7 @@ public class OrgUnit implements Serializable, IHasChildren<OrgUnit>
 
 	public static class Builder {
 		private boolean isActive;
+		private String businessKey;
 		private String name;
 		private String email;
 		private String esdhId;
@@ -139,6 +165,10 @@ public class OrgUnit implements Serializable, IHasChildren<OrgUnit>
 
 		public Builder isActive(boolean isActive) {
 			this.isActive = isActive;
+			return this;
+		}
+		public Builder businessKey(String businessKey) {
+			this.businessKey = businessKey;
 			return this;
 		}
 		public Builder name(String name) {

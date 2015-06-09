@@ -1,6 +1,5 @@
 package dk.os2opgavefordeler.service;
 
-import dk.os2opgavefordeler.model.Employment;
 import dk.os2opgavefordeler.model.OrgUnit;
 import dk.os2opgavefordeler.model.OrgUnit_;
 import dk.os2opgavefordeler.model.presentation.OrgUnitPO;
@@ -67,9 +66,9 @@ public class OrgUnitServiceImpl implements OrgUnitService {
 		return results;
 	}
 
-	public List<Employment> getSubordinateManagers(OrgUnit ou) {
-		return ou.flattened().map(OrgUnit::getManager).collect(Collectors.toList());
-	}
+//	public List<Employment> getSubordinateManagers(OrgUnit ou) {
+//		return ou.flattened().map(OrgUnit::getManager).collect(Collectors.toList());
+//	}
 
 
 	@Override

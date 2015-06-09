@@ -1,10 +1,10 @@
 package dk.os2opgavefordeler.model;
 
 import com.google.common.base.MoreObjects;
-import com.google.common.base.Objects;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Objects;
 
 /**
  * A person can have multiple employments in the organization structure, which can result in different titles, email
@@ -18,12 +18,12 @@ public class Employment implements Serializable {
 	private boolean isActive;
 
 	@ManyToOne
-	private OrgUnit employedIn;		// necessary?
+	private OrgUnit employedIn;
 
+	private String businessKey;
 	private String name;
 	private String email;
 	private String esdhId;
-	private String esdhLabel;
 	private String phone;
 	private String initials;
 	private String jobTitle;
@@ -35,10 +35,10 @@ public class Employment implements Serializable {
 		this();
 
 		this.isActive = builder.isActive;
+		this.businessKey = builder.businessKey;
 		this.name = builder.name;
 		this.email = builder.email;
 		this.esdhId = builder.esdhId;
-		this.esdhLabel = builder.esdhLabel;
 		this.phone = builder.phone;
 		this.initials = builder.initials;
 		this.jobTitle = builder.jobTitle;
@@ -62,6 +62,10 @@ public class Employment implements Serializable {
 		this.employedIn = employedIn;
 	}
 
+	public String getBusinessKey() {
+		return businessKey;
+	}
+
 	public String getName() {
 		return name;
 	}
@@ -70,20 +74,28 @@ public class Employment implements Serializable {
 		return email;
 	}
 
-	public String getEsdhId() {
-		return esdhId;
+	public void setEmail(String email) {
+		this.email = email;
 	}
 
-	public String getEsdhLabel() {
-		return esdhLabel;
+	public String getEsdhId() {
+		return esdhId;
 	}
 
 	public String getPhone() {
 		return phone;
 	}
 
+	public void setPhone(String phone) {
+		this.phone = phone;
+	}
+
 	public String getInitials() {
 		return initials;
+	}
+
+	public void setInitials(String initials) {
+		this.initials = initials;
 	}
 
 	public String getJobTitle() {
@@ -99,10 +111,10 @@ public class Employment implements Serializable {
 
 	public static class Builder {
 		private boolean isActive;
+		private String businessKey;
 		private String name;
 		private String email;
 		private String esdhId;
-		private String esdhLabel;
 		private String phone;
 		private String initials;
 		private String jobTitle;
@@ -115,6 +127,10 @@ public class Employment implements Serializable {
 			this.isActive = isActive;
 			return this;
 		}
+		public Builder businessKey(String businessKey) {
+			this.businessKey = businessKey;
+			return this;
+		}
 		public Builder name(String name) {
 			this.name = name;
 			return this;
@@ -125,10 +141,6 @@ public class Employment implements Serializable {
 		}
 		public Builder esdhId(String esdhId) {
 			this.esdhId = esdhId;
-			return this;
-		}
-		public Builder esdhLabel(String esdhLabel) {
-			this.esdhLabel = esdhLabel;
 			return this;
 		}
 		public Builder phone(String phone) {
@@ -150,7 +162,29 @@ public class Employment implements Serializable {
 		return MoreObjects.toStringHelper(this)
 			.add("id", id)
 			.add("name", name)
-			.add("esdh", esdhLabel)
+			.add("esdh", esdhId)
 			.toString();
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		final Employment that = (Employment) o;
+		return Objects.equals(id, that.id) &&
+			Objects.equals(isActive, that.isActive) &&
+			Objects.equals(employedIn, that.employedIn) &&
+			Objects.equals(businessKey, that.businessKey) &&
+			Objects.equals(name, that.name) &&
+			Objects.equals(email, that.email) &&
+			Objects.equals(esdhId, that.esdhId) &&
+			Objects.equals(phone, that.phone) &&
+			Objects.equals(initials, that.initials) &&
+			Objects.equals(jobTitle, that.jobTitle);
+	}
+
+	@Override
+	public int hashCode() {
+		return java.util.Objects.hash(id, isActive, employedIn, businessKey, name, email, esdhId, phone, initials, jobTitle);
 	}
 }
