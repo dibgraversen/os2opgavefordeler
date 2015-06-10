@@ -35,6 +35,7 @@
 		}
 
 		function ok(){
+			// TODO below, add topic parent org unit presence validation.
 			if($scope.topic.org || $scope.selectedOrgUnit){ // validate org unit either present or selected.
 				if($scope.selectedOrgUnit || $scope.selectedEmp){ // validate something has been selected.
 					if($scope.selectedOrgUnit){
