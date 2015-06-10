@@ -3,7 +3,7 @@
   "version": "0.0.1-alpha",
   "authors": [
     "Henrik Loevborg <hlo@miracle.dk>",
-    "Sune Marcher <sum@miracle.dk"
+    "Sune Marcher <sum@miracle.dk>"
   ],
   "private": true,
   "ignore": [
@@ -23,6 +23,7 @@
     "angular-ui-router": "~0.2.13",
     "bootstrap": "~3.3.4",
     "lodash": "~3.6.0",
+    "htmlsave": "~0.0.12",
     "spin.js": "~2.0.2"
   },
   "overrides": {
