@@ -27,6 +27,7 @@
 		$scope.responsible = responsible;
 		$scope.distributed = distributed;
 		$scope.distribution = distribution;
+		$scope.responsibilityChangeAllowed = responsibilityChangeAllowed;
 
 		////////////////
 
@@ -161,6 +162,25 @@
 			} else {
 				return  '';
 			}
+		}
+
+		/**
+		 * Determines if the users current role allows edit for given distributionRule
+		 * @param distributionRule
+		 * @return {boolean} true if edit allowed.
+		 */
+		function responsibilityChangeAllowed(distributionRule){
+			console.log($scope.user.currentRole.employment);
+			if(!responsibility(distributionRule)) return true; // not already handled.
+			if($scope.user.currentRole.municipalityAdmin) return true;
+			if(canManage(distributionRule)) return true;
+			return false;
+		}
+
+		function canManage(distributionRule){
+			return (distributionRule.responsible && $scope.user.currentRole.employment && distributionRule.responsible.managerId > 0 &&
+			distributionRule.responsible.managerId === $scope.user.currentRole.employment.id) ||
+					(distributionRule.parent && canManage(distributionRule.parent));
 		}
 	}
 })();
