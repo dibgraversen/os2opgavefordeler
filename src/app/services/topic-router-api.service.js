@@ -113,12 +113,6 @@
 			});
 		}
 
-		function setResponsibleOrg(topic){
-			var distRule = new DistributionRule(topic.id, topic.parent.id, topic.kle, topic.org.id,
-					topic.employee.id, topic.responsible.id);
-			return httpPost('/distribution-rules/'+topic.id, distRule);
-		}
-
 		function getEmployments(){
 			return httpGet('/employments');
 		}
@@ -224,7 +218,9 @@
 		// private methods
 
 		function httpGet(url, params) {
-			var options = {};
+			var options = {
+				cache: true
+			};
 			if (params) {
 				//options.params = encodeURIComponent( JSON.stringify(params) );
 				options.params = params;
