@@ -29,7 +29,7 @@
 				<tbody ng-repeat="orgUnit in orgUnits | filter:orgUnitFilter">
 				<tr ng-class="currentOrgUnit === orgUnit ? 'success' : ''" ng-click="setCurrentOrgUnit(orgUnit)">
 					<td>{{ orgUnit.name }}</td>
-					<td>{{ orgUnit.manager.name }}</td>
+					<td>{{ orgUnit.manager.name }} ({{ orgUnit.managerId }})</td>
 				</tr>
 				</tbody>
 			</table>

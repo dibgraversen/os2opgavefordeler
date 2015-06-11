@@ -178,8 +178,8 @@
 		}
 
 		function canManage(distributionRule){
-			return (distributionRule.responsible && $scope.user.currentRole.employment && distributionRule.responsible.managerId > 0 &&
-			distributionRule.responsible.managerId === $scope.user.currentRole.employment.id) ||
+			return (distributionRule.responsible && distributionRule.responsible.managerId > 0 &&
+			distributionRule.responsible.managerId === $scope.user.currentRole.employment) ||
 					(distributionRule.parent && canManage(distributionRule.parent));
 		}
 	}
