@@ -61,7 +61,19 @@ public class RolePO {
 		substitute = role.isSubstitute();
 	}
 
-	public Role toRole(){
+	private RolePO(Builder builder) {
+		this();
+		id = builder.id;
+		userId = builder.userId;
+		name = builder.name;
+		employment = builder.employment;
+		manager = builder.manager;
+		admin = builder.admin;
+		municipalityAdmin = builder.municipalityAdmin;
+		substitute = builder.substitute;
+	}
+
+	public Role toRole() {
 		Role result = new Role();
 		result.setId(id);
 		result.setUserId(userId);
@@ -150,5 +162,65 @@ public class RolePO {
 				", municipalityAdmin=" + municipalityAdmin +
 				", substitute=" + substitute +
 				'}';
+	}
+
+	//--------------------------------------------------------------------------
+	// Builder
+	//--------------------------------------------------------------------------
+	public static Builder builder() {
+		return new Builder();
+	}
+
+	public static class Builder {
+		private long id;
+		private long userId;
+		private String name;
+		private int employment;
+		private boolean manager;
+		private boolean admin;
+		private boolean municipalityAdmin;
+		private boolean substitute;
+
+		public RolePO build() { return new RolePO(this); }
+
+		public Builder id(long id) {
+			this.id = id;
+			return this;
+		}
+
+		public Builder userId(long userId) {
+			this.userId = userId;
+			return this;
+		}
+
+		public Builder name(String name) {
+			this.name = name;
+			return this;
+		}
+
+		public Builder employment(int employment) {
+			this.employment = employment;
+			return this;
+		}
+
+		public Builder manager(boolean manager) {
+			this.manager = manager;
+			return this;
+		}
+
+		public Builder admin(boolean admin) {
+			this.admin = admin;
+			return this;
+		}
+
+		public Builder municipalityAdmin(boolean municipalityAdmin) {
+			this.municipalityAdmin = municipalityAdmin;
+			return this;
+		}
+
+		public Builder substitute(boolean substitute) {
+			this.substitute = substitute;
+			return this;
+		}
 	}
 }

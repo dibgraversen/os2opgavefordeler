@@ -61,40 +61,43 @@ public class BootstrappingDataProviderSingleton {
 
 	private void buildForUserOne(){
 		UsersServiceMock mock = new UsersServiceMock();
-		RolePO rolePO1 = mock.buildRolePO(1, 1, "Henrik(dig)", 1, false, false, false, false);
-		Role role = rolePO1.toRole();
-		usersService.createRole(role);
-		RolePO rolePO2 = mock.buildRolePO(2, 1, "Admin", 0, false, true, false, false);
+		RolePO rolePO1 = RolePO.builder().id(1).userId(1).name("Henrik(dig)").employment(1)
+				.manager(false).admin(false).municipalityAdmin(false).substitute(false).build();
+		usersService.createRole(rolePO1.toRole());
+		RolePO rolePO2 = RolePO.builder().id(2).userId(1).name("sysadm").employment(0)
+				.manager(false).admin(true).municipalityAdmin(false).substitute(false).build();
 		usersService.createRole(rolePO2.toRole());
-		RolePO rolePO3 = mock.buildRolePO(3, 1, "Jørgen Jensen", 2, false, false, true, false);
+		RolePO rolePO3 = RolePO.builder().id(3).userId(1).name("Borge Meister").employment(2)
+				.manager(false).admin(false).municipalityAdmin(true).substitute(false).build();
 		usersService.createRole(rolePO3.toRole());
-		RolePO rolePO4 = mock.buildRolePO(4, 1, "Hans Jørgensen", 3, false, false, false, true);
+		RolePO rolePO4 = RolePO.builder().id(4).userId(1).name("Hans Jørgensen").employment(3)
+				.manager(false).admin(false).municipalityAdmin(false).substitute(true).build();
 		usersService.createRole(rolePO4.toRole());
+		RolePO rolePO5 = RolePO.builder().id(13).userId(1).name("David Hilbert").employment(10)
+				.manager(true).admin(false).municipalityAdmin(false).substitute(true).build();
+		usersService.createRole(rolePO5.toRole());
 	}
 
 	private void buildForUserTwo(){
 		UsersServiceMock mock = new UsersServiceMock();
-		RolePO rolePO1 = mock.buildRolePO(5, 2, "Sune(dig)", 4, false, false, false, false);
-		Role role = rolePO1.toRole();
-		usersService.createRole(role);
-//		RolePO rolePO2 = mock.buildRolePO(6, 2, "Admin", 0, false, true, false, false);
-//		usersService.createRole(rolePO2.toRole());
-//		RolePO rolePO3 = mock.buildRolePO(7, 2, "Adam Savage", 5, false, false, true, false);
-//		usersService.createRole(rolePO3.toRole());
-//		RolePO rolePO4 = mock.buildRolePO(8, 2, "Homer Simpson", 6, false, false, false, true);
-//		usersService.createRole(rolePO4.toRole());
+		RolePO rolePO1 = RolePO.builder().id(5).userId(2).name("Sune(dig)").employment(4)
+				.manager(false).admin(true).municipalityAdmin(false).substitute(false).build();
+		usersService.createRole(rolePO1.toRole());
 	}
 
 	private void buildForUserThree(){
 		UsersServiceMock mock = new UsersServiceMock();
-		RolePO rolePO1 = mock.buildRolePO(9, 3, "Helle(dig)", 7, false, false, false, false);
-		Role role = rolePO1.toRole();
-		usersService.createRole(role);
-		RolePO rolePO2 = mock.buildRolePO(10, 3, "Admin", 0, false, true, false, false);
+		RolePO rolePO1 = RolePO.builder().id(9).userId(3).name("Helle(dig)").employment(7)
+				.manager(false).admin(false).municipalityAdmin(false).substitute(false).build();
+		usersService.createRole(rolePO1.toRole());
+		RolePO rolePO2 = RolePO.builder().id(10).userId(3).name("sysadmin").employment(0)
+				.manager(false).admin(true).municipalityAdmin(false).substitute(false).build();
 		usersService.createRole(rolePO2.toRole());
-		RolePO rolePO3 = mock.buildRolePO(11, 3, "Adam Savage", 5, false, false, true, false);
+		RolePO rolePO3 = RolePO.builder().id(11).userId(3).name("Adam Savage").employment(5)
+				.manager(false).admin(false).municipalityAdmin(true).substitute(false).build();
 		usersService.createRole(rolePO3.toRole());
-		RolePO rolePO4 = mock.buildRolePO(12, 3, "Linus Thorvalds", 6, false, false, false, true);
+		RolePO rolePO4 = RolePO.builder().id(12).userId(3).name("Linus Thorvalds").employment(6)
+				.manager(false).admin(false).municipalityAdmin(false).substitute(true).build();
 		usersService.createRole(rolePO4.toRole());
 	}
 
