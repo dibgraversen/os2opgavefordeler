@@ -125,7 +125,8 @@
 		}
 
 		function updateDistributionRule(distributionRule){
-			var distRule = new DistributionRule(distributionRule.id, distributionRule.parent.id, distributionRule.kle,
+			var distRule = new DistributionRule(distributionRule.id, distributionRule.parent.id,
+					new KLE(distributionRule.kle.id, distributionRule.number, distributionRule.name, distributionRule.serviceText),
 			distributionRule.org.id, distributionRule.employee.id, distributionRule.responsible.id);
 			return httpPost('/distribution-rules/'+distributionRule.id, distRule);
 		}
