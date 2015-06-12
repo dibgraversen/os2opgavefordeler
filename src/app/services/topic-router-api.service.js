@@ -50,9 +50,11 @@
 				"scope": scope
 			}).then(function (data) {
 				var objectMap = {};
-				_.each(data, function (rule) {
+				_.each(data, function(rule){
 					objectMap[rule.id] = rule;
 					rule.children = [];
+				});
+				_.each(data, function (rule) {
 					if (rule.parent) {
 						var parent = objectMap[rule.parent];
 						rule.parent = parent;
