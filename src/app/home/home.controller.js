@@ -28,6 +28,7 @@
 		$scope.distributed = distributed;
 		$scope.distribution = distribution;
 		$scope.responsibilityChangeAllowed = responsibilityChangeAllowed;
+		$scope.distributionChangeAllowed = distributionChangeAllowed;
 
 		////////////////
 
@@ -181,6 +182,12 @@
 			return (distributionRule.responsible && distributionRule.responsible.managerId > 0 &&
 			distributionRule.responsible.managerId === $scope.user.currentRole.employment) ||
 					(distributionRule.parent && canManage(distributionRule.parent));
+		}
+
+		function distributionChangeAllowed(distributionRule){
+			if($scope.user.currentRole.municipalityAdmin) return true;
+			if(canManage(distributionRule)) return true;
+			return false;
 		}
 	}
 })();

@@ -10,6 +10,8 @@
 				<th></th>
 				<th>Opgave</th>
 				<th>Organisationsenhed</th>
+				<th ng-show="settings.showExpandedOrg">Email</th>
+				<th ng-show="settings.showExpandedOrg">Telefonnummer</th>
 				<th>Medarbejder</th>
 				<th></th>
 				<th ng-show="settings.showResponsible">Ansvarlig </th>
@@ -43,9 +45,10 @@
 													popover-placement="right"></span>
 				</td>
 				<td ng-class="topic.org ? '' : 'inherited'">{{ topic.org.name || distribution(topic) }}</td>
+				<td ng-show="settings.showExpandedOrg"></td>
 				<td>{{ topic.employee.name }}</td>
-				<td>
-					<button class="btn btn-primary" ng-show="responsibility(topic)"
+				<td class="button">
+					<button class="btn btn-primary" ng-show="distributionChangeAllowed(topic)"
 									popover-placement="left"
 									popover="klik her for at vedligeholde fordelingsregler"
 									popover-trigger="mouseenter" popover-popup-delay="1000"
@@ -55,7 +58,7 @@
 				<td ng-show="settings.showResponsible" ng-class=" topic.responsible ? '' : 'inherited' ">
 					{{ topic.responsible.name || responsible(topic) }}({{ topic.responsible.managerId }})
 				</td>
-				<td ng-show="settings.showResponsible">
+				<td ng-show="settings.showResponsible" class="button">
 					<div class="btn-group" ng-show="responsibilityChangeAllowed(topic)"
 							 ng-class="{open: open}" style="width:100px">
 						<button class="btn btn-primary " ng-click="editResponsibility(topic)">

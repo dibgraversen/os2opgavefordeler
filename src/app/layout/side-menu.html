@@ -15,6 +15,15 @@
 	</div>
 </div>
 
+<div ng-show="user.currentRole.manager" class="panel panel-default">
+	<div class="panel-heading">Stedfortræder</div>
+	<div class="panel-body">
+		<button class="btn btn-primary btn-block"
+				popover="virker ikke endnu" popover-trigger="mouseenter">Tilføj stedfortræder</button>
+	</div>
+
+</div>
+
 <div class="panel panel-default" style="margin-top:30px">
 	<div class="panel-heading">
 		Filtrering
@@ -45,6 +54,11 @@
 			<div class="checkbox">
 				<label>
 					<input type="checkbox" ng-model="settings.showResponsible" ng-click="updateSettings()"	/> Vis ansvarlig
+				</label>
+			</div>
+			<div class="checkbox">
+				<label>
+					<input type="checkbox" ng-model="settings.showExpandedOrg" ng-click="updateSettings()"	/> Vis kontaktopl.
 				</label>
 			</div>
 			<div>
