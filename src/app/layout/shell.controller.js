@@ -3,13 +3,15 @@
 
 	angular.module('topicRouter').controller('ShellCtrl', ShellCtrl);
 
-	ShellCtrl.$inject = ['$scope', '$rootScope', '$state', '$timeout', '$q', 'topicRouterApi'];
+	ShellCtrl.$inject = ['$scope', '$rootScope', '$state', '$timeout', '$q',
+		'topicRouterApi', 'version'];
 
-	function ShellCtrl($scope, $rootScope, $state, $timeout, $q, topicRouterApi) {
+	function ShellCtrl($scope, $rootScope, $state, $timeout, $q, topicRouterApi, version) {
 
 		/* jshint validthis:true */
 		var vm = this;
 		$scope.$state = $state;
+		$scope.version = version;
 
 		$scope.alerts = [];
 		$scope.addAlert = addAlert;
