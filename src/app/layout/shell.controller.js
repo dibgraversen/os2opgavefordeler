@@ -110,9 +110,12 @@
 
 		function changeRole(role) {
 			// functionality happens by ng-modal and radiobuttons.
-			console.log('switching user');
-			//$scope.user.currentRole = role;
-			console.log($scope.user);
+			if($state.current.name === 'settings' && !role.admin){
+				$state.go('home');
+			}
+			if($state.current.name === 'municipalityAdmin' && !role.municipalityAdmin){
+				$state.go('home');
+			}
 		}
 
 		function updateFilter() {

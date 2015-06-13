@@ -1,9 +1,13 @@
 (function () {
 	'use strict';
 
-	angular.module('topicRouter').controller('MunicipalityAdminCtrl', MunicipalityAdminCtrl);
+	var app = angular.module('topicRouter');
 
-	function MunicipalityAdminCtrl() {
+	app.controller('MunicipalityAdminCtrl', MunicipalityAdminCtrl);
+
+	MunicipalityAdminCtrl.$inject = ['$scope'];
+
+	function MunicipalityAdminCtrl($scope) {
 		$scope.something = 'a string';
 
 		activate();
