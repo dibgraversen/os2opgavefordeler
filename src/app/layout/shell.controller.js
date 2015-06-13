@@ -110,10 +110,10 @@
 
 		function changeRole(role) {
 			// functionality happens by ng-modal and radiobuttons.
-			if($state.current.name === 'settings' && !role.admin){
+			if($state.is('settings') && !role.admin){
 				$state.go('home');
 			}
-			if($state.current.name === 'municipalityAdmin' && !role.municipalityAdmin){
+			if($state.is('municipalityAdmin') && !role.municipalityAdmin){
 				$state.go('home');
 			}
 		}
