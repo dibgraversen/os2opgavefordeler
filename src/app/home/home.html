@@ -56,7 +56,8 @@
 					</button>
 				</td>
 				<td ng-show="settings.showResponsible" ng-class=" topic.responsible ? '' : 'inherited' ">
-					{{ topic.responsible.name || responsible(topic) }}({{ topic.responsible.managerId }})
+					{{ topic.responsible.name || responsible(topic) }}
+					<span ng-show="topic.responsible.manager">({{ topic.responsible.manager.name }})</span>
 				</td>
 				<td ng-show="settings.showResponsible" class="button">
 					<div class="btn-group" ng-show="responsibilityChangeAllowed(topic)"
