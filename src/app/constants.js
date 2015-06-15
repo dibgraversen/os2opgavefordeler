@@ -4,6 +4,6 @@
 
 .constant("serverUrl", "http://127.0.0.1:8080/TopicRouter/rest")
 
-.constant("version", "0.9.0-SNAPSHOT")
+.constant("version", "0.9.2-SNAPSHOT")
 
 ;})();
