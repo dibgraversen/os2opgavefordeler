@@ -18,8 +18,15 @@
 <div ng-show="user.currentRole.manager" class="panel panel-default">
 	<div class="panel-heading">Stedfortræder</div>
 	<div class="panel-body">
-		<button class="btn btn-primary btn-block"
-				popover="virker ikke endnu" popover-trigger="mouseenter">Tilføj stedfortræder</button>
+		<ul ng-repeat="sub in substitutes" class="list-unstyled">
+			<li>
+				{{ sub.name }}
+				<span class="glyphicon glyphicon-remove" ng-click="removeSubstitute(sub)"></span>
+			</li>
+		</ul>
+		<button class="btn btn-primary btn-block" ng-click="addSubstitute()">
+			Tilføj stedfortræder
+		</button>
 	</div>
 
 </div>

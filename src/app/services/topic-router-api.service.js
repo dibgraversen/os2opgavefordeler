@@ -17,7 +17,9 @@
 			getOrgUnitsForResponsibility: getOrgUnitsForResponsibility,
 			getEmployments: getEmployments,
 		  getEmployment: getEmployment,
-			updateDistributionRule: updateDistributionRule
+			updateDistributionRule: updateDistributionRule,
+			addSubstitute: addSubstitute,
+			removeSubstitute: removeSubstitute
 		};
 
 		var baseUrl = serverUrl;
@@ -131,6 +133,16 @@
 					new KLE(distributionRule.kle.id, distributionRule.number, distributionRule.name, distributionRule.serviceText),
 			distributionRule.org.id, distributionRule.employee.id, distributionRule.responsible.id);
 			return httpPost('/distribution-rules/'+distributionRule.id, distRule);
+		}
+
+		function addSubstitute(userEmployment, substituteEmployment){
+			return true;
+		}
+
+		function removeSubstitute(userEmployment, substituteEmployment){
+			var deferred = $q.defer();
+			deferred.resolve(substituteEmployment);
+			return deferred.promise;
 		}
 
 		// DTO classes.

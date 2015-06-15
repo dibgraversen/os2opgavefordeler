@@ -1,0 +1,34 @@
+<div id="responsible-modal">
+	<div class="modal-header">
+		<button type="button" class="close" ng-click="cancel()"><span aria-hidden="true">&times;</span></button>
+		<h4 class="modal-title">Tilføj stedfortræder</h4>
+	</div>
+	<div class="modal-body">
+		<div>Vælg en person der skal fungere som stedfortræder.</div>
+		<div>
+			<input type="text" placeholder="filter" class="form-control"
+						 ng-model="employeeFilter" />
+			<table class="table table-hover">
+				<thead>
+				<tr>
+					<th>Navn</th>
+				</tr>
+				</thead>
+				<tbody ng-repeat="employee in employees | filter:employeeFilter">
+				<tr ng-class="currentEmployee === employee ? 'success' : ''" ng-click="setCurrentEmployee(employee)">
+					<td>{{ employee.name }}</td>
+				</tr>
+				</tbody>
+			</table>
+			<alert ng-repeat="alert in modalAlerts" type="{{alert.type}}"
+						 close="closeAlert($index)" class="animate-fade"
+						 style="width: 100%">{{alert.msg}}
+			</alert>
+		</div>
+	</div>
+
+	<div class="modal-footer">
+		<button class="btn btn-primary" ng-click="ok()">Gem</button>
+		<button class="btn btn-default" ng-click="cancel()">Annuller</button>
+	</div>
+</div>

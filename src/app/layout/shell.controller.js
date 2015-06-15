@@ -3,10 +3,10 @@
 
 	angular.module('topicRouter').controller('ShellCtrl', ShellCtrl);
 
-	ShellCtrl.$inject = ['$scope', '$rootScope', '$state', '$timeout', '$q',
+	ShellCtrl.$inject = ['$scope', '$rootScope', '$state', '$timeout', '$q', '$modal',
 		'topicRouterApi', 'version'];
 
-	function ShellCtrl($scope, $rootScope, $state, $timeout, $q, topicRouterApi, version) {
+	function ShellCtrl($scope, $rootScope, $state, $timeout, $q, $modal, topicRouterApi, version) {
 
 		/* jshint validthis:true */
 		var vm = this;
@@ -24,6 +24,10 @@
 
 		$scope.changeUser = changeUser;
 		$scope.changeRole = changeRole;
+
+		$scope.substitutes = [];
+		$scope.addSubstitute = addSubstitute;
+		$scope.removeSubstitute = removeSubstitute;
 
 		$scope.filter = {
 			text: '',
@@ -116,6 +120,26 @@
 			if($state.is('municipalityAdmin') && !role.municipalityAdmin){
 				$state.go('home');
 			}
+		}
+
+		function addSubstitute(){
+			$modal.open({
+				templateUrl: 'app/home/add-substitute-modal.html',
+				controller: 'AddSubstituteModalInstanceCtrl'
+			}).result.then(function(sub){
+				console.log('getting a sub');
+				topicRouterApi.addSubstitute($scope.user.currentRole.employment, sub);
+				$scope.substitutes.push(sub);
+			});
+		}
+
+		function removeSubstitute(substitute){
+			topicRouterApi.removeSubstitute($scope.user.currentEmployment, substitute)
+					.then(function(){
+						_.remove($scope.substitutes, function(sub){
+							return sub === substitute;
+						});
+					});
 		}
 
 		function updateFilter() {
