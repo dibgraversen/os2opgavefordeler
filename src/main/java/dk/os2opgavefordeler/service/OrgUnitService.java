@@ -1,5 +1,6 @@
 package dk.os2opgavefordeler.service;
 
+import dk.os2opgavefordeler.model.Employment;
 import dk.os2opgavefordeler.model.OrgUnit;
 import dk.os2opgavefordeler.model.presentation.OrgUnitPO;
 
@@ -31,4 +32,7 @@ public interface OrgUnitService {
 
 	List<OrgUnitPO> getToplevelOrgUnitPO();
 	Optional<OrgUnitPO> getOrgUnitPO(int id);
+
+	Optional<Employment> getEmployment(int id);
+	Optional<Employment> getEmploymentByName(String name);
 }

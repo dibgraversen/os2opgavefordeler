@@ -2,6 +2,7 @@ package dk.os2opgavefordeler.service;
 
 import dk.os2opgavefordeler.model.*;
 import dk.os2opgavefordeler.model.presentation.DistributionRulePO;
+import dk.os2opgavefordeler.rest.DistributionRuleScope;
 import org.slf4j.Logger;
 
 import javax.ejb.Stateless;
@@ -92,16 +93,20 @@ public class DistributionServiceImpl implements DistributionService {
 	}
 
 	@Override
-	public List<DistributionRulePO> getPoDistributionsAll() {
-		List<DistributionRule> distributions = getDistributionsAll();
-		return distributions.stream()
-			.map(DistributionRulePO::new)
-			.collect(Collectors.toList());
-	}
+	public List<DistributionRulePO> getPoDistributions(OrgUnit orgUnit, DistributionRuleScope scope) {
+		final List<DistributionRule> distributions;
+		switch(scope) {
+			case INHERITED:
+				distributions = getDistributionsForOrg(orgUnit.getId(), true, true);
+				break;
+			case RESPONSIBLE:
+				distributions = getDistributionsForOrg(orgUnit.getId(), true, false);
+				break;
+			case ALL:
+			default:/* intentional fallthrough */
+				distributions = getDistributionsAll();
+		}
 
-	@Override
-	public List<DistributionRulePO> getPoDistributions(int orgId, boolean includeUnassigned, boolean includeImplicit) {
-		List<DistributionRule> distributions = getDistributionsForOrg(orgId, includeUnassigned, includeImplicit);
 		return distributions.stream()
 			.map(DistributionRulePO::new)
 			.collect(Collectors.toList());

@@ -1,5 +1,7 @@
 package dk.os2opgavefordeler.service;
 
+import dk.os2opgavefordeler.model.Employment;
+import dk.os2opgavefordeler.model.Employment_;
 import dk.os2opgavefordeler.model.OrgUnit;
 import dk.os2opgavefordeler.model.OrgUnit_;
 import dk.os2opgavefordeler.model.presentation.OrgUnitPO;
@@ -84,6 +86,28 @@ public class OrgUnitServiceImpl implements OrgUnitService {
 		return getOrgUnit(id).map(OrgUnitPO::new);
 	}
 
+	@Override
+	public Optional<Employment> getEmployment(int id) {
+		final List<Employment> results = persistence.criteriaFind(Employment.class,
+			(cb, cq, ou) -> cq.where(cb.equal(ou.get(Employment_.id), id))
+		);
+
+		return results.isEmpty() ?
+			Optional.empty() :
+			Optional.of(results.get(0));
+	}
+
+	@Override
+	public Optional<Employment> getEmploymentByName(String name) {
+		final List<Employment> results = persistence.criteriaFind(Employment.class,
+			(cb, cq, ou) -> cq.where(cb.equal(ou.get(Employment_.name), name))
+		);
+
+		return results.isEmpty() ?
+			Optional.empty() :
+			Optional.of(results.get(0));
+	}
+
 	private List<OrgUnit> touchChildren(List<OrgUnit> ou) {
 		ou.forEach(child -> {
 			child.getEmployees().size();
@@ -93,6 +117,7 @@ public class OrgUnitServiceImpl implements OrgUnitService {
 	}
 
 	private void fixRelations(OrgUnit input) {
+		input.getManager().ifPresent(man -> man.setEmployedIn(input));
 		input.getEmployees().forEach( emp -> emp.setEmployedIn(input) );
 		input.getChildren().forEach(child -> {
 			child.setParent(input);

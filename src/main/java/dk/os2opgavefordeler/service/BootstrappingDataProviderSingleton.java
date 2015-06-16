@@ -70,7 +70,7 @@ public class BootstrappingDataProviderSingleton {
 		RolePO rolePO3 = RolePO.builder().id(3).userId(1).name("Borge Meister").employment(2)
 				.manager(false).admin(false).municipalityAdmin(true).substitute(false).build();
 		usersService.createRole(rolePO3.toRole());
-		RolePO rolePO4 = RolePO.builder().id(4).userId(1).name("Hans Jørgensen").employment(3)
+		RolePO rolePO4 = RolePO.builder().id(4).userId(1).name("Olfert Kvium").employment(3)
 				.manager(false).admin(false).municipalityAdmin(false).substitute(true).build();
 		usersService.createRole(rolePO4.toRole());
 		RolePO rolePO5 = RolePO.builder().id(13).userId(1).name("David Hilbert").employment(10)
