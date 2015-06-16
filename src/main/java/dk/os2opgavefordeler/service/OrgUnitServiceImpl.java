@@ -73,11 +73,10 @@ public class OrgUnitServiceImpl implements OrgUnitService {
 
 	@Override
 	public List<OrgUnitPO> getToplevelOrgUnitPO() {
-		final Optional<OrgUnit> ou = getToplevelOrgUnit();
+		final Optional<OrgUnit> orgUnit = getToplevelOrgUnit();
 
-		return ou.isPresent() ?
-			ou.get().flattened().map(OrgUnitPO::new).collect(Collectors.toList()) :
-			Collections.emptyList();
+		return orgUnit.map( ou -> ou.flattened().map(OrgUnitPO::new).collect(Collectors.toList()) )
+			.orElse(Collections.emptyList());
 	}
 
 	@Override

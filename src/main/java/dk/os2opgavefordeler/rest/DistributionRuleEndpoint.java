@@ -41,6 +41,7 @@ public class DistributionRuleEndpoint {
 	@Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
 	public Response routesForEmployment(@QueryParam("employment") Integer employmentId, @QueryParam("scope") String scope) {
 		//TODO: define scopes properly, define Enum.
+		//TODO: change employment parameter to role
 
 		log.info("routesForEmployment[{},{}]", employmentId, scope);
 
@@ -125,19 +126,19 @@ public class DistributionRuleEndpoint {
 	private void updateDistributionRule(DistributionRule existing, DistributionRulePO updated) {
 		//TODO: these updates should probably call service methods instead of setters. At some point, we might want to
 		//calculate stuff and stuff with stuff on.
-		possiblyUpdate(existing.getResponsibleOrg().map(OrgUnit::getId).orElse(0), updated.getResponsible(), newOwnerId -> {
+		updateIfChanged(existing.getResponsibleOrg().map(OrgUnit::getId).orElse(0), updated.getResponsible(), newOwnerId -> {
 			OrgUnit newOwner = (newOwnerId == 0) ? null :
 				orgUnitService.getOrgUnit(newOwnerId).orElseThrow(IllegalArgumentException::new);
 			existing.setResponsibleOrg(newOwner);
 		});
 
-		possiblyUpdate(existing.getAssignedOrg().map(OrgUnit::getId).orElse(0), updated.getOrg(), newOrgId -> {
+		updateIfChanged(existing.getAssignedOrg().map(OrgUnit::getId).orElse(0), updated.getOrg(), newOrgId -> {
 			OrgUnit newOrg = (newOrgId == 0) ? null :
 				orgUnitService.getOrgUnit(newOrgId).orElseThrow(IllegalArgumentException::new);
 			existing.setAssignedOrg(newOrg);
 		});
 
-		possiblyUpdate(existing.getAssignedEmp(), updated.getEmployee(), newEmpId -> {
+		updateIfChanged(existing.getAssignedEmp(), updated.getEmployee(), newEmpId -> {
 			//TODO: validate once we add EmploymentService
 			//Employment emp = employmentService.getEmployment(newEmpId).orElseThrow(IllegalArgumentException::new);
 			existing.setAssignedEmp(newEmpId);
@@ -146,7 +147,7 @@ public class DistributionRuleEndpoint {
 		distributionService.merge(existing); // if we move logic to DistributionService, 'existing' is managed and this shouldn't be necessary.
 	}
 
-	private<T extends Comparable<T>> void possiblyUpdate(T oldVal, T newVal, Consumer<T> updater) {
+	private<T extends Comparable<T>> void updateIfChanged(T oldVal, T newVal, Consumer<T> updater) {
 		if(!newVal.equals(oldVal)) {
 			updater.accept(newVal);
 		}

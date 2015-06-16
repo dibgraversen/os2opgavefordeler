@@ -239,6 +239,16 @@
 
 	<profiles>
 		<profile>
+			<id>server-test</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+			<properties>
+				<jboss-as.host>localhost</jboss-as.host>
+				<jboss-as.port>19999</jboss-as.port>
+			</properties>
+		</profile>
+		<profile>
 			<!-- The default profile skips all tests, though you can tune it
 				to run just unit tests based on a custom pattern -->
 			<!-- Seperate profiles are provided for running all tests, including
