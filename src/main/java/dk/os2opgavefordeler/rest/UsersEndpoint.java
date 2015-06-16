@@ -7,12 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import javax.ws.rs.GET;
-import javax.ws.rs.OPTIONS;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
@@ -51,16 +46,5 @@ public class UsersEndpoint {
 	public void updateSettingsForUser(@PathParam("userId") long userId, UserSettingsPO settings){
 		settings.setUserId(userId);
 		usersService.updateSettings(settings);
-	}
-
-	@OPTIONS
-	public Response getOptions(){
-		return Response.ok().build();
-	}
-
-	@OPTIONS
-	@Path("/{userId}/settings")
-	public Response getOptionsForSettings(){
-		return Response.ok().build();
 	}
 }
