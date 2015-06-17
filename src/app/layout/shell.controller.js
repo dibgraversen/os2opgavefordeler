@@ -52,12 +52,24 @@
 		activate();
 
 		function activate() {
+			topicRouterApi.getUserInfo().then(function(user) {
+				if(user.loggedIn) {
+					changeUser({
+						name: "Mock Me",
+						id: user.id,
+						loggedIn: true
+					});
+				} else {
+					$state.go("login");
+				}
+			});
+
 			//user = getUser();
 			//if(user){
-			changeUser({
-				name: 'Henrik',
-				id: 1
-			});
+			//changeUser({
+			//	name: 'Henrik',
+			//	id: 1
+			//});
 			//}
 			//getSettings($scope.user.id);
 			//getRoles($scope.user);
