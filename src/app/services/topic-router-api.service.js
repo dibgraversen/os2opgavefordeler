@@ -3,12 +3,12 @@
 
 	angular.module('topicRouter').factory('topicRouterApi', topicRouterApi);
 
-	topicRouterApi.$inject = ['$http', '$q', '$timeout', 'serverUrl', 'appSpinner'];
+	topicRouterApi.$inject = ['$http', '$q', '$timeout', '$cacheFactory', 'serverUrl', 'appSpinner'];
 
 	var maxPopoverLength = 150;
 
 	// NOTE consider implementing ngResource to manage RESTful resource endpoints.
-	function topicRouterApi($http, $q, $timeout, serverUrl, appSpinner) {
+	function topicRouterApi($http, $q, $timeout, $cacheFactory, serverUrl, appSpinner) {
 		var service = {
 			getTopicRoutes: getTopicRoutes,
 			getRoles: getRoles,
@@ -16,7 +16,7 @@
 			updateSettings: updateSettings,
 			getOrgUnitsForResponsibility: getOrgUnitsForResponsibility,
 			getEmployments: getEmployments,
-		  getEmployment: getEmployment,
+			getEmployment: getEmployment,
 			updateDistributionRule: updateDistributionRule,
 			addSubstitute: addSubstitute,
 			removeSubstitute: removeSubstitute
@@ -28,6 +28,8 @@
 				'Content-Type': 'application/json'
 			}
 		};
+
+		var cache = $cacheFactory('cache');
 
 		return service;
 
@@ -131,7 +133,7 @@
 		function updateDistributionRule(distributionRule){
 			var distRule = new DistributionRule(distributionRule.id, distributionRule.parent.id,
 					new KLE(distributionRule.kle.id, distributionRule.number, distributionRule.name, distributionRule.serviceText),
-			distributionRule.org.id, distributionRule.employee.id, distributionRule.responsible.id);
+					distributionRule.org.id, distributionRule.employee.id, distributionRule.responsible.id);
 			return httpPost('/distribution-rules/'+distributionRule.id, distRule);
 		}
 
@@ -237,7 +239,7 @@
 
 		function httpGet(url, params) {
 			var options = {
-				cache: true
+				cache: cache
 			};
 			if (params) {
 				//options.params = encodeURIComponent( JSON.stringify(params) );
@@ -247,6 +249,7 @@
 		}
 
 		function httpPost(url, data) {
+			cache.removeAll();
 			return httpExecute(url, 'POST', {data: data});
 		}
 
@@ -258,10 +261,15 @@
 			};
 			angular.extend(options, defaults); // merge defaults into options.
 			appSpinner.showSpinner();
-			return $http(options).then(function (response) {
+			return $http(options).then(
+					function (response) {
 						appSpinner.hideSpinner();
 						console.log('**response from EXECUTE', response);
 						return response.data;
+					},
+					function(reason){
+						appSpinner.hideSpinner();
+						console.log('**response from EXECUTE', reason);
 					});
 		}
 
