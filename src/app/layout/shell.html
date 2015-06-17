@@ -68,11 +68,11 @@
 	<div id="ng-view"
 			 class="container-fluid slide-animation admin-content main-content">
 		<div class="row">
-			<div class="col-md-2" ng-show="sidemenuVisible">
+			<div ng-show="user.loggedIn" class="col-md-2" ng-show="sidemenuVisible">
 				<div data-ng-include="'/app/layout/side-menu.html'"></div>
 			</div>
 			<div ng-class="sidemenuVisible ? 'col-md-10' : 'col-md-12' ">
-				<div class="pull-left" style="margin-top: 20px; margin-right: 30px">
+				<div ng-show="user.loggedIn" class="pull-left" style="margin-top: 20px; margin-right: 30px">
 					<button class="btn btn-default toggle-side"
 									popover="Fold ud for at se sidemenu"
 									popover-placement="right" popover-trigger="mouseenter"

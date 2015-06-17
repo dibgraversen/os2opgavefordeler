@@ -10,6 +10,7 @@
 	// NOTE consider implementing ngResource to manage RESTful resource endpoints.
 	function topicRouterApi($http, $q, $timeout, $cacheFactory, serverUrl, appSpinner) {
 		var service = {
+			getUserInfo: getUserInfo,
 			getTopicRoutes: getTopicRoutes,
 			getRoles: getRoles,
 			getSettings: getSettings,
@@ -33,6 +34,10 @@
 		var cache = $cacheFactory('cache');
 
 		return service;
+
+		function getUserInfo() {
+			return httpGet('/user/info');
+		}
 
 		function getSettings(userId) {
 			return httpGet('/user/' + userId + '/settings');

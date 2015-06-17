@@ -34,6 +34,12 @@
           templateUrl: 'app/municipality-admin/municipality-admin.html',
           controller: 'MunicipalityAdminCtrl',
           controllerAs: 'vm'
+        })
+        .state('login', {
+          url: "/login",
+          templateUrl: 'app/layout/login.html',
+          controller: 'LoginCtrl',
+          controllerAs: 'vm'
         });
     $urlRouterProvider.otherwise('/');
   }
