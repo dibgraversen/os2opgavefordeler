@@ -25,7 +25,8 @@
 		var baseUrl = serverUrl;
 		var requestConfig = {
 			headers: {
-				'Content-Type': 'application/json'
+				'Content-Type': 'application/json',
+				'Cache-Control': 'no-cache'
 			}
 		};
 
