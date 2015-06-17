@@ -1,6 +1,8 @@
 package dk.os2opgavefordeler.rest;
 
+import com.google.common.collect.ImmutableMap;
 import dk.os2opgavefordeler.model.DistributionRule;
+import dk.os2opgavefordeler.model.Employment;
 import dk.os2opgavefordeler.model.OrgUnit;
 import dk.os2opgavefordeler.model.presentation.DistributionRulePO;
 import dk.os2opgavefordeler.service.DistributionService;
@@ -14,6 +16,8 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 @Path("/distribution-rules")
@@ -33,14 +37,15 @@ public class DistributionRuleEndpoint {
 
 	/**
 	 * @param employmentId The employment for whom to look up TopicRoutes
-	 * @param scope      The scope for which to get the TopicRoutes. Can be ALL, MINE or ALL_MINE.
+	 * @param scope      The scope for which to get the TopicRoutes.
 	 * @return a list of TopicRoutePO's matching the employment and scope.
 	 */
 	@GET
 	@Path("/")
 	@Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
-	public Response routesForEmployment(@QueryParam("employment") Integer employmentId, @QueryParam("scope") String scope) {
+	public Response routesForEmployment(@QueryParam("employment") Integer employmentId, @QueryParam("scope") DistributionRuleScope scope) {
 		//TODO: define scopes properly, define Enum.
+		//TODO: change employment parameter to role
 
 		log.info("routesForEmployment[{},{}]", employmentId, scope);
 
@@ -48,15 +53,11 @@ public class DistributionRuleEndpoint {
 			return Response.status(Response.Status.BAD_REQUEST).build();
 		}
 
-		//TODO: what if employment != orgUnit.manager ?
-		int orgUnitId = getOrgUnitFromEmploymentId(employmentId);
+		//TODO: what if current user/role isn't the manager of the given orgunit? Should we still return results filtered
+		//by the orgunit, or should we return an empty result unless scope is 'ALL'?
+		final Optional<OrgUnit> orgUnit = getOrgUnitFromEmploymentId(employmentId);
 
-		final List<DistributionRulePO> result;
-		if("ALL".equals(scope)) {
-			result = distributionService.getPoDistributionsAll();
-		} else {
-			result = distributionService.getPoDistributions(orgUnitId, false, true);
-		}
+		final List<DistributionRulePO> result = distributionService.getPoDistributions(orgUnit.get(), scope);
 
 		return Response.ok(result).build();
 	}
@@ -77,7 +78,10 @@ public class DistributionRuleEndpoint {
 		//TODO: multi-tenancy considerations. Do we pass municipality to service methods, or do we inject that in the
 		//services? At any rate, make sure we can't get mess with other municipalities' data.
 		return distributionService.getDistribution(distId)
-			.map(existing -> doUpdateResponsibleOrganization(existing, distribution))
+			.map(existing -> {
+				log.info("updateResponsibleOrganization - updating resource");
+				return doUpdateResponsibleOrganization(existing, distribution);
+			})
 			.orElseGet(() -> {
 				log.info("updateResponsibleOrganization - nonexisting distributionRule[{}]", distId);
 				return Response.status(Response.Status.NOT_FOUND).build();
@@ -125,19 +129,19 @@ public class DistributionRuleEndpoint {
 	private void updateDistributionRule(DistributionRule existing, DistributionRulePO updated) {
 		//TODO: these updates should probably call service methods instead of setters. At some point, we might want to
 		//calculate stuff and stuff with stuff on.
-		possiblyUpdate(existing.getResponsibleOrg().map(OrgUnit::getId).orElse(0), updated.getResponsible(), newOwnerId -> {
+		updateIfChanged(existing.getResponsibleOrg().map(OrgUnit::getId).orElse(0), updated.getResponsible(), newOwnerId -> {
 			OrgUnit newOwner = (newOwnerId == 0) ? null :
 				orgUnitService.getOrgUnit(newOwnerId).orElseThrow(IllegalArgumentException::new);
 			existing.setResponsibleOrg(newOwner);
 		});
 
-		possiblyUpdate(existing.getAssignedOrg().map(OrgUnit::getId).orElse(0), updated.getOrg(), newOrgId -> {
+		updateIfChanged(existing.getAssignedOrg().map(OrgUnit::getId).orElse(0), updated.getOrg(), newOrgId -> {
 			OrgUnit newOrg = (newOrgId == 0) ? null :
 				orgUnitService.getOrgUnit(newOrgId).orElseThrow(IllegalArgumentException::new);
 			existing.setAssignedOrg(newOrg);
 		});
 
-		possiblyUpdate(existing.getAssignedEmp(), updated.getEmployee(), newEmpId -> {
+		updateIfChanged(existing.getAssignedEmp(), updated.getEmployee(), newEmpId -> {
 			//TODO: validate once we add EmploymentService
 			//Employment emp = employmentService.getEmployment(newEmpId).orElseThrow(IllegalArgumentException::new);
 			existing.setAssignedEmp(newEmpId);
@@ -146,30 +150,23 @@ public class DistributionRuleEndpoint {
 		distributionService.merge(existing); // if we move logic to DistributionService, 'existing' is managed and this shouldn't be necessary.
 	}
 
-	private<T extends Comparable<T>> void possiblyUpdate(T oldVal, T newVal, Consumer<T> updater) {
+	private<T extends Comparable<T>> void updateIfChanged(T oldVal, T newVal, Consumer<T> updater) {
 		if(!newVal.equals(oldVal)) {
 			updater.accept(newVal);
 		}
 	}
 
-	private int getOrgUnitFromEmploymentId(int employmentId) {
-		//TODO: perform proper lookup(employment -> orgunit)
-		switch(employmentId) {
-			case 1:
-				return 1;
+	private Optional<OrgUnit> getOrgUnitFromEmploymentId(int employmentId) {
+		final Map<Integer,String> map = ImmutableMap.of(
+			1, "Borge Meister",
+			2, "Borge Meister",
+			3, "Olfert Kvium",
+			10, "David Hilbert");
 
-			case 2:
-			case 3:
-				return 2;
-			case 4:
-			case 5:
-				return 3;
-			case 6:
-			case 7:
-				return 4;
+		final String name = map.getOrDefault(employmentId, "INVALID");
 
-			default:
-				return -1;
-		}
+		final Optional<Employment> emp = orgUnitService.getEmploymentByName(name);
+		log.info("Employment:{} -> {} -> {}", employmentId, emp, emp.map(e -> e.getEmployedIn()));
+		return emp.map(e -> e.getEmployedIn());
 	}
 }

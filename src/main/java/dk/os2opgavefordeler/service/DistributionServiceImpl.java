@@ -1,15 +1,15 @@
 package dk.os2opgavefordeler.service;
 
-import dk.os2opgavefordeler.model.DistributionRule;
-import dk.os2opgavefordeler.model.DistributionRule_;
-import dk.os2opgavefordeler.model.OrgUnit;
+import dk.os2opgavefordeler.model.*;
 import dk.os2opgavefordeler.model.presentation.DistributionRulePO;
+import dk.os2opgavefordeler.rest.DistributionRuleScope;
 import org.slf4j.Logger;
 
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
+import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Predicate;
 import java.util.List;
 import java.util.Optional;
@@ -56,7 +56,14 @@ public class DistributionServiceImpl implements DistributionService {
 
 	@Override
 	public List<DistributionRule> getDistributionsAll() {
-		return persistence.findAll(DistributionRule.class);
+		List<DistributionRule> results = persistence.criteriaFind(DistributionRule.class, (cb, cq, rule) ->
+		{
+			Join<DistributionRule, Kle> joined = rule.join(DistributionRule_.kle);
+			cq.orderBy(cb.asc(joined.get(Kle_.number)));
+		});
+
+		return results.stream()
+			.collect(Collectors.toList());
 	}
 
 	@Override
@@ -86,16 +93,20 @@ public class DistributionServiceImpl implements DistributionService {
 	}
 
 	@Override
-	public List<DistributionRulePO> getPoDistributionsAll() {
-		List<DistributionRule> distributions = getDistributionsAll();
-		return distributions.stream()
-			.map(DistributionRulePO::new)
-			.collect(Collectors.toList());
-	}
+	public List<DistributionRulePO> getPoDistributions(OrgUnit orgUnit, DistributionRuleScope scope) {
+		final List<DistributionRule> distributions;
+		switch(scope) {
+			case INHERITED:
+				distributions = getDistributionsForOrg(orgUnit.getId(), true, true);
+				break;
+			case RESPONSIBLE:
+				distributions = getDistributionsForOrg(orgUnit.getId(), true, false);
+				break;
+			case ALL:
+			default:/* intentional fallthrough */
+				distributions = getDistributionsAll();
+		}
 
-	@Override
-	public List<DistributionRulePO> getPoDistributions(int orgId, boolean includeUnassigned, boolean includeImplicit) {
-		List<DistributionRule> distributions = getDistributionsForOrg(orgId, includeUnassigned, includeImplicit);
 		return distributions.stream()
 			.map(DistributionRulePO::new)
 			.collect(Collectors.toList());
