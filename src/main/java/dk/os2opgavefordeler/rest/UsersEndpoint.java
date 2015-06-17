@@ -1,6 +1,7 @@
 package dk.os2opgavefordeler.rest;
 
 import dk.os2opgavefordeler.model.presentation.RolePO;
+import dk.os2opgavefordeler.model.presentation.UserInfoPO;
 import dk.os2opgavefordeler.model.presentation.UserSettingsPO;
 import dk.os2opgavefordeler.service.UsersService;
 import org.slf4j.Logger;
@@ -21,6 +22,13 @@ public class UsersEndpoint {
 
 	@Inject
 	UsersService usersService;
+
+	@GET
+	@Path("/info")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getUserInfo() {
+		return Response.ok().entity(new UserInfoPO()).build();
+	}
 
 	@GET
 	@Path("/{userId}/roles")
