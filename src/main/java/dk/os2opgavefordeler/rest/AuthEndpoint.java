@@ -9,15 +9,14 @@ import com.nimbusds.oauth2.sdk.id.ClientID;
 import com.nimbusds.oauth2.sdk.id.State;
 import com.nimbusds.openid.connect.sdk.*;
 import com.nimbusds.openid.connect.sdk.op.OIDCProviderMetadata;
+import dk.os2opgavefordeler.model.IdentityProvider;
+import dk.os2opgavefordeler.service.AuthService;
 import org.slf4j.Logger;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
@@ -25,6 +24,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Optional;
 
 
 @Path("/auth")
@@ -32,6 +32,10 @@ import java.net.URL;
 public class AuthEndpoint {
 	@Inject
 	Logger log;
+
+	@Inject
+	AuthService authService;
+
 
 	public static final String callback_url = "http://localhost:8080/TopicRouter/rest/auth/authenticate";
 
@@ -48,47 +52,57 @@ public class AuthEndpoint {
 	@Path("/idp")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response listIdp() {
-		return Response.ok().build();
+		return Response.ok().entity(authService.identityProviderPOList()).build();
 	}
 
 
 
 	@GET
-	@Path("/info")
+	@Path("/idp/{providerId}")
 	@Consumes( {"*/*", MediaType.APPLICATION_JSON })
 	@Produces({MediaType.APPLICATION_JSON, MediaType.TEXT_HTML } )
-	public Response getInfo(@Context HttpServletRequest request) throws URISyntaxException, IOException, ParseException, SerializeException {
-		OIDCProviderMetadata providerMetadata = getProvider();
+	public Response beginAuthentication(@PathParam(value = "providerId") int providerId) {
+		try {
+			final IdentityProvider idp = authService.findProvider(providerId).orElseThrow(RuntimeException::new);
+			final URI authReqURI = authService.beginAuthenticationFlow(idp);
 
-		// Generate random state string for pairing the response to the request
-		State state = new State();
-		Nonce nonce = new Nonce();				// not required for CODE flow
-		Scope scope = Scope.parse("openid email");
+			log.info("Redirecting to {}", authReqURI);
 
-		ClientID apiKey = new ClientID(AuthEndpoint.client_id);
-		URI callback = new URI(callback_url);
+			return Response.temporaryRedirect(authReqURI).build();
 
-		// Compose the request
-		AuthenticationRequest authenticationRequest = new AuthenticationRequest(
-			providerMetadata.getAuthorizationEndpointURI(),
-			new ResponseType(ResponseType.Value.CODE),
-			scope, apiKey, callback, state, nonce);
+			/*
+			OIDCProviderMetadata providerMetadata = getProvider(idp);
 
-		URI authReqURI = authenticationRequest.toURI();
+			// Generate random state string for pairing the response to the request
+			State state = new State();
+			Nonce nonce = new Nonce();                // not required for CODE flow
+			Scope scope = Scope.parse("openid email");
 
-		log.info("Redirecting to {}", authReqURI);
+			ClientID apiKey = new ClientID(idp.getClientId());
+			URI callback = new URI(callback_url);
 
-		return Response.temporaryRedirect(authReqURI).build();
+			// Compose the request
+			AuthenticationRequest authenticationRequest = new AuthenticationRequest(
+				providerMetadata.getAuthorizationEndpointURI(),
+				new ResponseType(ResponseType.Value.CODE),
+				scope, apiKey, callback, state, nonce);
+
+			URI authReqURI = authenticationRequest.toURI();
+			*/
+		}
+		catch(Throwable t) {
+			log.error("error in beingAuthentication", t);
+			return Response.serverError().build();
+		}
 	}
 
-	private OIDCProviderMetadata getProvider() throws URISyntaxException, IOException, ParseException {
-		log.info("Getting provider metadata");
+	private OIDCProviderMetadata getProvider(IdentityProvider idp) throws URISyntaxException, IOException, ParseException {
+		log.info("Getting provider metadata for {}", idp.getName());
 
-		URI idp = new URI(idp_url);
-		URI provider = idp.resolve(".well-known/openid-configuration");
+		URI idpUrl = new URI(idp.getIdpUrl());
+		URI provider = idpUrl.resolve(".well-known/openid-configuration");
 
 		URL providerConfigurationURL = provider.toURL();
-
 
 		String providerInfo = null;
 		try {
@@ -124,6 +138,7 @@ public class AuthEndpoint {
 		// 2) Verify state parameter matches one from query string, or throw 401-unauthorized
 
 		// 3) Extract 'code', exchange for access + id tokens.
+/*
 		AuthenticationResponse authResp = null;
 		try {
 			authResp = AuthenticationResponseParser.parse(ui.getRequestUri());
@@ -148,7 +163,7 @@ public class AuthEndpoint {
 //		if (!verifyState(successResponse.getState())) {
 //			// TODO proper error handling
 //		}
-
+/*
 		AuthorizationCode authCode = successResponse.getAuthorizationCode();
 		log.info("Auth code: {}", authCode);
 
@@ -159,7 +174,7 @@ public class AuthEndpoint {
 
 		ClientAuthentication clientAuth = new ClientSecretBasic(clientID, clientSecret);
 
-		OIDCProviderMetadata providerMetadata = getProvider();
+		OIDCProviderMetadata providerMetadata = getProvider(TODO);
 
 		TokenRequest tokenReq = new TokenRequest(
 			providerMetadata.getTokenEndpointURI(),
@@ -194,7 +209,7 @@ public class AuthEndpoint {
 
 		log.info("Access token: {}", accessTokenResponse.getAccessToken());
 		log.info("id token      {}", accessTokenResponse.getIDTokenString());
-
+*/
 /*
 		accessResources("https://www.googleapis.com/userinfo/v2/me", service, accessToken);
 		accessResources("https://www.googleapis.com/oauth2/v3/userinfo", service, accessToken);
