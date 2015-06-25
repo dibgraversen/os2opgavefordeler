@@ -1,6 +1,7 @@
 package dk.os2opgavefordeler.service;
 
 import dk.os2opgavefordeler.model.IdentityProvider;
+import dk.os2opgavefordeler.model.User;
 import dk.os2opgavefordeler.model.presentation.IdentityProviderPO;
 
 import java.net.URI;
@@ -18,5 +19,14 @@ public interface AuthService {
 	 * @return 3rd-party URI which the client should be redirected to;
 	 * @param idp
 	 */
-	URI beginAuthenticationFlow(IdentityProvider idp);
+	URI beginAuthenticationFlow(IdentityProvider idp, String callbackUrl) throws Throwable;
+
+	/**
+	 * Finalizes OpenID Connect authentication flow.
+	 * @param idp
+	 * @param expectedState
+	 * @return the authenticated User
+	 * @throws hissy fits if the user can't be authenticated
+	 */
+	User finalizeAuthenticationFlow(IdentityProvider idp, String expectedState) throws Throwable;
 }

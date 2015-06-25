@@ -21,6 +21,7 @@ public class IdentityProvider implements Serializable {
 	}
 
 	public IdentityProvider(Builder builder) {
+		this.id = builder.id;
 		this.name = builder.name;
 		this.idpUrl = builder.url;
 		this.clientId = builder.clientId;
@@ -58,6 +59,7 @@ public class IdentityProvider implements Serializable {
 	}
 
 	public static class Builder {
+		private int id;
 		private String name;
 		private String url;
 		private String clientId;
@@ -67,6 +69,10 @@ public class IdentityProvider implements Serializable {
 			return new IdentityProvider(this);
 		}
 
+		public Builder id(int id) {
+			this.id = id;
+			return this;
+		}
 		public Builder name(String name) {
 			this.name = name;
 			return this;
