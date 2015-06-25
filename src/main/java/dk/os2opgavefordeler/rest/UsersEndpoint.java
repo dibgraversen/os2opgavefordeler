@@ -5,7 +5,6 @@ import dk.os2opgavefordeler.model.presentation.UserInfoPO;
 import dk.os2opgavefordeler.model.presentation.UserSettingsPO;
 import dk.os2opgavefordeler.service.UsersService;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.ws.rs.*;
@@ -18,7 +17,8 @@ import java.util.List;
  */
 @Path("/user")
 public class UsersEndpoint {
-	private final Logger log = LoggerFactory.getLogger(getClass());
+	@Inject
+	private Logger log;
 
 	@Inject
 	UsersService usersService;
