@@ -1,11 +1,6 @@
 package dk.os2opgavefordeler.service;
 
-import com.nimbusds.oauth2.sdk.ParseException;
-import com.nimbusds.oauth2.sdk.ResponseType;
-import com.nimbusds.oauth2.sdk.Scope;
-import com.nimbusds.oauth2.sdk.id.ClientID;
-import com.nimbusds.openid.connect.sdk.AuthenticationRequest;
-import com.nimbusds.openid.connect.sdk.op.OIDCProviderMetadata;
+import com.nimbusds.oauth2.sdk.*;
 import com.nimbusds.oauth2.sdk.auth.ClientAuthentication;
 import com.nimbusds.oauth2.sdk.auth.ClientSecretBasic;
 import com.nimbusds.oauth2.sdk.auth.Secret;
@@ -53,6 +48,11 @@ public class AuthServiceImpl implements AuthService {
 	}
 
 	@Override
+	public String generateCsrfToken() {
+		return new State().toString();
+	}
+
+	@Override
 	public Optional<IdentityProvider> findProvider(int id) {
 		return Optional.ofNullable(providers.get(id));
 	}
@@ -70,15 +70,15 @@ public class AuthServiceImpl implements AuthService {
 	}
 
 	@Override
-	public URI beginAuthenticationFlow(IdentityProvider idp, String callbackUrl)
+	public URI beginAuthenticationFlow(IdentityProvider idp, String token, String callbackUrl)
 	throws Throwable
 	{
 		OIDCProviderMetadata providerMetadata = getProvider(idp);
 
 		// Generate random state string for pairing the response to the request
-		State state = new State();
+		State state = new State(token);
 		Nonce nonce = new Nonce();                // not required for CODE flow
-		Scope scope = Scope.parse("openid email");
+		Scope scope = Scope.parse("openid email profile");
 
 		ClientID apiKey = new ClientID(idp.getClientId());
 		URI callback = new URI(callbackUrl);
@@ -93,24 +93,24 @@ public class AuthServiceImpl implements AuthService {
 	}
 
 	@Override
-	public User finalizeAuthenticationFlow(IdentityProvider idp, String expectedState)
+	public User finalizeAuthenticationFlow(IdentityProvider idp, String token, String callbackUrl, URI requestUri)
 	throws Throwable
 	{
-		throw new RuntimeException();
-		/*
+		//TODO: loads of cleanup, refactoring and error handling
+
 		AuthenticationResponse authResp = null;
 		try {
-			authResp = AuthenticationResponseParser.parse(ui.getRequestUri());
+			authResp = AuthenticationResponseParser.parse(requestUri);
 		} catch (ParseException e) {
 			// TODO error handling
 			log.error("Error parsing response");
-			return Response.serverError().build();
+			throw new RuntimeException();
 		}
 
 		if (authResp instanceof AuthenticationErrorResponse) {
 			ErrorObject error = ((AuthenticationErrorResponse) authResp)
 				.getErrorObject();
-			return Response.serverError().build();
+			throw new RuntimeException();
 		}
 
 		AuthenticationSuccessResponse successResponse = (AuthenticationSuccessResponse) authResp;
@@ -119,21 +119,22 @@ public class AuthServiceImpl implements AuthService {
 		 * The state in the received authentication response must match the state
 		 * specified in the previous outgoing authentication request.
 		*/
-//		if (!verifyState(successResponse.getState())) {
-//			// TODO proper error handling
-//		}
-/*
+		if(!token.equals(successResponse.getState().getValue())) {
+			log.info("Invalid CSRF token - {} vs {}", token, successResponse.getState().getValue());
+			throw new RuntimeException();
+		}
+
 		AuthorizationCode authCode = successResponse.getAuthorizationCode();
 		log.info("Auth code: {}", authCode);
 
 
-		ClientID clientID = new ClientID(client_id);
-		URI callback = new URI(callback_url);
-		Secret clientSecret = new Secret(client_secret);
+		ClientID clientID = new ClientID(idp.getClientId());
+		URI callback = new URI(callbackUrl);
+		Secret clientSecret = new Secret(idp.getClientSecret());
 
 		ClientAuthentication clientAuth = new ClientSecretBasic(clientID, clientSecret);
 
-		OIDCProviderMetadata providerMetadata = getProvider(TODO);
+		OIDCProviderMetadata providerMetadata = getProvider(idp);
 
 		TokenRequest tokenReq = new TokenRequest(
 			providerMetadata.getTokenEndpointURI(),
@@ -145,7 +146,7 @@ public class AuthServiceImpl implements AuthService {
 			tokenHTTPResp = tokenReq.toHTTPRequest().send();
 		} catch (SerializeException | IOException e) {
 			log.error("token request error", e);
-			return Response.serverError().build();
+			throw new RuntimeException();
 		}
 
 		// Parse and check response
@@ -154,31 +155,32 @@ public class AuthServiceImpl implements AuthService {
 			tokenResponse = OIDCTokenResponseParser.parse(tokenHTTPResp);
 		} catch (ParseException e) {
 			log.error("token parse error", e);
-			return Response.serverError().build();
+			throw new RuntimeException();
 		}
 
 		if (tokenResponse instanceof TokenErrorResponse) {
 			ErrorObject error = ((TokenErrorResponse) tokenResponse).getErrorObject();
 			log.error("token something error {}/{}", error, error.getDescription());
 
-			return Response.serverError().build();
+			throw new RuntimeException();
 		}
 
 		OIDCAccessTokenResponse accessTokenResponse = (OIDCAccessTokenResponse) tokenResponse;
 
 		log.info("Access token: {}", accessTokenResponse.getAccessToken());
 		log.info("id token      {}", accessTokenResponse.getIDTokenString());
-*/
 /*
 		accessResources("https://www.googleapis.com/userinfo/v2/me", service, accessToken);
 		accessResources("https://www.googleapis.com/oauth2/v3/userinfo", service, accessToken);
 
 */
+		return null;
 	}
 
 
 
 	private OIDCProviderMetadata getProvider(IdentityProvider idp) throws URISyntaxException, IOException, ParseException {
+		//TODO: cache?
 		log.info("Getting provider metadata for {}", idp.getName());
 
 		URI idpUrl = new URI(idp.getIdpUrl());

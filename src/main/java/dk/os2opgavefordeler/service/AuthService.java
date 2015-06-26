@@ -14,12 +14,14 @@ public interface AuthService {
 	List<IdentityProvider> identityProviderList();
 	List<IdentityProviderPO> identityProviderPOList();
 
+	String generateCsrfToken();
+
 	/**
 	 * Begins OpenID Connect authentication flow.
 	 * @return 3rd-party URI which the client should be redirected to;
 	 * @param idp
 	 */
-	URI beginAuthenticationFlow(IdentityProvider idp, String callbackUrl) throws Throwable;
+	URI beginAuthenticationFlow(IdentityProvider idp, String token, String callbackUrl) throws Throwable;
 
 	/**
 	 * Finalizes OpenID Connect authentication flow.
@@ -28,5 +30,5 @@ public interface AuthService {
 	 * @return the authenticated User
 	 * @throws hissy fits if the user can't be authenticated
 	 */
-	User finalizeAuthenticationFlow(IdentityProvider idp, String expectedState) throws Throwable;
+	User finalizeAuthenticationFlow(IdentityProvider idp, String token, String callbackUrl, URI requestUri) throws Throwable;
 }
