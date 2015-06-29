@@ -1,6 +1,7 @@
 package dk.os2opgavefordeler.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Lists;
 import dk.os2opgavefordeler.model.*;
 import dk.os2opgavefordeler.model.presentation.FilterScope;
 import dk.os2opgavefordeler.model.presentation.RolePO;
@@ -43,6 +44,8 @@ public class BootstrappingDataProviderSingleton {
 
 	@PostConstruct
 	public void bootstrap() {
+		buildUsers();
+
 		buildRoles();
 		buildUserSettings();
 
@@ -50,6 +53,12 @@ public class BootstrappingDataProviderSingleton {
 
 		final List<Kle> groups = loadBootstrapKle();
 		buildDistributionRules();
+	}
+
+	private void buildUsers() {
+		usersService.createUser(new User("hfp@miracle.dk", Collections.<Role>emptyList()));
+		usersService.createUser(new User("hlo@miracle.dk", Collections.<Role>emptyList()));
+		usersService.createUser(new User("sum@miracle.dk", Collections.<Role>emptyList()));
 	}
 
 	public void buildRoles(){

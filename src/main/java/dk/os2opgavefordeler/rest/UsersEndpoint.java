@@ -1,5 +1,6 @@
 package dk.os2opgavefordeler.rest;
 
+import dk.os2opgavefordeler.model.User;
 import dk.os2opgavefordeler.model.presentation.RolePO;
 import dk.os2opgavefordeler.model.presentation.UserInfoPO;
 import dk.os2opgavefordeler.model.presentation.UserSettingsPO;
@@ -7,7 +8,9 @@ import dk.os2opgavefordeler.service.UsersService;
 import org.slf4j.Logger;
 
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
@@ -23,11 +26,19 @@ public class UsersEndpoint {
 	@Inject
 	UsersService usersService;
 
+	@Context
+	private HttpServletRequest request;
+
 	@GET
 	@Path("/info")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getUserInfo() {
-		return Response.ok().entity(new UserInfoPO()).build();
+		User user = (User) request.getSession().getAttribute("authenticated-user");
+		log.info("User from session: {}", user);
+
+		return (user==null) ?
+			Response.ok().entity(UserInfoPO.INVALID).build() :
+			Response.ok().entity(new UserInfoPO(user)).build();
 	}
 
 	@GET

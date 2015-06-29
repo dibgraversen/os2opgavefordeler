@@ -10,9 +10,7 @@ import org.slf4j.LoggerFactory;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import javax.ejb.Stateless;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -34,18 +32,27 @@ public class UsersServiceImpl implements UsersService {
 
 	@Override
 	public Optional<User> findByEmail(String email) {
-		throw new NotImplementedException();
+		TypedQuery<User> query = em.createQuery("SELECT u FROM User u WHERE u.email = :email", User.class);
+		query.setParameter("email", email);
+
+		try {
+			return Optional.of(query.getSingleResult());
+		}
+		catch(NoResultException ex) {
+			return Optional.empty();
+		}
 	}
 
 	@Override
 	public User createUser(User user) {
-		throw new NotImplementedException();
+		em.persist(user);
+		return user;
 	}
 
 	@Override
 	public List<RolePO> getRoles(long userId) {
 		List<RolePO> result = new ArrayList<>();
-		Query query = em.createQuery("SELECT r FROM Role r WHERE userId = :userId");
+		Query query = em.createQuery("SELECT r FROM Role r WHERE r.userId = :userId");
 		query.setParameter("userId", userId);
 		final List<Role> roles = query.getResultList();
 		for (Role role : roles) {
@@ -62,7 +69,7 @@ public class UsersServiceImpl implements UsersService {
 	@Override
 	public UserSettingsPO getSettings(long userId) {
 		// TODO what if not created?
-		Query query = em.createQuery("SELECT u FROM UserSettings u WHERE userId = :userId");
+		Query query = em.createQuery("SELECT u FROM UserSettings u WHERE u.userId = :userId");
 		query.setParameter("userId", userId);
 		UserSettings settings = (UserSettings) query.getSingleResult();
 		return new UserSettingsPO(settings);
