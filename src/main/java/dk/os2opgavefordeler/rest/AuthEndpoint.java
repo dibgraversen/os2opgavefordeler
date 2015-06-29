@@ -3,6 +3,7 @@ package dk.os2opgavefordeler.rest;
 import dk.os2opgavefordeler.model.IdentityProvider;
 import dk.os2opgavefordeler.model.User;
 import dk.os2opgavefordeler.service.AuthService;
+import dk.os2opgavefordeler.service.AuthenticationException;
 import org.slf4j.Logger;
 
 import javax.enterprise.context.RequestScoped;
@@ -86,14 +87,16 @@ public class AuthEndpoint {
 				.orElseThrow(RuntimeException::new);
 
 			final User user = authService.finalizeAuthenticationFlow(idp, token, callback_url, ui.getRequestUri());
+			request.getSession().setAttribute("authenticated-user", user);
+
 			//TODO: keep this user logged in. Session state? Persisted token + cookie?
 
 			log.info("finishAuthentication: {} is now logged in, redirecting to {}", user, home_url);
 			return Response.temporaryRedirect(URI.create(home_url)).build();
 		}
-		catch(Throwable t) {
-			log.error("error in finishAuthentication", t);
-			return Response.serverError().build();
+		catch(AuthenticationException ex) {
+			log.error("Error authenticating user", ex);
+			return Response.status(Response.Status.FORBIDDEN).build();
 		}
 		finally {
 			session.removeAttribute(S_CSRF_TOKEN);

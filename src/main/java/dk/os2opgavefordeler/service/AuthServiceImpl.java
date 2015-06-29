@@ -71,35 +71,35 @@ public class AuthServiceImpl implements AuthService {
 
 	@Override
 	public URI beginAuthenticationFlow(IdentityProvider idp, String token, String callbackUrl)
-	throws Throwable
+	throws AuthenticationException
 	{
 		return openIdConnect.beginAuthenticationFlow(idp, token, callbackUrl);
 	}
 
 	@Override
 	public User finalizeAuthenticationFlow(IdentityProvider idp, String token, String callbackUrl, URI requestUri)
-	throws Throwable
+	throws AuthenticationException
 	{
-		ReadOnlyJWTClaimsSet claims = openIdConnect.finalizeAuthenticationFlow(idp, token, callbackUrl, requestUri);
+		try {
+			ReadOnlyJWTClaimsSet claims = openIdConnect.finalizeAuthenticationFlow(idp, token, callbackUrl, requestUri);
 
-		final String email = claims.getStringClaim("email");
-		log.info("Email from claim: {}", email);
+			final String email = claims.getStringClaim("email");
+			log.info("Email from claim: {}", email);
 
-		/*
-		return userService.findByEmail(email)
-			.map(user -> {
-				log.info("User found by email, returning");
-				return user;
-			})
-			.orElseGet(() -> {
-				log.info("User not found, creating");
-				return createUser(email);
-			});
-			*/
-
-		return null;
+			return userService.findByEmail(email)
+				.map(user -> {
+					log.info("User found by email, returning");
+					return user;
+				})
+				.orElseGet(() -> {
+					log.info("User not found, creating");
+					return createUser(email);
+				});
+		}
+		catch(java.text.ParseException e) {
+			throw new AuthenticationException("Error parsing claims", e);
+		}
 	}
-
 
 
 	private User createUser(String email) {

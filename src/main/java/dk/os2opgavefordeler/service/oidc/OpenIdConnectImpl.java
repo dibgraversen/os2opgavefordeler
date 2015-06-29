@@ -17,6 +17,7 @@ import com.nimbusds.openid.connect.sdk.*;
 import com.nimbusds.openid.connect.sdk.op.OIDCProviderMetadata;
 import com.nimbusds.openid.connect.sdk.util.DefaultJWTDecoder;
 import dk.os2opgavefordeler.model.IdentityProvider;
+import dk.os2opgavefordeler.service.AuthenticationException;
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
 import org.slf4j.Logger;
@@ -24,6 +25,7 @@ import org.slf4j.Logger;
 import javax.inject.Inject;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -33,33 +35,42 @@ import java.security.spec.InvalidKeySpecException;
 import java.util.Scanner;
 
 public class OpenIdConnectImpl implements OpenIdConnect {
+	public static final String OPENID_DISCOVERY_DOCUMENT_PATH = ".well-known/openid-configuration";
 	@Inject
 	private Logger log;
 
 	@Override
 	public URI beginAuthenticationFlow(IdentityProvider idp, String token, String callbackUrl)
-	throws Throwable
+	throws AuthenticationException
 	{
-		OIDCProviderMetadata providerMetadata = getProvider(idp);
+		try {
+			OIDCProviderMetadata providerMetadata = getProvider(idp);
 
-		State state = new State(token);
-		Scope scope = Scope.parse("openid email profile");
+			State state = new State(token);
+			Scope scope = Scope.parse("openid email");
 
-		ClientID apiKey = new ClientID(idp.getClientId());
-		URI callback = new URI(callbackUrl);
+			ClientID apiKey = new ClientID(idp.getClientId());
+			URI callback = new URI(callbackUrl);
 
-		// Compose the request
-		AuthenticationRequest authenticationRequest = new AuthenticationRequest(
-			providerMetadata.getAuthorizationEndpointURI(),
-			new ResponseType(ResponseType.Value.CODE),
-			scope, apiKey, callback, state, null);
+			// Compose the request
+			AuthenticationRequest authenticationRequest = new AuthenticationRequest(
+				providerMetadata.getAuthorizationEndpointURI(),
+				new ResponseType(ResponseType.Value.CODE),
+				scope, apiKey, callback, state, null);
 
-		return authenticationRequest.toURI();
+			return authenticationRequest.toURI();
+		}
+		catch(URISyntaxException e) {
+			throw new AuthenticationException("URI Syntax Error", e);
+		}
+		catch(SerializeException e) {
+			throw new AuthenticationException("Error forming authentication request URL");
+		}
 	}
 
 	@Override
 	public ReadOnlyJWTClaimsSet finalizeAuthenticationFlow(IdentityProvider idp, String token, String callbackUrl, URI requestUri)
-	throws Throwable
+	throws AuthenticationException
 	{
 		//TODO: loads of cleanup, refactoring and error handling
 		//TODO: expose our own Claims type instead of leaking nimbusds.
@@ -79,159 +90,169 @@ public class OpenIdConnectImpl implements OpenIdConnect {
 		ReadOnlyJWTClaimsSet claims = verifyIdToken(accessTokenResponse.getIDToken(), pmd);
 		log.info("Verified, claims: {}", claims);
 
+
+//		pmd.getUserInfoEndpointURI();
+
+
 		return claims;
 	}
 
-	private void validateReponseToken(AuthenticationSuccessResponse successResponse, String token) {
+	private void validateReponseToken(AuthenticationSuccessResponse successResponse, String token)
+	throws AuthenticationException
+	{
 		if(!token.equals(successResponse.getState().getValue())) {
-			log.info("Invalid CSRF token - {} vs {}", token, successResponse.getState().getValue());
-			throw new RuntimeException();
+			throw new AuthenticationException("Invalid CSRF token");
 		}
 	}
 
-	private AuthenticationSuccessResponse parseResponse(URI requestUri) {
-		AuthenticationResponse authResp = null;
+	private AuthenticationSuccessResponse parseResponse(URI requestUri)
+	throws AuthenticationException
+	{
 		try {
-			authResp = AuthenticationResponseParser.parse(requestUri);
+			final AuthenticationResponse authResp = AuthenticationResponseParser.parse(requestUri);
+			if (authResp instanceof AuthenticationErrorResponse) {
+				final ErrorObject error = ((AuthenticationErrorResponse) authResp).getErrorObject();
+				throw new AuthenticationException(error.getDescription());
+			}
+			return (AuthenticationSuccessResponse) authResp;
 		} catch (ParseException e) {
-			// TODO error handling
-			log.error("Error parsing response");
-			throw new RuntimeException();
+			throw new AuthenticationException("Error parsing IDP callback");
 		}
-
-		if (authResp instanceof AuthenticationErrorResponse) {
-			ErrorObject error = ((AuthenticationErrorResponse) authResp)
-				.getErrorObject();
-			throw new RuntimeException();
-		}
-
-		AuthenticationSuccessResponse successResponse = (AuthenticationSuccessResponse) authResp;
-		return successResponse;
 	}
 
 	private OIDCAccessTokenResponse requestTokens(IdentityProvider idp, OIDCProviderMetadata providerMetadata, String callbackUrl, AuthorizationCode authCode)
-	throws Throwable
+	throws AuthenticationException
 	{
-		ClientID clientID = new ClientID(idp.getClientId());
-		URI callback = new URI(callbackUrl);
-		Secret clientSecret = new Secret(idp.getClientSecret());
-
-		ClientAuthentication clientAuth = new ClientSecretBasic(clientID, clientSecret);
-
-		TokenRequest tokenReq = new TokenRequest(
-			providerMetadata.getTokenEndpointURI(),
-			clientAuth, new AuthorizationCodeGrant(authCode,
-			callback));
-
-		HTTPResponse tokenHTTPResp = null;
 		try {
-			tokenHTTPResp = tokenReq.toHTTPRequest().send();
-		} catch (SerializeException | IOException e) {
-			log.error("token request error", e);
-			throw new RuntimeException();
+			final ClientID clientID = new ClientID(idp.getClientId());
+			final URI callback = new URI(callbackUrl);
+			final Secret clientSecret = new Secret(idp.getClientSecret());
+
+			final ClientAuthentication clientAuth = new ClientSecretBasic(clientID, clientSecret);
+
+			final TokenRequest tokenReq = new TokenRequest(
+				providerMetadata.getTokenEndpointURI(),
+				clientAuth, new AuthorizationCodeGrant(authCode, callback));
+				//Note: repeating 'scope' shouldn't be necessary in the token request. Doesn't matter for google, and
+				//doesn't seem to make a difference for IdentityServer3.
+
+			final HTTPResponse tokenHTTPResp = tokenReq.toHTTPRequest().send();
+
+			final TokenResponse tokenResponse = OIDCTokenResponseParser.parse(tokenHTTPResp);
+			if (tokenResponse instanceof TokenErrorResponse) {
+				ErrorObject error = ((TokenErrorResponse) tokenResponse).getErrorObject();
+				throw new AuthenticationException(error.getDescription());
+			}
+
+			OIDCAccessTokenResponse accessTokenResponse = (OIDCAccessTokenResponse) tokenResponse;
+			return accessTokenResponse;
 		}
-
-		// Parse and check response
-		TokenResponse tokenResponse = null;
-		try {
-			tokenResponse = OIDCTokenResponseParser.parse(tokenHTTPResp);
-		} catch (ParseException e) {
-			log.error("token parse error", e);
-			throw new RuntimeException();
+		catch (URISyntaxException e) {
+			throw new AuthenticationException("Error in IDP URI", e);
 		}
-
-		if (tokenResponse instanceof TokenErrorResponse) {
-			ErrorObject error = ((TokenErrorResponse) tokenResponse).getErrorObject();
-			log.error("token something error {}/{}", error, error.getDescription());
-
-			throw new RuntimeException();
+		catch (SerializeException | IOException e) {
+			throw new AuthenticationException("Error requesting token", e);
 		}
-
-		OIDCAccessTokenResponse accessTokenResponse = (OIDCAccessTokenResponse) tokenResponse;
-		return accessTokenResponse;
+		catch (ParseException e) {
+			throw new AuthenticationException("Error parsing token", e);
+		}
 	}
 
-	private ReadOnlyJWTClaimsSet verifyIdToken(JWT idToken, OIDCProviderMetadata providerMetadata) {
-		String keyId = (String) idToken.getHeader().toJSONObject().get("kid");
+	private ReadOnlyJWTClaimsSet verifyIdToken(JWT idToken, OIDCProviderMetadata providerMetadata)
+	throws AuthenticationException
+	{
+		final String keyId = (String) idToken.getHeader().toJSONObject().get("kid");
+
+		final RSAPublicKey providerKey = lookupKey(providerMetadata, keyId);
+		final ReadOnlyJWTClaimsSet claims = verfifyClaims(idToken, providerKey);
+
+		return claims;
+	}
+
+	private RSAPublicKey lookupKey(OIDCProviderMetadata providerMetadata, String keyId)
+	throws AuthenticationException
+	{
 		log.info("looking for key {}", keyId);
-
-
 		RSAPublicKey providerKey = null;
 		try {
-			//TODO: extract kid from idToken
 			JSONObject key = getProviderRSAJWK(providerMetadata.getJWKSetURI().toURL().openStream(), keyId);
 			providerKey = RSAKey.parse(key).toRSAPublicKey();
-		} catch (NoSuchAlgorithmException | InvalidKeySpecException
-			| IOException | java.text.ParseException e) {
-			//TODO: error handling
-			log.error("verifyIdToken: error parsing", e);
-			throw new RuntimeException();
+		} catch (NoSuchAlgorithmException | InvalidKeySpecException | IOException | java.text.ParseException e) {
+			throw new AuthenticationException("Error parsing JWT", e);
 		}
+		return providerKey;
+	}
 
+	private ReadOnlyJWTClaimsSet verfifyClaims(JWT idToken, RSAPublicKey providerKey)
+	throws AuthenticationException
+	{
 		DefaultJWTDecoder jwtDecoder = new DefaultJWTDecoder();
 		jwtDecoder.addJWSVerifier(new RSASSAVerifier(providerKey));
 		ReadOnlyJWTClaimsSet claims = null;
 		try {
 			claims = jwtDecoder.decodeJWT(idToken);
 		} catch (JOSEException | java.text.ParseException e) {
-			//TODO: error handling
-			log.error("verifyIdToken: error decoding", e);
-			throw new RuntimeException();
+			throw new AuthenticationException("Error decoding JWT", e);
 		}
-
 		return claims;
 	}
 
-	private JSONObject getProviderRSAJWK(InputStream is, String kid) throws java.text.ParseException {
+	private JSONObject getProviderRSAJWK(InputStream is, String kid)
+	throws java.text.ParseException {
+		//TODO: this code is a bit fast-and-loose, and doesn't support the HMAC scheme - fix.
 		// Read all data from stream
-		StringBuilder sb = new StringBuilder();
+		final StringBuilder sb = new StringBuilder();
 		try (Scanner scanner = new Scanner(is);) {
 			while (scanner.hasNext()) {
 				sb.append(scanner.next());
 			}
 		}
 
-		// Parse the data as json
-		String jsonString = sb.toString();
-		JSONObject json = JSONObjectUtils.parseJSONObject(jsonString);
+		final String jsonString = sb.toString();
+		final JSONObject json = JSONObjectUtils.parseJSONObject(jsonString);
 
 		// Find the RSA signing key
-		JSONArray keyList = (JSONArray) json.get("keys");
+		final JSONArray keyList = (JSONArray) json.get("keys");
 		for (Object key : keyList) {
 			JSONObject k = (JSONObject) key;
 			if (k.get("use").equals("sig") && k.get("kty").equals("RSA") && kid.equals(k.get("kid"))) {
 				return k;
 			}
 		}
+
 		return null;
 	}
 
-	private OIDCProviderMetadata getProvider(IdentityProvider idp) throws URISyntaxException, IOException, ParseException {
-		//TODO: cache?
+	private OIDCProviderMetadata getProvider(IdentityProvider idp)
+	throws AuthenticationException
+	{
+		//TODO: should we cache the provider info?
+		//Probably not necessary - during normal operation, the user is authenticated by a session token,
+		// and even during the OIDC flow we should only be doing two fetches.
 		log.info("Getting provider metadata for {}", idp.getName());
 
-		URI idpUrl = new URI(idp.getIdpUrl());
-		URI provider = idpUrl.resolve(".well-known/openid-configuration");
-
-		URL providerConfigurationURL = provider.toURL();
-
-		String providerInfo = null;
 		try {
-			log.info("Trying to open stream {}", providerConfigurationURL);
-			InputStream stream = providerConfigurationURL.openStream();
+			final URI idpUrl = new URI(idp.getIdpUrl());
+			final URI provider = idpUrl.resolve(OPENID_DISCOVERY_DOCUMENT_PATH);
+			final URL providerConfigurationURL = provider.toURL();
 
-			log.info("Opened stream, trying to scan...");
+			final InputStream stream = providerConfigurationURL.openStream();
+
+			String providerInfo = null;
 			try (Scanner s = new Scanner(stream)) {
 				providerInfo = s.useDelimiter("\\A").hasNext() ? s.next() : "";
 			}
+
+			return OIDCProviderMetadata.parse(providerInfo);
 		}
-		catch(IOException ex) {
-			log.error("We got an IO exception", ex);
-
+		catch(URISyntaxException | MalformedURLException e) {
+			throw new AuthenticationException("Error in IDP URL", e);
 		}
-
-		log.info("got the medatadada");
-
-		return OIDCProviderMetadata.parse(providerInfo);
+		catch(IOException e) {
+			throw new AuthenticationException("Error fetching IDP discovery document", e);
+		}
+		catch(ParseException e) {
+			throw new AuthenticationException("Error parsing discovery document", e);
+		}
 	}
 }
