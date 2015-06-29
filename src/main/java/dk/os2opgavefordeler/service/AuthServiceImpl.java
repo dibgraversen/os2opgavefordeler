@@ -1,6 +1,13 @@
 package dk.os2opgavefordeler.service;
 
+import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.crypto.RSASSAVerifier;
+import com.nimbusds.jose.jwk.RSAKey;
+import com.nimbusds.jose.util.JSONObjectUtils;
+import com.nimbusds.jwt.JWT;
+import com.nimbusds.jwt.ReadOnlyJWTClaimsSet;
 import com.nimbusds.oauth2.sdk.*;
+import com.nimbusds.oauth2.sdk.ParseException;
 import com.nimbusds.oauth2.sdk.auth.ClientAuthentication;
 import com.nimbusds.oauth2.sdk.auth.ClientSecretBasic;
 import com.nimbusds.oauth2.sdk.auth.Secret;
@@ -9,10 +16,13 @@ import com.nimbusds.oauth2.sdk.id.ClientID;
 import com.nimbusds.oauth2.sdk.id.State;
 import com.nimbusds.openid.connect.sdk.*;
 import com.nimbusds.openid.connect.sdk.op.OIDCProviderMetadata;
-import dk.os2opgavefordeler.model.IdentityProvider;
-import dk.os2opgavefordeler.model.User;
+import com.nimbusds.openid.connect.sdk.util.DefaultJWTDecoder;
+import dk.os2opgavefordeler.model.*;
 import dk.os2opgavefordeler.model.presentation.IdentityProviderPO;
+import net.minidev.json.JSONArray;
+import net.minidev.json.JSONObject;
 import org.slf4j.Logger;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
@@ -21,6 +31,9 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.security.NoSuchAlgorithmException;
+import java.security.interfaces.RSAPublicKey;
+import java.security.spec.InvalidKeySpecException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -28,6 +41,12 @@ import java.util.stream.Collectors;
 public class AuthServiceImpl implements AuthService {
 	@Inject
 	private Logger log;
+
+	@Inject
+	private UsersService userService;
+
+	@Inject
+	private EmploymentService employmentService;
 
 	static private final Map<Integer, IdentityProvider> providers = new HashMap<>();
 	static {
@@ -115,10 +134,6 @@ public class AuthServiceImpl implements AuthService {
 
 		AuthenticationSuccessResponse successResponse = (AuthenticationSuccessResponse) authResp;
 
-		/* Don't forget to check the state!
-		 * The state in the received authentication response must match the state
-		 * specified in the previous outgoing authentication request.
-		*/
 		if(!token.equals(successResponse.getState().getValue())) {
 			log.info("Invalid CSRF token - {} vs {}", token, successResponse.getState().getValue());
 			throw new RuntimeException();
@@ -169,14 +184,147 @@ public class AuthServiceImpl implements AuthService {
 
 		log.info("Access token: {}", accessTokenResponse.getAccessToken());
 		log.info("id token      {}", accessTokenResponse.getIDTokenString());
-/*
-		accessResources("https://www.googleapis.com/userinfo/v2/me", service, accessToken);
-		accessResources("https://www.googleapis.com/oauth2/v3/userinfo", service, accessToken);
 
-*/
+		log.info("Verifying id token");
+		ReadOnlyJWTClaimsSet claims = verifyIdToken(accessTokenResponse.getIDToken(), providerMetadata);
+		log.info("Verified, claims: {}", claims);
+
+		/*
+		final String email = getEmailFromToken(accessTokenResponse);
+
+		return userService.findByEmail(email)
+			.map(user -> {
+				log.info("User found by email, returning");
+				return user;
+			})
+			.orElseGet(() -> {
+				log.info("User not found, creating");
+				return createUser(email);
+			});
+			*/
+
 		return null;
 	}
 
+
+
+
+	private ReadOnlyJWTClaimsSet verifyIdToken(JWT idToken, OIDCProviderMetadata providerMetadata) {
+		String keyId = (String) idToken.getHeader().toJSONObject().get("kid");
+		log.info("looking for key {}", keyId);
+
+
+		RSAPublicKey providerKey = null;
+		try {
+			//TODO: extract kid from idToken
+			JSONObject key = getProviderRSAJWK(providerMetadata.getJWKSetURI().toURL().openStream(), keyId);
+			providerKey = RSAKey.parse(key).toRSAPublicKey();
+		} catch (NoSuchAlgorithmException | InvalidKeySpecException
+			| IOException | java.text.ParseException e) {
+			//TODO: error handling
+			log.error("verifyIdToken: error parsing", e);
+			throw new RuntimeException();
+		}
+
+		DefaultJWTDecoder jwtDecoder = new DefaultJWTDecoder();
+		jwtDecoder.addJWSVerifier(new RSASSAVerifier(providerKey));
+		ReadOnlyJWTClaimsSet claims = null;
+		try {
+			claims = jwtDecoder.decodeJWT(idToken);
+		} catch (JOSEException | java.text.ParseException e) {
+			//TODO: error handling
+			log.error("verifyIdToken: error decoding", e);
+			throw new RuntimeException();
+		}
+
+		return claims;
+	}
+
+	private JSONObject getProviderRSAJWK(InputStream is, String kid) throws java.text.ParseException {
+		// Read all data from stream
+		StringBuilder sb = new StringBuilder();
+		try (Scanner scanner = new Scanner(is);) {
+			while (scanner.hasNext()) {
+				sb.append(scanner.next());
+			}
+		}
+
+		// Parse the data as json
+		String jsonString = sb.toString();
+		JSONObject json = JSONObjectUtils.parseJSONObject(jsonString);
+
+		// Find the RSA signing key
+		JSONArray keyList = (JSONArray) json.get("keys");
+		for (Object key : keyList) {
+			JSONObject k = (JSONObject) key;
+			if (k.get("use").equals("sig") && k.get("kty").equals("RSA") && kid.equals(k.get("kid"))) {
+				return k;
+			}
+		}
+		return null;
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	private User createUser(String email) {
+		// In order to create a User from an OpenID Connect login, we require the email to be present in a municipality.
+		//
+		// An email address can be used for several Employments. For instance, it's possible for a manager to also have
+		// non-manager employment - so we create a role of each of the employment.
+		//
+		final List<Employment> employments = employmentService.findByEmail(email);
+		if(employments.isEmpty()) {
+			throw new RuntimeException("No employments found");				//TODO: proper exception. Unathorized.
+		}
+
+		final List<dk.os2opgavefordeler.model.Role> roles = createRolesFromEmployments(employments);
+		final User user = new User(email, roles);
+
+		log.info("Persising {} with roles={}", user, roles);
+		return userService.createUser(user);
+	}
+
+	private List<dk.os2opgavefordeler.model.Role> createRolesFromEmployments(List<Employment> employments) {
+		return employments.stream()
+			.map(emp -> {
+				dk.os2opgavefordeler.model.Role role = new dk.os2opgavefordeler.model.Role();
+
+				role.setManager(emp.getEmployedIn().getChildren().equals(emp));
+				role.setEmployment(emp.getId());
+				role.setName(String.format("%s (%s)", emp.getName(), emp.getEmployedIn().getName()));
+
+				return role;
+			})
+			.collect(Collectors.toList());
+	}
+
+	private boolean hasManagerRole(List<Employment> roles) {
+		return roles.stream()
+			.anyMatch(emp -> emp.getEmployedIn().getManager().equals(emp));
+	}
+
+	private String getEmailFromToken(OIDCAccessTokenResponse accessTokenResponse) {
+		throw new NotImplementedException();
+	}
 
 
 	private OIDCProviderMetadata getProvider(IdentityProvider idp) throws URISyntaxException, IOException, ParseException {

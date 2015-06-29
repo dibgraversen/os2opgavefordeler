@@ -31,6 +31,16 @@ public class EmploymentServiceImpl implements EmploymentService {
 	}
 
 	@Override
+	public List<Employment> findByEmail(String email) {
+		final List<Employment> results = persistence.criteriaFind(Employment.class,
+			(cb, cq, ou) -> cq.where(cb.equal(ou.get(Employment_.email), email)
+			)
+		);
+
+		return results;
+	}
+
+	@Override
 	public Optional<EmploymentPO> getEmploymentPO(int id) {
 		return getEmployment(id).map(EmploymentPO::new);
 	}

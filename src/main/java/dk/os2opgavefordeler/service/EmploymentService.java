@@ -9,6 +9,7 @@ import java.util.Optional;
 public interface EmploymentService {
 	Optional<Employment> getEmployment(int id);
 	Optional<EmploymentPO> getEmploymentPO(int id);
+	List<Employment> findByEmail(String email);
 
 	List<Employment> getAll();
 	List<EmploymentPO> getAllPO();

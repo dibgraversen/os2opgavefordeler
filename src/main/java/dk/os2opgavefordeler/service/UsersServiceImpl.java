@@ -1,11 +1,13 @@
 package dk.os2opgavefordeler.service;
 
 import dk.os2opgavefordeler.model.Role;
+import dk.os2opgavefordeler.model.User;
 import dk.os2opgavefordeler.model.UserSettings;
 import dk.os2opgavefordeler.model.presentation.RolePO;
 import dk.os2opgavefordeler.model.presentation.UserSettingsPO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -13,6 +15,7 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author hlo@miracle.dk
@@ -23,6 +26,21 @@ public class UsersServiceImpl implements UsersService {
 
 	@PersistenceContext(unitName = "OS2TopicRouter")
 	private EntityManager em;
+
+	@Override
+	public Optional<User> findById(int userId) {
+		throw new NotImplementedException();
+	}
+
+	@Override
+	public Optional<User> findByEmail(String email) {
+		throw new NotImplementedException();
+	}
+
+	@Override
+	public User createUser(User user) {
+		throw new NotImplementedException();
+	}
 
 	@Override
 	public List<RolePO> getRoles(long userId) {
