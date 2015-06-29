@@ -1,15 +1,14 @@
 {
   "dev": {
-    "serverUrl": "http://127.0.0.1:8080/TopicRouter/rest",
-    "version": "0.9.4-SNAPSHOT"
-
+    "serverUrl": "http://localhost:8080/TopicRouter/rest",
+    "version": "0.9.6-SNAPSHOT"
   },
   "test": {
     "serverUrl": "http://os2-test.miracle.local:80/TopicRouter/rest",
-    "version": "0.9.4"
+    "version": "0.9.6"
   },
   "prod": {
     "serverUrl": "someserver.dk/TopicRouter/rest",
-    "version": "0.9.4"
+    "version": "0.9.6"
   }
 }

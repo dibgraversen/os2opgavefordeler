@@ -268,6 +268,7 @@
 			var defaults = {
 				url: baseUrl + requestUrl,
 				method: method,
+				withCredentials: true,
 				headers: requestConfig.headers
 			};
 			angular.extend(options, defaults); // merge defaults into options.
