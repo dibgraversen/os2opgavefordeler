@@ -42,7 +42,6 @@ public class OpenIdConnectImpl implements OpenIdConnect {
 	{
 		OIDCProviderMetadata providerMetadata = getProvider(idp);
 
-		// Generate random state string for pairing the response to the request
 		State state = new State(token);
 		Scope scope = Scope.parse("openid email profile");
 
@@ -65,6 +64,32 @@ public class OpenIdConnectImpl implements OpenIdConnect {
 		//TODO: loads of cleanup, refactoring and error handling
 		//TODO: expose our own Claims type instead of leaking nimbusds.
 
+		AuthenticationSuccessResponse successResponse = parseResponse(requestUri);
+		validateReponseToken(successResponse, token);
+		AuthorizationCode authCode = successResponse.getAuthorizationCode();
+
+		OIDCProviderMetadata pmd = getProvider(idp);
+
+		OIDCAccessTokenResponse accessTokenResponse = requestTokens(idp, pmd, callbackUrl, authCode);
+
+		log.info("Access token: {}", accessTokenResponse.getAccessToken());
+		log.info("id token      {}", accessTokenResponse.getIDTokenString());
+
+		log.info("Verifying id token");
+		ReadOnlyJWTClaimsSet claims = verifyIdToken(accessTokenResponse.getIDToken(), pmd);
+		log.info("Verified, claims: {}", claims);
+
+		return claims;
+	}
+
+	private void validateReponseToken(AuthenticationSuccessResponse successResponse, String token) {
+		if(!token.equals(successResponse.getState().getValue())) {
+			log.info("Invalid CSRF token - {} vs {}", token, successResponse.getState().getValue());
+			throw new RuntimeException();
+		}
+	}
+
+	private AuthenticationSuccessResponse parseResponse(URI requestUri) {
 		AuthenticationResponse authResp = null;
 		try {
 			authResp = AuthenticationResponseParser.parse(requestUri);
@@ -81,23 +106,17 @@ public class OpenIdConnectImpl implements OpenIdConnect {
 		}
 
 		AuthenticationSuccessResponse successResponse = (AuthenticationSuccessResponse) authResp;
+		return successResponse;
+	}
 
-		if(!token.equals(successResponse.getState().getValue())) {
-			log.info("Invalid CSRF token - {} vs {}", token, successResponse.getState().getValue());
-			throw new RuntimeException();
-		}
-
-		AuthorizationCode authCode = successResponse.getAuthorizationCode();
-		log.info("Auth code: {}", authCode);
-
-
+	private OIDCAccessTokenResponse requestTokens(IdentityProvider idp, OIDCProviderMetadata providerMetadata, String callbackUrl, AuthorizationCode authCode)
+	throws Throwable
+	{
 		ClientID clientID = new ClientID(idp.getClientId());
 		URI callback = new URI(callbackUrl);
 		Secret clientSecret = new Secret(idp.getClientSecret());
 
 		ClientAuthentication clientAuth = new ClientSecretBasic(clientID, clientSecret);
-
-		OIDCProviderMetadata providerMetadata = getProvider(idp);
 
 		TokenRequest tokenReq = new TokenRequest(
 			providerMetadata.getTokenEndpointURI(),
@@ -129,15 +148,7 @@ public class OpenIdConnectImpl implements OpenIdConnect {
 		}
 
 		OIDCAccessTokenResponse accessTokenResponse = (OIDCAccessTokenResponse) tokenResponse;
-
-		log.info("Access token: {}", accessTokenResponse.getAccessToken());
-		log.info("id token      {}", accessTokenResponse.getIDTokenString());
-
-		log.info("Verifying id token");
-		ReadOnlyJWTClaimsSet claims = verifyIdToken(accessTokenResponse.getIDToken(), providerMetadata);
-		log.info("Verified, claims: {}", claims);
-
-		return claims;
+		return accessTokenResponse;
 	}
 
 	private ReadOnlyJWTClaimsSet verifyIdToken(JWT idToken, OIDCProviderMetadata providerMetadata) {
