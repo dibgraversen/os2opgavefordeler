@@ -80,12 +80,12 @@ public class AuthEndpoint {
 
 		try {
 			int idpId = Optional.ofNullable((Integer) session.getAttribute(S_IDP_ID))
-				.orElseThrow(RuntimeException::new);
+				.orElseThrow( () -> new AuthenticationException("S_IDP_ID not set"));
 			String token = Optional.ofNullable((String) session.getAttribute(S_CSRF_TOKEN))
-				.orElseThrow(RuntimeException::new);
+				.orElseThrow( () -> new AuthenticationException("S_CSRF_TOKEN not set") );
 
 			IdentityProvider idp = authService.findProvider(idpId)
-				.orElseThrow(RuntimeException::new);
+				.orElseThrow( () -> new AuthenticationException("Invalid IDP id"));
 
 			final User user = authService.finalizeAuthenticationFlow(idp, token, config.getOpenIdCallbackUrl(), ui.getRequestUri());
 			request.getSession().setAttribute("authenticated-user", user);
