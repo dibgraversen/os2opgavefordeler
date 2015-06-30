@@ -55,7 +55,8 @@ public class DistributionRuleEndpoint {
 
 		//TODO: what if current user/role isn't the manager of the given orgunit? Should we still return results filtered
 		//by the orgunit, or should we return an empty result unless scope is 'ALL'?
-		final Optional<OrgUnit> orgUnit = getOrgUnitFromEmploymentId(employmentId);
+		final Optional<Employment> employment = orgUnitService.getEmployment(employmentId);
+		final Optional<OrgUnit> orgUnit = employment.map(e -> e.getEmployedIn());
 
 		final List<DistributionRulePO> result = distributionService.getPoDistributions(orgUnit.get(), scope);
 
@@ -154,19 +155,5 @@ public class DistributionRuleEndpoint {
 		if(!newVal.equals(oldVal)) {
 			updater.accept(newVal);
 		}
-	}
-
-	private Optional<OrgUnit> getOrgUnitFromEmploymentId(int employmentId) {
-		final Map<Integer,String> map = ImmutableMap.of(
-			1, "Borge Meister",
-			2, "Borge Meister",
-			3, "Olfert Kvium",
-			10, "David Hilbert");
-
-		final String name = map.getOrDefault(employmentId, "INVALID");
-
-		final Optional<Employment> emp = orgUnitService.getEmploymentByName(name);
-		log.info("Employment:{} -> {} -> {}", employmentId, emp, emp.map(e -> e.getEmployedIn()));
-		return emp.map(e -> e.getEmployedIn());
 	}
 }
