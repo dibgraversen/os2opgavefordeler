@@ -19,7 +19,7 @@ import java.util.List;
  * @author hlo@miracle.dk
  */
 @Path("/user")
-public class UsersEndpoint {
+public class UserEndpoint {
 	@Inject
 	private Logger log;
 

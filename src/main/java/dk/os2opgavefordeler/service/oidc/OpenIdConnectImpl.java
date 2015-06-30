@@ -13,7 +13,9 @@ import com.nimbusds.oauth2.sdk.auth.Secret;
 import com.nimbusds.oauth2.sdk.http.HTTPResponse;
 import com.nimbusds.oauth2.sdk.id.ClientID;
 import com.nimbusds.oauth2.sdk.id.State;
+import com.nimbusds.oauth2.sdk.token.BearerAccessToken;
 import com.nimbusds.openid.connect.sdk.*;
+import com.nimbusds.openid.connect.sdk.claims.UserInfo;
 import com.nimbusds.openid.connect.sdk.op.OIDCProviderMetadata;
 import com.nimbusds.openid.connect.sdk.util.DefaultJWTDecoder;
 import dk.os2opgavefordeler.model.IdentityProvider;
@@ -90,12 +92,47 @@ public class OpenIdConnectImpl implements OpenIdConnect {
 		ReadOnlyJWTClaimsSet claims = verifyIdToken(accessTokenResponse.getIDToken(), pmd);
 		log.info("Verified, claims: {}", claims);
 
-
-//		pmd.getUserInfoEndpointURI();
-
+//		dumpUserEndpointInfo(pmd, accessTokenResponse);
 
 		return claims;
 	}
+
+	/*
+	private JSONObject dumpUserEndpointInfo(OIDCProviderMetadata providerMetadata, OIDCAccessTokenResponse accessToken) {
+		//TODO: is there a way to get this information as a signed JWT?
+
+		UserInfoRequest userInfoReq = new UserInfoRequest(
+			providerMetadata.getUserInfoEndpointURI(),
+			(BearerAccessToken) accessToken.getAccessToken() );
+
+		HTTPResponse userInfoHTTPResp = null;
+		try {
+			userInfoHTTPResp = userInfoReq.toHTTPRequest().send();
+		} catch (SerializeException | IOException e) {
+			log.error("Meh(1)", e);
+		}
+
+		UserInfoResponse userInfoResponse = null;
+		try {
+			userInfoResponse = UserInfoResponse.parse(userInfoHTTPResp);
+		} catch (ParseException e) {
+			log.error("Meh(2)", e);
+		}
+
+		if (userInfoResponse instanceof UserInfoErrorResponse) {
+			ErrorObject error = ((UserInfoErrorResponse) userInfoResponse).getErrorObject();
+			log.error("Meh(3)");
+			// TODO error handling
+		}
+
+		UserInfoSuccessResponse sresp = (UserInfoSuccessResponse) userInfoResponse;
+		UserInfo userInfo = sresp.getUserInfo();
+
+		log.info("user(1): USERINFO.email{}", userInfo.getEmail());
+
+		return sresp.getUserInfo().toJSONObject();
+	}
+	*/
 
 	private void validateReponseToken(AuthenticationSuccessResponse successResponse, String token)
 	throws AuthenticationException

@@ -26,5 +26,4 @@ public class UserInfoPO {
 		this.id = user.getId();
 		this.loggedIn = true;
 	}
-
 }
