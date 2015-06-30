@@ -53,7 +53,7 @@ public class AuthEndpoint {
 
 			final IdentityProvider idp = authService.findProvider(providerId).orElseThrow(RuntimeException::new);
 			final String token = authService.generateCsrfToken();
-			final URI authReqURI = authService.beginAuthenticationFlow(idp, token, config.getCallbackUrl());
+			final URI authReqURI = authService.beginAuthenticationFlow(idp, token, config.getOpenIdCallbackUrl());
 
 			session.setAttribute(S_CSRF_TOKEN, token);
 			session.setAttribute(S_IDP_ID, providerId);
@@ -87,7 +87,7 @@ public class AuthEndpoint {
 			IdentityProvider idp = authService.findProvider(idpId)
 				.orElseThrow(RuntimeException::new);
 
-			final User user = authService.finalizeAuthenticationFlow(idp, token, config.getCallbackUrl(), ui.getRequestUri());
+			final User user = authService.finalizeAuthenticationFlow(idp, token, config.getOpenIdCallbackUrl(), ui.getRequestUri());
 			request.getSession().setAttribute("authenticated-user", user);
 
 			//TODO: keep this user logged in. Session state? Persisted token + cookie?

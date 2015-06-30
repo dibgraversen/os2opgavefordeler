@@ -1,16 +1,32 @@
 package dk.os2opgavefordeler.service;
 
+import org.slf4j.Logger;
+
+import javax.inject.Inject;
+
 public class ConfigServiceImpl implements ConfigService {
-	public static final String callback_url = "http://localhost:8080/TopicRouter/rest/auth/authenticate";
-	public static final String home_url = "http://localhost:9001/";	//TODO: property? Or should we pick it up from the original request referer?
+	@Inject
+	Logger log;
 
 	@Override
 	public String getHomeUrl() {
-		return home_url;
+		return getProperty("topicrouter.url.home", "http://localhost:9001/");
 	}
 
 	@Override
-	public String getCallbackUrl() {
-		return callback_url;
+	public String getOpenIdCallbackUrl() {
+		return getProperty("topicrouter.url.openid.callback", "http://localhost:8080/TopicRouter/rest/auth/authenticate");
+	}
+
+
+	private String getProperty(String property, String defaultValue) {
+		final String value = System.getProperty(property);
+
+		if(value == null) {
+			log.warn("Property {} is not set, return default", property);
+			return defaultValue;
+		}
+
+		return value;
 	}
 }
