@@ -2,6 +2,7 @@ package dk.os2opgavefordeler.model;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import java.io.Serializable;
 
 /**
@@ -12,7 +13,8 @@ public class Role implements Serializable {
 	@Id
 	private long id;
 
-	private long userId;
+	@ManyToOne
+	private User owner;
 
 	private String name;
 
@@ -38,11 +40,7 @@ public class Role implements Serializable {
 	}
 
 	public long getUserId() {
-		return userId;
-	}
-
-	public void setUserId(long userId) {
-		this.userId = userId;
+		return owner.getId();
 	}
 
 	public String getName() {
@@ -97,7 +95,6 @@ public class Role implements Serializable {
 	public String toString() {
 		return "Role{" +
 				"id=" + id +
-				", userId=" + userId +
 				", name='" + name + '\'' +
 				", employment=" + employment +
 				", manager=" + manager +

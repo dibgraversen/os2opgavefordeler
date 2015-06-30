@@ -51,7 +51,7 @@ public class UsersServiceImpl implements UsersService {
 
 	@Override
 	public List<RolePO> getRoles(long userId) {
-		final TypedQuery<Role> query = em.createQuery("SELECT r FROM Role r WHERE r.userId = :userId", Role.class);
+		final TypedQuery<Role> query = em.createQuery("SELECT r FROM Role r WHERE r.owner.id = :userId", Role.class);
 		query.setParameter("userId", userId);
 		final List<Role> roles = query.getResultList();
 

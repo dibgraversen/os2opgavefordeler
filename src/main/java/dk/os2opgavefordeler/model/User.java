@@ -13,11 +13,11 @@ import java.util.List;
 public class User implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	private int id;
+	private long id;
 
 	private String email;
 
-	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "owner")
 	private List<Role> roles;
 
 	@OneToOne
@@ -35,7 +35,7 @@ public class User implements Serializable {
 	//--------------------------------------------------------------------------
 	// Getter/setters
 	//--------------------------------------------------------------------------
-	public int getId() {
+	public long getId() {
 		return id;
 	}
 

@@ -6,10 +6,10 @@ public class UserInfoPO {
 	public static final UserInfoPO INVALID = new UserInfoPO(-1, false);
 
 	private boolean loggedIn;
-	private int id;
+	private long id;
 
 
-	public int getId() {
+	public long getId() {
 		return id;
 	}
 

@@ -76,7 +76,6 @@ public class RolePO {
 	public Role toRole() {
 		Role result = new Role();
 		result.setId(id);
-		result.setUserId(userId);
 		result.setName(name);
 		result.setEmployment(employment);
 		result.setManager(manager);
