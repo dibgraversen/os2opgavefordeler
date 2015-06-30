@@ -2,10 +2,7 @@ package dk.os2opgavefordeler.model;
 
 import dk.os2opgavefordeler.model.presentation.FilterScope;
 
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.io.Serializable;
 
 /**
@@ -13,19 +10,23 @@ import java.io.Serializable;
  */
 @Entity
 public class UserSettings implements Serializable {
-	@Id
+	@Id @GeneratedValue(strategy = GenerationType.AUTO)
 	private long id;
 
 	private long userId;
 
 	@Enumerated(EnumType.STRING)
-	private FilterScope scope;
+	private FilterScope scope = FilterScope.ALL;
 
 	private boolean showResponsible;
 
 	private boolean showExpandedOrg;
 
 	public UserSettings() {
+	}
+
+	public UserSettings(long userId) {
+		this.userId = userId;
 	}
 
 	public long getId() {

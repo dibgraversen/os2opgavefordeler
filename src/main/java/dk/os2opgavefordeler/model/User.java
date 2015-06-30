@@ -2,6 +2,7 @@ package dk.os2opgavefordeler.model;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableList;
+import com.nimbusds.openid.connect.sdk.claims.UserInfo;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -18,6 +19,9 @@ public class User implements Serializable {
 
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private List<Role> roles;
+
+	@OneToOne
+	private UserSettings settings;
 
 	public User() {
 	}

@@ -44,7 +44,7 @@ public class UsersEndpoint {
 	@GET
 	@Path("/{userId}/roles")
 	@Produces(MediaType.APPLICATION_JSON)
-	public List<RolePO> getRolesForUser(@PathParam("userId") long userId){
+	public List<RolePO> getRolesForUser(@PathParam("userId") long userId) {
 		List<RolePO> result = usersService.getRoles(userId);
 		return result;
 	}
@@ -52,17 +52,17 @@ public class UsersEndpoint {
 	@GET
 	@Path("/{userId}/settings")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getSettingsForUser(@PathParam("userId") long userId){
-		if(userId == 0){
+	public Response getSettingsForUser(@PathParam("userId") long userId) {
+		if(userId == 0) {
 			log.warn("invalid userId");
 			return Response.status(Response.Status.BAD_REQUEST).entity("invalid userId").build();
 		}
-		return Response.ok(usersService.getSettings(userId)).build();
+		return Response.ok(usersService.getSettingsPO(userId)).build();
 	}
 
 	@POST
 	@Path("/{userId}/settings")
-	public void updateSettingsForUser(@PathParam("userId") long userId, UserSettingsPO settings){
+	public void updateSettingsForUser(@PathParam("userId") long userId, UserSettingsPO settings) {
 		settings.setUserId(userId);
 		usersService.updateSettings(settings);
 	}

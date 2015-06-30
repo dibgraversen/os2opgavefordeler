@@ -11,9 +11,9 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import javax.ejb.Stateless;
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * @author hlo@miracle.dk
@@ -51,13 +51,13 @@ public class UsersServiceImpl implements UsersService {
 
 	@Override
 	public List<RolePO> getRoles(long userId) {
-		List<RolePO> result = new ArrayList<>();
-		Query query = em.createQuery("SELECT r FROM Role r WHERE r.userId = :userId");
+		final TypedQuery<Role> query = em.createQuery("SELECT r FROM Role r WHERE r.userId = :userId", Role.class);
 		query.setParameter("userId", userId);
 		final List<Role> roles = query.getResultList();
-		for (Role role : roles) {
-			result.add(new RolePO(role));
-		}
+
+		final List<RolePO> result = roles.stream()
+			.map(RolePO::new)
+			.collect(Collectors.toList());
 		return result;
 	}
 
@@ -67,17 +67,36 @@ public class UsersServiceImpl implements UsersService {
 	}
 
 	@Override
-	public UserSettingsPO getSettings(long userId) {
-		// TODO what if not created?
-		Query query = em.createQuery("SELECT u FROM UserSettings u WHERE u.userId = :userId");
+	public Optional<UserSettings> getSettings(long userId) {
+		final TypedQuery<UserSettings> query = em.createQuery("SELECT u FROM UserSettings u WHERE u.userId = :userId", UserSettings.class);
 		query.setParameter("userId", userId);
-		UserSettings settings = (UserSettings) query.getSingleResult();
+
+		try {
+			UserSettings settings = query.getSingleResult();
+			return Optional.of(settings);
+		}
+		catch(NoResultException ex) {
+			return Optional.empty();
+		}
+	}
+
+	@Override
+	public UserSettingsPO getSettingsPO(long userId) {
+		//TODO: should create-if-not-existing responsibility be here or in the controller?
+		final UserSettings settings = getSettings(userId).orElseGet(
+			() -> {
+				log.info("getSettingsPO: no existing settings, creating new");
+				return createUserSettings(new UserSettings(userId));
+			}
+		);
+
 		return new UserSettingsPO(settings);
 	}
 
 	@Override
-	public void createUserSettings(UserSettings userSettings) {
+	public UserSettings createUserSettings(UserSettings userSettings) {
 		em.persist(userSettings);
+		return userSettings;
 	}
 
 	@Override

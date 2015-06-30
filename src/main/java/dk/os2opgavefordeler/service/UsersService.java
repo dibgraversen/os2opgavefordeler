@@ -21,9 +21,10 @@ public interface UsersService {
 
 	void createRole(Role role);
 
-	UserSettingsPO getSettings(long userId);
+	Optional<UserSettings> getSettings(long userId);
+	UserSettingsPO getSettingsPO(long userId);
 
-	void createUserSettings(UserSettings userSettings);
+	UserSettings createUserSettings(UserSettings userSettings);
 
 	void updateSettings(UserSettingsPO settings);
 }

@@ -124,7 +124,6 @@ public class BootstrappingDataProviderSingleton {
 	private void buildUserSettingsForUserOne(){
 		log.warn("Starting Singleton - loading mock user settings");
 		UserSettings settings = new UserSettings();
-		settings.setId(1);
 		settings.setUserId(1);
 		settings.setScope(FilterScope.INHERITED);
 		settings.setShowResponsible(false);
@@ -135,7 +134,6 @@ public class BootstrappingDataProviderSingleton {
 	private void buildUserSettingsForUserTwo(){
 		log.warn("Starting Singleton - loading mock user settings");
 		UserSettings settings = new UserSettings();
-		settings.setId(2);
 		settings.setUserId(2);
 		settings.setScope(FilterScope.ALL);
 		settings.setShowResponsible(true);
