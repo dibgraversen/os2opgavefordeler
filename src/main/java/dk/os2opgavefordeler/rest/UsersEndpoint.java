@@ -4,7 +4,7 @@ import dk.os2opgavefordeler.model.User;
 import dk.os2opgavefordeler.model.presentation.RolePO;
 import dk.os2opgavefordeler.model.presentation.UserInfoPO;
 import dk.os2opgavefordeler.model.presentation.UserSettingsPO;
-import dk.os2opgavefordeler.service.UsersService;
+import dk.os2opgavefordeler.service.UserService;
 import org.slf4j.Logger;
 
 import javax.inject.Inject;
@@ -24,7 +24,7 @@ public class UsersEndpoint {
 	private Logger log;
 
 	@Inject
-	UsersService usersService;
+	UserService usersService;
 
 	@Context
 	private HttpServletRequest request;

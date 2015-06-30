@@ -1,7 +1,6 @@
 package dk.os2opgavefordeler.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.Lists;
 import dk.os2opgavefordeler.model.*;
 import dk.os2opgavefordeler.model.presentation.FilterScope;
 import dk.os2opgavefordeler.model.presentation.RolePO;
@@ -28,7 +27,7 @@ public class BootstrappingDataProviderSingleton {
 	private Logger log;
 
 	@Inject
-	UsersService usersService;
+	UserService usersService;
 
 	@Inject
 	OrgUnitService orgUnitService;

@@ -21,7 +21,7 @@ public class AuthServiceImpl implements AuthService {
 	private Logger log;
 
 	@Inject
-	private UsersService userService;
+	private UserService userService;
 
 	@Inject
 	private EmploymentService employmentService;

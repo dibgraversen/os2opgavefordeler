@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
  * @author hlo@miracle.dk
  */
 @Stateless
-public class UsersServiceImpl implements UsersService {
+public class UserServiceImpl implements UserService {
 	private final Logger log = LoggerFactory.getLogger(getClass());
 
 	@PersistenceContext(unitName = "OS2TopicRouter")
