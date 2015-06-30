@@ -1,8 +1,6 @@
 package dk.os2opgavefordeler.model;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 import java.io.Serializable;
 
 /**
@@ -10,7 +8,7 @@ import java.io.Serializable;
  */
 @Entity
 public class Role implements Serializable {
-	@Id
+	@Id @GeneratedValue(strategy = GenerationType.AUTO)
 	private long id;
 
 	@ManyToOne
@@ -31,6 +29,69 @@ public class Role implements Serializable {
 	public Role() {
 	}
 
+	public Role(Builder builder) {
+		this.name = builder.name;
+		this.employment = builder.employment;
+		this.manager = builder.manager;
+		this.admin = builder.admin;
+		this.municipalityAdmin = builder.municipalityAdmin;
+		this.substitute = builder.substitute;
+	}
+
+
+	//--------------------------------------------------------------------------
+	// Builder
+	//--------------------------------------------------------------------------
+	public static Builder builder() {
+		return new Builder();
+	}
+
+	public void setOwner(User owner) {
+		this.owner = owner;
+	}
+
+	public static class Builder {
+		private String name;
+		private int employment;
+		private boolean manager;
+		private boolean admin;
+		private boolean municipalityAdmin;
+		private boolean substitute;
+
+		public Role build() {
+			return new Role(this);
+		}
+
+		public Builder name(String name) {
+			this.name = name;
+			return this;
+		}
+		public Builder employment(int employment) {
+			this.employment = employment;
+			return this;
+		}
+		public Builder manager(boolean manager) {
+			this.manager = manager;
+			return this;
+		}
+		public Builder admin(boolean admin) {
+			this.admin = admin;
+			return this;
+		}
+		public Builder municipalityAdmin(boolean municipalityAdmin) {
+			this.municipalityAdmin = municipalityAdmin;
+			return this;
+		}
+		public Builder substitute(boolean substitute) {
+			this.substitute = substitute;
+			return this;
+		}
+	}
+
+
+	//--------------------------------------------------------------------------
+	// Getter/setters
+	//--------------------------------------------------------------------------
 	public long getId() {
 		return id;
 	}
@@ -91,6 +152,10 @@ public class Role implements Serializable {
 		this.substitute = substitute;
 	}
 
+
+	//--------------------------------------------------------------------------
+	// toString
+	//--------------------------------------------------------------------------
 	@Override
 	public String toString() {
 		return "Role{" +

@@ -3,6 +3,7 @@ package dk.os2opgavefordeler.service;
 import dk.os2opgavefordeler.model.Role;
 import dk.os2opgavefordeler.model.User;
 import dk.os2opgavefordeler.model.UserSettings;
+import dk.os2opgavefordeler.model.UserSettings_;
 import dk.os2opgavefordeler.model.presentation.RolePO;
 import dk.os2opgavefordeler.model.presentation.UserSettingsPO;
 import org.slf4j.Logger;
@@ -26,8 +27,16 @@ public class UserServiceImpl implements UserService {
 	private EntityManager em;
 
 	@Override
-	public Optional<User> findById(int userId) {
-		throw new NotImplementedException();
+	public Optional<User> findById(long userId) {
+		TypedQuery<User> query = em.createQuery("SELECT u FROM User u WHERE u.id = :userId", User.class);
+		query.setParameter("userId", userId);
+
+		try {
+			return Optional.of(query.getSingleResult());
+		}
+		catch(NoResultException ex) {
+			return Optional.empty();
+		}
 	}
 
 	@Override

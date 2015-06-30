@@ -14,6 +14,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author hlo@miracle.dk
@@ -33,12 +34,19 @@ public class UserEndpoint {
 	@Path("/me")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getUserInfo() {
-		User user = (User) request.getSession().getAttribute("authenticated-user");
-		log.info("User from session: {}", user);
+		//Since we do the following lookup-from-db-and-verify dance (to avoid stale sessions), we might perhaps as well
+		//store just the userid. This is going the be changed to access tokens anyway, so leave be for now.
 
-		return (user==null) ?
-			Response.ok().entity(UserInfoPO.INVALID).build() :
-			Response.ok().entity(new UserInfoPO(user)).build();
+		final User user = (User) request.getSession().getAttribute("authenticated-user");
+		final Optional<User> verifiedUser = (user == null) ? Optional.empty() : usersService.findById(user.getId());
+
+		log.info("User from session: {}, db-verified: {}" , user, verifiedUser);
+
+		final boolean valid = verifiedUser.map(u -> u.equals(user)).orElse(false);
+
+		return valid ?
+			Response.ok().entity(new UserInfoPO(user)).build() :
+			Response.ok().entity(UserInfoPO.INVALID).build();
 	}
 
 	@GET

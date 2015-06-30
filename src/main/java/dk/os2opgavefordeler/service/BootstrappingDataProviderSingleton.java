@@ -1,9 +1,8 @@
 package dk.os2opgavefordeler.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.ImmutableList;
 import dk.os2opgavefordeler.model.*;
-import dk.os2opgavefordeler.model.presentation.FilterScope;
-import dk.os2opgavefordeler.model.presentation.RolePO;
 import org.slf4j.Logger;
 
 import javax.annotation.PostConstruct;
@@ -27,117 +26,64 @@ public class BootstrappingDataProviderSingleton {
 	private Logger log;
 
 	@Inject
-	UserService usersService;
+	private UserService usersService;
 
 	@Inject
-	OrgUnitService orgUnitService;
+	private OrgUnitService orgUnitService;
+
+	@Inject
+	private EmploymentService employmentService;
 
 	@Inject
 	private KleImportService importer;
 
 	@Inject
-	KleService kleService;
+	private KleService kleService;
 
 	@Inject
-	DistributionService distService;
+	private DistributionService distService;
 
 	@PostConstruct
 	public void bootstrap() {
-		buildUsers();
-
-		buildRoles();
-		buildUserSettings();
-
 		buildOrgUnits();
+		buildUsers();
 
 		final List<Kle> groups = loadBootstrapKle();
 		buildDistributionRules();
 	}
 
 	private void buildUsers() {
-		usersService.createUser(new User("hfp@miracle.dk", Collections.<Role>emptyList()));
-		usersService.createUser(new User("hlo@miracle.dk", Collections.<Role>emptyList()));
-		usersService.createUser(new User("sum@miracle.dk", Collections.<Role>emptyList()));
+		addUser("hfp@miracle.dk", buildRoles());
+		addUser("hlo@miracle.dk", buildRoles());
+		addUser("sum@miracle.dk", buildRoles());
 	}
 
-	public void buildRoles(){
-		log.warn("Starting Singleton - loading mock roles");
-		buildForUserOne();
-		buildForUserTwo();
-		buildForUserThree();
+	private User addUser(String email, List<Role> roles) {
+		final User user = new User(email, roles);
+		return usersService.createUser(user);
 	}
 
-	private void buildForUserOne(){
-		UsersServiceMock mock = new UsersServiceMock();
-		RolePO rolePO1 = RolePO.builder().id(1).userId(1).name("Henrik(dig)").employment(1)
-				.manager(false).admin(false).municipalityAdmin(false).substitute(false).build();
-		usersService.createRole(rolePO1.toRole());
-		RolePO rolePO2 = RolePO.builder().id(2).userId(1).name("sysadm").employment(0)
-				.manager(false).admin(true).municipalityAdmin(false).substitute(false).build();
-		usersService.createRole(rolePO2.toRole());
-		RolePO rolePO3 = RolePO.builder().id(3).userId(1).name("Borge Meister").employment(2)
-				.manager(false).admin(false).municipalityAdmin(true).substitute(false).build();
-		usersService.createRole(rolePO3.toRole());
-		RolePO rolePO4 = RolePO.builder().id(4).userId(1).name("Olfert Kvium").employment(3)
-				.manager(false).admin(false).municipalityAdmin(false).substitute(true).build();
-		usersService.createRole(rolePO4.toRole());
-		RolePO rolePO5 = RolePO.builder().id(13).userId(1).name("David Hilbert").employment(10)
-				.manager(true).admin(false).municipalityAdmin(false).substitute(true).build();
-		usersService.createRole(rolePO5.toRole());
-	}
+	private List<Role> buildRoles() {
+		final Employment borge = employmentService.findByEmail("borge@kommune.dk").get(0);
+		final Employment kodah = employmentService.findByEmail("kodah@kommune.dk").get(0);
+		final Employment admin = employmentService.findByEmail("admin@kommune.dk").get(0);
+		final Employment menig = employmentService.findByEmail("menig@kommune.dk").get(0);
 
-	private void buildForUserTwo(){
-		UsersServiceMock mock = new UsersServiceMock();
-		RolePO rolePO1 = RolePO.builder().id(5).userId(2).name("Sune(dig)").employment(4)
-				.manager(false).admin(true).municipalityAdmin(false).substitute(false).build();
-		usersService.createRole(rolePO1.toRole());
-	}
+		final List<Role> roles = ImmutableList.of(
+			Role.builder().name(borge.getName()).employment(borge.getId()).manager(true).build(),
+			Role.builder().name(kodah.getName()).employment(kodah.getId()).manager(true).build(),
+			Role.builder().name(admin.getName() + " (Kommuneadmin)").employment(admin.getId()).municipalityAdmin(true).build(),
+			Role.builder().name(menig.getName() + " (Upriviligeret)").employment(menig.getId()).build(),
+			Role.builder().name("Sysadmin").admin(true).build()
+		);
 
-	private void buildForUserThree(){
-		UsersServiceMock mock = new UsersServiceMock();
-		RolePO rolePO1 = RolePO.builder().id(9).userId(3).name("Helle(dig)").employment(7)
-				.manager(false).admin(false).municipalityAdmin(false).substitute(false).build();
-		usersService.createRole(rolePO1.toRole());
-		RolePO rolePO2 = RolePO.builder().id(10).userId(3).name("sysadmin").employment(0)
-				.manager(false).admin(true).municipalityAdmin(false).substitute(false).build();
-		usersService.createRole(rolePO2.toRole());
-		RolePO rolePO3 = RolePO.builder().id(11).userId(3).name("Adam Savage").employment(5)
-				.manager(false).admin(false).municipalityAdmin(true).substitute(false).build();
-		usersService.createRole(rolePO3.toRole());
-		RolePO rolePO4 = RolePO.builder().id(12).userId(3).name("Linus Thorvalds").employment(6)
-				.manager(false).admin(false).municipalityAdmin(false).substitute(true).build();
-		usersService.createRole(rolePO4.toRole());
-	}
-
-	private void buildUserSettings(){
-		buildUserSettingsForUserOne();
-		buildUserSettingsForUserTwo();
+		return roles;
 	}
 
 	private void buildOrgUnits() {
 		log.info("Loading bootstrap organization");
 		final OrgUnit rootOrg = loadBootstrapOrgUnit();
 		orgUnitService.importOrganization(rootOrg);
-	}
-
-	private void buildUserSettingsForUserOne(){
-		log.warn("Starting Singleton - loading mock user settings");
-		UserSettings settings = new UserSettings();
-		settings.setUserId(1);
-		settings.setScope(FilterScope.INHERITED);
-		settings.setShowResponsible(false);
-		settings.setShowExpandedOrg(false);
-		usersService.createUserSettings(settings);
-	}
-
-	private void buildUserSettingsForUserTwo(){
-		log.warn("Starting Singleton - loading mock user settings");
-		UserSettings settings = new UserSettings();
-		settings.setUserId(2);
-		settings.setScope(FilterScope.ALL);
-		settings.setShowResponsible(true);
-		settings.setShowExpandedOrg(false);
-		usersService.createUserSettings(settings);
 	}
 
 	private List<Kle> loadBootstrapKle() {

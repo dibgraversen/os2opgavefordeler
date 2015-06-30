@@ -29,6 +29,8 @@ public class User implements Serializable {
 	public User(String email, List<Role> roles) {
 		this.email = email;
 		this.roles = roles;
+
+		this.roles.forEach(role -> role.setOwner(this));
 	}
 
 

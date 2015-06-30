@@ -13,7 +13,7 @@ import java.util.Optional;
  * @author hlo@miracle.dk
  */
 public interface UserService {
-	Optional<User> findById(int userId);
+	Optional<User> findById(long userId);
 	Optional<User> findByEmail(String email);
 	User createUser(User user);
 

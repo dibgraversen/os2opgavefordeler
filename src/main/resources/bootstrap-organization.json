@@ -1,21 +1,24 @@
 {
 	"name": "Fantastisk Kommune",
 	"manager": {
-		"name": "Borge Meister"
+		"name": "Borge Meister",
+		"email": "borge@kommune.dk"
 	},
 	"employees": [
 		{
 			"name": "Jeanne Deij"
 		},
 		{
-			"name": "Menig Mand"
+			"name": "Menig Mand",
+			"email": "menig@kommune.dk"
 		}
 	],
 	"children": [
 		{
 			"name": "Administration",
 			"manager": {
-				"name": "Amin Stratah"
+				"name": "Amin Stratah",
+				"email": "admin@kommune.dk"
 			},
 			"children": [
 				{
@@ -48,7 +51,8 @@
 				{
 					"name": "Udvikling",
 					"manager": {
-						"name": "Karl Kodah"
+						"name": "Karl Kodah",
+						"email": "kodah@kommune.dk"
 					},
 
 					"children": [
