@@ -8,6 +8,7 @@ import java.io.Serializable;
 import java.util.List;
 
 @Entity
+@Table(name="User_")							// "User" is a reserved word in postgres, so we have to rename.
 public class User implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
