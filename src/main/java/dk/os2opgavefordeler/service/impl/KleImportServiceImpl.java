@@ -1,4 +1,4 @@
-package dk.os2opgavefordeler.service;
+package dk.os2opgavefordeler.service.impl;
 
 import java.io.InputStream;
 import java.util.List;
@@ -16,6 +16,8 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
 import dk.os2opgavefordeler.model.Kle;
+import dk.os2opgavefordeler.service.KleImportMapper;
+import dk.os2opgavefordeler.service.KleImportService;
 import org.slf4j.Logger;
 import org.xml.sax.SAXException;
 

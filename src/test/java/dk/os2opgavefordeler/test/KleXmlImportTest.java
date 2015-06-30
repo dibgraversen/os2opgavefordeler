@@ -7,9 +7,9 @@ import java.util.Optional;
 
 import dk.os2opgavefordeler.LoggerProducer;
 import dk.os2opgavefordeler.model.Kle;
-import dk.os2opgavefordeler.service.KleImportMapperImpl;
+import dk.os2opgavefordeler.service.impl.KleImportMapperImpl;
 import dk.os2opgavefordeler.service.KleImportService;
-import dk.os2opgavefordeler.service.KleImportServiceImpl;
+import dk.os2opgavefordeler.service.impl.KleImportServiceImpl;
 
 import static org.junit.Assert.*;
 

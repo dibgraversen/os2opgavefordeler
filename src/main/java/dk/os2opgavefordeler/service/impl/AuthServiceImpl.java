@@ -1,4 +1,4 @@
-package dk.os2opgavefordeler.service;
+package dk.os2opgavefordeler.service.impl;
 
 import com.nimbusds.jwt.ReadOnlyJWTClaimsSet;
 import com.nimbusds.oauth2.sdk.id.State;
@@ -6,6 +6,10 @@ import dk.os2opgavefordeler.model.Employment;
 import dk.os2opgavefordeler.model.IdentityProvider;
 import dk.os2opgavefordeler.model.User;
 import dk.os2opgavefordeler.model.presentation.IdentityProviderPO;
+import dk.os2opgavefordeler.service.AuthService;
+import dk.os2opgavefordeler.service.AuthenticationException;
+import dk.os2opgavefordeler.service.EmploymentService;
+import dk.os2opgavefordeler.service.UserService;
 import dk.os2opgavefordeler.service.oidc.OpenIdConnect;
 import org.slf4j.Logger;
 

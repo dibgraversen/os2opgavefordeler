@@ -1,5 +1,6 @@
-package dk.os2opgavefordeler.service;
+package dk.os2opgavefordeler.service.impl;
 
+import dk.os2opgavefordeler.service.PersistenceService;
 import org.slf4j.Logger;
 
 import javax.ejb.Stateless;

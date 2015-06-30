@@ -257,6 +257,7 @@
 				<activeByDefault>false</activeByDefault>
 			</activation>
 			<properties>
+				<jboss-as.id>topicrouter-test</jboss-as.id>
 				<jboss-as.host>localhost</jboss-as.host>
 				<jboss-as.port>19999</jboss-as.port>
 			</properties>

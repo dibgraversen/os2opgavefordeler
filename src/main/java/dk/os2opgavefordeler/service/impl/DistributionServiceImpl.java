@@ -1,8 +1,10 @@
-package dk.os2opgavefordeler.service;
+package dk.os2opgavefordeler.service.impl;
 
 import dk.os2opgavefordeler.model.*;
 import dk.os2opgavefordeler.model.presentation.DistributionRulePO;
 import dk.os2opgavefordeler.rest.DistributionRuleScope;
+import dk.os2opgavefordeler.service.DistributionService;
+import dk.os2opgavefordeler.service.PersistenceService;
 import org.slf4j.Logger;
 
 import javax.ejb.Stateless;

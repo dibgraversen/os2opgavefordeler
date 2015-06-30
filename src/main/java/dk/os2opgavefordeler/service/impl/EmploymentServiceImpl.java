@@ -1,8 +1,10 @@
-package dk.os2opgavefordeler.service;
+package dk.os2opgavefordeler.service.impl;
 
 import dk.os2opgavefordeler.model.Employment;
 import dk.os2opgavefordeler.model.Employment_;
 import dk.os2opgavefordeler.model.presentation.EmploymentPO;
+import dk.os2opgavefordeler.service.EmploymentService;
+import dk.os2opgavefordeler.service.PersistenceService;
 
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;

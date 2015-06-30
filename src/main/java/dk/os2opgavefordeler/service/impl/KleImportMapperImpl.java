@@ -1,9 +1,10 @@
-package dk.os2opgavefordeler.service;
+package dk.os2opgavefordeler.service.impl;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import dk.os2opgavefordeler.model.Kle;
 import dk.os2opgavefordeler.model.kle_import.*;
+import dk.os2opgavefordeler.service.KleImportMapper;
 import dk.os2opgavefordeler.util.FilteringXMLStreamWriter;
 
 import javax.annotation.PostConstruct;

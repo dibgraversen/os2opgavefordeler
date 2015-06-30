@@ -1,4 +1,4 @@
-package dk.os2opgavefordeler.service;
+package dk.os2opgavefordeler.service.impl;
 
 import dk.os2opgavefordeler.model.Role;
 import dk.os2opgavefordeler.model.User;
@@ -6,6 +6,7 @@ import dk.os2opgavefordeler.model.UserSettings;
 import dk.os2opgavefordeler.model.UserSettings_;
 import dk.os2opgavefordeler.model.presentation.RolePO;
 import dk.os2opgavefordeler.model.presentation.UserSettingsPO;
+import dk.os2opgavefordeler.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
