@@ -4,6 +4,7 @@ import dk.os2opgavefordeler.model.IdentityProvider;
 import dk.os2opgavefordeler.model.User;
 import dk.os2opgavefordeler.service.AuthService;
 import dk.os2opgavefordeler.service.AuthenticationException;
+import dk.os2opgavefordeler.service.ConfigService;
 import org.slf4j.Logger;
 
 import javax.enterprise.context.RequestScoped;
@@ -34,8 +35,8 @@ public class AuthEndpoint {
 	@Context
 	private HttpServletRequest request;
 
-	public static final String callback_url = "http://localhost:8080/TopicRouter/rest/auth/authenticate";
-	public static final String home_url = "http://localhost:9001/";	//TODO: property? Or should we pick it up from the original request referer?
+	@Inject
+	ConfigService config;
 
 	@GET
 	@Path("/providers")
@@ -52,7 +53,7 @@ public class AuthEndpoint {
 
 			final IdentityProvider idp = authService.findProvider(providerId).orElseThrow(RuntimeException::new);
 			final String token = authService.generateCsrfToken();
-			final URI authReqURI = authService.beginAuthenticationFlow(idp, token, callback_url);
+			final URI authReqURI = authService.beginAuthenticationFlow(idp, token, config.getCallbackUrl());
 
 			session.setAttribute(S_CSRF_TOKEN, token);
 			session.setAttribute(S_IDP_ID, providerId);
@@ -86,13 +87,13 @@ public class AuthEndpoint {
 			IdentityProvider idp = authService.findProvider(idpId)
 				.orElseThrow(RuntimeException::new);
 
-			final User user = authService.finalizeAuthenticationFlow(idp, token, callback_url, ui.getRequestUri());
+			final User user = authService.finalizeAuthenticationFlow(idp, token, config.getCallbackUrl(), ui.getRequestUri());
 			request.getSession().setAttribute("authenticated-user", user);
 
 			//TODO: keep this user logged in. Session state? Persisted token + cookie?
 
-			log.info("finishAuthentication: {} is now logged in, redirecting to {}", user, home_url);
-			return Response.temporaryRedirect(URI.create(home_url)).build();
+			log.info("finishAuthentication: {} is now logged in, redirecting to {}", user, config.getHomeUrl());
+			return Response.temporaryRedirect(URI.create(config.getHomeUrl())).build();
 		}
 		catch(AuthenticationException ex) {
 			log.error("Error authenticating user", ex);
