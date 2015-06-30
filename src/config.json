@@ -4,7 +4,8 @@
     "version": "0.9.6-SNAPSHOT"
   },
   "test": {
-    "serverUrl": "http://os2-test.miracle.local:80/TopicRouter/rest",
+    "serverUrl": "http://topicrouter.miracle.dk/rest",
+
     "version": "0.9.6"
   },
   "prod": {
@@ -12,3 +13,4 @@
     "version": "0.9.6"
   }
 }
+Ï

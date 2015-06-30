@@ -41,15 +41,15 @@
 		}
 
 		function getUserInfo() {
-			return httpGet('/user/info');
+			return httpGet('/users/info');
 		}
 
 		function getSettings(userId) {
-			return httpGet('/user/' + userId + '/settings');
+			return httpGet('/users/' + userId + '/settings');
 		}
 
 		function updateSettings(userId, settings) {
-			return httpPost('/user/' + userId + '/settings', settings);
+			return httpPost('/users/' + userId + '/settings', settings);
 		}
 
 		function getTopicRoutes(employment, scope) {
@@ -113,7 +113,7 @@
 		}
 
 		function getRoles(userId) {
-			return httpGet('/user/' + userId + '/roles');
+			return httpGet('/users/' + userId + '/roles');
 		}
 
 		/**
