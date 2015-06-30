@@ -30,7 +30,7 @@ public class UserEndpoint {
 	private HttpServletRequest request;
 
 	@GET
-	@Path("/info")
+	@Path("/me")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getUserInfo() {
 		User user = (User) request.getSession().getAttribute("authenticated-user");
