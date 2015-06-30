@@ -41,7 +41,7 @@
 		}
 
 		function getUserInfo() {
-			return httpGet('/users/info');
+			return httpGet('/users/me');
 		}
 
 		function getSettings(userId) {
