@@ -1,0 +1,92 @@
+@startuml
+title SOFD Domain
+
+class User {
+  boolean admin
+}
+
+class Role {
+  User user
+  Employment employment
+  boolean admin
+  boolean municipalityAdmin
+  boolean manager
+  boolean substitute
+}
+
+class Municipality {
+  String name
+}
+
+class FilterRule {
+  Date from
+  Date to
+  String filter
+}
+
+class KLE {
+  String number
+  String name
+  Date expired
+  String serviceText
+  Date created
+  OrgUnit responsible
+}
+
+class OrgUnitsProperty {
+  String nøgle?
+  String navn
+  String id
+  String beskrivelse
+  boolean præsentér
+}
+
+class DistributionRule {
+  String name
+  KLE KLE
+  Employment medarbejder
+  String ESDHId
+  OrgUnit organisationsEnhed
+  EksternOrgUnit eksternOrgUnit
+}
+
+class Employment {
+  String name
+  String initials
+  String email
+  String ESDHId
+  EksternOrgUnit eksternOrgUnit
+  String stillingsBetegnelse
+  boolean active
+}
+
+class OrgUnit {
+  Employment manager
+  OrgUnit parent
+  String name
+  String ESDHId
+  String email
+  String phoneNumber
+  boolean aktiv
+  
+}
+
+class Settings {
+  boolean showExpandedOrg
+  boolean showResponsible
+  Enum scope
+}
+
+Role -- Employment
+User - Role
+Municipality -- OrgUnit
+OrgUnit - OrgUnit
+OrgUnit - OrgUnitsProperty
+OrgUnit -- DistributionRule
+Employment -- DistributionRule
+DistributionRule - KLE
+User -- Settings
+Employment - OrgUnit
+DistributionRule -- FilterRule
+
+@enduml
