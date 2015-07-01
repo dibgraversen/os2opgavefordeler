@@ -5,7 +5,7 @@
 
 	<groupId>dk.os2opgavefordeler</groupId>
 	<artifactId>TopicRouter</artifactId>
-	<version>1.0-SNAPSHOT</version>
+	<version>0.9.6-SNAPSHOT</version>
 	<packaging>war</packaging>
 
 	<name>OS2 KLE Topic Router</name>
@@ -24,6 +24,24 @@
 		<version.jackson>2.4.4</version.jackson>
 		<version.weld-for-test>1.1.23.Final</version.weld-for-test>
 	</properties>
+
+	<scm>
+		<connection>scm:git:git://git@github.com:miracle-as/OS2-OpgaveFordeler-Backend.git</connection>
+		<developerConnection>scm:git:git://git@github.com:miracle-as/OS2-OpgaveFordeler-Backend.git</developerConnection>
+	</scm>
+
+	<distributionManagement>
+		<repository>
+			<id>miracle-nexus</id>
+			<name>Miracle Nexus (releases)</name>
+			<url>http://nexus.miracle.local/nexus/content/repositories/releases/</url>
+		</repository>
+		<snapshotRepository>
+			<id>miracle-nexus</id>
+			<name>Miracle Nexus (snapshots)</name>
+			<url>http://nexus.miracle.local/nexus/content/repositories/snapshots/</url>
+		</snapshotRepository>
+	</distributionManagement>
 
 	<dependencyManagement>
 		<dependencies>
@@ -246,9 +264,24 @@
 				<artifactId>jboss-as-maven-plugin</artifactId>
 				<version>${version.org.jboss.as.plugins.maven.plugin}</version>
 			</plugin>
+			<plugin>
+				<groupId>external.atlassian.jgitflow</groupId>
+				<artifactId>jgitflow-maven-plugin</artifactId>
+				<version>1.0-m5.1</version>
+				<configuration>
+					<flowInitContext>
+						<masterBranchName>master</masterBranchName>
+						<developBranchName>develop</developBranchName>
+						<featureBranchPrefix>feature/</featureBranchPrefix>
+						<releaseBranchPrefix>release/</releaseBranchPrefix>
+						<hotfixBranchPrefix>hotfix/</hotfixBranchPrefix>
+						<versionTagPrefix>V_</versionTagPrefix>
+					</flowInitContext>
+					<enableSshAgent>true</enableSshAgent>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
-
 
 	<profiles>
 		<profile>
