@@ -214,7 +214,7 @@ public class OpenIdConnectImpl implements OpenIdConnect {
 		try {
 			JSONObject key = getProviderRSAJWK(providerMetadata.getJWKSetURI().toURL().openStream(), keyId);
 			providerKey = RSAKey.parse(key).toRSAPublicKey();
-		} catch (NoSuchAlgorithmException | InvalidKeySpecException | IOException | java.text.ParseException e) {
+		} catch (JOSEException | IOException | java.text.ParseException e) {
 			throw new AuthenticationException("Error parsing JWT", e);
 		}
 		return providerKey;
