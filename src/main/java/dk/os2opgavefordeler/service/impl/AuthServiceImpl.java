@@ -118,7 +118,8 @@ public class AuthServiceImpl implements AuthService {
 		}
 
 		final List<dk.os2opgavefordeler.model.Role> roles = createRolesFromEmployments(employments);
-		final User user = new User(email, roles);
+		final String name = employments.get(0).getName();					//TODO: better approach than grabbing first name?
+		final User user = new User(name, email, roles);
 
 		log.info("Persising {} with roles={}", user, roles);
 		return userService.createUser(user);
