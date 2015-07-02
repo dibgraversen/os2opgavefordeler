@@ -22,6 +22,7 @@
 		$scope.toggle = toggle;
 		$scope.responsibility = responsibility;
 		$scope.editRule = editRule;
+		$scope.deleteRule = deleteRule;
 		$scope.editResponsibility = editResponsibility;
 		$scope.deleteResponsibility = deleteResponsibility;
 		$scope.responsible = responsible;
@@ -114,6 +115,12 @@
 				controller: 'EditRuleModalInstanceCtrl',
 				size: 'lg'
 			});
+		}
+
+		function deleteRule(topic) {
+			topic.org = 0;
+			topic.employee = 0;
+			topicRouterApi.updateDistributionRule(topic);
 		}
 
 		function editResponsibility(topic){

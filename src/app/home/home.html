@@ -48,13 +48,20 @@
 				<td ng-show="settings.showExpandedOrg"></td>
 				<td>{{ topic.employee.name }}</td>
 				<td class="button">
-					<button class="btn btn-primary"
-							ng-show="distributionChangeAllowed(topic)"
-							popover="klik her for at vedligeholde fordelingsregler"
-							popover-placement="left" popover-trigger="mouseenter" popover-popup-delay="1000"
-							ng-click="editRule(topic)">
-						Fordeling
-					</button>
+					<div class="btn-group" ng-show="distributionChangeAllowed(topic)" dropdown>
+						<button class="btn btn-primary"
+								popover="klik her for at vedligeholde fordelingsregler"
+								popover-placement="left" popover-trigger="mouseenter" popover-popup-delay="1000"
+								ng-click="editRule(topic)">
+							Fordeling
+						</button>
+						<button ng-if="topic.org" type="button" class="btn btn-primary dropdown-toggle" dropdown-toggle>
+							<span class="caret"></span>
+						</button>
+						<ul ng-if="topic.org" class="dropdown-menu">
+							<li><a href="#" class="danger" ng-click="deleteRule(topic)">Fjern fordeling</a></li>
+						</ul>
+					</div>
 				</td>
 
 				<td ng-show="settings.showResponsible" ng-class=" topic.responsible ? '' : 'inherited' ">
