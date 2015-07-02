@@ -16,7 +16,7 @@
 			</div>
 			<div class="collapse navbar-collapse" ng-class="{'in': !navCollapsed}">
 				<ul class="nav navbar-nav">
-					<li ng-class="{ active: $state.is('home') }">
+					<li ng-show="user.loggedIn" ng-class="{ active: $state.is('home') }">
 						<a data-toggle="collapse" data-target=".navbar-collapse" ui-sref="home">Fordelinger</a>
 					</li>
 					<li ng-show="user.currentRole.admin" ng-class="{ active: $state.is('settings') }">
