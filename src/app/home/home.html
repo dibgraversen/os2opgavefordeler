@@ -48,32 +48,33 @@
 				<td ng-show="settings.showExpandedOrg"></td>
 				<td>{{ topic.employee.name }}</td>
 				<td class="button">
-					<button class="btn btn-primary" ng-show="distributionChangeAllowed(topic)"
-									popover-placement="left"
-									popover="klik her for at vedligeholde fordelingsregler"
-									popover-trigger="mouseenter" popover-popup-delay="1000"
-									ng-click="editRule(topic)">Fordeling
+					<button class="btn btn-primary"
+							ng-show="distributionChangeAllowed(topic)"
+							popover="klik her for at vedligeholde fordelingsregler"
+							popover-placement="left" popover-trigger="mouseenter" popover-popup-delay="1000"
+							ng-click="editRule(topic)">
+						Fordeling
 					</button>
 				</td>
+
 				<td ng-show="settings.showResponsible" ng-class=" topic.responsible ? '' : 'inherited' ">
 					{{ topic.responsible.name || responsible(topic) }}
 					<span ng-show="topic.responsible.manager">({{ topic.responsible.manager.name }})</span>
 				</td>
+
 				<td ng-show="settings.showResponsible" class="button">
-					<!-- for setting responsibility when no direct responsibility -->
-					<button ng-show="!topic.responsible && responsibilityChangeAllowed(topic)" class="btn btn-primary " ng-click="editResponsibility(topic)">
-						Ansvar
-					</button>
-					<div class="btn-group" ng-show="topic.responsible && responsibilityChangeAllowed(topic)"
-							 dropdown style="width:100px">
-						<button class="btn btn-primary" ng-click="editResponsibility(topic)">
+					<div class="btn-group" ng-show="responsibilityChangeAllowed(topic)" dropdown>
+						<button type="button" class="btn btn-primary"
+								popover="klik her for at vedligeholde ansvar"
+								popover-placement="left" popover-trigger="mouseenter" popover-popup-delay="1000"
+								ng-click="editResponsibility(topic)">
 							Ansvar
 						</button>
-						<button class="btn btn-primary dropdown-toggle" type="button" dropdown-toggle>
+						<button ng-if="topic.responsible" type="button" class="btn btn-primary dropdown-toggle" dropdown-toggle>
 							<span class="caret"></span>
 						</button>
-						<ul class="dropdown-menu" ng-show="topic.responsible">
-							<li><a href="#" class="danger" ng-click="deleteResponsibility(topic); open=false">Slip ansvar</a></li>
+						<ul ng-if="topic.responsible" class="dropdown-menu">
+							<li><a href="#" class="danger" ng-click="deleteResponsibility(topic)">Slip ansvar</a></li>
 						</ul>
 					</div>
 				</td>
