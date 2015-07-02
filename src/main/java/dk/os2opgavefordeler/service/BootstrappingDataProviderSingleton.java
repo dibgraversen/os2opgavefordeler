@@ -53,13 +53,15 @@ public class BootstrappingDataProviderSingleton {
 	}
 
 	private void buildUsers() {
-		addUser("hfp@miracle.dk", buildRoles());
-		addUser("hlo@miracle.dk", buildRoles());
-		addUser("sum@miracle.dk", buildRoles());
+		addUser("Helle Friis Pedersen",		"hfp@miracle.dk", buildRoles());
+		addUser("Hans Ehlert Thomsen",		"het@miracle.dk", buildRoles());
+		addUser("Henrik Løvborg",			"hlo@miracle.dk", buildRoles());
+		addUser("Simon Møgelvang Bang",		"smb@miracle.dk", buildRoles());
+		addUser("Sune Marcher",				"sum@miracle.dk", buildRoles());
 	}
 
-	private User addUser(String email, List<Role> roles) {
-		final User user = new User(email, roles);
+	private User addUser(String name, String email, List<Role> roles) {
+		final User user = new User(name, email, roles);
 		return usersService.createUser(user);
 	}
 

@@ -13,9 +13,7 @@ import com.nimbusds.oauth2.sdk.auth.Secret;
 import com.nimbusds.oauth2.sdk.http.HTTPResponse;
 import com.nimbusds.oauth2.sdk.id.ClientID;
 import com.nimbusds.oauth2.sdk.id.State;
-import com.nimbusds.oauth2.sdk.token.BearerAccessToken;
 import com.nimbusds.openid.connect.sdk.*;
-import com.nimbusds.openid.connect.sdk.claims.UserInfo;
 import com.nimbusds.openid.connect.sdk.op.OIDCProviderMetadata;
 import com.nimbusds.openid.connect.sdk.util.DefaultJWTDecoder;
 import dk.os2opgavefordeler.model.IdentityProvider;
@@ -201,7 +199,7 @@ public class OpenIdConnectImpl implements OpenIdConnect {
 		final String keyId = (String) idToken.getHeader().toJSONObject().get("kid");
 
 		final RSAPublicKey providerKey = lookupKey(providerMetadata, keyId);
-		final ReadOnlyJWTClaimsSet claims = verfifyClaims(idToken, providerKey);
+		final ReadOnlyJWTClaimsSet claims = verifyClaims(idToken, providerKey);
 
 		return claims;
 	}
@@ -214,13 +212,13 @@ public class OpenIdConnectImpl implements OpenIdConnect {
 		try {
 			JSONObject key = getProviderRSAJWK(providerMetadata.getJWKSetURI().toURL().openStream(), keyId);
 			providerKey = RSAKey.parse(key).toRSAPublicKey();
-		} catch (JOSEException | IOException | java.text.ParseException e) {
+		} catch (InvalidKeySpecException | NoSuchAlgorithmException | IOException | java.text.ParseException e) {
 			throw new AuthenticationException("Error parsing JWT", e);
 		}
 		return providerKey;
 	}
 
-	private ReadOnlyJWTClaimsSet verfifyClaims(JWT idToken, RSAPublicKey providerKey)
+	private ReadOnlyJWTClaimsSet verifyClaims(JWT idToken, RSAPublicKey providerKey)
 	throws AuthenticationException
 	{
 		DefaultJWTDecoder jwtDecoder = new DefaultJWTDecoder();
@@ -253,10 +251,12 @@ public class OpenIdConnectImpl implements OpenIdConnect {
 		for (Object key : keyList) {
 			JSONObject k = (JSONObject) key;
 			if (k.get("use").equals("sig") && k.get("kty").equals("RSA") && kid.equals(k.get("kid"))) {
+				log.info("Key found");
 				return k;
 			}
 		}
 
+		log.warn("Key not found!");
 		return null;
 	}
 
