@@ -25,27 +25,16 @@
 					<li ng-show="user.currentRole.municipalityAdmin" ng-class="{ active: $state.is('municipalityAdmin') }">
 						<a data-toggle="collapse" data-target=".navbar-collapse" ui-sref="municipalityAdmin">Administrer kommune</a>
 					</li>
-					<!--<li><a data-toggle="collapse" data-target=".navbar-collapse" href="#/locations">Locations</a></li>-->
 				</ul>
-				<!--<div class="btn-group navbar-right">-->
-				<!--<button type="button" class="btn btn-default navbar-btn" ng-click="sidemenuVisible = true" ng-class="sidemenuVisible ? 'active' : ''"><span class="glyphicon glyphicon-list"></span></button>-->
-				<!--<button type="button" class="btn btn-default navbar-btn" ng-click="sidemenuVisible = false" ng-class="sidemenuVisible ? '' : 'active'"><span class="glyphicon glyphicon-align-justify"></span></button>-->
-				<!--</div>-->
-				<ul class="nav navbar-nav navbar-right">
+				<ul ng-show="user.loggedIn" class="nav navbar-nav navbar-right">
 					<li class="active dropdown" dropdown>
 						<a href="#" class="dropdown-toggle" dropdown-toggle>
 							<span class="glyphicon glyphicon-user"></span> {{ user.name }}
 							<span class="caret"></span>
 						</a>
 						<ul class="dropdown-menu">
-							<li ng-hide="user.id === 1">
-								<a href="" ng-click='changeUser({ id: 1, name:"Henrik", loggedIn:true })'>Skift til Henrik</a>
-							</li>
-							<li ng-hide="user.id === 2">
-								<a href="" ng-click='changeUser({ id: 2, name:"Sune", loggedIn:true })'>Skift til Sune</a>
-							</li>
 							<li ng-hide="user.id === 3">
-								<a href="" ng-click='changeUser({ id: 3, name:"Helle", loggedIn:true })'>Skift til Helle</a>
+								<a href="" ng-click='logoutUser()'>Log ud</a>
 							</li>
 						</ul>
 					</li>
@@ -63,30 +52,14 @@
 
 	<div id="ng-view" class="container-fluid slide-animation admin-content main-content">
 		<div class="row">
-			<div ng-show="user.loggedIn && sidemenuVisible" class="col-md-2">
-				<div data-ng-include="'/app/layout/side-menu.html'"></div>
-			</div>
-			<div ng-class="(sidemenuVisible && user.loggedIn) ? 'col-md-10' : 'col-md-12' ">
-				<div ng-show="user.loggedIn" class="pull-left" style="margin-top: 20px; margin-right: 30px">
-					<button class="btn btn-default toggle-side"
-									popover="Fold ud for at se sidemenu"
-									popover-placement="right" popover-trigger="mouseenter"
-									popover-animation="false"
-									popover-popup-delay="1000"
-									ng-click="sidemenuVisible = !sidemenuVisible">
-						<span class="glyphicon"
-									ng-class="sidemenuVisible ? 'glyphicon-arrow-left' : 'glyphicon-arrow-right'"></span>
-					</button>
+			<div style="padding-top:20px">
+				<div id="messages" style="padding-left:70px">
+					<alert ng-repeat="alert in alerts" type="{{alert.type}}"
+						   close="closeAlert($index)" class="animate-fade"
+						   style="width: 100%">{{alert.msg}}
+					</alert>
 				</div>
-				<div style="padding-top:20px">
-					<div id="messages" style="padding-left:70px">
-						<alert ng-repeat="alert in alerts" type="{{alert.type}}"
-									 close="closeAlert($index)" class="animate-fade"
-									 style="width: 100%">{{alert.msg}}
-						</alert>
-					</div>
-					<div ui-view class=""></div>
-				</div>
+				<div ui-view></div>
 			</div>
 		</div>
 	</div>

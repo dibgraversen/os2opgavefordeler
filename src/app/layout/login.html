@@ -1,12 +1,29 @@
-<div>
-	<h1>Du skal være logget ind for at bruge opgavefordeleren.</h1>
-	<p>Vælg en af nedenstående identity providers for at logge på:</p>
+<div class="row">
+	<div class="col-md-2"></div>
 
-	<div class="row" ng-repeat="provider in providers">
-		<div class="col-md-12">
-			<a href="{{provider.url}}">
-				<button class="btn btn-primary">{{provider.name}}</button>
-			</a>
+	<div ng-show="{{!user.loggedIn}}" class="col-md-8">
+		<div class="page-header">
+			<h1>Du er ikke logget ind - <small>vælg en identity provider nedenfor.</small></h1>
+		</div>
+
+		<div class="row" ng-repeat="provider in providers">
+			<div class="col-md-12">
+				<a href="{{provider.url}}">
+					<button class="btn btn-primary">{{provider.name}}</button>
+				</a>
+			</div>
 		</div>
 	</div>
+
+	<div ng-show="{{user.loggedIn}}" class="col-md-8">
+		<div class="jumbotron">
+			<h1>Du er allerede logget ind.</h1>
+			<p>Du er logget ind som <i>{{user.name}}</i>.</p>
+			<p>Hvis du ønsker at skifte bruger, kan du logge ud i menuen i toppen af siden, eller ved at klikke her:</p>
+
+			<button type=button class="btn btn-primary" ng-click="logoutUser()">Log ud</button>
+		</div>
+	</div>
+
+	<div class="col-md-2"></div>
 </div>

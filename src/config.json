@@ -1,15 +1,14 @@
 {
-  "dev": {
-    "serverUrl": "http://localhost:8080/TopicRouter/rest",
-    "version": "0.9.6-SNAPSHOT"
-  },
-  "test": {
-    "serverUrl": "http://topicrouter.miracle.dk/rest",
-
-    "version": "0.9.6"
-  },
-  "prod": {
-    "serverUrl": "someserver.dk/TopicRouter/rest",
-    "version": "0.9.6"
-  }
+	"dev": {
+		"serverUrl": "http://localhost:8080/TopicRouter/rest",
+		"version": "0.9.7-SNAPSHOT"
+	},
+	"test": {
+		"serverUrl": "http://topicrouter.miracle.dk/rest",
+		"version": "0.9.7"
+	},
+	"prod": {
+		"serverUrl": "someserver.dk/TopicRouter/rest",
+		"version": "0.9.7"
+	}
 }

@@ -3,10 +3,10 @@
 
 	angular.module('topicRouter').controller('ShellCtrl', ShellCtrl);
 
-	ShellCtrl.$inject = ['$scope', '$rootScope', '$state', '$timeout', '$q', '$modal',
+	ShellCtrl.$inject = ['$scope', '$rootScope', '$state', '$timeout', '$q', '$modal', '$log',
 		'topicRouterApi', 'version'];
 
-	function ShellCtrl($scope, $rootScope, $state, $timeout, $q, $modal, topicRouterApi, version) {
+	function ShellCtrl($scope, $rootScope, $state, $timeout, $q, $modal, $log, topicRouterApi, version) {
 
 		/* jshint validthis:true */
 		var vm = this;
@@ -23,6 +23,7 @@
 		$scope.updateSettings = updateSettings;
 
 		$scope.changeUser = changeUser;
+		$scope.logoutUser = logoutUser;
 		$scope.changeRole = changeRole;
 
 		$scope.substitutes = [];
@@ -54,25 +55,11 @@
 		function activate() {
 			topicRouterApi.getUserInfo().then(function(user) {
 				if(user.loggedIn) {
-					changeUser({
-						name: "Mock Me",
-						id: user.id,
-						loggedIn: true
-					});
+					changeUser(user);
 				} else {
 					$state.go("login");
 				}
 			});
-
-			//user = getUser();
-			//if(user){
-			//changeUser({
-			//	name: 'Henrik',
-			//	id: 1
-			//});
-			//}
-			//getSettings($scope.user.id);
-			//getRoles($scope.user);
 		}
 
 		$rootScope.$on('spinner.toggle', function (event, args) {
@@ -94,6 +81,26 @@
 			$scope.user = user;
 			getSettings(user);
 			getRoles(user);
+		}
+
+		function logoutUser() {
+			topicRouterApi.logoutUser()
+			.then(function(message) {
+				$log.info("User logged out");
+				$scope.user = {
+					loggedIn: false
+				};
+				$state.reload();
+			});
+
+			/* TODO: after fixing http post so we can use success/error, add logout-error code:
+			 else {
+			 $log.warn("Couldn't log out");
+			 addAlert({
+			 msg: 'Kunne ikke logge ud',
+			 type: 'danger'
+			 });
+			 */
 		}
 
 		function getSettings(user) {

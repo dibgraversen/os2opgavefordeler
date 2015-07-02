@@ -12,6 +12,7 @@
 		var service = {
 			getIdentityProviders: getIdentityProviders,
 			getUserInfo: getUserInfo,
+			logoutUser: logoutUser,
 			getTopicRoutes: getTopicRoutes,
 			getRoles: getRoles,
 			getSettings: getSettings,
@@ -42,6 +43,10 @@
 
 		function getUserInfo() {
 			return httpGet('/users/me');
+		}
+
+		function logoutUser() {
+			return httpPost('/auth/logout', {});
 		}
 
 		function getSettings(userId) {
@@ -273,6 +278,7 @@
 			};
 			angular.extend(options, defaults); // merge defaults into options.
 			appSpinner.showSpinner();
+			//TODO: replace the following with Interceptor, so calling code can use success/error.
 			return $http(options).then(
 					function (response) {
 						appSpinner.hideSpinner();
