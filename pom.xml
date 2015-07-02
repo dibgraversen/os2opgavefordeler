@@ -71,8 +71,15 @@
 	<dependencies>
 		<dependency>
 			<groupId>com.nimbusds</groupId>
+			<artifactId>nimbus-jose-jwt</artifactId>
+			<version>3.10</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.nimbusds</groupId>
 			<artifactId>oauth2-oidc-sdk</artifactId>
 			<version>4.13</version>
+			<scope>compile</scope>
 		</dependency>
 
 		<dependency>
@@ -277,6 +284,7 @@
 						<versionTagPrefix>V_</versionTagPrefix>
 					</flowInitContext>
 					<enableSshAgent>true</enableSshAgent>
+					<scmCommentPrefix>[jgitflow] </scmCommentPrefix>
 				</configuration>
 			</plugin>
 		</plugins>
