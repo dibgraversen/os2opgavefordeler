@@ -29,11 +29,15 @@
 				<ul ng-show="user.loggedIn" class="nav navbar-nav navbar-right">
 					<li class="active dropdown" dropdown>
 						<a href="#" class="dropdown-toggle" dropdown-toggle>
-							<span class="glyphicon glyphicon-user"></span> {{ user.name }}
+							<span class="glyphicon glyphicon-user"></span> {{ user.name }} ({{ user.currentRole.name }})
 							<span class="caret"></span>
 						</a>
 						<ul class="dropdown-menu">
-							<li ng-hide="user.id === 3">
+							<li ng-repeat="role in user.roles" class="{{role == user.currentRole ? 'disabled':''}}">
+								<a href="" ng-click="changeRole(role)" >{{ role.name }}</a>
+							</li>
+							<li role="separator" class="divider"></li>
+							<li>
 								<a href="" ng-click='logoutUser()'>Log ud</a>
 							</li>
 						</ul>

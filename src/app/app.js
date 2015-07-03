@@ -30,7 +30,7 @@
           controllerAs: 'vm'
         })
         .state('municipalityAdmin', {
-          url: '/municipalityAdmin',
+          url: '/municipality-admin',
           templateUrl: 'app/municipality-admin/municipality-admin.html',
           controller: 'MunicipalityAdminCtrl',
           controllerAs: 'vm'

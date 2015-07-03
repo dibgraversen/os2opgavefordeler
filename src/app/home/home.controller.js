@@ -1,9 +1,6 @@
 (function () {
 	'use strict';
-
-	var app = angular.module('topicRouter');
-
-	app.controller('HomeCtrl', HomeCtrl);
+	angular.module('topicRouter').controller('HomeCtrl', HomeCtrl);
 
 	HomeCtrl.$inject = ['$scope', 'topicRouterApi', '$state', '$q', '$modal', 'serverUrl'];
 

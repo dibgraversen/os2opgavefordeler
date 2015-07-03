@@ -1,19 +1,21 @@
 (function () {
 	'use strict';
+	angular.module('topicRouter').controller('MunicipalityAdminCtrl', MunicipalityAdminCtrl);
 
-	var app = angular.module('topicRouter');
+	MunicipalityAdminCtrl.$inject = ['$scope', '$state', '$log'];
 
-	app.controller('MunicipalityAdminCtrl', MunicipalityAdminCtrl);
-
-	MunicipalityAdminCtrl.$inject = ['$scope'];
-
-	function MunicipalityAdminCtrl($scope) {
-		$scope.something = 'a string';
+	function MunicipalityAdminCtrl($scope, $state, $log) {
+		/* jshint validthis:true */
+		var vm = this;
 
 		activate();
 
 		function activate() {
-			console.log('municipality admin activated');
+			$log.info('MunicipalityAdmin::activate');
+			if(!($scope.user.loggedIn && $scope.user.currentRole.municipalityAdmin)) {
+				$log.info("not privileged, redirecting to home");
+				$state.go("home");
+			}
 		}
 	}
 })();

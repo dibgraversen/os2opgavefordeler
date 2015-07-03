@@ -1,15 +1,14 @@
 (function () {
 	'use strict';
-
 	angular.module('topicRouter').controller('ShellCtrl', ShellCtrl);
 
 	ShellCtrl.$inject = ['$scope', '$rootScope', '$state', '$timeout', '$q', '$modal', '$log',
 		'topicRouterApi', 'version'];
 
 	function ShellCtrl($scope, $rootScope, $state, $timeout, $q, $modal, $log, topicRouterApi, version) {
-
 		/* jshint validthis:true */
 		var vm = this;
+
 		$scope.$state = $state;
 		$scope.version = version;
 
@@ -53,6 +52,7 @@
 		activate();
 
 		function activate() {
+			$log.info("Shell::activate");
 			topicRouterApi.getUserInfo().then(function(user) {
 				if(user.loggedIn) {
 					changeUser(user);
@@ -132,12 +132,10 @@
 		}
 
 		function changeRole(role) {
-			// functionality happens by ng-modal and radiobuttons.
-			if($state.is('settings') && !role.admin){
-				$state.go('home');
-			}
-			if($state.is('municipalityAdmin') && !role.municipalityAdmin){
-				$state.go('home');
+			if(role !== $scope.user.currentRole) {
+				$log.info("changeRole: " + role);
+				$scope.user.currentRole = role;
+				$state.reload();
 			}
 		}
 

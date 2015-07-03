@@ -1,20 +1,3 @@
-<div class="panel panel-default" ng-show="user.roles.length > 1" style="margin-top:20px">
-	<div class="panel-heading">
-		Roller for {{ user.name }}
-	</div>
-	<div class="panel-body">
-		<form action="">
-			<div class="radio" ng-repeat="role in user.roles">
-				<label>
-					<input type="radio" name="roleRadios" ng-model="user.currentRole"
-								 ng-value="role" ng-change="changeRole(role)" />
-					{{ role.name }}
-				</label>
-			</div>
-		</form>
-	</div>
-</div>
-
 <div ng-show="user.currentRole.manager" class="panel panel-default">
 	<div class="panel-heading">Stedfortræder</div>
 	<div class="panel-body">
@@ -28,7 +11,6 @@
 			Tilføj stedfortræder
 		</button>
 	</div>
-
 </div>
 
 <div class="panel panel-default" style="margin-top:30px">
@@ -69,8 +51,7 @@
 				</label>
 			</div>
 			<div>
-				<input type="text" class="form-control" placeholder="Filter"
-							 ng-model="filter.text" />
+				<input type="text" class="form-control" placeholder="Filter" ng-model="filter.text" />
 			</div>
 		</form>
 	</div>
