@@ -6,11 +6,13 @@
 			<h1>Du er ikke logget ind - <small>vælg en identity provider nedenfor.</small></h1>
 		</div>
 
-		<div class="row" ng-repeat="provider in providers">
-			<div class="col-md-12">
-				<a href="{{provider.url}}">
-					<button class="btn btn-primary">{{provider.name}}</button>
-				</a>
+		<div class="panel panel-default">
+			<div class="panel-body">
+				<div class="form-inline">
+					<a href="{{provider.url}}" ng-repeat="provider in providers">
+						<button class="btn btn-primary btn-lg">{{provider.name}}</button>
+					</a>
+				</div>
 			</div>
 		</div>
 	</div>

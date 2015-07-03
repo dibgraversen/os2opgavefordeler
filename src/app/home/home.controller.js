@@ -34,6 +34,9 @@
 		////////////////
 
 		function activate() {
+			if(!$scope.user.loggedIn) {
+				$state.go("login");
+			}
 			$scope.$watch("user.currentRole", function(newValue, oldValue){
 				if(newValue && newValue.employment > 0){
 					refreshTopicRoutes();
@@ -46,8 +49,6 @@
 				if($scope.user.currentRole && $scope.user.currentRole.employment)
 					refreshTopicRoutes();
 			});
-
-
 		}
 
 		function refreshTopicRoutes(){
