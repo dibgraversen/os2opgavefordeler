@@ -11,7 +11,7 @@
 		activate();
 
 		function activate() {
-			$log.info("Settings::activate")
+			$log.info("Settings::activate");
 			if(!($scope.user.loggedIn && $scope.user.currentRole.admin)) {
 				$log.info("not privileged, redirecting to home");
 				$state.go("home");
