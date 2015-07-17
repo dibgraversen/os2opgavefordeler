@@ -1,8 +1,8 @@
 <div ng-show="sidemenuVisible" class="col-md-2">
 	<div ng-include="'/app/layout/side-menu.html'"></div>
 </div>
-<div ng-class="sidemenuVisible ? 'col-md-10' : 'col-md-12' ">
-	<div ng-show="user.loggedIn" class="pull-left" style="margin-top: 20px; margin-right: 30px">
+<div ng-class="sidemenuVisible ? 'col-md-10' : 'col-md-12'">
+	<div ng-show="user.loggedIn" class="pull-left" style="margin-right: 30px">
 		<button class="btn btn-default toggle-side"
 				popover="Fold ud for at se sidemenu"
 				popover-placement="right" popover-trigger="mouseenter"
