@@ -1,11 +1,27 @@
-<div>
-	<h2 class="page-title">Kommuneadmin side</h2>
-
-	<div class="jumbotron">
-		<div>
-			<p>
-				Velkommen til Kommuneadmin
-			</p>
+<div class="col-md-12">
+	<div class="col-md-6 col-md-offset-3">
+		<alert ng-repeat="alert in mAdminAlerts" type="{{alert.type}}"
+					 close="closeAlert($index)" class="animate-fade"
+					 style="width: 100%">{{alert.msg}}
+		</alert>
+		<h2 class="page-title">Kommuneadmin side</h2>
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				Upload ny organisationsstruktur
+			</div>
+			<div class="panel-body">
+				Her kan du uploade en ny fil med organisationsstruktur. Klik <a
+					href="#">her</a> for eksempel.
+				<form>
+					<div class="form-group">
+						<label for="orgFileInput">Vælg fil</label>
+						<input type="file" id="orgFileInput" file-model="uploadFile" multiple>
+					</div>
+					<div class="text-right">
+						<button type="button" class="btn btn-primary" ng-click="upload()">Upload</button>
+					</div>
+				</form>
+			</div>
 		</div>
 	</div>
 
