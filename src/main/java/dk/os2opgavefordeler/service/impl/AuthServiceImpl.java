@@ -6,10 +6,7 @@ import dk.os2opgavefordeler.model.Employment;
 import dk.os2opgavefordeler.model.IdentityProvider;
 import dk.os2opgavefordeler.model.User;
 import dk.os2opgavefordeler.model.presentation.IdentityProviderPO;
-import dk.os2opgavefordeler.service.AuthService;
-import dk.os2opgavefordeler.service.AuthenticationException;
-import dk.os2opgavefordeler.service.EmploymentService;
-import dk.os2opgavefordeler.service.UserService;
+import dk.os2opgavefordeler.service.*;
 import dk.os2opgavefordeler.service.oidc.OpenIdConnect;
 import org.slf4j.Logger;
 
@@ -26,9 +23,6 @@ public class AuthServiceImpl implements AuthService {
 
 	@Inject
 	private UserService userService;
-
-	@Inject
-	private EmploymentService employmentService;
 
 	@Inject
 	private OpenIdConnect openIdConnect;
@@ -97,46 +91,12 @@ public class AuthServiceImpl implements AuthService {
 				})
 				.orElseGet(() -> {
 					log.info("User not found, creating");
-					return createUser(email);
+					return userService.createUserFromOpenIdEmail(email);
 				});
 		}
 		catch(java.text.ParseException e) {
-			throw new AuthenticationException("Error parsing claims", e);
+			throw new AuthenticationException("Error parsing OpenID claims", e);
 		}
-	}
-
-
-	private User createUser(String email) {
-		// In order to create a User from an OpenID Connect login, we require the email to be present in a municipality.
-		//
-		// An email address can be used for several Employments. For instance, it's possible for a manager to also have
-		// non-manager employment - so we create a role of each of the employment.
-		//
-		final List<Employment> employments = employmentService.findByEmail(email);
-		if(employments.isEmpty()) {
-			throw new RuntimeException("No employments found");				//TODO: proper exception. Unathorized.
-		}
-
-		final List<dk.os2opgavefordeler.model.Role> roles = createRolesFromEmployments(employments);
-		final String name = employments.get(0).getName();					//TODO: better approach than grabbing first name?
-		final User user = new User(name, email, roles);
-
-		log.info("Persising {} with roles={}", user, roles);
-		return userService.createUser(user);
-	}
-
-	private List<dk.os2opgavefordeler.model.Role> createRolesFromEmployments(List<Employment> employments) {
-		return employments.stream()
-			.map(emp -> {
-				dk.os2opgavefordeler.model.Role role = new dk.os2opgavefordeler.model.Role();
-
-				role.setManager(emp.getEmployedIn().getChildren().equals(emp));
-				role.setEmployment(emp.getId());
-				role.setName(String.format("%s (%s)", emp.getName(), emp.getEmployedIn().getName()));
-
-				return role;
-			})
-			.collect(Collectors.toList());
 	}
 
 	private boolean hasManagerRole(List<Employment> roles) {

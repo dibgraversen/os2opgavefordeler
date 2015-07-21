@@ -1,15 +1,17 @@
 package dk.os2opgavefordeler.service.impl;
 
+import dk.os2opgavefordeler.model.Employment;
 import dk.os2opgavefordeler.model.Role;
 import dk.os2opgavefordeler.model.User;
 import dk.os2opgavefordeler.model.UserSettings;
 import dk.os2opgavefordeler.model.presentation.RolePO;
 import dk.os2opgavefordeler.model.presentation.UserSettingsPO;
-import dk.os2opgavefordeler.service.UserService;
+import dk.os2opgavefordeler.service.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ejb.Stateless;
+import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
@@ -27,6 +29,9 @@ public class UserServiceImpl implements UserService {
 
 	@PersistenceContext(unitName = "OS2TopicRouter")
 	private EntityManager em;
+
+	@Inject
+	private EmploymentService employmentService;
 
 	@Override
 	public Optional<User> findById(long userId) {
@@ -58,6 +63,26 @@ public class UserServiceImpl implements UserService {
 	public User createUser(User user) {
 		em.persist(user);
 		return user;
+	}
+
+	@Override
+	public User createUserFromOpenIdEmail(String email) {
+		// In order to create a User from an OpenID Connect login, we require the email to be present in a municipality.
+		//
+		// An email address can be used for several Employments. For instance, it's possible for a manager to also have
+		// non-manager employment - so we create a role of each of the employment.
+		//
+		final List<Employment> employments = employmentService.findByEmail(email);
+		if(employments.isEmpty()) {
+			throw new RuntimeException("No employments found");				//TODO: proper exception. Unathorized.
+		}
+
+		final List<Role> roles = createRolesFromEmployments(employments);
+		final String name = employments.get(0).getName();					//TODO: better approach than grabbing first name?
+		final User user = new User(name, email, roles);
+
+		log.info("Persising {} with roles={}", user, roles);
+		return createUser(user);
 	}
 
 	@Override
@@ -119,4 +144,17 @@ public class UserServiceImpl implements UserService {
 		em.merge(settings);
 	}
 
+	private List<Role> createRolesFromEmployments(List<Employment> employments) {
+		return employments.stream()
+			.map(emp -> {
+				final Role role = new Role();
+
+				role.setManager(emp.getEmployedIn().getChildren().equals(emp));
+				role.setEmployment(emp);
+				role.setName(String.format("%s (%s)", emp.getName(), emp.getEmployedIn().getName()));
+
+				return role;
+			})
+			.collect(Collectors.toList());
+	}
 }

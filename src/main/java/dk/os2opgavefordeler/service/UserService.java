@@ -15,7 +15,9 @@ import java.util.Optional;
 public interface UserService {
 	Optional<User> findById(long userId);
 	Optional<User> findByEmail(String email);
+
 	User createUser(User user);
+	User createUserFromOpenIdEmail(String email);
 
 	List<RolePO> getRoles(long userId);
 
