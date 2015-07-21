@@ -20,6 +20,7 @@ public interface UserService {
 	User createUserFromOpenIdEmail(String email);
 
 	List<RolePO> getRoles(long userId);
+	Optional<Role> findRoleById(long roleId);
 
 	void createRole(Role role);
 

@@ -2,7 +2,6 @@ package dk.os2opgavefordeler.service.impl;
 
 import com.nimbusds.jwt.ReadOnlyJWTClaimsSet;
 import com.nimbusds.oauth2.sdk.id.State;
-import dk.os2opgavefordeler.model.Employment;
 import dk.os2opgavefordeler.model.IdentityProvider;
 import dk.os2opgavefordeler.model.User;
 import dk.os2opgavefordeler.model.presentation.IdentityProviderPO;
@@ -48,6 +47,11 @@ public class AuthServiceImpl implements AuthService {
 	@Override
 	public String generateCsrfToken() {
 		return new State().toString();
+	}
+
+	@Override
+	public User getCurrentUser() {
+		throw new UnsupportedOperationException("Not implemented yet");
 	}
 
 	@Override
@@ -97,10 +101,5 @@ public class AuthServiceImpl implements AuthService {
 		catch(java.text.ParseException e) {
 			throw new AuthenticationException("Error parsing OpenID claims", e);
 		}
-	}
-
-	private boolean hasManagerRole(List<Employment> roles) {
-		return roles.stream()
-			.anyMatch(emp -> emp.getEmployedIn().getManager().equals(emp));
 	}
 }

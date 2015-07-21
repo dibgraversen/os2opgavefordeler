@@ -98,6 +98,19 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
+	public Optional<Role> findRoleById(long roleId) {
+		TypedQuery<Role> query = em.createQuery("SELECT r FROM Role r WHERE r.id = :roleId", Role.class);
+		query.setParameter("roleId", roleId);
+
+		try {
+			return Optional.of(query.getSingleResult());
+		}
+		catch(NoResultException ex) {
+			return Optional.empty();
+		}
+	}
+
+	@Override
 	public void createRole(Role role) {
 		em.persist(role);
 	}

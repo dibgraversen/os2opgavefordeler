@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Optional;
 
 public interface AuthService {
+	User getCurrentUser();	//TODO: should probably be handled with @Inject
+
 	Optional<IdentityProvider> findProvider(int id);
 
 	List<IdentityProvider> identityProviderList();

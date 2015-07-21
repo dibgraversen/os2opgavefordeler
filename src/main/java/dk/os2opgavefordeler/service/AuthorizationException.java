@@ -1,14 +1,15 @@
 package dk.os2opgavefordeler.service;
 
 public class AuthorizationException extends Exception {
-	private String message, userMessage;
-
-	public AuthorizationException(String message) {
-		this(message, null);
+	public AuthorizationException() {
+		super();
 	}
 
-	public AuthorizationException(String message, String userMessage) {
-		this.message = message;
-		this.userMessage = userMessage;
+	public AuthorizationException(String message) {
+		super(message);
+	}
+
+	public AuthorizationException(String message, Throwable cause) {
+		super(message, cause);
 	}
 }
