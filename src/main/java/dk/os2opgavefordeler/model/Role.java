@@ -2,6 +2,7 @@ package dk.os2opgavefordeler.model;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Objects;
 
 /**
  * @author hlo@miracle.dk
@@ -16,7 +17,8 @@ public class Role implements Serializable {
 
 	private String name;
 
-	private int employment;
+	@ManyToOne
+	private Employment employment;
 
 	private boolean manager;
 
@@ -46,13 +48,17 @@ public class Role implements Serializable {
 		return new Builder();
 	}
 
+	public User getOwner() {
+		return owner;
+	}
+
 	public void setOwner(User owner) {
 		this.owner = owner;
 	}
 
 	public static class Builder {
 		private String name;
-		private int employment;
+		private Employment employment;
 		private boolean manager;
 		private boolean admin;
 		private boolean municipalityAdmin;
@@ -66,7 +72,7 @@ public class Role implements Serializable {
 			this.name = name;
 			return this;
 		}
-		public Builder employment(int employment) {
+		public Builder employment(Employment employment) {
 			this.employment = employment;
 			return this;
 		}
@@ -112,11 +118,11 @@ public class Role implements Serializable {
 		this.name = name;
 	}
 
-	public int getEmployment() {
+	public Employment getEmployment() {
 		return employment;
 	}
 
-	public void setEmployment(int employment) {
+	public void setEmployment(Employment employment) {
 		this.employment = employment;
 	}
 
@@ -167,5 +173,22 @@ public class Role implements Serializable {
 				", municipalityAdmin=" + municipalityAdmin +
 				", substitute=" + substitute +
 				'}';
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		Role role = (Role) o;
+		return Objects.equals(employment, role.employment) &&
+			Objects.equals(manager, role.manager) &&
+			Objects.equals(admin, role.admin) &&
+			Objects.equals(municipalityAdmin, role.municipalityAdmin) &&
+			Objects.equals(substitute, role.substitute);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(employment, manager, admin, municipalityAdmin, substitute);
 	}
 }

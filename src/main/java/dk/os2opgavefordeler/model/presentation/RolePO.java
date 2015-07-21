@@ -54,7 +54,7 @@ public class RolePO {
 		id = role.getId();
 		userId = role.getUserId();
 		name = role.getName();
-		employment = role.getEmployment();
+		employment = role.getEmployment().getId();
 		manager = role.isManager();
 		admin = role.isAdmin();
 		municipalityAdmin = role.isMunicipalityAdmin();
@@ -71,18 +71,6 @@ public class RolePO {
 		admin = builder.admin;
 		municipalityAdmin = builder.municipalityAdmin;
 		substitute = builder.substitute;
-	}
-
-	public Role toRole() {
-		Role result = new Role();
-		result.setId(id);
-		result.setName(name);
-		result.setEmployment(employment);
-		result.setManager(manager);
-		result.setAdmin(admin);
-		result.setMunicipalityAdmin(municipalityAdmin);
-		result.setSubstitute(substitute);
-		return result;
 	}
 
 	public long getId() {
