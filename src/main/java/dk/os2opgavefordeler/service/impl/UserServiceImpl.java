@@ -161,23 +161,28 @@ public class UserServiceImpl implements UserService {
 		em.merge(settings);
 	}
 
-	public void createSubstituteRole(long targetUserId, long roleId)
+	public Role createSubstituteRole(long targetEmploymentId, long roleId)
 		throws ResourceNotFoundException, AuthorizationException
 	{
 		auth.verifyIsAdmin();
 
-		final User targetUser = findById(targetUserId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+		final Employment targetEmployment = employmentService.getEmployment(targetEmploymentId)
+			.orElseThrow(() -> new ResourceNotFoundException("Employment not found"));
+
+		final User targetUser = findByEmail(targetEmployment.getEmail())
+			.orElseGet(() -> createUserFromOpenIdEmail(targetEmployment.getEmail()));
+
 		final Role sourceRole = findRoleById(roleId).orElseThrow(() -> new ResourceNotFoundException("Role not found"));
 
 		auth.verifyCanActAs(sourceRole);
 
 		final Employment employment = sourceRole.getEmployment().orElseThrow(() -> new ResourceNotFoundException("Role has no employment"));
 
-		if(hasRoleFor(targetUser, employment.getId())) {
+		Optional<Role> existingRole = hasRoleFor(targetUser, employment.getId());
+		if(existingRole.isPresent()) {
 			log.info("createSubstituteRole: {} already has substitute role for {}", targetUser, employment);
 			//Don't add role if it already exists - and there's no reason to throw a hissy fit about it.
-			//TODO: move hasRoleFor to User class?
-			return;
+			return existingRole.get();
 		}
 
 		final Role substituteRole = Role.builder()
@@ -187,14 +192,15 @@ public class UserServiceImpl implements UserService {
 			.build();
 
 		targetUser.addRole(substituteRole);
+		return substituteRole;
 	}
 
-	private static boolean hasRoleFor(User user, long employmentId) {
+	private static Optional<Role> hasRoleFor(User user, long employmentId) {
 		return user.getRoles().stream()
-			.anyMatch(role -> role.getEmployment().map(
+			.filter(role -> role.getEmployment().map(
 					emp -> (emp.getId() == employmentId)
 				).orElse(false)
-			);
+			).findFirst();
 	}
 
 

@@ -2,6 +2,7 @@ package dk.os2opgavefordeler.rest;
 
 import dk.os2opgavefordeler.model.Role;
 import dk.os2opgavefordeler.model.User;
+import dk.os2opgavefordeler.model.presentation.RolePO;
 import dk.os2opgavefordeler.model.presentation.SubstitutePO;
 import dk.os2opgavefordeler.service.*;
 import org.slf4j.Logger;
@@ -58,11 +59,15 @@ public class RoleEndpoint {
 			validateNonzero(roleId, "Invalid roleId");
 			validateNonzero(employmentId, "Invalid employmentId");
 
-			employmentService.getEmployment(employmentId);
+			final Role role = userService.createSubstituteRole(employmentId, roleId);
 
-//			userService.createSubstituteRole(null, roleId);
-
-			return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
+			return Response.status(Response.Status.OK).entity(new RolePO(role)).build();
+		}
+		catch(ResourceNotFoundException e) {
+			return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
+		}
+		catch(AuthorizationException e) {
+			return Response.status(Response.Status.UNAUTHORIZED).entity(e.getMessage()).build();
 		}
 		catch(BadRequestArgumentException e) {
 			return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
@@ -75,5 +80,4 @@ public class RoleEndpoint {
 			throw new BadRequestArgumentException(message);
 		}
 	}
-
 }
