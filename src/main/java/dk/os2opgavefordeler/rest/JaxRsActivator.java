@@ -1,4 +1,4 @@
-package dk.osto.rest;
+package dk.os2opgavefordeler.rest;
 
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;

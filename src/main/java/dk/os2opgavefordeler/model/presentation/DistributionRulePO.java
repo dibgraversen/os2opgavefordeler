@@ -3,7 +3,6 @@ package dk.os2opgavefordeler.model.presentation;
 import dk.os2opgavefordeler.model.DistributionRule;
 import dk.os2opgavefordeler.model.Kle;
 import dk.os2opgavefordeler.model.OrgUnit;
-import dk.osto.model.KLE;
 
 /**
  * A Presentation Object for the TopicRoute model ready for use in the UI.
@@ -24,7 +23,7 @@ public class DistributionRulePO {
 	/**
 	 * The KLE data associated with this.
 	 */
-	private KLE kle;
+	private KlePO kle;
 
 	/**
 	 * The organisational unit responsible for handling this topic.
@@ -70,11 +69,11 @@ public class DistributionRulePO {
 		this.parent = parent;
 	}
 
-	public KLE getKle() {
+	public KlePO getKle() {
 		return kle;
 	}
 
-	public void setKle(KLE kle) {
+	public void setKle(KlePO kle) {
 		this.kle = kle;
 	}
 
@@ -104,8 +103,8 @@ public class DistributionRulePO {
 
 
 
-	private static KLE kleFrom(Kle in) {
-		KLE kle = new KLE();
+	private static KlePO kleFrom(Kle in) {
+		KlePO kle = new KlePO();
 
 		kle.setId(in.getId());
 		kle.setNumber(in.getNumber());
