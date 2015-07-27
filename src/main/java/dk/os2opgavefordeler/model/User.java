@@ -63,6 +63,26 @@ public class User implements Serializable {
 		return ImmutableList.copyOf(roles);
 	}
 
+	public void removeRole(Role role) {
+		if(roles.contains(role)) {
+			roles.remove(role);
+		}
+
+	}
+
+	public void addRole(Role role) {
+		final User currentOwner = role.getOwner();
+
+		if(currentOwner != null && !currentOwner.equals(this)) {
+			currentOwner.removeRole(role);
+
+		}
+		role.setOwner(this);
+		if(!roles.contains(role)) {
+			roles.add(role);
+		}
+	}
+
 
 	//--------------------------------------------------------------------------
 	// toString, equals, hashcode

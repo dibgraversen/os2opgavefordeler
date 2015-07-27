@@ -33,6 +33,9 @@ public class UserServiceImpl implements UserService {
 	@Inject
 	private EmploymentService employmentService;
 
+	@Inject
+	private AuthorizationService auth;
+
 	@Override
 	public Optional<User> findById(long userId) {
 		TypedQuery<User> query = em.createQuery("SELECT u FROM User u WHERE u.id = :userId", User.class);
@@ -155,6 +158,53 @@ public class UserServiceImpl implements UserService {
 		settings.setShowResponsible(updatedsettings.isShowResponsible());
 		settings.setShowExpandedOrg(updatedsettings.isShowExpandedOrg());
 		em.merge(settings);
+	}
+
+	public void createSubstituteRole(long targetUserId, long roleId)
+		throws ResourceNotFoundException, AuthorizationException
+	{
+		auth.verifyIsAdmin();
+
+		final User targetUser = findById(targetUserId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+		final Role sourceRole = findRoleById(roleId).orElseThrow(() -> new ResourceNotFoundException("Role not found"));
+
+		auth.verifyCanActAs(sourceRole);
+
+		final Employment employment = sourceRole.getEmployment().orElseThrow(() -> new ResourceNotFoundException("Role has no employment"));
+
+		if(hasRoleFor(targetUser, employment.getId())) {
+			log.info("createSubstituteRole: {} already has substitute role for {}", targetUser, employment);
+			//Don't add role if it already exists - and there's no reason to throw a hissy fit about it.
+			//TODO: move hasRoleFor to User class?
+			return;
+		}
+
+		final Role substituteRole = Role.builder()
+			.substitute(true)
+			.manager(sourceRole.isManager())
+			.employment(employment)
+			.build();
+
+		targetUser.addRole(substituteRole);
+	}
+
+	private static boolean hasRoleFor(User user, int employmentId) {
+		return user.getRoles().stream()
+			.anyMatch(role -> role.getEmployment().map(
+					emp -> (emp.getId() == employmentId)
+				).orElse(false)
+			);
+	}
+
+
+	@Override
+	public List<Role> findSubstitutesFor(long roleId) throws ResourceNotFoundException, AuthorizationException {
+		final Role role = findRoleById(roleId).orElseThrow(() -> new ResourceNotFoundException("Role not found"));
+		auth.verifyCanActAs(role);
+
+		return role.getOwner().getRoles().stream()
+			.filter(r -> r.isSubstitute())
+			.collect(Collectors.toList());
 	}
 
 	private List<Role> createRolesFromEmployments(List<Employment> employments) {

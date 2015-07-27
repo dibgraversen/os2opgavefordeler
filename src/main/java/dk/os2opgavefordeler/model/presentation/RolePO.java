@@ -1,5 +1,6 @@
 package dk.os2opgavefordeler.model.presentation;
 
+import dk.os2opgavefordeler.model.Employment;
 import dk.os2opgavefordeler.model.Role;
 
 /**
@@ -54,7 +55,7 @@ public class RolePO {
 		id = role.getId();
 		userId = role.getUserId();
 		name = role.getName();
-		employment = role.getEmployment().getId();
+		employment = role.getEmployment().map(e -> e.getId()).orElse(-1);
 		manager = role.isManager();
 		admin = role.isAdmin();
 		municipalityAdmin = role.isMunicipalityAdmin();

@@ -30,4 +30,7 @@ public interface UserService {
 	UserSettings createUserSettings(UserSettings userSettings);
 
 	void updateSettings(UserSettingsPO settings);
+
+	void createSubstituteRole(long targetUserId, long roleId) throws ResourceNotFoundException, AuthorizationException;
+	List<Role> findSubstitutesFor(long roleId) throws ResourceNotFoundException, AuthorizationException;
 }

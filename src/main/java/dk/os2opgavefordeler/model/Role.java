@@ -3,6 +3,7 @@ package dk.os2opgavefordeler.model;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * @author hlo@miracle.dk
@@ -118,8 +119,8 @@ public class Role implements Serializable {
 		this.name = name;
 	}
 
-	public Employment getEmployment() {
-		return employment;
+	public Optional<Employment> getEmployment() {
+		return Optional.ofNullable(employment);
 	}
 
 	public void setEmployment(Employment employment) {
