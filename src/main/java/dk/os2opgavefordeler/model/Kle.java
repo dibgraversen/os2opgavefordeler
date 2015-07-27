@@ -16,7 +16,7 @@ public class Kle implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	int id;
+	long id;
 
 	@ManyToOne
 	@JoinColumn
@@ -75,7 +75,7 @@ public class Kle implements Serializable {
 		return ImmutableList.copyOf(children);
 	}
 
-	public int getId() {
+	public long getId() {
 		return id;
 	}
 

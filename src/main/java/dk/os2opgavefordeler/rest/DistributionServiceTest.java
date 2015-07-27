@@ -179,7 +179,7 @@ public class DistributionServiceTest {
 		}
 	}
 
-	private Stream<String> getKleIds(int orgId, boolean includeUnowned, boolean includeImplicit) {
+	private Stream<String> getKleIds(long orgId, boolean includeUnowned, boolean includeImplicit) {
 		OrgUnit org;
 		if(orgId == ORG_1) {
 			org = orgUnitService.findByName("Digitalisering").get(0);

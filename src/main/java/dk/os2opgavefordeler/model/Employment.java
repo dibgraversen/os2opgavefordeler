@@ -13,7 +13,7 @@ import java.util.Objects;
 @Entity
 public class Employment implements Serializable {
 	@Id @GeneratedValue(strategy = GenerationType.AUTO)
-	private int id;
+	private long id;
 
 	private boolean isActive;
 
@@ -47,7 +47,7 @@ public class Employment implements Serializable {
 	//--------------------------------------------------------------------------
 	// Getter/setters
 	//--------------------------------------------------------------------------
-	public int getId() {
+	public long getId() {
 		return id;
 	}
 

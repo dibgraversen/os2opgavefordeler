@@ -26,7 +26,7 @@ public class RolePO {
 	 * This identifies the employment to which the role is connected.
 	 * Can be blank.
 	 */
-	private int employment;
+	private long employment;
 
 	/**
 	 * Whether or not the role is for a manager.
@@ -55,7 +55,7 @@ public class RolePO {
 		id = role.getId();
 		userId = role.getUserId();
 		name = role.getName();
-		employment = role.getEmployment().map(e -> e.getId()).orElse(-1);
+		employment = role.getEmployment().map(e -> e.getId()).orElse(-1L);
 		manager = role.isManager();
 		admin = role.isAdmin();
 		municipalityAdmin = role.isMunicipalityAdmin();
@@ -98,7 +98,7 @@ public class RolePO {
 		this.name = name;
 	}
 
-	public int getEmployment() {
+	public long getEmployment() {
 		return employment;
 	}
 

@@ -3,9 +3,9 @@ package dk.os2opgavefordeler.model.presentation;
 import dk.os2opgavefordeler.model.OrgUnit;
 
 public class OrgUnitPO {
-	private int id;
-	private int parentId;
-	private int managerId;
+	private long id;
+	private long parentId;
+	private long managerId;
 
 	private String name;
 	private String esdhId;
@@ -14,8 +14,8 @@ public class OrgUnitPO {
 
 	public OrgUnitPO(OrgUnit from) {
 		this.id = from.getId();
-		this.parentId = from.getParent().map(OrgUnit::getId).orElse(-1);
-		this.managerId = from.getManager().map(m -> m.getId()).orElse(-1);
+		this.parentId = from.getParent().map(OrgUnit::getId).orElse(-1L);
+		this.managerId = from.getManager().map(m -> m.getId()).orElse(-1L);
 
 		this.name = from.getName();
 		this.esdhId = from.getEsdhId();
@@ -23,11 +23,11 @@ public class OrgUnitPO {
 		this.phone = from.getPhone();
 	}
 
-	public int getParentId() {
+	public long getParentId() {
 		return parentId;
 	}
 
-	public int getManagerId() {
+	public long getManagerId() {
 		return managerId;
 	}
 
@@ -47,7 +47,7 @@ public class OrgUnitPO {
 		return phone;
 	}
 
-	public int getId() {
+	public long getId() {
 		return id;
 	}
 }

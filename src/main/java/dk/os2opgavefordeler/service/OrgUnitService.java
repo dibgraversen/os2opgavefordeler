@@ -26,13 +26,13 @@ public interface OrgUnitService {
 	 * @param id
 	 * @return fetched orgUnit, or Optional.empty if not found.
 	 */
-	Optional<OrgUnit> getOrgUnit(int id);
+	Optional<OrgUnit> getOrgUnit(long id);
 	Optional<OrgUnit> getToplevelOrgUnit();
 	List<OrgUnit> findByName(String name);
 
 	List<OrgUnitPO> getToplevelOrgUnitPO();
-	Optional<OrgUnitPO> getOrgUnitPO(int id);
+	Optional<OrgUnitPO> getOrgUnitPO(long id);
 
-	Optional<Employment> getEmployment(int id);
+	Optional<Employment> getEmployment(long id);
 	Optional<Employment> getEmploymentByName(String name);
 }

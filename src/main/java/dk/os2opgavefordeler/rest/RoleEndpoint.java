@@ -2,10 +2,8 @@ package dk.os2opgavefordeler.rest;
 
 import dk.os2opgavefordeler.model.Role;
 import dk.os2opgavefordeler.model.User;
-import dk.os2opgavefordeler.service.AuthService;
-import dk.os2opgavefordeler.service.AuthorizationException;
-import dk.os2opgavefordeler.service.ResourceNotFoundException;
-import dk.os2opgavefordeler.service.UserService;
+import dk.os2opgavefordeler.model.presentation.SubstitutePO;
+import dk.os2opgavefordeler.service.*;
 import org.slf4j.Logger;
 
 import javax.inject.Inject;
@@ -23,19 +21,20 @@ public class RoleEndpoint {
 	private UserService userService;
 
 	@Inject
+	private EmploymentService employmentService;
+
+	@Inject
 	private AuthService authenticationService;
 
 	@GET
 	@Path("/{id}/substitutes")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getSubstitutes(@PathParam("id") Long roleId) {
-		if(roleId == null || roleId == 0) {
-			return Response.status(Response.Status.BAD_REQUEST).entity("Invalid roleId").build();
-		}
-
 		final User currentUser = authenticationService.getCurrentUser();
 		try {
-			final List<Role> substitutes = userService.findSubstitutesFor(roleId);
+			validateNonzero(roleId, "Invalid roleId");
+
+			final List<SubstitutePO> substitutes = userService.findSubstitutesFor(roleId);
 			return Response.status(Response.Status.OK).entity(substitutes).build();
 		}
 		catch (ResourceNotFoundException ex) {
@@ -46,12 +45,35 @@ public class RoleEndpoint {
 			log.error("user {} unauthorized to act as role#{}", currentUser, roleId);
 			return Response.status(Response.Status.UNAUTHORIZED).entity("Unauthorized").build();
 		}
+		catch(BadRequestArgumentException e) {
+			return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+		}
 	}
 
 	@POST
 	@Path("/{roleId}/substitutes/{employmentId}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response createSubstitute() {
-		return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
+	public Response createSubstitute(@PathParam("roleId") Long roleId, @PathParam("employmentId") Long employmentId) {
+		try {
+			validateNonzero(roleId, "Invalid roleId");
+			validateNonzero(employmentId, "Invalid employmentId");
+
+			employmentService.getEmployment(employmentId);
+
+//			userService.createSubstituteRole(null, roleId);
+
+			return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
+		}
+		catch(BadRequestArgumentException e) {
+			return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+		}
 	}
+
+	private static void validateNonzero(Long value, String message) throws BadRequestArgumentException
+	{
+		if(value == null || value == 0) {
+			throw new BadRequestArgumentException(message);
+		}
+	}
+
 }

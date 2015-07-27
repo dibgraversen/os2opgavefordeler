@@ -36,7 +36,7 @@ public class OrgUnitServiceImpl implements OrgUnitService {
 	}
 
 	@Override
-	public Optional<OrgUnit> getOrgUnit(int id) {
+	public Optional<OrgUnit> getOrgUnit(long id) {
 		final List<OrgUnit> results = persistence.criteriaFind(OrgUnit.class,
 			(cb, cq, ou) -> cq.where(cb.equal(ou.get(OrgUnit_.id), id)
 			)
@@ -84,12 +84,12 @@ public class OrgUnitServiceImpl implements OrgUnitService {
 	}
 
 	@Override
-	public Optional<OrgUnitPO> getOrgUnitPO(int id) {
+	public Optional<OrgUnitPO> getOrgUnitPO(long id) {
 		return getOrgUnit(id).map(OrgUnitPO::new);
 	}
 
 	@Override
-	public Optional<Employment> getEmployment(int id) {
+	public Optional<Employment> getEmployment(long id) {
 		final List<Employment> results = persistence.criteriaFind(Employment.class,
 			(cb, cq, ou) -> cq.where(cb.equal(ou.get(Employment_.id), id))
 		);

@@ -130,13 +130,13 @@ public class DistributionRuleEndpoint {
 	private void updateDistributionRule(DistributionRule existing, DistributionRulePO updated) {
 		//TODO: these updates should probably call service methods instead of setters. At some point, we might want to
 		//calculate stuff and stuff with stuff on.
-		updateIfChanged(existing.getResponsibleOrg().map(OrgUnit::getId).orElse(0), updated.getResponsible(), newOwnerId -> {
+		updateIfChanged(existing.getResponsibleOrg().map(OrgUnit::getId).orElse(0L), updated.getResponsible(), newOwnerId -> {
 			OrgUnit newOwner = (newOwnerId == 0) ? null :
 				orgUnitService.getOrgUnit(newOwnerId).orElseThrow(IllegalArgumentException::new);
 			existing.setResponsibleOrg(newOwner);
 		});
 
-		updateIfChanged(existing.getAssignedOrg().map(OrgUnit::getId).orElse(0), updated.getOrg(), newOrgId -> {
+		updateIfChanged(existing.getAssignedOrg().map(OrgUnit::getId).orElse(0L), updated.getOrg(), newOrgId -> {
 			OrgUnit newOrg = (newOrgId == 0) ? null :
 				orgUnitService.getOrgUnit(newOrgId).orElseThrow(IllegalArgumentException::new);
 			existing.setAssignedOrg(newOrg);

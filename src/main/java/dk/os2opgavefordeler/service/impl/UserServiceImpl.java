@@ -5,6 +5,7 @@ import dk.os2opgavefordeler.model.Role;
 import dk.os2opgavefordeler.model.User;
 import dk.os2opgavefordeler.model.UserSettings;
 import dk.os2opgavefordeler.model.presentation.RolePO;
+import dk.os2opgavefordeler.model.presentation.SubstitutePO;
 import dk.os2opgavefordeler.model.presentation.UserSettingsPO;
 import dk.os2opgavefordeler.service.*;
 import org.slf4j.Logger;
@@ -188,7 +189,7 @@ public class UserServiceImpl implements UserService {
 		targetUser.addRole(substituteRole);
 	}
 
-	private static boolean hasRoleFor(User user, int employmentId) {
+	private static boolean hasRoleFor(User user, long employmentId) {
 		return user.getRoles().stream()
 			.anyMatch(role -> role.getEmployment().map(
 					emp -> (emp.getId() == employmentId)
@@ -198,12 +199,14 @@ public class UserServiceImpl implements UserService {
 
 
 	@Override
-	public List<Role> findSubstitutesFor(long roleId) throws ResourceNotFoundException, AuthorizationException {
+	public List<SubstitutePO> findSubstitutesFor(long roleId) throws ResourceNotFoundException, AuthorizationException {
 		final Role role = findRoleById(roleId).orElseThrow(() -> new ResourceNotFoundException("Role not found"));
 		auth.verifyCanActAs(role);
 
 		return role.getOwner().getRoles().stream()
 			.filter(r -> r.isSubstitute())
+			.peek(r -> log.info("findSubstitutesFor role {} - owner {}", r, r.getOwner()))
+			.map(r -> new SubstitutePO(r.getOwner().getName(), r.getId()))
 			.collect(Collectors.toList());
 	}
 

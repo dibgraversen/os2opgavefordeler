@@ -4,6 +4,7 @@ import dk.os2opgavefordeler.model.Role;
 import dk.os2opgavefordeler.model.User;
 import dk.os2opgavefordeler.model.UserSettings;
 import dk.os2opgavefordeler.model.presentation.RolePO;
+import dk.os2opgavefordeler.model.presentation.SubstitutePO;
 import dk.os2opgavefordeler.model.presentation.UserSettingsPO;
 
 import java.util.List;
@@ -32,5 +33,5 @@ public interface UserService {
 	void updateSettings(UserSettingsPO settings);
 
 	void createSubstituteRole(long targetUserId, long roleId) throws ResourceNotFoundException, AuthorizationException;
-	List<Role> findSubstitutesFor(long roleId) throws ResourceNotFoundException, AuthorizationException;
+	List<SubstitutePO> findSubstitutesFor(long roleId) throws ResourceNotFoundException, AuthorizationException;
 }

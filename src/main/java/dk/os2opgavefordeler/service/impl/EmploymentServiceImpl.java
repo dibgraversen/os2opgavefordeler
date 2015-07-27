@@ -21,7 +21,7 @@ public class EmploymentServiceImpl implements EmploymentService {
 	PersistenceService persistence;
 
 	@Override
-	public Optional<Employment> getEmployment(int id) {
+	public Optional<Employment> getEmployment(long id) {
 		final List<Employment> results = persistence.criteriaFind(Employment.class,
 			(cb, cq, ou) -> cq.where(cb.equal(ou.get(Employment_.id), id)
 			)
@@ -43,7 +43,7 @@ public class EmploymentServiceImpl implements EmploymentService {
 	}
 
 	@Override
-	public Optional<EmploymentPO> getEmploymentPO(int id) {
+	public Optional<EmploymentPO> getEmploymentPO(long id) {
 		return getEmployment(id).map(EmploymentPO::new);
 	}
 

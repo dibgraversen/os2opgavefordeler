@@ -46,7 +46,7 @@ public class DistributionServiceImpl implements DistributionService {
 	}
 
 	@Override
-	public Optional<DistributionRule> getDistribution(int id) {
+	public Optional<DistributionRule> getDistribution(long id) {
 		final List<DistributionRule> result = persistence.criteriaFind(DistributionRule.class,
 			(cb, cq, ent) -> cq.where(cb.equal(ent.get(DistributionRule_.id), id))
 		);
@@ -69,12 +69,12 @@ public class DistributionServiceImpl implements DistributionService {
 	}
 
 	@Override
-	public List<DistributionRule> getDistributionsForOrg(int orgId, boolean includeUnassigned) {
+	public List<DistributionRule> getDistributionsForOrg(long orgId, boolean includeUnassigned) {
 		return getDistributionsForOrg(orgId, includeUnassigned, false);
 	}
 
 	@Override
-	public List<DistributionRule> getDistributionsForOrg(int orgId, boolean includeUnassigned, boolean includeImplicit) {
+	public List<DistributionRule> getDistributionsForOrg(long orgId, boolean includeUnassigned, boolean includeImplicit) {
 		//TODO: implement a query-only solution instead of the current mix of query and subsequent collection filtering.
 
 		List<DistributionRule> results = persistence.criteriaFind(DistributionRule.class, (cb, cq, rule) ->
@@ -125,13 +125,13 @@ public class DistributionServiceImpl implements DistributionService {
 	 * @param includeImplicit whether to include implicitly owned DistributionRules
 	 * @return
 	 */
-	private java.util.function.Predicate<DistributionRule> getFilter(int orgId, boolean includeUnassigned, boolean includeImplicit) {
+	private java.util.function.Predicate<DistributionRule> getFilter(long orgId, boolean includeUnassigned, boolean includeImplicit) {
 		if (includeImplicit) {
 			// Include if implicitly owned by orgId, filter root-unowned based on 'includeUnassigned'
 			return dr -> getImplicitOwner(dr).map(id -> id == orgId).orElse(includeUnassigned);
 		} else {
 			// Include if explicitly owned by orgId, filter out implicitly owned, leave root-unowned.
-			return dr -> ( orgId == dr.getResponsibleOrg().map(OrgUnit::getId).orElse(-1)) || !getImplicitOwner(dr).isPresent();
+			return dr -> ( orgId == dr.getResponsibleOrg().map(OrgUnit::getId).orElse(-1L)) || !getImplicitOwner(dr).isPresent();
 		}
 	}
 
@@ -140,7 +140,7 @@ public class DistributionServiceImpl implements DistributionService {
 	 * @param dr DisitrbutionRule to find implicit owner for.
 	 * @return implicit owner, or Optional.empty for dr with no top-level owner.
 	 */
-	private Optional<Integer> getImplicitOwner(DistributionRule dr) {
+	private Optional<Long> getImplicitOwner(DistributionRule dr) {
 		if(dr == null) {
 			return Optional.empty();
 		} else if(dr.getResponsibleOrg().isPresent()) {
