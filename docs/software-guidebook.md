@@ -107,6 +107,15 @@ Der skal benyttes SAML til authentication.
 ===
 Id'er defineres med long.
 
+tabs til indentation.
+
+Anvendte Exceptions:
+- AuthorizationException
+- AuthenticationException
+- BadServiceArgumentException
+
+Der anvendes PresentationObjects (PO) til kommunikation. 
+
 Continuos integration
 ---
 Der etableres continuos integration til web interface og java applikation.
