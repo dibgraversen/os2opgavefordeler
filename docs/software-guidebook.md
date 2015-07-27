@@ -105,6 +105,7 @@ Der skal benyttes SAML til authentication.
 
 6. Principper
 ===
+Id'er defineres med long.
 
 Continuos integration
 ---
