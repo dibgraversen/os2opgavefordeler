@@ -153,11 +153,11 @@
 			return httpPost('/distribution-rules/'+distributionRule.id, distRule);
 		}
 
-		function addSubstitute(userEmployment, substituteEmployment){
-			return true;
+		function addSubstitute(userRole, substituteEmployment) {
+			return httpPost("/roles/" + userRole + "/substitutes/add?employmentId=" + substituteEmployment)
 		}
 
-		function removeSubstitute(userEmployment, substituteEmployment){
+		function removeSubstitute(userRole, substituteEmployment){
 			var deferred = $q.defer();
 			deferred.resolve(substituteEmployment);
 			return deferred.promise;

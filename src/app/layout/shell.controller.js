@@ -143,17 +143,16 @@
 			$modal.open({
 				templateUrl: 'app/home/add-substitute-modal.html',
 				controller: 'AddSubstituteModalInstanceCtrl'
-			}).result.then(function(sub){
-				console.log('getting a sub');
-				topicRouterApi.addSubstitute($scope.user.currentRole.employment, sub);
+			}).result.then(function(sub) {
+				topicRouterApi.addSubstitute($scope.user.currentRole.id, sub.id);
 				$scope.substitutes.push(sub);
 			});
 		}
 
-		function removeSubstitute(substitute){
-			topicRouterApi.removeSubstitute($scope.user.currentEmployment, substitute)
+		function removeSubstitute(substitute) {
+			topicRouterApi.removeSubstitute($scope.user.currentRole.id, substitute.id)
 					.then(function(){
-						_.remove($scope.substitutes, function(sub){
+						_.remove($scope.substitutes, function(sub) {
 							return sub === substitute;
 						});
 					});
