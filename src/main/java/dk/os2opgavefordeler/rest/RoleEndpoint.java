@@ -31,7 +31,6 @@ public class RoleEndpoint {
 	@Path("/{id}/substitutes")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getSubstitutes(@PathParam("id") Long roleId) {
-		final User currentUser = authenticationService.getCurrentUser();
 		try {
 			validateNonzero(roleId, "Invalid roleId");
 
@@ -43,7 +42,7 @@ public class RoleEndpoint {
 			return Response.status(Response.Status.NOT_FOUND).entity("Role not found").build();
 		}
 		catch (AuthorizationException e) {
-			log.error("user {} unauthorized to act as role#{}", currentUser, roleId);
+			log.error("current user unauthorized to act as role#{}", roleId);
 			return Response.status(Response.Status.UNAUTHORIZED).entity("Unauthorized").build();
 		}
 		catch(BadRequestArgumentException e) {
@@ -52,12 +51,14 @@ public class RoleEndpoint {
 	}
 
 	@POST
-	@Path("/{roleId}/substitutes/{employmentId}")
+	@Path("/{roleId}/substitutes/add")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response createSubstitute(@PathParam("roleId") Long roleId, @PathParam("employmentId") Long employmentId) {
+	public Response createSubstitute(@PathParam("roleId") Long roleId, @QueryParam("employmentId") Long employmentId) {
 		try {
 			validateNonzero(roleId, "Invalid roleId");
 			validateNonzero(employmentId, "Invalid employmentId");
+
+			log.info("createSubstitute {}->{}", roleId, employmentId);
 
 			final Role role = userService.createSubstituteRole(employmentId, roleId);
 

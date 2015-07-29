@@ -27,25 +27,25 @@ public class AuthEndpoint {
 
 
 	@Inject
-	Logger log;
+	private Logger log;
 
 	@Inject
-	AuthService authService;
+	private AuthService authService;
 
 	@Context
 	private HttpServletRequest request;
 
 	@Inject
-	ConfigService config;
+	private ConfigService config;
 
 	@POST
 	@Path("/logout")
 	@Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
 	public Response logout() {
 		log.info("Logging out user");
+//		authService.setCurrentUser(null);
 		request.getSession().removeAttribute(S_AUTHENTICATED_USER);
 		return Response.ok().entity(new SimpleMessage("logged out")).build();
-//		return Response.serverError().entity(new SimpleMessage("error logging out")).build();
 	}
 
 	@GET
@@ -98,9 +98,11 @@ public class AuthEndpoint {
 				.orElseThrow( () -> new AuthenticationException("Invalid IDP id"));
 
 			final User user = authService.finalizeAuthenticationFlow(idp, token, config.getOpenIdCallbackUrl(), ui.getRequestUri());
+
 			request.getSession().setAttribute(S_AUTHENTICATED_USER, user);
 
-			//TODO: keep this user logged in. Session state? Persisted token + cookie?
+			authService.setCurrentUser(user);
+
 
 			log.info("finishAuthentication: {} is now logged in, redirecting to {}", user, config.getHomeUrl());
 			return Response.temporaryRedirect(URI.create(config.getHomeUrl())).build();

@@ -50,9 +50,45 @@ public class AuthServiceImpl implements AuthService {
 	}
 
 	@Override
-	public User getCurrentUser() {
-		throw new UnsupportedOperationException("Not implemented yet");
+	public User getCurrentUser() throws AuthenticationException {
+		log.error("auth.getCurrentUser: not really implemented yet!");
+		final User user = null;
+
+		/*
+		//Since we do the following lookup-from-db-and-verify dance (to avoid stale sessions), we might perhaps as well
+		//store just the userid. This is going the be changed to access tokens anyway, so leave be for now.
+
+		final User user = (User) request.getSession().getAttribute("authenticated-user");
+
+		if(user == null) {
+			throw new AuthenticationException("user not logged ind");
+		}
+
+		final Optional<User> verifiedUser = userService.findById(user.getId());
+
+		log.info("User from session: {}, db-verified: {}" , user, verifiedUser);
+
+		final boolean valid = verifiedUser.map(u -> u.equals(user)).orElse(false);
+
+		if(!valid) {
+			throw new AuthenticationException("stale user");
+		}
+		*/
+
+		return user;
 	}
+
+	@Override
+	public void setCurrentUser(User user) {
+		/*
+		if(user != null) {
+			request.getSession().setAttribute(S_AUTHENTICATED_USER, user);
+		} else {
+			request.getSession().removeAttribute(S_AUTHENTICATED_USER);
+		}
+		*/
+	}
+
 
 	@Override
 	public Optional<IdentityProvider> findProvider(int id) {
