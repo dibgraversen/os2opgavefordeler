@@ -1,7 +1,6 @@
 package dk.os2opgavefordeler.rest;
 
 import dk.os2opgavefordeler.model.Role;
-import dk.os2opgavefordeler.model.User;
 import dk.os2opgavefordeler.model.presentation.RolePO;
 import dk.os2opgavefordeler.model.presentation.SubstitutePO;
 import dk.os2opgavefordeler.service.*;
@@ -25,7 +24,7 @@ public class RoleEndpoint {
 	private EmploymentService employmentService;
 
 	@Inject
-	private AuthService authenticationService;
+	private AuthenticationService authenticationService;
 
 	@GET
 	@Path("/{id}/substitutes")

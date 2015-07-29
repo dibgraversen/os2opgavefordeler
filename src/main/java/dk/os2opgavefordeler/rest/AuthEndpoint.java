@@ -3,7 +3,7 @@ package dk.os2opgavefordeler.rest;
 import dk.os2opgavefordeler.model.IdentityProvider;
 import dk.os2opgavefordeler.model.User;
 import dk.os2opgavefordeler.model.presentation.SimpleMessage;
-import dk.os2opgavefordeler.service.AuthService;
+import dk.os2opgavefordeler.service.AuthenticationService;
 import dk.os2opgavefordeler.service.AuthenticationException;
 import dk.os2opgavefordeler.service.ConfigService;
 import org.slf4j.Logger;
@@ -30,7 +30,7 @@ public class AuthEndpoint {
 	private Logger log;
 
 	@Inject
-	private AuthService authService;
+	private AuthenticationService authenticationService;
 
 	@Context
 	private HttpServletRequest request;
@@ -43,7 +43,7 @@ public class AuthEndpoint {
 	@Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
 	public Response logout() {
 		log.info("Logging out user");
-//		authService.setCurrentUser(null);
+//		authenticationService.setCurrentUser(null);
 		request.getSession().removeAttribute(S_AUTHENTICATED_USER);
 		return Response.ok().entity(new SimpleMessage("logged out")).build();
 	}
@@ -52,7 +52,7 @@ public class AuthEndpoint {
 	@Path("/providers")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response listIdp() {
-		return Response.ok().entity(authService.identityProviderPOList()).build();
+		return Response.ok().entity(authenticationService.identityProviderPOList()).build();
 	}
 
 	@GET
@@ -61,9 +61,9 @@ public class AuthEndpoint {
 		try {
 			final HttpSession session = request.getSession();
 
-			final IdentityProvider idp = authService.findProvider(providerId).orElseThrow(RuntimeException::new);
-			final String token = authService.generateCsrfToken();
-			final URI authReqURI = authService.beginAuthenticationFlow(idp, token, config.getOpenIdCallbackUrl());
+			final IdentityProvider idp = authenticationService.findProvider(providerId).orElseThrow(RuntimeException::new);
+			final String token = authenticationService.generateCsrfToken();
+			final URI authReqURI = authenticationService.beginAuthenticationFlow(idp, token, config.getOpenIdCallbackUrl());
 
 			session.setAttribute(S_CSRF_TOKEN, token);
 			session.setAttribute(S_IDP_ID, providerId);
@@ -94,14 +94,14 @@ public class AuthEndpoint {
 			String token = Optional.ofNullable((String) session.getAttribute(S_CSRF_TOKEN))
 				.orElseThrow( () -> new AuthenticationException("S_CSRF_TOKEN not set") );
 
-			IdentityProvider idp = authService.findProvider(idpId)
+			IdentityProvider idp = authenticationService.findProvider(idpId)
 				.orElseThrow( () -> new AuthenticationException("Invalid IDP id"));
 
-			final User user = authService.finalizeAuthenticationFlow(idp, token, config.getOpenIdCallbackUrl(), ui.getRequestUri());
+			final User user = authenticationService.finalizeAuthenticationFlow(idp, token, config.getOpenIdCallbackUrl(), ui.getRequestUri());
 
 			request.getSession().setAttribute(S_AUTHENTICATED_USER, user);
 
-			authService.setCurrentUser(user);
+			authenticationService.setCurrentUser(user);
 
 
 			log.info("finishAuthentication: {} is now logged in, redirecting to {}", user, config.getHomeUrl());

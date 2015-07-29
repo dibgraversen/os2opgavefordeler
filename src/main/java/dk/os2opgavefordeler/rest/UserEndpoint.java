@@ -4,8 +4,6 @@ import dk.os2opgavefordeler.model.User;
 import dk.os2opgavefordeler.model.presentation.RolePO;
 import dk.os2opgavefordeler.model.presentation.UserInfoPO;
 import dk.os2opgavefordeler.model.presentation.UserSettingsPO;
-import dk.os2opgavefordeler.service.AuthService;
-import dk.os2opgavefordeler.service.AuthenticationException;
 import dk.os2opgavefordeler.service.UserService;
 import org.slf4j.Logger;
 

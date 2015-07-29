@@ -16,7 +16,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Stateless
-public class AuthServiceImpl implements AuthService {
+public class AuthenticationServiceImpl implements AuthenticationService {
 	@Inject
 	private Logger log;
 
