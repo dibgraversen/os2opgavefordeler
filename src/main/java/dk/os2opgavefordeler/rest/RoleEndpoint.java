@@ -84,7 +84,7 @@ public class RoleEndpoint {
 
 			final Role role = userService.createSubstituteRole(employmentId, roleId);
 
-			return Response.status(Response.Status.OK).entity(new RolePO(role)).build();
+			return Response.status(Response.Status.OK).entity(new SubstitutePO(role.getOwner().getName(), role.getId())).build();
 		}
 		catch(ResourceNotFoundException e) {
 			return Response.status(Response.Status.NOT_FOUND).entity(new SimpleMessage(e.getMessage())).build();
