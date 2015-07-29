@@ -30,7 +30,8 @@
 				{
 					"name": "Kaffebestyrer",
 					"manager": {
-						"name": "Rune Nielsen"
+						"name": "Rune Nielsen",
+						"email": "rni@miracle.dk"
 					}
 				}
 			]

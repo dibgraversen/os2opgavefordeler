@@ -1,5 +1,6 @@
 package dk.os2opgavefordeler.service.impl;
 
+import com.google.common.base.Strings;
 import com.nimbusds.jwt.ReadOnlyJWTClaimsSet;
 import com.nimbusds.oauth2.sdk.id.State;
 import dk.os2opgavefordeler.model.IdentityProvider;
@@ -123,6 +124,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
 			final String email = claims.getStringClaim("email");
 			log.info("Email from claim: {}", email);
+
+			if(Strings.isNullOrEmpty(email)) {
+				throw new AuthenticationException("IDP returned empty email claim");
+			}
 
 			return userService.findByEmail(email)
 				.map(user -> {

@@ -24,6 +24,7 @@ public interface UserService {
 	Optional<Role> findRoleById(long roleId);
 
 	void createRole(Role role);
+	void removeRole(long roleId) throws ResourceNotFoundException, AuthorizationException;
 
 	Optional<UserSettings> getSettings(long userId);
 	UserSettingsPO getSettingsPO(long userId);

@@ -17,6 +17,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -82,7 +83,7 @@ public class UserServiceImpl implements UserService {
 		}
 
 		final List<Role> roles = createRolesFromEmployments(employments);
-		final String name = employments.get(0).getName();					//TODO: better approach than grabbing first name?
+		final String name = employments.get(0).getName();					//TODO: better approach than grabbing name from first employment?
 		final User user = new User(name, email, roles);
 
 		log.info("Persising {} with roles={}", user, roles);
@@ -117,6 +118,13 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public void createRole(Role role) {
 		em.persist(role);
+	}
+
+	@Override
+	public void removeRole(long roleId) throws ResourceNotFoundException, AuthorizationException {
+		final Role role = findRoleById(roleId).orElseThrow(() -> new ResourceNotFoundException("Role not found"));
+		auth.verifyCanActAs(role);
+		em.remove(role);
 	}
 
 	@Override
@@ -186,6 +194,7 @@ public class UserServiceImpl implements UserService {
 		}
 
 		final Role substituteRole = Role.builder()
+			.name(sourceRole.getName())
 			.substitute(true)
 			.manager(sourceRole.isManager())
 			.employment(employment)
@@ -209,8 +218,15 @@ public class UserServiceImpl implements UserService {
 		final Role role = findRoleById(roleId).orElseThrow(() -> new ResourceNotFoundException("Role not found"));
 		auth.verifyCanActAs(role);
 
-		return role.getOwner().getRoles().stream()
-			.filter(r -> r.isSubstitute())
+		if(!role.getEmployment().isPresent()) {
+			log.info("findSubstitutesFor {}: has no employment", role);
+			return Collections.emptyList();
+		}
+
+		final TypedQuery<Role> query = em.createQuery("SELECT r FROM Role r WHERE r.employment = :emp AND r.substitute = true", Role.class);
+		query.setParameter("emp", role.getEmployment().get());
+
+		return query.getResultList().stream()
 			.peek(r -> log.info("findSubstitutesFor role {} - owner {}", r, r.getOwner()))
 			.map(r -> new SubstitutePO(r.getOwner().getName(), r.getId()))
 			.collect(Collectors.toList());
