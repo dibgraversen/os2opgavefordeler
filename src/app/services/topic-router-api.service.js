@@ -79,7 +79,6 @@
 						var parent = objectMap[rule.parent];
 						rule.parent = parent;
 						parent.children.push(rule.id);
-						//console.log('rule has parent: '+rule.parent);
 					}
 					if(rule.employee > 0){
 						getEmployment(rule.employee).then(function(employee){
@@ -93,8 +92,7 @@
 					}
 					rule.open = true;
 					rule.visible = true;
-					if(rule.responsible > 0){
-						//if(rule.responsible === 2 ) rule.responsible = 3;
+					if(rule.responsible > 0) {
 						getOrgUnit(rule.responsible).then(function(orgUnit){
 							rule.responsible = orgUnit;
 						});
@@ -159,12 +157,7 @@
 
 		function removeSubstitute(substitute) {
 			$log.info("trying to remove ", substitute);
-
 			return httpDelete("/roles/" + substitute.roleId);
-
-//			var deferred = $q.defer();
-//			deferred.resolve(substituteEmployment);
-//			return deferred.promise;
 		}
 
 		// DTO classes.
@@ -269,7 +262,7 @@
 		}
 
 		function httpDelete(url) {
-			return httpExecute(url, 'DELETE');
+			return httpExecute(url, 'DELETE', {});
 		}
 
 		function httpPost(url, data) {
