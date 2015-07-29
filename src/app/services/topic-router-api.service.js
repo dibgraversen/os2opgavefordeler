@@ -3,12 +3,12 @@
 
 	angular.module('topicRouter').factory('topicRouterApi', topicRouterApi);
 
-	topicRouterApi.$inject = ['$http', '$q', '$timeout', '$cacheFactory', 'serverUrl', 'appSpinner'];
+	topicRouterApi.$inject = ['$http', '$q', '$timeout', '$cacheFactory', 'serverUrl', 'appSpinner', '$log'];
 
 	var maxPopoverLength = 150;
 
 	// NOTE consider implementing ngResource to manage RESTful resource endpoints.
-	function topicRouterApi($http, $q, $timeout, $cacheFactory, serverUrl, appSpinner) {
+	function topicRouterApi($http, $q, $timeout, $cacheFactory, serverUrl, appSpinner, $log) {
 		var service = {
 			getIdentityProviders: getIdentityProviders,
 			getUserInfo: getUserInfo,
@@ -154,13 +154,17 @@
 		}
 
 		function addSubstitute(userRole, substituteEmployment) {
-			return httpPost("/roles/" + userRole + "/substitutes/add?employmentId=" + substituteEmployment)
+			return httpPost("/roles/" + userRole + "/substitutes/add?employmentId=" + substituteEmployment);
 		}
 
-		function removeSubstitute(userRole, substituteEmployment){
-			var deferred = $q.defer();
-			deferred.resolve(substituteEmployment);
-			return deferred.promise;
+		function removeSubstitute(substitute) {
+			$log.info("trying to remove ", substitute);
+
+			return httpDelete("/roles/" + substitute.roleId);
+
+//			var deferred = $q.defer();
+//			deferred.resolve(substituteEmployment);
+//			return deferred.promise;
 		}
 
 		// DTO classes.
@@ -264,6 +268,10 @@
 			return httpExecute(url, 'GET', options);
 		}
 
+		function httpDelete(url) {
+			return httpExecute(url, 'DELETE');
+		}
+
 		function httpPost(url, data) {
 			cache.removeAll();
 			return httpExecute(url, 'POST', {data: data});
@@ -282,12 +290,12 @@
 			return $http(options).then(
 					function (response) {
 						appSpinner.hideSpinner();
-						console.log('**response from EXECUTE', response);
+						$log.info('**response from EXECUTE', response);
 						return response.data;
 					},
 					function(reason){
 						appSpinner.hideSpinner();
-						console.log('**response from EXECUTE', reason);
+						$log.info('**response from EXECUTE', reason);
 					});
 		}
 	}

@@ -144,14 +144,18 @@
 				templateUrl: 'app/home/add-substitute-modal.html',
 				controller: 'AddSubstituteModalInstanceCtrl'
 			}).result.then(function(sub) {
-				topicRouterApi.addSubstitute($scope.user.currentRole.id, sub.id);
-				$scope.substitutes.push(sub);
+				topicRouterApi.addSubstitute($scope.user.currentRole.id, sub.id).then(
+					function(substitute) {
+						$log.info("Substitute was added: ", substitute);
+						$scope.substitutes.push(substitute);
+					}
+				);
 			});
 		}
 
 		function removeSubstitute(substitute) {
-			topicRouterApi.removeSubstitute($scope.user.currentRole.id, substitute.id)
-					.then(function(){
+			topicRouterApi.removeSubstitute(substitute)
+					.then(function() {
 						_.remove($scope.substitutes, function(sub) {
 							return sub === substitute;
 						});
@@ -159,7 +163,7 @@
 		}
 
 		function updateFilter() {
-			console.log($scope.filter);
+			$log.info($scope.filter);
 		}
 
 		function updateSettings() {
