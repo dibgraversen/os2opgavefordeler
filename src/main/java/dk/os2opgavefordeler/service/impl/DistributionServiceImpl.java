@@ -61,7 +61,7 @@ public class DistributionServiceImpl implements DistributionService {
 	@Override
 	@SuppressWarnings("unchecked")
 	public List<DistributionRule> getDistributionsAll(long municipalityId) {
-		Query query = persistence.getEm().createQuery("SELECT r FROM DistributionRule r LEFT JOIN r.kle LEFT JOIN r.municipality WHERE r.municipality.id = :municipalityId ORDER BY r.kle.id ASC");
+		Query query = persistence.getEm().createQuery("SELECT r FROM DistributionRule r LEFT JOIN r.kle LEFT JOIN r.municipality WHERE r.municipality.id = :municipalityId ORDER BY r.kle.number ASC");
 		query.setParameter("municipalityId", municipalityId);
 		return query.getResultList();
 	}
@@ -83,19 +83,18 @@ public class DistributionServiceImpl implements DistributionService {
 			Join<DistributionRule, Municipality> ruleMunicipalityJoin = root.join(DistributionRule_.municipality);
 			final Predicate inMunicipality = cb.equal(ruleMunicipalityJoin.get(Municipality_.id), municipalityId);
 			predicates.add(inMunicipality);
-
 			final Predicate main = cb.equal(root.get(DistributionRule_.responsibleOrg), orgId);
-			if(includeUnassigned || includeImplicit){
+			if (includeUnassigned || includeImplicit) {
 				// TODO stop including all with no responsible org.
-				final Predicate mainOrUnassigned = cb.or(main, cb.isNull( root.get(DistributionRule_.responsibleOrg)));
+				final Predicate mainOrUnassigned = cb.or(main, cb.isNull(root.get(DistributionRule_.responsibleOrg)));
 				predicates.add(mainOrUnassigned);
 			} else {
 				predicates.add(main);
 			}
-
 			cq.where(predicates.toArray(new Predicate[]{}));
+			Join<DistributionRule, Kle> ruleKleJoin = root.join(DistributionRule_.kle);
+			cq.orderBy(cb.asc(ruleKleJoin.get("number")));
 		});
-
 		return results.stream()
 			.filter(getFilter(orgId, includeUnassigned, includeImplicit))
 			.collect(Collectors.toList());
