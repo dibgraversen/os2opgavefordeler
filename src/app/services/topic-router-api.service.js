@@ -23,7 +23,8 @@
 			updateDistributionRule: updateDistributionRule,
 			addSubstitute: addSubstitute,
 			removeSubstitute: removeSubstitute,
-			getMunicipalities: getMunicipalities
+			getMunicipalities: getMunicipalities,
+			createMunicipality: createMunicipality
 		};
 
 		var baseUrl = serverUrl;
@@ -163,6 +164,13 @@
 
 		function getMunicipalities(){
 			return httpGet('/municipalities');
+		}
+
+		/**
+		 * @param name The name of the municipality
+		 */
+		function createMunicipality(name){
+			return httpPost('/municipalities', { name: name });
 		}
 
 		// DTO classes.

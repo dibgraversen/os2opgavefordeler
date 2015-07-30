@@ -1,11 +1,25 @@
-<div>
-	<h2 class="page-title">Sysadm</h2>
+<div class="col-md-12">
 
-	<div class="jumbotron">
-		<div>
-			<p>
-				Velkommen til systemadmin.
-			</p>
-		</div>
+	<h2 class="page-title">Kommuner</h2>
+	<table class="table table-striped table-hover">
+		<thead>
+		<tr>
+			<th>
+				Navn
+			</th>
+		</tr>
+		</thead>
+		<tbody>
+		<tr ng-repeat="municipality in municipalities">
+			<td>{{ municipality.name }}</td>
+		</tr>
+		</tbody>
+	</table>
+
+	<div class="actions text-right">
+		<button type="button" class="btn btn-primary" ng-click="openCreateMunicipality()">
+			<span class="glyphicon glyphicon-plus"></span> Tilføj kommune
+		</button>
 	</div>
+
 </div>

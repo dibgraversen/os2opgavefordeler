@@ -2,11 +2,14 @@
 	'use strict';
 	angular.module('topicRouter').controller('SettingsCtrl', SettingsCtrl);
 
-	SettingsCtrl.$inject = ['$scope', '$state', '$log'];
+	SettingsCtrl.$inject = ['$scope', '$state', '$log', 'topicRouterApi', '$modal'];
 
-	function SettingsCtrl($scope, $state, $log) {
+	function SettingsCtrl($scope, $state, $log, topicRouterApi, $modal) {
 		/* jshint validthis: true */
 		var vm = this;
+		$scope.municipalities = [];
+
+		$scope.openCreateMunicipality = openCreateMunicipality;
 
 		activate();
 
@@ -16,9 +19,23 @@
 				$log.info("not privileged, redirecting to home");
 				$state.go("home");
 			}
+			topicRouterApi.getMunicipalities().then(function(municipalities){
+				$scope.municipalities = municipalities;
+			});
 		}
 
-		function navigate(){
+		// API
+
+		function openCreateMunicipality(){
+			var modalInstance = $modal.open({
+				templateUrl: 'app/municipality-admin/add-municipality-modal.html',
+				controller: 'AddMunicipalityModalInstanceCtrl',
+				size: 'md'
+			});
+
+			modalInstance.result.then(function(municipality){
+				$scope.municipalities.push(municipality);
+			});
 		}
 	}
 })();

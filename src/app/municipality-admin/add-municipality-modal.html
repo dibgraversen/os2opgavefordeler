@@ -1,0 +1,23 @@
+<div>
+	<div class="modal-header">
+		<button type="button" class="close" ng-click="cancel()"><span aria-hidden="true">&times;</span></button>
+		<h4 class="modal-title">Opret kommune</h4>
+	</div>
+	<div class="modal-body">
+		<alert ng-repeat="alert in createMunicipalityAlerts" type="{{alert.type}}"
+					 close="closeAlert($index)" class="animate-fade"
+					 style="width: 100%">{{alert.msg}}
+		</alert>
+		<form>
+			<div class="form-group">
+				<label for="municipalityName">Navn</label>
+				<input type="text" class="form-control" id="municipalityName" placeholder="Navn" ng-model="municipalityName" />
+			</div>
+		</form>
+
+	</div>
+	<div class="modal-footer">
+		<button class="btn btn-primary" ng-click="ok()">Opret</button>
+		<button class="btn btn-default" ng-click="cancel()">Annuller</button>
+	</div>
+</div>
