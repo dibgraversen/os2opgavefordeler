@@ -12,11 +12,11 @@ public interface DistributionService {
 	DistributionRule createDistributionRule(DistributionRule rule);
 	DistributionRule merge(DistributionRule rule);
 
-	Optional<DistributionRule> getDistribution(int id);
-	List<DistributionRule> getDistributionsAll();
+	Optional<DistributionRule> getDistribution(long id);
+	List<DistributionRule> getDistributionsAll(long municipalityId);
 
-	List<DistributionRule> getDistributionsForOrg(int orgId, boolean includeUnassigned);
-	List<DistributionRule> getDistributionsForOrg(int orgId, boolean includeUnassigned, boolean includeImplicit);
+	List<DistributionRule> getDistributionsForOrg(long orgId, long municipalityId, boolean includeUnassigned);
+	List<DistributionRule> getDistributionsForOrg(long orgId, long municipalityId, boolean includeUnassigned, boolean includeImplicit);
 
 	List<DistributionRulePO> getPoDistributions(OrgUnit orgUnit, DistributionRuleScope scope);
 }

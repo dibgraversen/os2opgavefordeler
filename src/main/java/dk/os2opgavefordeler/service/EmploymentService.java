@@ -7,10 +7,10 @@ import java.util.List;
 import java.util.Optional;
 
 public interface EmploymentService {
-	Optional<Employment> getEmployment(int id);
-	Optional<EmploymentPO> getEmploymentPO(int id);
+	Optional<Employment> getEmployment(long id);
+	Optional<EmploymentPO> getEmploymentPO(long id);
 	List<Employment> findByEmail(String email);
 
-	List<Employment> getAll();
-	List<EmploymentPO> getAllPO();
+	List<Employment> getAll(long municipalityId);
+	List<EmploymentPO> getAllPO(long municipalityId);
 }

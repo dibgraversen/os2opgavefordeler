@@ -1,10 +1,13 @@
 package dk.os2opgavefordeler.rest;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
 import dk.os2opgavefordeler.model.Employment;
 import dk.os2opgavefordeler.model.OrgUnit;
 import dk.os2opgavefordeler.model.presentation.OrgUnitPO;
 import dk.os2opgavefordeler.service.OrgUnitService;
+import org.jboss.resteasy.plugins.providers.multipart.InputPart;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 import org.slf4j.Logger;
 
 import javax.enterprise.context.RequestScoped;
@@ -12,12 +15,15 @@ import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
-@Path("/org-unit")
+@Path("/org-units")
 @RequestScoped
 public class OrgUnitEndpoint {
+	public static final String FILE = "file";
 	@Inject
 	Logger log;
 
@@ -27,8 +33,8 @@ public class OrgUnitEndpoint {
 	@GET
 	@Path("/")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response listAll() {
-		final List<OrgUnitPO> ou = orgUnitService.getToplevelOrgUnitPO();
+	public Response listAll( @QueryParam("municipalityId") Long municipalityId ) {
+		final List<OrgUnitPO> ou = orgUnitService.getToplevelOrgUnitPO(municipalityId);
 
 		if(!ou.isEmpty()) {
 			return Response.ok().entity(ou).build();
@@ -40,8 +46,8 @@ public class OrgUnitEndpoint {
 	@GET
 	@Path("/display")
 	@Produces(MediaType.TEXT_PLAIN)
-	public Response listAllDisplay() {
-		final Optional<OrgUnit> result = orgUnitService.getToplevelOrgUnit();
+	public Response listAllDisplay(@QueryParam("municipalityId") Long municipalityId) {
+		final Optional<OrgUnit> result = orgUnitService.getToplevelOrgUnit(municipalityId);
 
 		return result.map(
 			ou -> Response.ok().entity( printOrg(new StringBuilder(), 0, ou) )
@@ -53,7 +59,7 @@ public class OrgUnitEndpoint {
 	@GET
 	@Path("/{orgId}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response get(@PathParam("orgId") Integer orgId) {
+	public Response get(@PathParam("orgId") Long orgId) {
 		final Optional<OrgUnitPO> result = orgUnitService.getOrgUnitPO(orgId);
 
 		return result.map(
@@ -72,6 +78,32 @@ public class OrgUnitEndpoint {
 
 		orgUnitService.importOrganization(input);
 
+		return Response.ok().build();
+	}
+
+	@POST
+	@Path("/fileImport")
+	@Consumes(MediaType.MULTIPART_FORM_DATA)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response fileImport(MultipartFormDataInput multipartInput) {
+		Map<String, List<InputPart>> uploadForm = multipartInput.getFormDataMap();
+		List<InputPart> inputParts = uploadForm.get(FILE);
+		StringBuilder completeString = new StringBuilder();
+		for (InputPart inputPart : inputParts) {
+			try {
+				completeString.append(inputPart.getBodyAsString());
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		try {
+			ObjectMapper mapper = new ObjectMapper();
+			OrgUnit input = mapper.readValue(completeString.toString(), OrgUnit.class);
+			fixupOrgUnit(input);
+			orgUnitService.importOrganization(input);
+		} catch (IOException e) {
+			return Response.status(Response.Status.BAD_REQUEST).build();
+		}
 		return Response.ok().build();
 	}
 

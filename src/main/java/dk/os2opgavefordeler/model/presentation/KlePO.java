@@ -1,14 +1,14 @@
-package dk.osto.model;
+package dk.os2opgavefordeler.model.presentation;
 
 /**
  * @author hlo@miracle.dk
  */
-public class KLE {
+public class KlePO {
 
 	/**
 	 * Id for reference.
 	 */
-	private int id;
+	private long id;
 
 	/**
 	 * KLE number e.g. 01.06.01.
@@ -30,14 +30,14 @@ public class KLE {
 	 */
 	private String serviceText;
 
-	public KLE() {
+	public KlePO() {
 	}
 
-	public int getId() {
+	public long getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(long id) {
 		this.id = id;
 	}
 

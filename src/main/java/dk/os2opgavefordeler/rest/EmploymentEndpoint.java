@@ -1,7 +1,10 @@
 package dk.os2opgavefordeler.rest;
 
 import dk.os2opgavefordeler.model.presentation.EmploymentPO;
+import dk.os2opgavefordeler.model.presentation.SimpleMessage;
+import dk.os2opgavefordeler.service.BadRequestArgumentException;
 import dk.os2opgavefordeler.service.EmploymentService;
+import dk.os2opgavefordeler.util.Validate;
 import org.slf4j.Logger;
 
 import javax.enterprise.context.RequestScoped;
@@ -24,26 +27,37 @@ public class EmploymentEndpoint {
 	@GET
 	@Path("/")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response listAll() {
-		final List<EmploymentPO> employees =  employmentService.getAllPO();
+	public Response listAll(@QueryParam("municipalityId") Long municipalityId) {
+		try {
+			Validate.nonZero(municipalityId, "Invalid municipalityId");
+			final List<EmploymentPO> employees = employmentService.getAllPO(municipalityId);
 
-		if(!employees.isEmpty()) {
-			return Response.ok().entity(employees).build();
-		} else {
-			return Response.status(404).build();
+			if(!employees.isEmpty()) {
+				return Response.ok().entity(employees).build();
+			} else {
+				return Response.status(404).build();
+			}
+		}
+		catch(BadRequestArgumentException e) {
+			return Response.status(Response.Status.BAD_REQUEST).entity(new SimpleMessage(e.getMessage())).build();
 		}
 	}
 
 	@GET
 	@Path("/{empId}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response get(@PathParam("empId") Integer empId) {
-		final Optional<EmploymentPO> result = employmentService.getEmploymentPO(empId);
+	public Response get(@PathParam("empId") Long empId) {
+		try {
+			Validate.nonZero(empId, "Invalid employmentId");
+			final Optional<EmploymentPO> result = employmentService.getEmploymentPO(empId);
 
-		return result.map(
-			epo -> Response.ok().entity(epo)
-		).orElseGet(
-			() -> Response.status(404)
-		).build();
+			return result.map(
+				epo -> Response.ok().entity(epo)
+			).orElseGet(
+				() -> Response.status(404)
+			).build();
+		} catch (BadRequestArgumentException e) {
+			return Response.status(Response.Status.BAD_REQUEST).entity(new SimpleMessage(e.getMessage())).build();
+		}
 	}
 }

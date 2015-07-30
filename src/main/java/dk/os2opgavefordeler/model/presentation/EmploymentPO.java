@@ -3,7 +3,7 @@ package dk.os2opgavefordeler.model.presentation;
 import dk.os2opgavefordeler.model.Employment;
 
 public class EmploymentPO {
-	private int id;
+	private long id;
 
 //	private boolean isActive;
 	private String name;
@@ -23,7 +23,7 @@ public class EmploymentPO {
 		this.jobTitle = source.getJobTitle();
 	}
 
-	public int getId() {
+	public long getId() {
 		return id;
 	}
 

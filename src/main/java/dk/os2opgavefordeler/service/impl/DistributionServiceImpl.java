@@ -11,8 +11,10 @@ import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
+import javax.persistence.Query;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Predicate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -46,7 +48,7 @@ public class DistributionServiceImpl implements DistributionService {
 	}
 
 	@Override
-	public Optional<DistributionRule> getDistribution(int id) {
+	public Optional<DistributionRule> getDistribution(long id) {
 		final List<DistributionRule> result = persistence.criteriaFind(DistributionRule.class,
 			(cb, cq, ent) -> cq.where(cb.equal(ent.get(DistributionRule_.id), id))
 		);
@@ -57,38 +59,42 @@ public class DistributionServiceImpl implements DistributionService {
 	}
 
 	@Override
-	public List<DistributionRule> getDistributionsAll() {
-		List<DistributionRule> results = persistence.criteriaFind(DistributionRule.class, (cb, cq, rule) ->
-		{
-			Join<DistributionRule, Kle> joined = rule.join(DistributionRule_.kle);
-			cq.orderBy(cb.asc(joined.get(Kle_.number)));
-		});
-
-		return results.stream()
-			.collect(Collectors.toList());
+	@SuppressWarnings("unchecked")
+	public List<DistributionRule> getDistributionsAll(long municipalityId) {
+		Query query = persistence.getEm().createQuery("SELECT r FROM DistributionRule r LEFT JOIN r.kle LEFT JOIN r.municipality WHERE r.municipality.id = :municipalityId ORDER BY r.kle.number ASC");
+		query.setParameter("municipalityId", municipalityId);
+		return query.getResultList();
 	}
 
 	@Override
-	public List<DistributionRule> getDistributionsForOrg(int orgId, boolean includeUnassigned) {
-		return getDistributionsForOrg(orgId, includeUnassigned, false);
+	public List<DistributionRule> getDistributionsForOrg(long orgId, long municipalityId, boolean includeUnassigned) {
+		return getDistributionsForOrg(orgId, municipalityId, includeUnassigned, false);
 	}
 
 	@Override
-	public List<DistributionRule> getDistributionsForOrg(int orgId, boolean includeUnassigned, boolean includeImplicit) {
+	public List<DistributionRule> getDistributionsForOrg(long orgId, long municipalityId, boolean includeUnassigned, boolean includeImplicit) {
 		//TODO: implement a query-only solution instead of the current mix of query and subsequent collection filtering.
-
-		List<DistributionRule> results = persistence.criteriaFind(DistributionRule.class, (cb, cq, rule) ->
+		List<DistributionRule> results = persistence.criteriaFind(DistributionRule.class, (cb, cq, root) ->
 		{
 			// Implicit querying currently needs to include not directly owned rules, since their (possible) implicit
 			// ownership will be determined by Java code.
-			final Predicate main = cb.equal(rule.get(DistributionRule_.responsibleOrg), orgId);
-			final Predicate pred = (includeUnassigned || includeImplicit) ?
-				cb.or(main, cb.isNull( rule.get(DistributionRule_.responsibleOrg))) :
-				main;
-
-			cq.where(pred);
+			List<Predicate> predicates = new ArrayList<Predicate>();
+			// filter by municipality.
+			Join<DistributionRule, Municipality> ruleMunicipalityJoin = root.join(DistributionRule_.municipality);
+			final Predicate inMunicipality = cb.equal(ruleMunicipalityJoin.get(Municipality_.id), municipalityId);
+			predicates.add(inMunicipality);
+			final Predicate main = cb.equal(root.get(DistributionRule_.responsibleOrg), orgId);
+			if (includeUnassigned || includeImplicit) {
+				// TODO stop including all with no responsible org.
+				final Predicate mainOrUnassigned = cb.or(main, cb.isNull(root.get(DistributionRule_.responsibleOrg)));
+				predicates.add(mainOrUnassigned);
+			} else {
+				predicates.add(main);
+			}
+			cq.where(predicates.toArray(new Predicate[]{}));
+			Join<DistributionRule, Kle> ruleKleJoin = root.join(DistributionRule_.kle);
+			cq.orderBy(cb.asc(ruleKleJoin.get("number")));
 		});
-
 		return results.stream()
 			.filter(getFilter(orgId, includeUnassigned, includeImplicit))
 			.collect(Collectors.toList());
@@ -99,14 +105,14 @@ public class DistributionServiceImpl implements DistributionService {
 		final List<DistributionRule> distributions;
 		switch(scope) {
 			case INHERITED:
-				distributions = getDistributionsForOrg(orgUnit.getId(), true, true);
+				distributions = getDistributionsForOrg(orgUnit.getId(), orgUnit.getMunicipality().get().getId(), true, true);
 				break;
 			case RESPONSIBLE:
-				distributions = getDistributionsForOrg(orgUnit.getId(), true, false);
+				distributions = getDistributionsForOrg(orgUnit.getId(), orgUnit.getMunicipality().get().getId(), true, false);
 				break;
 			case ALL:
 			default:/* intentional fallthrough */
-				distributions = getDistributionsAll();
+				distributions = getDistributionsAll(orgUnit.getMunicipality().get().getId());
 		}
 
 		return distributions.stream()
@@ -125,13 +131,13 @@ public class DistributionServiceImpl implements DistributionService {
 	 * @param includeImplicit whether to include implicitly owned DistributionRules
 	 * @return
 	 */
-	private java.util.function.Predicate<DistributionRule> getFilter(int orgId, boolean includeUnassigned, boolean includeImplicit) {
+	private java.util.function.Predicate<DistributionRule> getFilter(long orgId, boolean includeUnassigned, boolean includeImplicit) {
 		if (includeImplicit) {
 			// Include if implicitly owned by orgId, filter root-unowned based on 'includeUnassigned'
 			return dr -> getImplicitOwner(dr).map(id -> id == orgId).orElse(includeUnassigned);
 		} else {
 			// Include if explicitly owned by orgId, filter out implicitly owned, leave root-unowned.
-			return dr -> ( orgId == dr.getResponsibleOrg().map(OrgUnit::getId).orElse(-1)) || !getImplicitOwner(dr).isPresent();
+			return dr -> ( orgId == dr.getResponsibleOrg().map(OrgUnit::getId).orElse(-1L)) || !getImplicitOwner(dr).isPresent();
 		}
 	}
 
@@ -140,7 +146,7 @@ public class DistributionServiceImpl implements DistributionService {
 	 * @param dr DisitrbutionRule to find implicit owner for.
 	 * @return implicit owner, or Optional.empty for dr with no top-level owner.
 	 */
-	private Optional<Integer> getImplicitOwner(DistributionRule dr) {
+	private Optional<Long> getImplicitOwner(DistributionRule dr) {
 		if(dr == null) {
 			return Optional.empty();
 		} else if(dr.getResponsibleOrg().isPresent()) {

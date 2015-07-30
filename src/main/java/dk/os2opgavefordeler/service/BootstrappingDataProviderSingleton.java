@@ -22,6 +22,14 @@ import java.util.stream.Stream;
 @Singleton
 @Startup
 public class BootstrappingDataProviderSingleton {
+	private static final String DIGITALISERING = "Digitalisering";
+	private static final String MODERN_ART = "Moderne kunst";
+
+	private static final String DEVELOPMENT = "Udvikling";
+	private static final String CULTURE = "Kultur";
+
+
+
 	@Inject
 	private Logger log;
 
@@ -43,25 +51,46 @@ public class BootstrappingDataProviderSingleton {
 	@Inject
 	private DistributionService distService;
 
+	@Inject
+	private MunicipalityService mService;
+
+	private Municipality miracle;
+	private Municipality syddjurs;
+
 	@PostConstruct
 	public void bootstrap() {
+		addMunicipalities();
 		buildOrgUnits();
 		buildUsers();
 
 		final List<Kle> groups = loadBootstrapKle();
-		buildDistributionRules();
+		buildDistributionRulesForMunicipality(miracle, findOrg(DIGITALISERING), findOrg(MODERN_ART));
+		buildDistributionRulesForMunicipality(syddjurs, findOrg(DEVELOPMENT), findOrg(CULTURE));
+	}
+
+	private void addMunicipalities() {
+		miracle = addMunicipality("Miracle");
+		syddjurs = addMunicipality("Syddjurs Kommune");
+	}
+
+	private Municipality addMunicipality(String name) {
+		Municipality m = new Municipality();
+		m.setName(name);
+		mService.createMunicipality(m);
+		return m;
 	}
 
 	private void buildUsers() {
-		addUser("Helle Friis Pedersen",		"hfp@miracle.dk", buildRoles());
-		addUser("Hans Ehlert Thomsen",		"het@miracle.dk", buildRoles());
-		addUser("Henrik Løvborg",			"hlo@miracle.dk", buildRoles());
-		addUser("Simon Møgelvang Bang",		"smb@miracle.dk", buildRoles());
-		addUser("Sune Marcher",				"sum@miracle.dk", buildRoles());
+		addUser("Helle Friis Pedersen", "hfp@miracle.dk", buildRoles());
+		addUser("Hans Ehlert Thomsen", "het@miracle.dk", buildRoles());
+		addUser("Henrik Løvborg", "hlo@miracle.dk", buildRoles());
+		addUser("Simon Møgelvang Bang", "smb@miracle.dk", buildRoles());
+		addUser("Sune Marcher", "sum@miracle.dk", buildRoles());
 	}
 
 	private User addUser(String name, String email, List<Role> roles) {
 		final User user = new User(name, email, roles);
+		user.setMunicipality(miracle);
 		return usersService.createUser(user);
 	}
 
@@ -72,10 +101,10 @@ public class BootstrappingDataProviderSingleton {
 		final Employment menig = employmentService.findByEmail("menig@kommune.dk").get(0);
 
 		final List<Role> roles = ImmutableList.of(
-			Role.builder().name(borge.getName()).employment(borge.getId()).manager(true).build(),
-			Role.builder().name(kodah.getName()).employment(kodah.getId()).manager(true).build(),
-			Role.builder().name(admin.getName() + " (Kommuneadmin)").employment(admin.getId()).municipalityAdmin(true).build(),
-			Role.builder().name(menig.getName() + " (Upriviligeret)").employment(menig.getId()).build(),
+			Role.builder().name(borge.getName()).employment(borge).manager(true).build(),
+			Role.builder().name(kodah.getName()).employment(kodah).manager(true).build(),
+			Role.builder().name(admin.getName() + " (Kommuneadmin)").employment(admin).municipalityAdmin(true).build(),
+			Role.builder().name(menig.getName() + " (Upriviligeret)").employment(menig).build(),
 			Role.builder().name("Sysadmin").admin(true).build()
 		);
 
@@ -90,7 +119,7 @@ public class BootstrappingDataProviderSingleton {
 
 	private List<Kle> loadBootstrapKle() {
 		log.info("Loading bootstrap KLE");
-		try(final InputStream resource = getResource("KLE-valid-data.xml")) {
+		try (final InputStream resource = getResource("KLE-valid-data.xml")) {
 			final List<Kle> groups = importer.importFromXml(resource);
 			kleService.storeAllKleMainGroups(groups);
 			return groups;
@@ -103,7 +132,7 @@ public class BootstrappingDataProviderSingleton {
 	private OrgUnit loadBootstrapOrgUnit() {
 		final ObjectMapper mapper = new ObjectMapper();
 
-		try (final InputStream resource = getResource("KLE-valid-data.xml")){
+		try (final InputStream resource = getResource("KLE-valid-data.xml")) {
 			return mapper.readValue(getResource("bootstrap-organization.json"), OrgUnit.class);
 		} catch (IOException e) {
 			log.error("Couldn't deserialize bootstrap org", e);
@@ -113,61 +142,72 @@ public class BootstrappingDataProviderSingleton {
 	}
 
 
-	private void buildDistributionRules() {
+	private void buildDistributionRulesForMunicipality(Municipality municipality,
+																										 OrgUnit org1,
+																										 OrgUnit org2) {
 		createRules(
-			// === Fully unassigned group
-			DistributionRule.builder()
-				.responsibleOrg(null)
-				.kle(kleService.fetchMainGroup("00").get())
-				.children(
-					DistributionRule.builder()
+				// === Fully unassigned group
+				DistributionRule.builder()
 						.responsibleOrg(null)
-						.kle(kleService.fetchMainGroup("00.01").get())
+						.kle(kleService.fetchMainGroup("00").get())
+						.municipality(municipality)
 						.children(
-							DistributionRule.builder()
-								.responsibleOrg(null)
-								.kle(kleService.fetchMainGroup("00.01.00").get())
-							.build()
+								DistributionRule.builder()
+										.responsibleOrg(null)
+										.kle(kleService.fetchMainGroup("00.01").get())
+										.municipality(municipality)
+										.children(
+												DistributionRule.builder()
+														.responsibleOrg(null)
+														.kle(kleService.fetchMainGroup("00.01.00").get())
+														.municipality(municipality)
+														.build()
+										)
+										.build()
 						)
-					.build()
-				)
-			.build(),
+						.build(),
 
-			// === Group with assigned toplevel
-			DistributionRule.builder()
-				.responsibleOrg(findOrg("Digitalisering"))
-				.kle(kleService.fetchMainGroup("13").get())
-				.children(
-					DistributionRule.builder()
-						.responsibleOrg(null)
-						.kle(kleService.fetchMainGroup("13.00").get())
+				// === Group with assigned toplevel
+				DistributionRule.builder()
+						.responsibleOrg(org1)
+						.kle(kleService.fetchMainGroup("13").get())
+						.municipality(municipality)
 						.children(
-							DistributionRule.builder()
-								.responsibleOrg(null)
-								.kle(kleService.fetchMainGroup("13.00.00").get())
-							.build()
+								DistributionRule.builder()
+										.responsibleOrg(null)
+										.kle(kleService.fetchMainGroup("13.00").get())
+										.municipality(municipality)
+										.children(
+												DistributionRule.builder()
+														.responsibleOrg(null)
+														.kle(kleService.fetchMainGroup("13.00.00").get())
+														.municipality(municipality)
+														.build()
+										)
+										.build()
 						)
-					.build()
-				)
-			.build(),
+						.build(),
 
-			// Group with two assigned levels
-			DistributionRule.builder()
-				.responsibleOrg(findOrg("Moderne kunst"))
-				.kle(kleService.fetchMainGroup("14").get())
-				.children(
-					DistributionRule.builder()
-						.responsibleOrg(findOrg("Moderne kunst"))
-						.kle(kleService.fetchMainGroup("14.00").get())
+				// Group with two assigned levels
+				DistributionRule.builder()
+						.responsibleOrg(org2)
+						.kle(kleService.fetchMainGroup("14").get())
+						.municipality(municipality)
 						.children(
-							DistributionRule.builder()
-								.responsibleOrg(null)
-								.kle(kleService.fetchMainGroup("14.00.01").get())
-								.build()
+								DistributionRule.builder()
+										.responsibleOrg(org2)
+										.kle(kleService.fetchMainGroup("14.00").get())
+										.municipality(municipality)
+										.children(
+												DistributionRule.builder()
+														.responsibleOrg(null)
+														.kle(kleService.fetchMainGroup("14.00.01").get())
+														.municipality(municipality)
+														.build()
+										)
+										.build()
 						)
 						.build()
-				)
-			.build()
 		);
 	}
 

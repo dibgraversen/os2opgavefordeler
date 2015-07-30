@@ -56,4 +56,8 @@ public class PersistenceServiceImpl implements PersistenceService {
 	public void rollbackTransaction() {
 		em.getTransaction().rollback();
 	}
+
+	public EntityManager getEm(){
+		return em;
+	}
 }

@@ -105,6 +105,16 @@ Der skal benyttes SAML til authentication.
 
 6. Principper
 ===
+Id'er defineres med long.
+
+tabs til indentation.
+
+Anvendte Exceptions:
+- AuthorizationException
+- AuthenticationException
+- BadServiceArgumentException
+
+Der anvendes PresentationObjects (PO) til kommunikation. 
 
 Continuos integration
 ---

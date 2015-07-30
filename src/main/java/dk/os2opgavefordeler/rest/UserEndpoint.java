@@ -25,7 +25,7 @@ public class UserEndpoint {
 	private Logger log;
 
 	@Inject
-	UserService usersService;
+	private UserService userService;
 
 	@Context
 	private HttpServletRequest request;
@@ -38,7 +38,7 @@ public class UserEndpoint {
 		//store just the userid. This is going the be changed to access tokens anyway, so leave be for now.
 
 		final User user = (User) request.getSession().getAttribute("authenticated-user");
-		final Optional<User> verifiedUser = (user == null) ? Optional.empty() : usersService.findById(user.getId());
+		final Optional<User> verifiedUser = (user == null) ? Optional.empty() : userService.findById(user.getId());
 
 		log.info("User from session: {}, db-verified: {}" , user, verifiedUser);
 
@@ -47,13 +47,22 @@ public class UserEndpoint {
 		return valid ?
 			Response.ok().entity(new UserInfoPO(user)).build() :
 			Response.ok().entity(UserInfoPO.INVALID).build();
+		/*
+		try {
+			final User user = authenticationService.getCurrentUser();
+			return Response.ok().entity(new UserInfoPO(user)).build();
+		}
+		catch(AuthenticationException e) {
+			return Response.ok().entity(UserInfoPO.INVALID).build();
+		}
+		*/
 	}
 
 	@GET
 	@Path("/{userId}/roles")
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<RolePO> getRolesForUser(@PathParam("userId") long userId) {
-		List<RolePO> result = usersService.getRoles(userId);
+		List<RolePO> result = userService.getRoles(userId);
 		return result;
 	}
 
@@ -65,13 +74,13 @@ public class UserEndpoint {
 			log.warn("invalid userId");
 			return Response.status(Response.Status.BAD_REQUEST).entity("invalid userId").build();
 		}
-		return Response.ok(usersService.getSettingsPO(userId)).build();
+		return Response.ok(userService.getSettingsPO(userId)).build();
 	}
 
 	@POST
 	@Path("/{userId}/settings")
 	public void updateSettingsForUser(@PathParam("userId") long userId, UserSettingsPO settings) {
 		settings.setUserId(userId);
-		usersService.updateSettings(settings);
+		userService.updateSettings(settings);
 	}
 }

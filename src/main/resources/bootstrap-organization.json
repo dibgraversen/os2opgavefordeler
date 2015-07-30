@@ -1,97 +1,158 @@
 {
+	"businessKey": "K1", 
 	"name": "Fantastisk Kommune",
 	"manager": {
-		"name": "Borge Meister",
-		"email": "borge@kommune.dk"
+	"businessKey": "E1",
+	"name": "Borge Meister",
+	"email": "borge@kommune.dk"
 	},
 	"employees": [
-		{
-			"name": "Jeanne Deij"
-		},
-		{
-			"name": "Menig Mand",
-			"email": "menig@kommune.dk"
-		}
+	{
+		"businessKey": "E2",
+		"name": "Jeanne Deij"
+	},
+	{
+		"businessKey": "E3",
+		"name": "Menig Mand",
+		"email": "menig@kommune.dk"
+	}
 	],
+	"municipality": {
+	"name": "Miracle"
+	},
 	"children": [
+	{
+		"businessKey": "K2",
+		"name": "Administration",
+		"manager": {
+		"businessKey": "E4",
+		"name": "Amin Stratah",
+		"email": "admin@kommune.dk"
+		},
+		"municipality": {
+		"name": "Miracle"
+		},
+		"children": [
 		{
-			"name": "Administration",
+			"businessKey": "K3",
+			"name": "Personale",
 			"manager": {
-				"name": "Amin Stratah",
-				"email": "admin@kommune.dk"
+			"businessKey": "E5",
+			"name": "Jette Jensen"
 			},
-			"children": [
-				{
-					"name": "Personale",
-					"manager": {
-						"name": "Jette Jensen"
-					}
-				},
-				{
-					"name": "Kaffebestyrer",
-					"manager": {
-						"name": "Rune Nielsen"
-					}
-				}
-			]
+			"municipality": {
+			"name": "Miracle"
+			}
+
 		},
 		{
-			"name": "Digitalisering",
+			"businessKey": "K4",
+			"name": "Kaffebestyrer",
 			"manager": {
-				"name": "David Hilbert"
+			"businessKey": "E6",
+			"name": "Rune Nielsen",
+			"email": "rni@miracle.dk"
 			},
-
-			"children": [
-				{
-					"name": "Services",
-					"manager": {
-						"name": "Laila Leander"
-					}
-				},
-				{
-					"name": "Udvikling",
-					"manager": {
-						"name": "Karl Kodah",
-						"email": "kodah@kommune.dk"
-					},
-
-					"children": [
-						{
-							"name": "Backend",
-							"manager": {
-								"name": "Tyge Tordenskjold"
-							}
-						},
-						{
-							"name": "Borgervendt",
-							"manager": {
-								"name": "Søren Dines"
-							}
-						}
-					]
-				}
-			]
+			"municipality": {
+			"name": "Miracle"
+			}
+		}
+		]
+	},
+	{
+		"businessKey": "K5",
+		"name": "Digitalisering",
+		"manager": {
+		"businessKey": "E7",
+		"name": "David Hilbert"
+		},
+		"municipality": {
+		"name": "Miracle"
+		},
+		"children": [
+		{
+			"businessKey": "K6",
+			"name": "Services",
+			"manager": {
+			"businessKey": "E8",
+			"name": "Laila Leander"
+			},
+			"municipality": {
+			"name": "Miracle"
+			}
 		},
 		{
-			"name": "Kultur",
+			"businessKey": "K7",
+			"name": "Udvikling",
 			"manager": {
-				"name": "Hemet Nesingwary"
+			"businessKey": "E9",
+			"name": "Karl Kodah",
+			"email": "kodah@kommune.dk"
 			},
-
+			"municipality": {
+			"name": "Miracle"
+			},
 			"children": [
-				{
-					"name": "Berigelse",
-					"manager": {
-						"name": "Olfert Kvium"
-					}
+			{
+				"businessKey": "K8",
+				"name": "Backend",
+				"manager": {
+				"businessKey": "E10",
+				"name": "Tyge Tordenskjold"
 				},
-				{
-					"name": "Moderne kunst",
-					"manager": {
-						"name": "Picasso Monetsen"
-					} 
+				"municipality": {
+				"name": "Miracle"
 				}
+			},
+			{
+				"businessKey": "K9",
+				"name": "Borgervendt",
+				"manager": {
+				"businessKey": "E11",
+				"name": "Søren Dines"
+				},
+				"municipality": {
+				"name": "Miracle"
+				}
+			}
 			]
 		}
+		]
+	},
+	{
+		"businessKey": "K10",
+		"name": "Kultur",
+		"manager": {
+		"businessKey": "E12",
+		"name": "Hemet Nesingwary"
+		},
+		"municipality": {
+		"name": "Miracle"
+		},
+		"children": [
+		{
+			"businessKey": "K11",
+			"name": "Berigelse",
+			"manager": {
+			"businessKey": "E13",
+			"name": "Olfert Kvium"
+			},
+			"municipality": {
+			"name": "Miracle"
+			}
+		},
+		{
+			"businessKey": "K12",
+			"name": "Moderne kunst",
+			"manager": {
+			"businessKey": "E14",
+			"name": "Picasso Monetsen"
+			},
+			"municipality": {
+			"name": "Miracle"
+			}
+		}
+		]
+	}
 	]
 }

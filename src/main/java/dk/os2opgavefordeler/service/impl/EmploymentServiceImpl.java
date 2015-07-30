@@ -10,6 +10,7 @@ import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
+import javax.persistence.Query;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -21,7 +22,7 @@ public class EmploymentServiceImpl implements EmploymentService {
 	PersistenceService persistence;
 
 	@Override
-	public Optional<Employment> getEmployment(int id) {
+	public Optional<Employment> getEmployment(long id) {
 		final List<Employment> results = persistence.criteriaFind(Employment.class,
 			(cb, cq, ou) -> cq.where(cb.equal(ou.get(Employment_.id), id)
 			)
@@ -43,18 +44,21 @@ public class EmploymentServiceImpl implements EmploymentService {
 	}
 
 	@Override
-	public Optional<EmploymentPO> getEmploymentPO(int id) {
+	public Optional<EmploymentPO> getEmploymentPO(long id) {
 		return getEmployment(id).map(EmploymentPO::new);
 	}
 
 	@Override
-	public List<Employment> getAll() {
-		return persistence.findAll(Employment.class);
+	@SuppressWarnings("unchecked")
+	public List<Employment> getAll(long municipalityId) {
+		Query query = persistence.getEm().createQuery("SELECT emp FROM Employment emp WHERE emp.employedIn.municipality.id = :municipalityId");
+		query.setParameter("municipalityId", municipalityId);
+		return query.getResultList();
 	}
 
 	@Override
-	public List<EmploymentPO> getAllPO() {
-		final List<Employment> employments = getAll();
+	public List<EmploymentPO> getAllPO(long municipalityId) {
+		final List<Employment> employments = getAll(municipalityId);
 		return employments.stream()
 			.map(EmploymentPO::new)
 			.collect(Collectors.toList());

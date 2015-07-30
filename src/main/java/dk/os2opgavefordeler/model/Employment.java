@@ -13,7 +13,7 @@ import java.util.Objects;
 @Entity
 public class Employment implements Serializable {
 	@Id @GeneratedValue(strategy = GenerationType.AUTO)
-	private int id;
+	private long id;
 
 	private boolean isActive;
 
@@ -47,8 +47,16 @@ public class Employment implements Serializable {
 	//--------------------------------------------------------------------------
 	// Getter/setters
 	//--------------------------------------------------------------------------
-	public int getId() {
+	public long getId() {
 		return id;
+	}
+
+	public boolean isActive() {
+		return isActive;
+	}
+
+	public void setIsActive(boolean isActive) {
+		this.isActive = isActive;
 	}
 
 	public OrgUnit getEmployedIn() {
@@ -70,6 +78,10 @@ public class Employment implements Serializable {
 		return name;
 	}
 
+	public void setName(String name) {
+		this.name = name;
+	}
+
 	public String getEmail() {
 		return email;
 	}
@@ -80,6 +92,10 @@ public class Employment implements Serializable {
 
 	public String getEsdhId() {
 		return esdhId;
+	}
+
+	public void setEsdhId(String esdhId) {
+		this.esdhId = esdhId;
 	}
 
 	public String getPhone() {
@@ -101,6 +117,12 @@ public class Employment implements Serializable {
 	public String getJobTitle() {
 		return jobTitle;
 	}
+
+	public void setJobTitle(String jobTitle) {
+		this.jobTitle = jobTitle;
+	}
+
+
 
 	//--------------------------------------------------------------------------
 	// Builder
@@ -163,6 +185,7 @@ public class Employment implements Serializable {
 			.add("id", id)
 			.add("name", name)
 			.add("esdh", esdhId)
+			.add("email", email)
 			.toString();
 	}
 
