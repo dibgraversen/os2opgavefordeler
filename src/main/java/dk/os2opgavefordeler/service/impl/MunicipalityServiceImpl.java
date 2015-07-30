@@ -25,7 +25,7 @@ public class MunicipalityServiceImpl implements MunicipalityService {
 	}
 
 	@Override
-	public Municipality getMunicipality(int id) {
+	public Municipality getMunicipality(long id) {
 		return getEm().find(Municipality.class, id);
 	}
 

@@ -19,7 +19,7 @@ import java.util.Optional;
 public class DistributionRule implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	private int id;
+	private long id;
 
 	@ManyToOne
 	@JoinColumn
@@ -48,7 +48,7 @@ public class DistributionRule implements Serializable {
 
 //	@ManyToOne
 //	private Employment assignedEmp;
-	private int assignedEmp;
+	private long assignedEmp;
 
 	@NotNull
 	@ManyToOne(fetch = FetchType.EAGER)
@@ -70,11 +70,11 @@ public class DistributionRule implements Serializable {
 		this.assignedOrg = assignedOrg;
 	}
 
-	public int getAssignedEmp() {
+	public long getAssignedEmp() {
 		return assignedEmp;
 	}
 
-	public void setAssignedEmp(int assignedEmp) {
+	public void setAssignedEmp(long assignedEmp) {
 		this.assignedEmp = assignedEmp;
 	}
 //	@OneToMany
@@ -99,7 +99,7 @@ public class DistributionRule implements Serializable {
 		return Optional.ofNullable(parent);
 	}
 
-	public int getId() {
+	public long getId() {
 		return id;
 	}
 

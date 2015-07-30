@@ -14,7 +14,7 @@ import java.util.Optional;
 @Entity
 public class OrgUnit implements Serializable, IHasChildren<OrgUnit> {
 	@Id @GeneratedValue(strategy = GenerationType.AUTO)
-	private int id;
+	private long id;
 
 	private boolean isActive;
 
@@ -84,11 +84,13 @@ public class OrgUnit implements Serializable, IHasChildren<OrgUnit> {
 		}
 	}
 
-	public int getId() {
+
+
+	public long getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(long id) {
 		this.id = id;
 	}
 

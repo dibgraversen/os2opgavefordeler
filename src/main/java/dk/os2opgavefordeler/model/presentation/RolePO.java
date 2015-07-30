@@ -1,5 +1,6 @@
 package dk.os2opgavefordeler.model.presentation;
 
+import dk.os2opgavefordeler.model.Employment;
 import dk.os2opgavefordeler.model.Role;
 
 /**
@@ -25,7 +26,7 @@ public class RolePO {
 	 * This identifies the employment to which the role is connected.
 	 * Can be blank.
 	 */
-	private int employment;
+	private long employment;
 
 	/**
 	 * Whether or not the role is for a manager.
@@ -54,7 +55,7 @@ public class RolePO {
 		id = role.getId();
 		userId = role.getUserId();
 		name = role.getName();
-		employment = role.getEmployment();
+		employment = role.getEmployment().map(e -> e.getId()).orElse(-1L);
 		manager = role.isManager();
 		admin = role.isAdmin();
 		municipalityAdmin = role.isMunicipalityAdmin();
@@ -71,18 +72,6 @@ public class RolePO {
 		admin = builder.admin;
 		municipalityAdmin = builder.municipalityAdmin;
 		substitute = builder.substitute;
-	}
-
-	public Role toRole() {
-		Role result = new Role();
-		result.setId(id);
-		result.setName(name);
-		result.setEmployment(employment);
-		result.setManager(manager);
-		result.setAdmin(admin);
-		result.setMunicipalityAdmin(municipalityAdmin);
-		result.setSubstitute(substitute);
-		return result;
 	}
 
 	public long getId() {
@@ -109,11 +98,11 @@ public class RolePO {
 		this.name = name;
 	}
 
-	public int getEmployment() {
+	public long getEmployment() {
 		return employment;
 	}
 
-	public void setEmployment(int employment) {
+	public void setEmployment(long employment) {
 		this.employment = employment;
 	}
 
@@ -174,7 +163,7 @@ public class RolePO {
 		private long id;
 		private long userId;
 		private String name;
-		private int employment;
+		private long employment;
 		private boolean manager;
 		private boolean admin;
 		private boolean municipalityAdmin;
@@ -197,7 +186,7 @@ public class RolePO {
 			return this;
 		}
 
-		public Builder employment(int employment) {
+		public Builder employment(long employment) {
 			this.employment = employment;
 			return this;
 		}

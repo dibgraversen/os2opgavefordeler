@@ -1,15 +1,12 @@
 package dk.os2opgavefordeler.service.impl;
 
+import com.google.common.base.Strings;
 import com.nimbusds.jwt.ReadOnlyJWTClaimsSet;
 import com.nimbusds.oauth2.sdk.id.State;
-import dk.os2opgavefordeler.model.Employment;
 import dk.os2opgavefordeler.model.IdentityProvider;
 import dk.os2opgavefordeler.model.User;
 import dk.os2opgavefordeler.model.presentation.IdentityProviderPO;
-import dk.os2opgavefordeler.service.AuthService;
-import dk.os2opgavefordeler.service.AuthenticationException;
-import dk.os2opgavefordeler.service.EmploymentService;
-import dk.os2opgavefordeler.service.UserService;
+import dk.os2opgavefordeler.service.*;
 import dk.os2opgavefordeler.service.oidc.OpenIdConnect;
 import org.slf4j.Logger;
 
@@ -20,15 +17,12 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Stateless
-public class AuthServiceImpl implements AuthService {
+public class AuthenticationServiceImpl implements AuthenticationService {
 	@Inject
 	private Logger log;
 
 	@Inject
 	private UserService userService;
-
-	@Inject
-	private EmploymentService employmentService;
 
 	@Inject
 	private OpenIdConnect openIdConnect;
@@ -55,6 +49,47 @@ public class AuthServiceImpl implements AuthService {
 	public String generateCsrfToken() {
 		return new State().toString();
 	}
+
+	@Override
+	public User getCurrentUser() throws AuthenticationException {
+		log.error("auth.getCurrentUser: not really implemented yet!");
+		final User user = null;
+
+		/*
+		//Since we do the following lookup-from-db-and-verify dance (to avoid stale sessions), we might perhaps as well
+		//store just the userid. This is going the be changed to access tokens anyway, so leave be for now.
+
+		final User user = (User) request.getSession().getAttribute("authenticated-user");
+
+		if(user == null) {
+			throw new AuthenticationException("user not logged ind");
+		}
+
+		final Optional<User> verifiedUser = userService.findById(user.getId());
+
+		log.info("User from session: {}, db-verified: {}" , user, verifiedUser);
+
+		final boolean valid = verifiedUser.map(u -> u.equals(user)).orElse(false);
+
+		if(!valid) {
+			throw new AuthenticationException("stale user");
+		}
+		*/
+
+		return user;
+	}
+
+	@Override
+	public void setCurrentUser(User user) {
+		/*
+		if(user != null) {
+			request.getSession().setAttribute(S_AUTHENTICATED_USER, user);
+		} else {
+			request.getSession().removeAttribute(S_AUTHENTICATED_USER);
+		}
+		*/
+	}
+
 
 	@Override
 	public Optional<IdentityProvider> findProvider(int id) {
@@ -90,6 +125,10 @@ public class AuthServiceImpl implements AuthService {
 			final String email = claims.getStringClaim("email");
 			log.info("Email from claim: {}", email);
 
+			if(Strings.isNullOrEmpty(email)) {
+				throw new AuthenticationException("IDP returned empty email claim");
+			}
+
 			return userService.findByEmail(email)
 				.map(user -> {
 					log.info("User found by email, returning");
@@ -97,50 +136,11 @@ public class AuthServiceImpl implements AuthService {
 				})
 				.orElseGet(() -> {
 					log.info("User not found, creating");
-					return createUser(email);
+					return userService.createUserFromOpenIdEmail(email);
 				});
 		}
 		catch(java.text.ParseException e) {
-			throw new AuthenticationException("Error parsing claims", e);
+			throw new AuthenticationException("Error parsing OpenID claims", e);
 		}
-	}
-
-
-	private User createUser(String email) {
-		// In order to create a User from an OpenID Connect login, we require the email to be present in a municipality.
-		//
-		// An email address can be used for several Employments. For instance, it's possible for a manager to also have
-		// non-manager employment - so we create a role of each of the employment.
-		//
-		final List<Employment> employments = employmentService.findByEmail(email);
-		if(employments.isEmpty()) {
-			throw new RuntimeException("No employments found");				//TODO: proper exception. Unathorized.
-		}
-
-		final List<dk.os2opgavefordeler.model.Role> roles = createRolesFromEmployments(employments);
-		final String name = employments.get(0).getName();					//TODO: better approach than grabbing first name?
-		final User user = new User(name, email, roles);
-
-		log.info("Persising {} with roles={}", user, roles);
-		return userService.createUser(user);
-	}
-
-	private List<dk.os2opgavefordeler.model.Role> createRolesFromEmployments(List<Employment> employments) {
-		return employments.stream()
-			.map(emp -> {
-				dk.os2opgavefordeler.model.Role role = new dk.os2opgavefordeler.model.Role();
-
-				role.setManager(emp.getEmployedIn().getChildren().equals(emp));
-				role.setEmployment(emp.getId());
-				role.setName(String.format("%s (%s)", emp.getName(), emp.getEmployedIn().getName()));
-
-				return role;
-			})
-			.collect(Collectors.toList());
-	}
-
-	private boolean hasManagerRole(List<Employment> roles) {
-		return roles.stream()
-			.anyMatch(emp -> emp.getEmployedIn().getManager().equals(emp));
 	}
 }

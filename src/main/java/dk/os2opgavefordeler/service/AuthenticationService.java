@@ -1,6 +1,7 @@
 package dk.os2opgavefordeler.service;
 
 import dk.os2opgavefordeler.model.IdentityProvider;
+import dk.os2opgavefordeler.model.Role;
 import dk.os2opgavefordeler.model.User;
 import dk.os2opgavefordeler.model.presentation.IdentityProviderPO;
 
@@ -8,7 +9,10 @@ import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
-public interface AuthService {
+public interface AuthenticationService {
+	User getCurrentUser() throws AuthenticationException;	//TODO: should probably be handled with @Inject and managed by container.
+	void setCurrentUser(User user);							//TODO: no, no and no.
+
 	Optional<IdentityProvider> findProvider(int id);
 
 	List<IdentityProvider> identityProviderList();
@@ -20,13 +24,17 @@ public interface AuthService {
 	 * Begins OpenID Connect authentication flow.
 	 * @return 3rd-party URI which the client should be redirected to;
 	 * @param idp
+	 * @param token
+	 * @param callbackUrl
 	 */
 	URI beginAuthenticationFlow(IdentityProvider idp, String token, String callbackUrl) throws AuthenticationException;
 
 	/**
 	 * Finalizes OpenID Connect authentication flow.
 	 * @param idp
-	 * @param expectedState
+	 * @param token
+	 * @param callbackUrl
+	 * @param requestUri
 	 * @return the authenticated User
 	 * @throws hissy fits if the user can't be authenticated
 	 */

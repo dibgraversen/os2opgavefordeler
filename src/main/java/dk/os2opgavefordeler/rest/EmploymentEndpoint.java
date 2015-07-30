@@ -24,7 +24,7 @@ public class EmploymentEndpoint {
 	@GET
 	@Path("/")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response listAll(@QueryParam("municipalityId") int municipalityId) {
+	public Response listAll(@QueryParam("municipalityId") Long municipalityId) {
 		final List<EmploymentPO> employees =  employmentService.getAllPO(municipalityId);
 
 		if(!employees.isEmpty()) {
@@ -37,7 +37,7 @@ public class EmploymentEndpoint {
 	@GET
 	@Path("/{empId}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response get(@PathParam("empId") Integer empId) {
+	public Response get(@PathParam("empId") Long empId) {
 		final Optional<EmploymentPO> result = employmentService.getEmploymentPO(empId);
 
 		return result.map(

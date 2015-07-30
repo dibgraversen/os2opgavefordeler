@@ -39,7 +39,7 @@ public class OrgUnitServiceImpl implements OrgUnitService {
 	@Override
 	public OrgUnit saveOrgUnit(OrgUnit orgUnit) {
 		EntityManager em = persistence.getEm();
-		Integer currentMunicipality = orgUnit.getMunicipality().get().getId();
+		Long currentMunicipality = orgUnit.getMunicipality().get().getId();
 		List<Employment> newEmployments = new ArrayList<>();
 
 		// check for existence.
@@ -121,7 +121,7 @@ public class OrgUnitServiceImpl implements OrgUnitService {
 		return result;
 	}
 
-	private Optional<OrgUnit> getOrgUnitFromBusinessKey(String businessKey, int municipalityId){
+	private Optional<OrgUnit> getOrgUnitFromBusinessKey(String businessKey, long municipalityId){
 		Query query = persistence.getEm().createQuery("SELECT org FROM OrgUnit org WHERE org.businessKey = :businessKey AND org.municipality.id = :municipalityId");
 		query.setParameter("businessKey", businessKey);
 		query.setParameter("municipalityId", municipalityId);
@@ -133,7 +133,7 @@ public class OrgUnitServiceImpl implements OrgUnitService {
 		}
 	}
 
-	private Optional<Employment> getEmploymentFromBusinessKey(String businessKey, int municipalityId){
+	private Optional<Employment> getEmploymentFromBusinessKey(String businessKey, long municipalityId){
 		Query query = persistence.getEm().createQuery("SELECT emp FROM Employment emp WHERE emp.businessKey = :businessKey AND emp.employedIn.municipality.id = :municipalityId");
 		query.setParameter("businessKey", businessKey);
 		query.setParameter("municipalityId", municipalityId);
@@ -156,8 +156,8 @@ public class OrgUnitServiceImpl implements OrgUnitService {
 		return result;
 	}
 
-	private void deleteNotInCollection(List<String> businessKeys, int municipalityId){
-		List<Integer> orgIdsForDeletion = getOrgIdsForDeletion(businessKeys, municipalityId);
+	private void deleteNotInCollection(List<String> businessKeys, long municipalityId){
+		List<Long> orgIdsForDeletion = getOrgIdsForDeletion(businessKeys, municipalityId);
 		unlinkAssignedOrgs(orgIdsForDeletion);
 		unlinkResponsible(orgIdsForDeletion);
 		unlinkEmployments(orgIdsForDeletion);
@@ -165,7 +165,7 @@ public class OrgUnitServiceImpl implements OrgUnitService {
 	}
 
 	@SuppressWarnings("unchecked")
-	private List<Integer> getOrgIdsForDeletion(List<String> businessKeys, int municipalityId){
+	private List<Long> getOrgIdsForDeletion(List<String> businessKeys, long municipalityId){
 		EntityManager em = persistence.getEm();
 		Query getOrgIdsForDeletion = em.createQuery("SELECT org.id FROM OrgUnit org WHERE org.businessKey NOT IN (:businessKeys) AND org.municipality.id = :municipalityId");
 		getOrgIdsForDeletion.setParameter("businessKeys", businessKeys);
@@ -174,35 +174,35 @@ public class OrgUnitServiceImpl implements OrgUnitService {
 	}
 
 	@SuppressWarnings("unchecked")
-	private void unlinkAssignedOrgs(List<Integer> orgIds){
+	private void unlinkAssignedOrgs(List<Long> orgIds){
 		EntityManager em = persistence.getEm();
 		Query assignedRuleIdsQuery = em.createQuery("SELECT rule.id FROM DistributionRule rule LEFT JOIN rule.assignedOrg as org WHERE rule.assignedOrg.id = org.id AND org.id IN (:orgIds)");
 		assignedRuleIdsQuery.setParameter("orgIds", orgIds);
-		List<Integer> assignedRuleIds = (List<Integer>)assignedRuleIdsQuery.getResultList();
+		List<Long> assignedRuleIds = (List<Long>)assignedRuleIdsQuery.getResultList();
 		Query unrefAssignedOrg = em.createQuery("UPDATE DistributionRule rule SET rule.assignedOrg = NULL WHERE rule.id IN (:assignedRuleIds)");
 		unrefAssignedOrg.setParameter("assignedRuleIds", assignedRuleIds);
 		unrefAssignedOrg.executeUpdate();
 	}
 
 	@SuppressWarnings("unchecked")
-	private void unlinkResponsible(List<Integer> orgIds){
+	private void unlinkResponsible(List<Long> orgIds){
 		EntityManager em = persistence.getEm();
 		Query responsibleRuleIdsQuery = em.createQuery("SELECT rule.id FROM DistributionRule rule LEFT JOIN rule.responsibleOrg as org WHERE rule.responsibleOrg.id = org.id AND org.id IN (:orgIds)");
 		responsibleRuleIdsQuery.setParameter("orgIds", orgIds);
-		List<Integer> responsibleRuleIds = (List<Integer>) responsibleRuleIdsQuery.getResultList();
+		List<Long> responsibleRuleIds = (List<Long>) responsibleRuleIdsQuery.getResultList();
 		Query unrefAssignedOrg = em.createQuery("UPDATE DistributionRule rule SET rule.responsibleOrg = NULL WHERE rule.id IN (:responsibleRuleIds)");
 		unrefAssignedOrg.setParameter("responsibleRuleIds", responsibleRuleIds);
 		unrefAssignedOrg.executeUpdate();
 	}
 
-	public void unlinkEmployments(List<Integer> orgIds){
+	public void unlinkEmployments(List<Long> orgIds){
 		EntityManager em = persistence.getEm();
 		Query unlinkEmploymentsQuery = em.createQuery("UPDATE Employment e SET e.employedIn = null WHERE e.employedIn.id IN (:orgIds)");
 		unlinkEmploymentsQuery.setParameter("orgIds", orgIds);
 		unlinkEmploymentsQuery.executeUpdate();
 	}
 
-	public void deleteOrgs(List<Integer> orgIds){
+	public void deleteOrgs(List<Long> orgIds){
 		EntityManager em = persistence.getEm();
 		Query unlinkEmploymentsQuery = em.createQuery("DELETE OrgUnit org WHERE org.id IN (:orgIds)");
 		unlinkEmploymentsQuery.setParameter("orgIds", orgIds);
@@ -236,7 +236,7 @@ public class OrgUnitServiceImpl implements OrgUnitService {
 	}
 
 	@Override
-	public Optional<OrgUnit> getOrgUnit(int id) {
+	public Optional<OrgUnit> getOrgUnit(long id) {
 		final List<OrgUnit> results = persistence.criteriaFind(OrgUnit.class,
 			(cb, cq, ou) -> cq.where(cb.equal(ou.get(OrgUnit_.id), id)
 			)
@@ -249,7 +249,7 @@ public class OrgUnitServiceImpl implements OrgUnitService {
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public Optional<OrgUnit> getToplevelOrgUnit(int municipalityId) {
+	public Optional<OrgUnit> getToplevelOrgUnit(long municipalityId) {
 		Query query = persistence.getEm().createQuery("SELECT org FROM OrgUnit org WHERE org.parent IS NULL AND org.municipality.id = :municipalityId");
 		query.setParameter("municipalityId", municipalityId);
 		Optional<OrgUnit> result;
@@ -277,7 +277,7 @@ public class OrgUnitServiceImpl implements OrgUnitService {
 
 
 	@Override
-	public List<OrgUnitPO> getToplevelOrgUnitPO(int municipalityId) {
+	public List<OrgUnitPO> getToplevelOrgUnitPO(long municipalityId) {
 		final Optional<OrgUnit> orgUnit = getToplevelOrgUnit(municipalityId);
 
 		return orgUnit.map( ou -> ou.flattened().map(OrgUnitPO::new).collect(Collectors.toList()) )
@@ -285,12 +285,12 @@ public class OrgUnitServiceImpl implements OrgUnitService {
 	}
 
 	@Override
-	public Optional<OrgUnitPO> getOrgUnitPO(int id) {
+	public Optional<OrgUnitPO> getOrgUnitPO(long id) {
 		return getOrgUnit(id).map(OrgUnitPO::new);
 	}
 
 	@Override
-	public Optional<Employment> getEmployment(int id) {
+	public Optional<Employment> getEmployment(long id) {
 		final List<Employment> results = persistence.criteriaFind(Employment.class,
 			(cb, cq, ou) -> cq.where(cb.equal(ou.get(Employment_.id), id))
 		);
@@ -301,7 +301,7 @@ public class OrgUnitServiceImpl implements OrgUnitService {
 	}
 
 	@Override
-	public Optional<Employment> getEmploymentByName(int municipalityId,  String name) {
+	public Optional<Employment> getEmploymentByName(long municipalityId,  String name) {
 		final List<Employment> results = persistence.criteriaFind(Employment.class,
 			(cb, cq, ou) -> cq.where(cb.equal(ou.get(Employment_.name), name))
 		);

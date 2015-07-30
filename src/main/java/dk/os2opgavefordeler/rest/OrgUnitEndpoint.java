@@ -33,7 +33,7 @@ public class OrgUnitEndpoint {
 	@GET
 	@Path("/")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response listAll(@QueryParam("municipalityId")int municipalityId) {
+	public Response listAll( @QueryParam("municipalityId") Long municipalityId ) {
 		final List<OrgUnitPO> ou = orgUnitService.getToplevelOrgUnitPO(municipalityId);
 
 		if(!ou.isEmpty()) {
@@ -46,7 +46,7 @@ public class OrgUnitEndpoint {
 	@GET
 	@Path("/display")
 	@Produces(MediaType.TEXT_PLAIN)
-	public Response listAllDisplay(@QueryParam("municipalityId") int municipalityId) {
+	public Response listAllDisplay(@QueryParam("municipalityId") Long municipalityId) {
 		final Optional<OrgUnit> result = orgUnitService.getToplevelOrgUnit(municipalityId);
 
 		return result.map(
@@ -59,7 +59,7 @@ public class OrgUnitEndpoint {
 	@GET
 	@Path("/{orgId}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response get(@PathParam("orgId") Integer orgId) {
+	public Response get(@PathParam("orgId") Long orgId) {
 		final Optional<OrgUnitPO> result = orgUnitService.getOrgUnitPO(orgId);
 
 		return result.map(

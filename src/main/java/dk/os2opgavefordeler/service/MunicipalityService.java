@@ -9,7 +9,7 @@ import java.util.List;
  */
 public interface MunicipalityService {
 	Municipality createMunicipality(Municipality municipality);
-	Municipality getMunicipality(int id);
+	Municipality getMunicipality(long id);
 	List<Municipality> getMunicipalities();
 
 	Municipality findByName(String name);

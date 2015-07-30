@@ -11,7 +11,7 @@ public class UserInfoPO {
 	private boolean loggedIn;
 	private Municipality municipality;
 
-	public UserInfoPO(int id, String name, boolean isLoggedIn, Municipality municipality) {
+	public UserInfoPO(long id, String name, boolean isLoggedIn, Municipality municipality) {
 		this.id = id;
 		this.name = name;
 		this.loggedIn = isLoggedIn;
