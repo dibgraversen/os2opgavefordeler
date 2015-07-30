@@ -46,7 +46,7 @@
 			if($scope.uploadFile){
 				uiUploader.addFiles([$scope.uploadFile]);
 				uiUploader.startUpload({
-					url: serverUrl+'/org-unit/fileImport',
+					url: serverUrl+'/org-units/fileImport',
 					concurrency: 1,
 					onProgress: function(file){
 						$log.info(file.name + '=' + file.humanSize);
