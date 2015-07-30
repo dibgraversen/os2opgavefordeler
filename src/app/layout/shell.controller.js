@@ -2,10 +2,10 @@
 	'use strict';
 	angular.module('topicRouter').controller('ShellCtrl', ShellCtrl);
 
-	ShellCtrl.$inject = ['$scope', '$rootScope', '$state', '$timeout', '$q', '$modal', '$log',
+	ShellCtrl.$inject = ['$scope', '$rootScope', '$state', '$timeout', '$q', '$log',
 		'topicRouterApi', 'version'];
 
-	function ShellCtrl($scope, $rootScope, $state, $timeout, $q, $modal, $log, topicRouterApi, version) {
+	function ShellCtrl($scope, $rootScope, $state, $timeout, $q, $log, topicRouterApi, version) {
 		/* jshint validthis:true */
 		var vm = this;
 
@@ -24,10 +24,6 @@
 		$scope.changeUser = changeUser;
 		$scope.logoutUser = logoutUser;
 		$scope.changeRole = changeRole;
-
-		$scope.substitutes = [];
-		$scope.addSubstitute = addSubstitute;
-		$scope.removeSubstitute = removeSubstitute;
 
 		$scope.filter = {
 			text: '',
@@ -138,33 +134,10 @@
 
 		function changeRole(role) {
 			if(role !== $scope.user.currentRole) {
-				$log.info("changeRole: " + role);
+				$log.info("changeRole: ", role);
 				$scope.user.currentRole = role;
 				$state.reload();
 			}
-		}
-
-		function addSubstitute(){
-			$modal.open({
-				templateUrl: 'app/home/add-substitute-modal.html',
-				controller: 'AddSubstituteModalInstanceCtrl'
-			}).result.then(function(sub) {
-				topicRouterApi.addSubstitute($scope.user.currentRole.id, sub.id).then(
-					function(substitute) {
-						$log.info("Substitute was added: ", substitute);
-						$scope.substitutes.push(substitute);
-					}
-				);
-			});
-		}
-
-		function removeSubstitute(substitute) {
-			topicRouterApi.removeSubstitute(substitute)
-					.then(function() {
-						_.remove($scope.substitutes, function(sub) {
-							return sub === substitute;
-						});
-					});
 		}
 
 		function updateFilter() {

@@ -1,13 +1,10 @@
 (function () {
 	'use strict';
+	angular.module('topicRouter').controller('AddSubstituteModalInstanceCtrl', AddSubstituteModalInstanceCtrl);
 
-	var app = angular.module('topicRouter');
+	AddSubstituteModalInstanceCtrl.$inject = ['$log', '$scope', '$modalInstance', 'topicRouterApi'];
 
-	app.controller('AddSubstituteModalInstanceCtrl', AddSubstituteModalInstanceCtrl);
-
-	AddSubstituteModalInstanceCtrl.$inject = ['$scope', '$modalInstance', 'topicRouterApi'];
-
-	function AddSubstituteModalInstanceCtrl($scope, $modalInstance, topicRouterApi){
+	function AddSubstituteModalInstanceCtrl($log, $scope, $modalInstance, topicRouterApi){
 		$scope.employeeFilter = "";
 		$scope.modalAlerts = [];
 
@@ -20,7 +17,8 @@
 		activate();
 
 		function activate(){
-			topicRouterApi.getEmployments().then(function(employees){
+			$log.info("AddSubstituteModal::activate");
+			topicRouterApi.getEmployments($scope.user.municipality.id).then(function(employees){
 				$scope.employees = employees;
 			});
 		}
