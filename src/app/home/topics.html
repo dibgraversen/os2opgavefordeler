@@ -48,7 +48,7 @@
 				<td ng-show="settings.showExpandedOrg"></td>
 				<td>{{ topic.employee.name }}</td>
 				<td class="button">
-					<div class="btn-group" ng-show="distributionChangeAllowed(topic)" dropdown>
+					<div class="btn-group" ng-show="distributionChangeAllowed(topic)" dropdown style="width:110px">
 						<button class="btn btn-primary"
 								popover="klik her for at vedligeholde fordelingsregler"
 								popover-placement="left" popover-trigger="mouseenter" popover-popup-delay="1000"
@@ -70,7 +70,7 @@
 				</td>
 
 				<td ng-show="settings.showResponsible" class="button">
-					<div class="btn-group" ng-show="responsibilityChangeAllowed(topic)" dropdown>
+					<div class="btn-group" ng-show="responsibilityChangeAllowed(topic)" dropdown style="width:105px">
 						<button type="button" class="btn btn-primary"
 								popover="klik her for at vedligeholde ansvar"
 								popover-placement="left" popover-trigger="mouseenter" popover-popup-delay="1000"
