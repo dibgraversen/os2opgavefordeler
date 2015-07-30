@@ -2,10 +2,10 @@
 	'use strict';
 	angular.module('topicRouter').controller('HomeCtrl', HomeCtrl);
 
-	HomeCtrl.$inject = ['$scope', 'topicRouterApi', '$state', '$q', '$modal', 'serverUrl'];
+	HomeCtrl.$inject = ['$scope', 'topicRouterApi', '$state', '$q', '$modal', '$log', 'serverUrl'];
 
 	/* @ngInject */
-	function HomeCtrl($scope, topicRouterApi, $state, $q, $modal, serverUrl) {
+	function HomeCtrl($scope, topicRouterApi, $state, $q, $modal, $log, serverUrl) {
 		/* jshint validthis: true */
 
 		$scope.topicRoutes = [];
@@ -15,6 +15,10 @@
 		activate();
 
 		// API
+		$scope.substitutes = [];
+		$scope.addSubstitute = addSubstitute;
+		$scope.removeSubstitute = removeSubstitute;
+
 		$scope.save = save;
 		$scope.toggle = toggle;
 		$scope.responsibility = responsibility;
@@ -31,11 +35,15 @@
 		////////////////
 
 		function activate() {
+			$log.info("Home::activate");
 			if(!$scope.user.loggedIn) {
 				$state.go("login");
 			}
 			$scope.$watch("user.currentRole", function(newValue, oldValue){
-				if(newValue && newValue.employment > 0){
+				$log.info('Home:: user.currentRole changed', oldValue, " --> ", newValue);
+
+				if(newValue && newValue.employment > 0) {
+					refreshSubstitutes();
 					refreshTopicRoutes();
 				} else {
 					$scope.topicRoutes = [];
@@ -46,6 +54,37 @@
 				if($scope.user.currentRole && $scope.user.currentRole.employment)
 					refreshTopicRoutes();
 			});
+		}
+
+		function addSubstitute(){
+			$modal.open({
+				scope: $scope,
+				templateUrl: 'app/home/add-substitute-modal.html',
+				controller: 'AddSubstituteModalInstanceCtrl'
+			}).result.then(function(sub) {
+					topicRouterApi.addSubstitute($scope.user.currentRole.id, sub.id).then(
+						function(substitute) {
+							$log.info("Substitute was added: ", substitute);
+							$scope.substitutes.push(substitute);
+						}
+					);
+				});
+		}
+
+		function removeSubstitute(substitute) {
+			topicRouterApi.removeSubstitute(substitute)
+				.then(function() {
+					_.remove($scope.substitutes, function(sub) {
+						return sub === substitute;
+					});
+				});
+		}
+
+		function refreshSubstitutes() {
+			topicRouterApi.getSubstitutes($scope.user.currentRole.id)
+				.then(function(substitutes) {
+					$scope.substitutes = substitutes;
+				});
 		}
 
 		function refreshTopicRoutes(){
@@ -182,7 +221,7 @@
 		 * @return {boolean} true if edit allowed.
 		 */
 		function responsibilityChangeAllowed(distributionRule){
-			//console.log($scope.user.currentRole.employment);
+			$log.info($scope.user.currentRole.employment);
 			if(!responsibility(distributionRule)) return true; // not already handled.
 			if($scope.user.currentRole.municipalityAdmin) return true;
 			if(canManage(distributionRule)) return true;

@@ -21,6 +21,7 @@
 			getEmployments: getEmployments,
 			getEmployment: getEmployment,
 			updateDistributionRule: updateDistributionRule,
+			getSubstitutes: getSubstitutes,
 			addSubstitute: addSubstitute,
 			removeSubstitute: removeSubstitute,
 			getMunicipalities: getMunicipalities
@@ -152,6 +153,10 @@
 			return httpPost('/distribution-rules/'+distributionRule.id, distRule);
 		}
 
+		function getSubstitutes(userRole) {
+			return httpGet("/roles/" + userRole + "/substitutes");
+		}
+
 		function addSubstitute(userRole, substituteEmployment) {
 			return httpPost("/roles/" + userRole + "/substitutes/add?employmentId=" + substituteEmployment);
 		}
@@ -267,6 +272,7 @@
 		}
 
 		function httpDelete(url) {
+			cache.removeAll();
 			return httpExecute(url, 'DELETE', {});
 		}
 
