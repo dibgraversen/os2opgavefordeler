@@ -4,7 +4,9 @@ import dk.os2opgavefordeler.model.Municipality;
 import dk.os2opgavefordeler.service.MunicipalityService;
 
 import javax.inject.Inject;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
@@ -26,4 +28,14 @@ public class MunicipalityEndpoint {
 		List<Municipality> result = municipalityService.getMunicipalities();
 		return Response.ok().entity(result).build();
 	}
+
+	@POST
+	@Path("/")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response createMunicipality(Municipality municipality){
+		Municipality result =  municipalityService.createMunicipality(municipality);
+		return Response.ok().entity(result).build();
+	}
+
 }
