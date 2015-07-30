@@ -3,12 +3,12 @@
 
 	angular.module('topicRouter').factory('topicRouterApi', topicRouterApi);
 
-	topicRouterApi.$inject = ['$http', '$q', '$timeout', '$cacheFactory', 'serverUrl', 'appSpinner'];
+	topicRouterApi.$inject = ['$http', '$q', '$timeout', '$cacheFactory', 'serverUrl', 'appSpinner', '$log'];
 
 	var maxPopoverLength = 150;
 
 	// NOTE consider implementing ngResource to manage RESTful resource endpoints.
-	function topicRouterApi($http, $q, $timeout, $cacheFactory, serverUrl, appSpinner) {
+	function topicRouterApi($http, $q, $timeout, $cacheFactory, serverUrl, appSpinner, $log) {
 		var service = {
 			getIdentityProviders: getIdentityProviders,
 			getUserInfo: getUserInfo,
@@ -80,7 +80,6 @@
 						var parent = objectMap[rule.parent];
 						rule.parent = parent;
 						parent.children.push(rule.id);
-						//console.log('rule has parent: '+rule.parent);
 					}
 					if(rule.employee > 0){
 						getEmployment(rule.employee).then(function(employee){
@@ -94,8 +93,7 @@
 					}
 					rule.open = true;
 					rule.visible = true;
-					if(rule.responsible > 0){
-						//if(rule.responsible === 2 ) rule.responsible = 3;
+					if(rule.responsible > 0) {
 						getOrgUnit(rule.responsible).then(function(orgUnit){
 							rule.responsible = orgUnit;
 						});
@@ -154,14 +152,13 @@
 			return httpPost('/distribution-rules/'+distributionRule.id, distRule);
 		}
 
-		function addSubstitute(userEmployment, substituteEmployment){
-			return true;
+		function addSubstitute(userRole, substituteEmployment) {
+			return httpPost("/roles/" + userRole + "/substitutes/add?employmentId=" + substituteEmployment);
 		}
 
-		function removeSubstitute(userEmployment, substituteEmployment){
-			var deferred = $q.defer();
-			deferred.resolve(substituteEmployment);
-			return deferred.promise;
+		function removeSubstitute(substitute) {
+			$log.info("trying to remove ", substitute);
+			return httpDelete("/roles/" + substitute.roleId);
 		}
 
 		function getMunicipalities(){
@@ -269,6 +266,10 @@
 			return httpExecute(url, 'GET', options);
 		}
 
+		function httpDelete(url) {
+			return httpExecute(url, 'DELETE', {});
+		}
+
 		function httpPost(url, data) {
 			cache.removeAll();
 			return httpExecute(url, 'POST', {data: data});
@@ -287,12 +288,12 @@
 			return $http(options).then(
 					function (response) {
 						appSpinner.hideSpinner();
-						console.log('**response from EXECUTE', response);
+						$log.info('**response from EXECUTE', response);
 						return response.data;
 					},
 					function(reason){
 						appSpinner.hideSpinner();
-						console.log('**response from EXECUTE', reason);
+						$log.info('**response from EXECUTE', reason);
 					});
 		}
 	}
