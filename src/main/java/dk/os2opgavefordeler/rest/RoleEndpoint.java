@@ -1,10 +1,10 @@
 package dk.os2opgavefordeler.rest;
 
 import dk.os2opgavefordeler.model.Role;
-import dk.os2opgavefordeler.model.presentation.RolePO;
 import dk.os2opgavefordeler.model.presentation.SimpleMessage;
 import dk.os2opgavefordeler.model.presentation.SubstitutePO;
 import dk.os2opgavefordeler.service.*;
+import dk.os2opgavefordeler.util.Validate;
 import org.slf4j.Logger;
 
 import javax.inject.Inject;
@@ -29,10 +29,11 @@ public class RoleEndpoint {
 
 	@DELETE
 	@Path("/{roleId}")
+	@Produces(MediaType.APPLICATION_JSON)
 	public Response deleteRole(@PathParam("roleId") Long roleId) {
 		log.info("deleteRole({})", roleId);
 		try {
-			validateNonzero(roleId, "Invalid roleId");
+			Validate.nonZero(roleId, "Invalid roleId");
 			userService.removeRole(roleId);
 
 			return Response.noContent().build();
@@ -55,7 +56,7 @@ public class RoleEndpoint {
 	public Response getSubstitutes(@PathParam("id") Long roleId) {
 		log.info("getSubstitutes({})", roleId);
 		try {
-			validateNonzero(roleId, "Invalid roleId");
+			Validate.nonZero(roleId, "Invalid roleId");
 
 			final List<SubstitutePO> substitutes = userService.findSubstitutesFor(roleId);
 			return Response.status(Response.Status.OK).entity(substitutes).build();
@@ -79,8 +80,8 @@ public class RoleEndpoint {
 	public Response createSubstitute(@PathParam("roleId") Long roleId, @QueryParam("employmentId") Long employmentId) {
 		log.info("createSubstitute({}, {})", roleId, employmentId);
 		try {
-			validateNonzero(roleId, "Invalid roleId");
-			validateNonzero(employmentId, "Invalid employmentId");
+			Validate.nonZero(roleId, "Invalid roleId");
+			Validate.nonZero(employmentId, "Invalid employmentId");
 
 			final Role role = userService.createSubstituteRole(employmentId, roleId);
 
@@ -94,14 +95,6 @@ public class RoleEndpoint {
 		}
 		catch(BadRequestArgumentException e) {
 			return Response.status(Response.Status.BAD_REQUEST).entity(new SimpleMessage(e.getMessage())).build();
-		}
-	}
-
-
-	private static void validateNonzero(Long value, String message) throws BadRequestArgumentException
-	{
-		if(value == null || value == 0) {
-			throw new BadRequestArgumentException(message);
 		}
 	}
 }
