@@ -22,7 +22,8 @@
 			getEmployment: getEmployment,
 			updateDistributionRule: updateDistributionRule,
 			addSubstitute: addSubstitute,
-			removeSubstitute: removeSubstitute
+			removeSubstitute: removeSubstitute,
+			getMunicipalities: getMunicipalities
 		};
 
 		var baseUrl = serverUrl;
@@ -107,7 +108,7 @@
 		}
 
 		function getOrgUnit(orgId){
-			return httpGet('/org-unit/'+orgId).then(function(orgUnit){
+			return httpGet('/org-units/'+orgId).then(function(orgUnit){
 				if(orgUnit.managerId > 0){
 					getEmployment(orgUnit.managerId).then(function(employment){
 						orgUnit.manager = employment;
@@ -125,8 +126,8 @@
 		 * Returns a list of orgUnits to choose from.
 		 * @returns {Object[]} OrgUnit - A list of all OrgUnits.
 		 */
-		function getOrgUnitsForResponsibility(){
-			return httpGet('/org-unit').then(function(orgUnits){
+		function getOrgUnitsForResponsibility(municipalityId){
+			return httpGet('/org-units', { municipalityId: municipalityId }).then(function(orgUnits){
 				_.each(orgUnits, function(orgUnit){
 					if(orgUnit.managerId > 0){
 						getEmployment(orgUnit.managerId).then(function(employment){
@@ -138,8 +139,8 @@
 			});
 		}
 
-		function getEmployments(){
-			return httpGet('/employments');
+		function getEmployments(municipalityId){
+			return httpGet('/employments', { municipalityId: municipalityId });
 		}
 
 		function getEmployment(empId){
@@ -161,6 +162,10 @@
 			var deferred = $q.defer();
 			deferred.resolve(substituteEmployment);
 			return deferred.promise;
+		}
+
+		function getMunicipalities(){
+			return httpGet('/municipalities');
 		}
 
 		// DTO classes.

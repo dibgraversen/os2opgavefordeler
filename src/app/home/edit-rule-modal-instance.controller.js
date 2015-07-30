@@ -5,9 +5,9 @@
 
 	app.controller('EditRuleModalInstanceCtrl', EditRuleModalInstanceCtrl);
 
-	EditRuleModalInstanceCtrl.$inject = ['$scope', '$modalInstance', 'topicRouterApi', 'topic'];
+	EditRuleModalInstanceCtrl.$inject = ['$scope', '$modalInstance', 'topicRouterApi', 'topic', 'municipality'];
 
-	function EditRuleModalInstanceCtrl($scope, $modalInstance, topicRouterApi, topic){
+	function EditRuleModalInstanceCtrl($scope, $modalInstance, topicRouterApi, topic, municipality){
 		$scope.topic = topic;
 		$scope.orgUnits = [];
 		$scope.employments = [];
@@ -25,11 +25,11 @@
 
 		function activate(){
 			// load some org. stuff.
-			topicRouterApi.getOrgUnitsForResponsibility().then(function(orgUnits){
+			topicRouterApi.getOrgUnitsForResponsibility(municipality.id).then(function(orgUnits){
 				$scope.orgUnits = orgUnits;
 			});
 
-			topicRouterApi.getEmployments().then(function(employments){
+			topicRouterApi.getEmployments(municipality.id).then(function(employments){
 				$scope.employments = employments;
 			});
 		}

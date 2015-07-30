@@ -5,9 +5,9 @@
 
 	app.controller('EditResponsibilityModalInstanceCtrl', EditResponsibilityModalInstanceCtrl);
 
-	EditResponsibilityModalInstanceCtrl.$inject = ['$scope', '$modalInstance', 'topicRouterApi', 'topic'];
+	EditResponsibilityModalInstanceCtrl.$inject = ['$scope', '$modalInstance', 'topicRouterApi', 'topic', 'municipality'];
 
-	function EditResponsibilityModalInstanceCtrl($scope, $modalInstance, topicRouterApi, topic){
+	function EditResponsibilityModalInstanceCtrl($scope, $modalInstance, topicRouterApi, topic, municipality){
 		$scope.topic = topic;
 		$scope.orgUnitFilter = "";
 		$scope.modalAlerts = [];
@@ -21,7 +21,7 @@
 		activate();
 
 		function activate(){
-			topicRouterApi.getOrgUnitsForResponsibility().then(function(orgUnits){
+			topicRouterApi.getOrgUnitsForResponsibility(municipality.id).then(function(orgUnits){
 				$scope.orgUnits = orgUnits;
 			});
 		}

@@ -103,10 +103,13 @@
 
 		function editRule(topic){
 			$modal.open({
-				//scope: $scope,
+				scope: $scope,
 				resolve: {
 					topic: function(){
 						return topic;
+					},
+					municipality: function(){
+						return $scope.user.municipality;
 					}
 				},
 				templateUrl: 'app/home/edit-rule-modal.html',
@@ -126,6 +129,9 @@
 				resolve: {
 					topic: function(){
 						return topic;
+					},
+					municipality: function(){
+						return $scope.user.municipality;
 					}
 				},
 				templateUrl: 'app/home/edit-responsibility-modal.html',
@@ -176,7 +182,7 @@
 		 * @return {boolean} true if edit allowed.
 		 */
 		function responsibilityChangeAllowed(distributionRule){
-			console.log($scope.user.currentRole.employment);
+			//console.log($scope.user.currentRole.employment);
 			if(!responsibility(distributionRule)) return true; // not already handled.
 			if($scope.user.currentRole.municipalityAdmin) return true;
 			if(canManage(distributionRule)) return true;

@@ -60,6 +60,11 @@
 					$state.go("login");
 				}
 			});
+			topicRouterApi.getMunicipalities()
+					.then(function(municipalities){
+						$scope.municipalities = municipalities;
+						$scope.currentMunicipality = municipalities[0];
+					});
 		}
 
 		$rootScope.$on('spinner.toggle', function (event, args) {
