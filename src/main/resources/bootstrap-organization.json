@@ -1,157 +1,158 @@
 {
-  "businessKey": "K1",
-  "name": "Fantastisk Kommune",
-  "manager": {
+	"businessKey": "K1", 
+	"name": "Fantastisk Kommune",
+	"manager": {
 	"businessKey": "E1",
 	"name": "Borge Meister",
 	"email": "borge@kommune.dk"
-  },
-  "employees": [
+	},
+	"employees": [
 	{
-	  "businessKey": "E2",
-	  "name": "Jeanne Deij"
+		"businessKey": "E2",
+		"name": "Jeanne Deij"
 	},
 	{
-	  "businessKey": "E3",
-	  "name": "Menig Mand",
-	  "email": "menig@kommune.dk"
+		"businessKey": "E3",
+		"name": "Menig Mand",
+		"email": "menig@kommune.dk"
 	}
-  ],
-  "municipality": {
+	],
+	"municipality": {
 	"name": "Miracle"
-  },
-  "children": [
+	},
+	"children": [
 	{
-	  "businessKey": "K2",
-	  "name": "Administration",
-	  "manager": {
+		"businessKey": "K2",
+		"name": "Administration",
+		"manager": {
 		"businessKey": "E4",
 		"name": "Amin Stratah",
 		"email": "admin@kommune.dk"
-	  },
-	  "municipality": {
+		},
+		"municipality": {
 		"name": "Miracle"
-	  },
-	  "children": [
+		},
+		"children": [
 		{
-		  "businessKey": "K3",
-		  "name": "Personale",
-		  "manager": {
+			"businessKey": "K3",
+			"name": "Personale",
+			"manager": {
 			"businessKey": "E5",
 			"name": "Jette Jensen"
-		  },
-		  "municipality": {
+			},
+			"municipality": {
 			"name": "Miracle"
-		  }
+			}
 
 		},
 		{
-		  "businessKey": "K4",
-		  "name": "Kaffebestyrer",
-		  "manager": {
+			"businessKey": "K4",
+			"name": "Kaffebestyrer",
+			"manager": {
 			"businessKey": "E6",
-			"name": "Rune Nielsen"
-		  },
-		  "municipality": {
+			"name": "Rune Nielsen",
+			"email": "rni@miracle.dk"
+			},
+			"municipality": {
 			"name": "Miracle"
-		  }
+			}
 		}
-	  ]
+		]
 	},
 	{
-	  "businessKey": "K5",
-	  "name": "Digitalisering",
-	  "manager": {
+		"businessKey": "K5",
+		"name": "Digitalisering",
+		"manager": {
 		"businessKey": "E7",
 		"name": "David Hilbert"
-	  },
-	  "municipality": {
+		},
+		"municipality": {
 		"name": "Miracle"
-	  },
-	  "children": [
+		},
+		"children": [
 		{
-		  "businessKey": "K6",
-		  "name": "Services",
-		  "manager": {
+			"businessKey": "K6",
+			"name": "Services",
+			"manager": {
 			"businessKey": "E8",
 			"name": "Laila Leander"
-		  },
-		  "municipality": {
+			},
+			"municipality": {
 			"name": "Miracle"
-		  }
+			}
 		},
 		{
-		  "businessKey": "K7",
-		  "name": "Udvikling",
-		  "manager": {
+			"businessKey": "K7",
+			"name": "Udvikling",
+			"manager": {
 			"businessKey": "E9",
 			"name": "Karl Kodah",
 			"email": "kodah@kommune.dk"
-		  },
-		  "municipality": {
+			},
+			"municipality": {
 			"name": "Miracle"
-		  },
-		  "children": [
+			},
+			"children": [
 			{
-			  "businessKey": "K8",
-			  "name": "Backend",
-			  "manager": {
+				"businessKey": "K8",
+				"name": "Backend",
+				"manager": {
 				"businessKey": "E10",
 				"name": "Tyge Tordenskjold"
-			  },
-			  "municipality": {
+				},
+				"municipality": {
 				"name": "Miracle"
-			  }
+				}
 			},
 			{
-			  "businessKey": "K9",
-			  "name": "Borgervendt",
-			  "manager": {
+				"businessKey": "K9",
+				"name": "Borgervendt",
+				"manager": {
 				"businessKey": "E11",
 				"name": "Søren Dines"
-			  },
-			  "municipality": {
+				},
+				"municipality": {
 				"name": "Miracle"
-			  }
+				}
 			}
-		  ]
+			]
 		}
-	  ]
+		]
 	},
 	{
-	  "businessKey": "K10",
-	  "name": "Kultur",
-	  "manager": {
+		"businessKey": "K10",
+		"name": "Kultur",
+		"manager": {
 		"businessKey": "E12",
 		"name": "Hemet Nesingwary"
-	  },
-	  "municipality": {
+		},
+		"municipality": {
 		"name": "Miracle"
-	  },
-	  "children": [
+		},
+		"children": [
 		{
-		  "businessKey": "K11",
-		  "name": "Berigelse",
-		  "manager": {
+			"businessKey": "K11",
+			"name": "Berigelse",
+			"manager": {
 			"businessKey": "E13",
 			"name": "Olfert Kvium"
-		  },
-		  "municipality": {
+			},
+			"municipality": {
 			"name": "Miracle"
-		  }
+			}
 		},
 		{
-		  "businessKey": "K12",
-		  "name": "Moderne kunst",
-		  "manager": {
+			"businessKey": "K12",
+			"name": "Moderne kunst",
+			"manager": {
 			"businessKey": "E14",
 			"name": "Picasso Monetsen"
-		  },
-		  "municipality": {
+			},
+			"municipality": {
 			"name": "Miracle"
-		  }
+			}
 		}
-	  ]
+		]
 	}
-  ]
+	]
 }
