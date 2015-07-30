@@ -24,8 +24,8 @@ public class EmploymentEndpoint {
 	@GET
 	@Path("/")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response listAll() {
-		final List<EmploymentPO> employees =  employmentService.getAllPO();
+	public Response listAll(@QueryParam("municipalityId") int municipalityId) {
+		final List<EmploymentPO> employees =  employmentService.getAllPO(municipalityId);
 
 		if(!employees.isEmpty()) {
 			return Response.ok().entity(employees).build();

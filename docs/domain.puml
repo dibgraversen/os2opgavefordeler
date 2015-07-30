@@ -68,7 +68,7 @@ class OrgUnit {
   String email
   String phoneNumber
   boolean aktiv
-  
+
 }
 
 class Settings {
@@ -77,15 +77,18 @@ class Settings {
   Enum scope
 }
 
+
 Role -- Employment
-User - Role
-Municipality -- OrgUnit
+Role - User
+User - Settings
+User -- Municipality
+OrgUnit -- Municipality
 OrgUnit - OrgUnit
 OrgUnit - OrgUnitsProperty
 OrgUnit -- DistributionRule
 Employment -- DistributionRule
-DistributionRule - KLE
-User -- Settings
+KLE - DistributionRule
+DistributionRule - Municipality
 Employment - OrgUnit
 DistributionRule -- FilterRule
 

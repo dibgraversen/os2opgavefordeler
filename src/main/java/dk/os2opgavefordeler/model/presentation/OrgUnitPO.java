@@ -1,5 +1,7 @@
 package dk.os2opgavefordeler.model.presentation;
 
+import dk.os2opgavefordeler.model.Employment;
+import dk.os2opgavefordeler.model.Municipality;
 import dk.os2opgavefordeler.model.OrgUnit;
 
 public class OrgUnitPO {
@@ -11,16 +13,18 @@ public class OrgUnitPO {
 	private String esdhId;
 	private String email;
 	private String phone;
+	private Municipality municipality;
 
 	public OrgUnitPO(OrgUnit from) {
 		this.id = from.getId();
 		this.parentId = from.getParent().map(OrgUnit::getId).orElse(-1);
-		this.managerId = from.getManager().map(m -> m.getId()).orElse(-1);
+		this.managerId = from.getManager().map(Employment::getId).orElse(-1);
 
 		this.name = from.getName();
 		this.esdhId = from.getEsdhId();
 		this.email = from.getEmail();
 		this.phone = from.getPhone();
+		this.municipality = from.getMunicipality().orElse(null);
 	}
 
 	public int getParentId() {
@@ -49,5 +53,13 @@ public class OrgUnitPO {
 
 	public int getId() {
 		return id;
+	}
+
+	public Municipality getMunicipality() {
+		return municipality;
+	}
+
+	public void setMunicipality(Municipality municipality) {
+		this.municipality = municipality;
 	}
 }

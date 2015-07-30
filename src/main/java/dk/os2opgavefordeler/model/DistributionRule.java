@@ -3,6 +3,7 @@ package dk.os2opgavefordeler.model;
 import com.google.common.base.MoreObjects;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -49,6 +50,10 @@ public class DistributionRule implements Serializable {
 //	private Employment assignedEmp;
 	private int assignedEmp;
 
+	@NotNull
+	@ManyToOne(fetch = FetchType.EAGER)
+	private Municipality municipality;
+
 	public Optional<OrgUnit> getResponsibleOrg() {
 		return Optional.ofNullable(responsibleOrg);
 	}
@@ -83,6 +88,7 @@ public class DistributionRule implements Serializable {
 		this();
 		this.responsibleOrg = builder.responsibleOrg;
 		this.kle = builder.kle;
+		this.municipality = builder.municipality;
 		if(!builder.children.isEmpty()) {
 			this.children = builder.children;
 			children.stream().forEach(child -> child.parent = this);
@@ -105,6 +111,14 @@ public class DistributionRule implements Serializable {
 		this.kle = kle;
 	}
 
+	public Municipality getMunicipality() {
+		return municipality;
+	}
+
+	public void setMunicipality(Municipality municipality) {
+		this.municipality = municipality;
+	}
+
 	@Override
 	public String toString() {
 		return MoreObjects.toStringHelper(this.getClass())
@@ -125,6 +139,7 @@ public class DistributionRule implements Serializable {
 	public static class Builder {
 		private OrgUnit responsibleOrg = null;
 		private Kle kle = null;
+		private Municipality municipality;
 		private List<DistributionRule> children = new ArrayList<>();
 
 
@@ -139,6 +154,11 @@ public class DistributionRule implements Serializable {
 
 		public Builder kle(Kle kle) {
 			this.kle = kle;
+			return this;
+		}
+
+		public Builder municipality(Municipality municipality){
+			this.municipality = municipality;
 			return this;
 		}
 

@@ -1,5 +1,6 @@
 package dk.os2opgavefordeler.service;
 
+import javax.persistence.EntityManager;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
@@ -18,4 +19,6 @@ public interface PersistenceService {
 	interface CriteriaOp<T> {
 		void apply(CriteriaBuilder cb, CriteriaQuery<T> cq, Root<T> ent);
 	}
+
+	EntityManager getEm();
 }

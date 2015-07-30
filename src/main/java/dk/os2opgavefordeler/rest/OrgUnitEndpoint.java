@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-@Path("/org-unit")
+@Path("/org-units")
 @RequestScoped
 public class OrgUnitEndpoint {
 	public static final String FILE = "file";
@@ -33,8 +33,8 @@ public class OrgUnitEndpoint {
 	@GET
 	@Path("/")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response listAll() {
-		final List<OrgUnitPO> ou = orgUnitService.getToplevelOrgUnitPO();
+	public Response listAll(@QueryParam("municipalityId")int municipalityId) {
+		final List<OrgUnitPO> ou = orgUnitService.getToplevelOrgUnitPO(municipalityId);
 
 		if(!ou.isEmpty()) {
 			return Response.ok().entity(ou).build();
@@ -46,8 +46,8 @@ public class OrgUnitEndpoint {
 	@GET
 	@Path("/display")
 	@Produces(MediaType.TEXT_PLAIN)
-	public Response listAllDisplay() {
-		final Optional<OrgUnit> result = orgUnitService.getToplevelOrgUnit();
+	public Response listAllDisplay(@QueryParam("municipalityId") int municipalityId) {
+		final Optional<OrgUnit> result = orgUnitService.getToplevelOrgUnit(municipalityId);
 
 		return result.map(
 			ou -> Response.ok().entity( printOrg(new StringBuilder(), 0, ou) )

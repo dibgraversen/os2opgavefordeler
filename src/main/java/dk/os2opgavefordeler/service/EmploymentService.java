@@ -11,6 +11,6 @@ public interface EmploymentService {
 	Optional<EmploymentPO> getEmploymentPO(int id);
 	List<Employment> findByEmail(String email);
 
-	List<Employment> getAll();
-	List<EmploymentPO> getAllPO();
+	List<Employment> getAll(int municipalityId);
+	List<EmploymentPO> getAllPO(int municipalityId);
 }

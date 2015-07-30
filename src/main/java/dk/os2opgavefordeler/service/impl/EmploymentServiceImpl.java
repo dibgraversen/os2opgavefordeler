@@ -10,6 +10,7 @@ import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
+import javax.persistence.Query;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -48,13 +49,16 @@ public class EmploymentServiceImpl implements EmploymentService {
 	}
 
 	@Override
-	public List<Employment> getAll() {
-		return persistence.findAll(Employment.class);
+	@SuppressWarnings("unchecked")
+	public List<Employment> getAll(int municipalityId) {
+		Query query = persistence.getEm().createQuery("SELECT emp FROM Employment emp WHERE emp.employedIn.municipality.id = :municipalityId");
+		query.setParameter("municipalityId", municipalityId);
+		return query.getResultList();
 	}
 
 	@Override
-	public List<EmploymentPO> getAllPO() {
-		final List<Employment> employments = getAll();
+	public List<EmploymentPO> getAllPO(int municipalityId) {
+		final List<Employment> employments = getAll(municipalityId);
 		return employments.stream()
 			.map(EmploymentPO::new)
 			.collect(Collectors.toList());

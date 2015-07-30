@@ -8,12 +8,13 @@ import java.util.List;
 import java.util.Optional;
 
 public interface OrgUnitService {
+
 	/**
 	 * Persist an OrgUnit.
 	 * @param orgUnit
 	 * @return the input orgUnit, for possible ease of method chaining.
 	 */
-	OrgUnit createOrgUnit(OrgUnit orgUnit);
+	OrgUnit saveOrgUnit(OrgUnit orgUnit);
 
 	/**
 	 * Imports an organization tree.
@@ -27,12 +28,13 @@ public interface OrgUnitService {
 	 * @return fetched orgUnit, or Optional.empty if not found.
 	 */
 	Optional<OrgUnit> getOrgUnit(int id);
-	Optional<OrgUnit> getToplevelOrgUnit();
+
+	Optional<OrgUnit> getToplevelOrgUnit(int municipalityId);
 	List<OrgUnit> findByName(String name);
 
-	List<OrgUnitPO> getToplevelOrgUnitPO();
+	List<OrgUnitPO> getToplevelOrgUnitPO(int municipalityId);
 	Optional<OrgUnitPO> getOrgUnitPO(int id);
 
 	Optional<Employment> getEmployment(int id);
-	Optional<Employment> getEmploymentByName(String name);
+	Optional<Employment> getEmploymentByName(int municipalityId, String name);
 }

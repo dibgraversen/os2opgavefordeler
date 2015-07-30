@@ -24,6 +24,9 @@ public class User implements Serializable {
 	@OneToOne
 	private UserSettings settings;
 
+	@ManyToOne(fetch = FetchType.EAGER)
+	private Municipality municipality;
+
 	public User() {
 	}
 
@@ -63,6 +66,13 @@ public class User implements Serializable {
 		return ImmutableList.copyOf(roles);
 	}
 
+	public Municipality getMunicipality() {
+		return municipality;
+	}
+
+	public void setMunicipality(Municipality municipality) {
+		this.municipality = municipality;
+	}
 
 	//--------------------------------------------------------------------------
 	// toString, equals, hashcode
@@ -73,6 +83,7 @@ public class User implements Serializable {
 			.add("id", id)
 			.add("name", name)
 			.add("email", email)
+			.add("municipality", municipality)
 			.toString();
 	}
 

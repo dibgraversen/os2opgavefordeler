@@ -33,6 +33,7 @@ public class DistributionServiceTest {
 	public static final int ORG_NONEXISTING = 42;
 	public static final int ORG_1 = 1;
 	public static final int ORG_2 = 2;
+	public static final int MUNICIPALITY_ID = 1;
 
 	@Inject
 	Logger log;
@@ -192,7 +193,7 @@ public class DistributionServiceTest {
 			orgId = org.getId();
 		}
 
-		return distributionService.getDistributionsForOrg(orgId, includeUnowned, includeImplicit)
+		return distributionService.getDistributionsForOrg(orgId, MUNICIPALITY_ID, includeUnowned, includeImplicit)
 			.stream()
 			.map(d -> d.getKle().getNumber());
 	}
