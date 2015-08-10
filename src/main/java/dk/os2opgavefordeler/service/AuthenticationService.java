@@ -39,4 +39,6 @@ public interface AuthenticationService {
 	 * @throws hissy fits if the user can't be authenticated
 	 */
 	User finalizeAuthenticationFlow(IdentityProvider idp, String token, String callbackUrl, URI requestUri) throws AuthenticationException;
+
+	User findOrCreateUserFromEmail(String email);
 }
