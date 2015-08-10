@@ -5,7 +5,10 @@ import com.google.common.base.Strings;
 import dk.os2opgavefordeler.model.Employment;
 import dk.os2opgavefordeler.model.OrgUnit;
 import dk.os2opgavefordeler.model.presentation.OrgUnitPO;
+import dk.os2opgavefordeler.model.presentation.SimpleMessage;
+import dk.os2opgavefordeler.service.BadRequestArgumentException;
 import dk.os2opgavefordeler.service.OrgUnitService;
+import dk.os2opgavefordeler.util.Validate;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 import org.slf4j.Logger;
@@ -33,40 +36,59 @@ public class OrgUnitEndpoint {
 	@GET
 	@Path("/")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response listAll( @QueryParam("municipalityId") Long municipalityId ) {
-		final List<OrgUnitPO> ou = orgUnitService.getToplevelOrgUnitPO(municipalityId);
+	public Response listAll(@QueryParam("municipalityId") Long municipalityId) {
+		try {
+			Validate.nonZero(municipalityId, "Invalid municipalityId");
 
-		if(!ou.isEmpty()) {
-			return Response.ok().entity(ou).build();
-		} else {
-			return Response.status(404).build();
+			final List<OrgUnitPO> ou = orgUnitService.getToplevelOrgUnitPO(municipalityId);
+
+			if (!ou.isEmpty()) {
+				return Response.ok().entity(ou).build();
+			} else {
+				return Response.status(404).build();
+			}
+		}
+		catch(BadRequestArgumentException e) {
+			return Response.status(Response.Status.BAD_REQUEST).entity(new SimpleMessage(e.getMessage())).build();
 		}
 	}
 
 	@GET
 	@Path("/display")
 	@Produces(MediaType.TEXT_PLAIN)
-	public Response listAllDisplay(@QueryParam("municipalityId") Long municipalityId) {
-		final Optional<OrgUnit> result = orgUnitService.getToplevelOrgUnit(municipalityId);
+	public Response displayTree(@QueryParam("municipalityId") Long municipalityId) {
+		try {
+			Validate.nonZero(municipalityId, "Invalid municipalityId");
+			final Optional<OrgUnit> result = orgUnitService.getToplevelOrgUnit(municipalityId);
 
-		return result.map(
-			ou -> Response.ok().entity( printOrg(new StringBuilder(), 0, ou) )
-		).orElseGet(
-			() -> Response.status(404)
-		).build();
+			return result.map(
+				ou -> Response.ok().entity(printOrg(new StringBuilder(), 0, ou))
+			).orElseGet(
+				() -> Response.status(404)
+			).build();
+		}
+		catch(BadRequestArgumentException e) {
+			return Response.status(Response.Status.BAD_REQUEST).entity(new SimpleMessage(e.getMessage())).build();
+		}
 	}
 
 	@GET
 	@Path("/{orgId}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response get(@PathParam("orgId") Long orgId) {
-		final Optional<OrgUnitPO> result = orgUnitService.getOrgUnitPO(orgId);
+		try {
+			Validate.nonZero(orgId, "Invalid orgId");
+			final Optional<OrgUnitPO> result = orgUnitService.getOrgUnitPO(orgId);
 
-		return result.map(
-			ou -> Response.ok().entity(ou)
-		).orElseGet(
-			() -> Response.status(404)
-		).build();
+			return result.map(
+				ou -> Response.ok().entity(ou)
+			).orElseGet(
+				() -> Response.status(404)
+			).build();
+		}
+		catch(BadRequestArgumentException e) {
+			return Response.status(Response.Status.BAD_REQUEST).entity(new SimpleMessage(e.getMessage())).build();
+		}
 	}
 
 	@POST

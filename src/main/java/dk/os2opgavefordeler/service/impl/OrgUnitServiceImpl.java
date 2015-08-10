@@ -18,6 +18,7 @@ import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -250,11 +251,13 @@ public class OrgUnitServiceImpl implements OrgUnitService {
 	@Override
 	@SuppressWarnings("unchecked")
 	public Optional<OrgUnit> getToplevelOrgUnit(long municipalityId) {
-		Query query = persistence.getEm().createQuery("SELECT org FROM OrgUnit org WHERE org.parent IS NULL AND org.municipality.id = :municipalityId");
+		TypedQuery<OrgUnit> query = persistence.getEm().createQuery("SELECT org FROM OrgUnit org WHERE org.parent IS NULL AND org.municipality.id = :municipalityId", OrgUnit.class);
 		query.setParameter("municipalityId", municipalityId);
 		Optional<OrgUnit> result;
 		try {
-			OrgUnit orgUnit = (OrgUnit) query.getSingleResult();
+			final OrgUnit orgUnit = query.getSingleResult();
+			orgUnit.getEmployees();
+			touchChildren(orgUnit.getChildren());
 			result = Optional.of(orgUnit);
 		} catch (NoResultException nre){
 			result = Optional.empty();
@@ -314,6 +317,7 @@ public class OrgUnitServiceImpl implements OrgUnitService {
 	private List<OrgUnit> touchChildren(List<OrgUnit> ou) {
 		ou.forEach(child -> {
 			child.getEmployees().size();
+			child.getMunicipality();
 			touchChildren(child.getChildren());
 		});
 		return ou;

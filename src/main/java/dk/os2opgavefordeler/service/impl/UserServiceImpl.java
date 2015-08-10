@@ -235,9 +235,10 @@ public class UserServiceImpl implements UserService {
 	private List<Role> createRolesFromEmployments(List<Employment> employments) {
 		return employments.stream()
 			.map(emp -> {
+				final Optional<Employment> departmentManager = emp.getEmployedIn().getManager();
 				final Role role = new Role();
 
-				role.setManager(emp.getEmployedIn().getChildren().equals(emp));
+				role.setManager( departmentManager.map(m -> m.equals(emp)).orElse(false) );
 				role.setEmployment(emp);
 				role.setName(String.format("%s (%s)", emp.getName(), emp.getEmployedIn().getName()));
 
