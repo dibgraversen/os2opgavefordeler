@@ -7,3 +7,7 @@ end-if
 if (outcome != failure) of /system-property=topicrouter.url.openid.callback:add()
 	/system-property=topicrouter.url.openid.callback:write-attribute(name=value, value="http://localhost:8080/TopicRouter/rest/auth/authenticate")
 end-if
+
+if (outcome != failure) of /system-property=topicrouter.login.godmode.enabled:add()
+	/system-property=topicrouter.login.godmode.enabled:write-attribute(name=value, value=true)
+end-if

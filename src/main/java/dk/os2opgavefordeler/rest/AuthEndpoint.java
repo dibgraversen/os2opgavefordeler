@@ -1,10 +1,11 @@
 package dk.os2opgavefordeler.rest;
 
+import com.google.common.base.Strings;
 import dk.os2opgavefordeler.model.IdentityProvider;
 import dk.os2opgavefordeler.model.User;
 import dk.os2opgavefordeler.model.presentation.SimpleMessage;
-import dk.os2opgavefordeler.service.AuthenticationService;
 import dk.os2opgavefordeler.service.AuthenticationException;
+import dk.os2opgavefordeler.service.AuthenticationService;
 import dk.os2opgavefordeler.service.ConfigService;
 import org.slf4j.Logger;
 
@@ -100,7 +101,6 @@ public class AuthEndpoint {
 			final User user = authenticationService.finalizeAuthenticationFlow(idp, token, config.getOpenIdCallbackUrl(), ui.getRequestUri());
 
 			request.getSession().setAttribute(S_AUTHENTICATED_USER, user);
-
 			authenticationService.setCurrentUser(user);
 
 
@@ -115,5 +115,24 @@ public class AuthEndpoint {
 			session.removeAttribute(S_CSRF_TOKEN);
 			session.removeAttribute(S_IDP_ID);
 		}
+	}
+
+	@GET
+	@Path("/iddqd")
+	@Produces(MediaType.TEXT_HTML + "; charset=UTF-8")
+	public Response godModeLogin(@QueryParam(value = "email") String email) {
+		if(!config.isGodModeLoginEnabled()) {
+			log.warn("IDDQD Auth endpoint hit but not enabled!");
+			return Response.status(Response.Status.NOT_FOUND).build();
+		}
+		if(Strings.isNullOrEmpty(email)) {
+			return Response.status(Response.Status.BAD_REQUEST).entity("No email supplied").build();
+		}
+
+		log.info("IDDQD Auth - attempting to log in [{}]", email);
+		final User user = authenticationService.findOrCreateUserFromEmail(email);
+		request.getSession().setAttribute(S_AUTHENTICATED_USER, user);
+		authenticationService.setCurrentUser(user);
+		return Response.temporaryRedirect(URI.create(config.getHomeUrl())).build();
 	}
 }

@@ -129,18 +129,23 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 				throw new AuthenticationException("IDP returned empty email claim");
 			}
 
-			return userService.findByEmail(email)
-				.map(user -> {
-					log.info("User found by email, returning");
-					return user;
-				})
-				.orElseGet(() -> {
-					log.info("User not found, creating");
-					return userService.createUserFromOpenIdEmail(email);
-				});
+			return findOrCreateUserFromEmail(email);
 		}
 		catch(java.text.ParseException e) {
 			throw new AuthenticationException("Error parsing OpenID claims", e);
 		}
+	}
+
+	@Override
+	public User findOrCreateUserFromEmail(String email) {
+		return userService.findByEmail(email)
+			.map(user -> {
+				log.info("User found by email, returning");
+				return user;
+			})
+			.orElseGet(() -> {
+				log.info("User not found, creating");
+				return userService.createUserFromOpenIdEmail(email);
+			});
 	}
 }
