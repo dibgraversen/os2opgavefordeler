@@ -186,7 +186,6 @@ public class OrgUnit implements Serializable, IHasChildren<OrgUnit> {
 		return MoreObjects.toStringHelper(this)
 			.add("id", id)
 			.add("name", name)
-			.add("municipality", municipality)
 			.toString();
 	}
 
