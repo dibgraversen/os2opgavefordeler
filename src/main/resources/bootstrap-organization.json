@@ -1,158 +1,181 @@
 {
-	"businessKey": "K1", 
+	"businessKey": "K1",
 	"name": "Fantastisk Kommune",
+	"email": "fantastisk@kommune.dk",
+	"phone": "555-1458",
 	"manager": {
-	"businessKey": "E1",
-	"name": "Borge Meister",
-	"email": "borge@kommune.dk"
+		"businessKey": "E1",
+		"name": "Borge Meister",
+		"email": "borge@kommune.dk"
 	},
 	"employees": [
-	{
-		"businessKey": "E2",
-		"name": "Jeanne Deij"
-	},
-	{
-		"businessKey": "E3",
-		"name": "Menig Mand",
-		"email": "menig@kommune.dk"
-	}
+		{
+			"businessKey": "E2",
+			"name": "Jeanne Deij"
+		},
+		{
+			"businessKey": "E3",
+			"name": "Menig Mand",
+			"email": "menig@kommune.dk"
+		}
 	],
 	"municipality": {
-	"name": "Miracle"
+		"name": "Miracle"
 	},
 	"children": [
-	{
-		"businessKey": "K2",
-		"name": "Administration",
-		"manager": {
-		"businessKey": "E4",
-		"name": "Amin Stratah",
-		"email": "admin@kommune.dk"
-		},
-		"municipality": {
-		"name": "Miracle"
-		},
-		"children": [
 		{
-			"businessKey": "K3",
-			"name": "Personale",
+			"businessKey": "K2",
+			"name": "Administration",
+			"email": "administration@kommune.dk",
+			"phone": "555-1422",
 			"manager": {
-			"businessKey": "E5",
-			"name": "Jette Jensen"
+				"businessKey": "E4",
+				"name": "Amin Stratah",
+				"email": "admin@kommune.dk"
 			},
 			"municipality": {
-			"name": "Miracle"
-			}
-
-		},
-		{
-			"businessKey": "K4",
-			"name": "Kaffebestyrer",
-			"manager": {
-			"businessKey": "E6",
-			"name": "Rune Nielsen",
-			"email": "rni@miracle.dk"
-			},
-			"municipality": {
-			"name": "Miracle"
-			}
-		}
-		]
-	},
-	{
-		"businessKey": "K5",
-		"name": "Digitalisering",
-		"manager": {
-		"businessKey": "E7",
-		"name": "David Hilbert"
-		},
-		"municipality": {
-		"name": "Miracle"
-		},
-		"children": [
-		{
-			"businessKey": "K6",
-			"name": "Services",
-			"manager": {
-			"businessKey": "E8",
-			"name": "Laila Leander"
-			},
-			"municipality": {
-			"name": "Miracle"
-			}
-		},
-		{
-			"businessKey": "K7",
-			"name": "Udvikling",
-			"manager": {
-			"businessKey": "E9",
-			"name": "Karl Kodah",
-			"email": "kodah@kommune.dk"
-			},
-			"municipality": {
-			"name": "Miracle"
+				"name": "Miracle"
 			},
 			"children": [
-			{
-				"businessKey": "K8",
-				"name": "Backend",
-				"manager": {
-				"businessKey": "E10",
-				"name": "Tyge Tordenskjold"
+				{
+					"businessKey": "K3",
+					"name": "Personale",
+					"email": "personale@kommune.dk",
+					"phone": "555-1442",
+					"manager": {
+						"businessKey": "E5",
+						"name": "Jette Jensen"
+					},
+					"municipality": {
+						"name": "Miracle"
+					}
 				},
-				"municipality": {
-				"name": "Miracle"
+				{
+					"businessKey": "K4",
+					"name": "Kaffebestyrer",
+					"email": "kaffe@kommune.dk",
+					"phone": "555-1358",
+					"manager": {
+						"businessKey": "E6",
+						"name": "Rune Nielsen",
+						"email": "rni@miracle.dk"
+					},
+					"municipality": {
+						"name": "Miracle"
+					}
 				}
+			]
+		},
+		{
+			"businessKey": "K5",
+			"name": "Digitalisering",
+			"email": "digitalisering@kommune.dk",
+			"phone": "555-2525",
+			"manager": {
+				"businessKey": "E7",
+				"name": "David Hilbert"
 			},
-			{
-				"businessKey": "K9",
-				"name": "Borgervendt",
-				"manager": {
-				"businessKey": "E11",
-				"name": "Søren Dines"
-				},
-				"municipality": {
+			"municipality": {
 				"name": "Miracle"
+			},
+			"children": [
+				{
+					"businessKey": "K6",
+					"name": "Services",
+					"email": "services@kommune.dk",
+					"phone": "555-2424",
+					"manager": {
+						"businessKey": "E8",
+						"name": "Laila Leander"
+					},
+					"municipality": {
+						"name": "Miracle"
+					}
+				},
+				{
+					"businessKey": "K7",
+					"name": "Udvikling",
+					"email": "udvikling@kommune.dk",
+					"phone": "555-8456",
+					"manager": {
+						"businessKey": "E9",
+						"name": "Karl Kodah",
+						"email": "kodah@kommune.dk"
+					},
+					"municipality": {
+						"name": "Miracle"
+					},
+					"children": [
+						{
+							"businessKey": "K8",
+							"name": "Backend",
+							"email": "backend@kommune.dk",
+							"phone": "555-8989",
+							"manager": {
+								"businessKey": "E10",
+								"name": "Tyge Tordenskjold"
+							},
+							"municipality": {
+								"name": "Miracle"
+							}
+						},
+						{
+							"businessKey": "K9",
+							"name": "Borgervendt",
+							"email": "borger@kommune.dk",
+							"phone": "555-7575",
+							"manager": {
+								"businessKey": "E11",
+								"name": "Søren Dines"
+							},
+							"municipality": {
+								"name": "Miracle"
+							}
+						}
+					]
 				}
-			}
+			]
+		},
+		{
+			"businessKey": "K10",
+			"name": "Kultur",
+			"email": "kultur@kommune.dk",
+			"phone": "555-8648",
+			"manager": {
+				"businessKey": "E12",
+				"name": "Hemet Nesingwary"
+			},
+			"municipality": {
+				"name": "Miracle"
+			},
+			"children": [
+				{
+					"businessKey": "K11",
+					"name": "Berigelse",
+					"email": "kultur@kommune.dk",
+					"phone": "555-8782",
+					"manager": {
+						"businessKey": "E13",
+						"name": "Olfert Kvium"
+					},
+					"municipality": {
+						"name": "Miracle"
+					}
+				},
+				{
+					"businessKey": "K12",
+					"name": "Moderne kunst",
+					"email": "kultur@kommune.dk",
+					"phone": "555-4628",
+					"manager": {
+						"businessKey": "E14",
+						"name": "Picasso Monetsen"
+					},
+					"municipality": {
+						"name": "Miracle"
+					}
+				}
 			]
 		}
-		]
-	},
-	{
-		"businessKey": "K10",
-		"name": "Kultur",
-		"manager": {
-		"businessKey": "E12",
-		"name": "Hemet Nesingwary"
-		},
-		"municipality": {
-		"name": "Miracle"
-		},
-		"children": [
-		{
-			"businessKey": "K11",
-			"name": "Berigelse",
-			"manager": {
-			"businessKey": "E13",
-			"name": "Olfert Kvium"
-			},
-			"municipality": {
-			"name": "Miracle"
-			}
-		},
-		{
-			"businessKey": "K12",
-			"name": "Moderne kunst",
-			"manager": {
-			"businessKey": "E14",
-			"name": "Picasso Monetsen"
-			},
-			"municipality": {
-			"name": "Miracle"
-			}
-		}
-		]
-	}
 	]
 }
