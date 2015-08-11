@@ -45,7 +45,8 @@
 						popover-placement="right"></span>
 				</td>
 				<td ng-class="topic.org ? '' : 'inherited'">{{ topic.org.name || distribution(topic) }}</td>
-				<td ng-show="settings.showExpandedOrg"></td>
+				<td ng-show="settings.showExpandedOrg">{{ topic.responsible.email }}</td>
+				<td ng-show="settings.showExpandedOrg">{{ topic.responsible.phone }}</td>
 				<td>{{ topic.employee.name }}</td>
 				<td class="button">
 					<div class="btn-group" ng-show="distributionChangeAllowed(topic)" dropdown style="width:110px">
