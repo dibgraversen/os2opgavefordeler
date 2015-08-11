@@ -159,10 +159,12 @@ public class OrgUnitServiceImpl implements OrgUnitService {
 
 	private void deleteNotInCollection(List<String> businessKeys, long municipalityId){
 		List<Long> orgIdsForDeletion = getOrgIdsForDeletion(businessKeys, municipalityId);
-		unlinkAssignedOrgs(orgIdsForDeletion);
-		unlinkResponsible(orgIdsForDeletion);
-		unlinkEmployments(orgIdsForDeletion);
-		deleteOrgs(orgIdsForDeletion);
+		if(orgIdsForDeletion.size() > 0){
+			unlinkAssignedOrgs(orgIdsForDeletion);
+			unlinkResponsible(orgIdsForDeletion);
+			unlinkEmployments(orgIdsForDeletion);
+			deleteOrgs(orgIdsForDeletion);
+		}
 	}
 
 	@SuppressWarnings("unchecked")
