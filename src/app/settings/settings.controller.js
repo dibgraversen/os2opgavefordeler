@@ -28,7 +28,7 @@
 
 		function openCreateMunicipality(){
 			var modalInstance = $modal.open({
-				templateUrl: 'app/municipality-admin/add-municipality-modal.html',
+				templateUrl: 'app/settings/add-municipality-modal.html',
 				controller: 'AddMunicipalityModalInstanceCtrl',
 				size: 'md'
 			});
