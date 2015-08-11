@@ -3,6 +3,8 @@
 	"name": "Fantastisk Kommune",
 	"email": "fantastisk@kommune.dk",
 	"phone": "555-1458",
+	"esdhId": "fako",
+	"esdhLabel": "Fantastisk kommune",
 	"manager": {
 		"businessKey": "E1",
 		"name": "Borge Meister",
@@ -11,12 +13,12 @@
 	"employees": [
 		{
 			"businessKey": "E2",
-			"name": "Jeanne Deij"
+			"name": "Jeanne Deere"
 		},
 		{
 			"businessKey": "E3",
-			"name": "Menig Mand",
-			"email": "menig@kommune.dk"
+			"name": "Jørgen Jensen",
+			"email": "jj@kommune.dk"
 		}
 	],
 	"municipality": {
@@ -28,9 +30,11 @@
 			"name": "Administration",
 			"email": "administration@kommune.dk",
 			"phone": "555-1422",
+			"esdhId": "admi",
+			"esdhLabel": "Administration",
 			"manager": {
 				"businessKey": "E4",
-				"name": "Amin Stratah",
+				"name": "Hans Jørgensen",
 				"email": "admin@kommune.dk"
 			},
 			"municipality": {
@@ -42,6 +46,8 @@
 					"name": "Personale",
 					"email": "personale@kommune.dk",
 					"phone": "555-1442",
+					"esdhId": "pers",
+					"esdhLabel": "Personale",
 					"manager": {
 						"businessKey": "E5",
 						"name": "Jette Jensen"
@@ -55,6 +61,8 @@
 					"name": "Kaffebestyrer",
 					"email": "kaffe@kommune.dk",
 					"phone": "555-1358",
+					"esdhId": "kaff",
+					"esdhLabel": "Kaffebestyrer",
 					"manager": {
 						"businessKey": "E6",
 						"name": "Rune Nielsen",
@@ -71,6 +79,8 @@
 			"name": "Digitalisering",
 			"email": "digitalisering@kommune.dk",
 			"phone": "555-2525",
+			"esdhId": "digi",
+			"esdhLabel": "Digitalisering",
 			"manager": {
 				"businessKey": "E7",
 				"name": "David Hilbert"
@@ -84,6 +94,8 @@
 					"name": "Services",
 					"email": "services@kommune.dk",
 					"phone": "555-2424",
+					"esdhId": "serv",
+					"esdhLabel": "Services",
 					"manager": {
 						"businessKey": "E8",
 						"name": "Laila Leander"
@@ -97,9 +109,11 @@
 					"name": "Udvikling",
 					"email": "udvikling@kommune.dk",
 					"phone": "555-8456",
+					"esdhId": "Udvi",
+					"esdhLabel": "Udvikling",
 					"manager": {
 						"businessKey": "E9",
-						"name": "Karl Kodah",
+						"name": "Ervin Jensen",
 						"email": "kodah@kommune.dk"
 					},
 					"municipality": {
@@ -111,6 +125,8 @@
 							"name": "Backend",
 							"email": "backend@kommune.dk",
 							"phone": "555-8989",
+							"esdhId": "back",
+							"esdhLabel": "Backend",
 							"manager": {
 								"businessKey": "E10",
 								"name": "Tyge Tordenskjold"
@@ -124,9 +140,11 @@
 							"name": "Borgervendt",
 							"email": "borger@kommune.dk",
 							"phone": "555-7575",
+							"esdhId": "borg",
+							"esdhLabel": "Borgervendt",
 							"manager": {
 								"businessKey": "E11",
-								"name": "Søren Dines"
+								"name": "Søren Andersen"
 							},
 							"municipality": {
 								"name": "Miracle"
@@ -141,6 +159,8 @@
 			"name": "Kultur",
 			"email": "kultur@kommune.dk",
 			"phone": "555-8648",
+			"esdhId": "kult",
+			"esdhLabel": "Kultur",
 			"manager": {
 				"businessKey": "E12",
 				"name": "Hemet Nesingwary"
@@ -154,6 +174,8 @@
 					"name": "Berigelse",
 					"email": "kultur@kommune.dk",
 					"phone": "555-8782",
+					"esdhId": "kult",
+					"esdhLabel": "Kultur",
 					"manager": {
 						"businessKey": "E13",
 						"name": "Olfert Kvium"
@@ -167,6 +189,8 @@
 					"name": "Moderne kunst",
 					"email": "kultur@kommune.dk",
 					"phone": "555-4628",
+					"esdhId": "kult",
+					"esdhLabel": "Kultur",
 					"manager": {
 						"businessKey": "E14",
 						"name": "Picasso Monetsen"
