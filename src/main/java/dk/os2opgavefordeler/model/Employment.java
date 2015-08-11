@@ -24,6 +24,7 @@ public class Employment implements Serializable {
 	private String name;
 	private String email;
 	private String esdhId;
+	private String esdhLabel;
 	private String phone;
 	private String initials;
 	private String jobTitle;
@@ -39,6 +40,7 @@ public class Employment implements Serializable {
 		this.name = builder.name;
 		this.email = builder.email;
 		this.esdhId = builder.esdhId;
+		this.esdhLabel = builder.esdhLabel;
 		this.phone = builder.phone;
 		this.initials = builder.initials;
 		this.jobTitle = builder.jobTitle;
@@ -94,6 +96,10 @@ public class Employment implements Serializable {
 		return esdhId;
 	}
 
+	public String getEsdhLabel() {
+		return esdhLabel;
+	}
+
 	public void setEsdhId(String esdhId) {
 		this.esdhId = esdhId;
 	}
@@ -137,6 +143,7 @@ public class Employment implements Serializable {
 		private String name;
 		private String email;
 		private String esdhId;
+		private String esdhLabel;
 		private String phone;
 		private String initials;
 		private String jobTitle;
@@ -163,6 +170,10 @@ public class Employment implements Serializable {
 		}
 		public Builder esdhId(String esdhId) {
 			this.esdhId = esdhId;
+			return this;
+		}
+		public Builder esdhLabel(String esdhLabel) {
+			this.esdhLabel = esdhLabel;
 			return this;
 		}
 		public Builder phone(String phone) {
