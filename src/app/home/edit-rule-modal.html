@@ -24,12 +24,16 @@
 						<tr>
 							<th>Afdelingsnavn</th>
 							<th>Leder</th>
+							<th>Esdh id</th>
+							<th>Esdh betegnelse</th>
 						</tr>
 						</thead>
 						<tbody ng-repeat="orgUnit in orgUnits | filter:orgFilter">
 						<tr ng-class="selectedOrgUnit === orgUnit ? 'success' : ''" ng-click="setSelectedOrgUnit(orgUnit)">
 							<td>{{ orgUnit.name }}</td>
 							<td>{{ orgUnit.manager.name }}</td>
+							<td>{{ orgUnit.esdhId }}</td>
+							<td>{{ orgUnit.esdhName }}</td>
 						</tr>
 						</tbody>
 					</table>
