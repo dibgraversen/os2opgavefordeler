@@ -15,6 +15,7 @@
 		less: './src/styles/less/app.less',
 		styles: './src/styles/*.css',
 		images: './src/images/**/*',
+		assets: './src/assets/**/*',
 		index: './src/index.html',
 		partials: ['./src/app/**/*.html', '!./src/index.html'],
 		distDev: './dist.dev',
@@ -103,6 +104,11 @@
 				.pipe(gulp.dest(paths.distDev + '/images/'));
 	};
 
+	pipes.assetsDev = function() {
+		return gulp.src(paths.assets)
+				.pipe(gulp.dest(paths.distDev + '/public/'));
+	};
+
 	pipes.validatedIndex = function() {
 		return gulp.src(paths.index)
 				.pipe(plugins.htmlhint())
@@ -128,7 +134,11 @@
 	};
 
 	pipes.builtAppDev = function() {
-		return es.merge(pipes.builtIndexDev(), pipes.builtPartialsDev(), pipes.processedImagesDev());
+		return es.merge(
+				pipes.builtIndexDev(),
+				pipes.builtPartialsDev(),
+				pipes.processedImagesDev(),
+				pipes.assetsDev());
 	};
 
 	// == TASKS =========
@@ -219,12 +229,12 @@
 
 	// END 'A Healthy Gulp Setup for AngularJS Projects'.
 
-	gulp.task('scripts', function () {
-		return gulp.src([paths.scripts])
-				.pipe(plugins.jshint())
-				.pipe(plugins.jshint.reporter(require('jshint-stylish')))
-				.pipe(plugins.size());
-	});
+	//gulp.task('scripts', function () {
+	//	return gulp.src([paths.scripts])
+	//			.pipe(plugins.jshint())
+	//			.pipe(plugins.jshint.reporter(require('jshint-stylish')))
+	//			.pipe(plugins.size());
+	//});
 
 	gulp.task('css', function () {
 		return gulp.src([paths.less])
@@ -232,20 +242,20 @@
 				.pipe(gulp.dest('src/styles'));
 	});
 
-	gulp.task('watch', ['serve'], function () {
-		var server = plugins.livereload();
-
-		gulp.watch([
-			'src/**/*.html',
-			'src/app/**/*.js',
-			'src/styles/*.css'
-		]).on('change', function (file) {
-			console.log('File changed: ' + file.path);
-			server.changed(file.path);
-		});
-		gulp.watch('src/styles/less/*.less', ['css']);
-		gulp.watch(paths.scripts, ['scripts']);
-	});
+	//gulp.task('watch', ['serve'], function () {
+	//	var server = plugins.livereload();
+	//
+	//	gulp.watch([
+	//		'src/**/*.html',
+	//		'src/app/**/*.js',
+	//		'src/styles/*.css'
+	//	]).on('change', function (file) {
+	//		console.log('File changed: ' + file.path);
+	//		server.changed(file.path);
+	//	});
+	//	gulp.watch('src/styles/less/*.less', ['css']);
+	//	gulp.watch(paths.scripts, ['scripts']);
+	//});
 
 	gulp.task('injectjs', function () {
 		var target = gulp.src('./src/index.html');
