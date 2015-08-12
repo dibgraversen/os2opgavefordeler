@@ -48,11 +48,13 @@
 						<thead>
 						<tr>
 							<th>Navn</th>
+							<th>Esdh id</th>
 						</tr>
 						</thead>
 						<tbody ng-repeat="emp in employments | filter:empFilter">
 						<tr ng-class="selectedEmp === emp ? 'success' : ''" ng-click="setSelectedEmp(emp)">
 							<td>{{ emp.name }}</td>
+							<td>{{ emp.esdhId }}</td>
 						</tr>
 						</tbody>
 					</table>
