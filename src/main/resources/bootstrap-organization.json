@@ -13,7 +13,8 @@
 	"employees": [
 		{
 			"businessKey": "E2",
-			"name": "Jeanne Deere"
+			"name": "Jeanne Deere",
+			"email": "jd@kommune.dk"
 		},
 		{
 			"businessKey": "E3",
@@ -50,7 +51,8 @@
 					"esdhLabel": "Personale",
 					"manager": {
 						"businessKey": "E5",
-						"name": "Jette Jensen"
+						"name": "Jette Jensen",
+						"email": "jej@kommune.dk"
 					},
 					"municipality": {
 						"name": "Miracle"
@@ -83,7 +85,8 @@
 			"esdhLabel": "Digitalisering",
 			"manager": {
 				"businessKey": "E7",
-				"name": "David Hilbert"
+				"name": "David Hilbert",
+				"email": "dh@kommune.dk"
 			},
 			"municipality": {
 				"name": "Miracle"
@@ -98,7 +101,8 @@
 					"esdhLabel": "Services",
 					"manager": {
 						"businessKey": "E8",
-						"name": "Laila Leander"
+						"name": "Laila Leander",
+						"email": "ll@kommune.dk"
 					},
 					"municipality": {
 						"name": "Miracle"
@@ -129,7 +133,8 @@
 							"esdhLabel": "Backend",
 							"manager": {
 								"businessKey": "E10",
-								"name": "Tyge Tordenskjold"
+								"name": "Tyge Tordenskjold",
+								"email": "tt@kommune.dk"
 							},
 							"municipality": {
 								"name": "Miracle"
@@ -144,7 +149,8 @@
 							"esdhLabel": "Borgervendt",
 							"manager": {
 								"businessKey": "E11",
-								"name": "Søren Andersen"
+								"name": "Søren Andersen",
+								"email": "sa@kommune.dk"
 							},
 							"municipality": {
 								"name": "Miracle"
@@ -163,7 +169,8 @@
 			"esdhLabel": "Kultur",
 			"manager": {
 				"businessKey": "E12",
-				"name": "Hemet Nesingwary"
+				"name": "Hemet Nesingwary",
+				"email": "hnw@kommune.dk"
 			},
 			"municipality": {
 				"name": "Miracle"
@@ -178,7 +185,8 @@
 					"esdhLabel": "Kultur",
 					"manager": {
 						"businessKey": "E13",
-						"name": "Olfert Kvium"
+						"name": "Olfert Kvium",
+						"email": "ok@kommune.dk"
 					},
 					"municipality": {
 						"name": "Miracle"
@@ -193,7 +201,8 @@
 					"esdhLabel": "Kultur",
 					"manager": {
 						"businessKey": "E14",
-						"name": "Picasso Monetsen"
+						"name": "Picasso Monetsen",
+						"email": "pm@kommune.dk"
 					},
 					"municipality": {
 						"name": "Miracle"
