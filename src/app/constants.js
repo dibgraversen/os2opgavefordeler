@@ -2,8 +2,8 @@
 	'use strict';
 	angular.module("app.config", [])
 
-.constant("serverUrl", "http://localhost:8080/TopicRouter/rest")
+.constant("serverUrl", "http://topicrouter.miracle.dk/rest")
 
-.constant("version", "0.9.9-SNAPSHOT")
+.constant("version", "0.9.13")
 
 ;})();

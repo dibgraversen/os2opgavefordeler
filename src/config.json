@@ -1,11 +1,11 @@
 {
 	"dev": {
 		"serverUrl": "http://localhost:8080/TopicRouter/rest",
-		"version": "0.9.12-SNAPSHOT"
+		"version": "0.9.13-SNAPSHOT"
 	},
 	"test": {
 		"serverUrl": "http://topicrouter.miracle.dk/rest",
-		"version": "0.9.12"
+		"version": "0.9.13"
 	},
 	"prod": {
 		"serverUrl": "http://os2opgavefordeler.miracle.dk/rest",
