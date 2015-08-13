@@ -8,18 +8,24 @@
 	"manager": {
 		"businessKey": "E1",
 		"name": "Borge Meister",
-		"email": "borge@kommune.dk"
+		"email": "borge@kommune.dk",
+		"esdhId": "bome",
+		"jobTitle": "Borgmester"
 	},
 	"employees": [
 		{
 			"businessKey": "E2",
 			"name": "Jeanne Deere",
-			"email": "jd@kommune.dk"
+			"email": "jd@kommune.dk",
+			"esdhId": "jede",
+			"jobTitle": "Sekretær"
 		},
 		{
 			"businessKey": "E3",
 			"name": "Jørgen Jensen",
-			"email": "jj@kommune.dk"
+			"email": "jj@kommune.dk",
+			"esdhId": "joje",
+			"jobTitle": "Sekretær"
 		}
 	],
 	"municipality": {
@@ -36,7 +42,9 @@
 			"manager": {
 				"businessKey": "E4",
 				"name": "Hans Jørgensen",
-				"email": "admin@kommune.dk"
+				"email": "admin@kommune.dk",
+				"esdhId": "hajo",
+				"jobTitle": "Kontorchef"
 			},
 			"municipality": {
 				"name": "Miracle"
@@ -52,7 +60,9 @@
 					"manager": {
 						"businessKey": "E5",
 						"name": "Jette Jensen",
-						"email": "jej@kommune.dk"
+						"email": "jej@kommune.dk",
+						"esdhId": "jeje",
+						"jobTitle": "Personalechef"
 					},
 					"municipality": {
 						"name": "Miracle"
@@ -68,7 +78,9 @@
 					"manager": {
 						"businessKey": "E6",
 						"name": "Rune Nielsen",
-						"email": "rni@miracle.dk"
+						"email": "rni@miracle.dk",
+						"esdhId": "runi",
+						"jobTitle": "Konsulent"
 					},
 					"municipality": {
 						"name": "Miracle"
@@ -86,7 +98,8 @@
 			"manager": {
 				"businessKey": "E7",
 				"name": "David Hilbert",
-				"email": "dh@kommune.dk"
+				"email": "dh@kommune.dk",
+				"esdhId": "dahi"
 			},
 			"municipality": {
 				"name": "Miracle"
@@ -102,7 +115,8 @@
 					"manager": {
 						"businessKey": "E8",
 						"name": "Laila Leander",
-						"email": "ll@kommune.dk"
+						"email": "ll@kommune.dk",
+						"esdhId": "lale"
 					},
 					"municipality": {
 						"name": "Miracle"
@@ -118,7 +132,8 @@
 					"manager": {
 						"businessKey": "E9",
 						"name": "Ervin Jensen",
-						"email": "kodah@kommune.dk"
+						"email": "kodah@kommune.dk",
+						"esdhId": "erje"
 					},
 					"municipality": {
 						"name": "Miracle"
@@ -134,7 +149,8 @@
 							"manager": {
 								"businessKey": "E10",
 								"name": "Tyge Tordenskjold",
-								"email": "tt@kommune.dk"
+								"email": "tt@kommune.dk",
+								"esdhId": "tyto"
 							},
 							"municipality": {
 								"name": "Miracle"
@@ -150,7 +166,8 @@
 							"manager": {
 								"businessKey": "E11",
 								"name": "Søren Andersen",
-								"email": "sa@kommune.dk"
+								"email": "sa@kommune.dk",
+								"esdhId": "soan"
 							},
 							"municipality": {
 								"name": "Miracle"
@@ -170,7 +187,8 @@
 			"manager": {
 				"businessKey": "E12",
 				"name": "Hemet Nesingwary",
-				"email": "hnw@kommune.dk"
+				"email": "hnw@kommune.dk",
+				"esdhId": "hene"
 			},
 			"municipality": {
 				"name": "Miracle"
@@ -186,7 +204,8 @@
 					"manager": {
 						"businessKey": "E13",
 						"name": "Olfert Kvium",
-						"email": "ok@kommune.dk"
+						"email": "ok@kommune.dk",
+						"esdhId": "olkv"
 					},
 					"municipality": {
 						"name": "Miracle"
@@ -202,7 +221,8 @@
 					"manager": {
 						"businessKey": "E14",
 						"name": "Picasso Monetsen",
-						"email": "pm@kommune.dk"
+						"email": "pm@kommune.dk",
+						"esdhId": "pimo"
 					},
 					"municipality": {
 						"name": "Miracle"
