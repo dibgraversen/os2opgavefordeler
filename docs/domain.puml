@@ -3,6 +3,7 @@ title SOFD Domain
 
 class User {
   boolean admin
+  Municipality municipality
 }
 
 class Role {
@@ -48,6 +49,7 @@ class DistributionRule {
   String ESDHId
   OrgUnit organisationsEnhed
   EksternOrgUnit eksternOrgUnit
+  Municipality municipality
 }
 
 class Employment {
@@ -58,6 +60,7 @@ class Employment {
   EksternOrgUnit eksternOrgUnit
   String stillingsBetegnelse
   boolean active
+  Municipality municipality
 }
 
 class OrgUnit {
@@ -68,7 +71,7 @@ class OrgUnit {
   String email
   String phoneNumber
   boolean aktiv
-
+  Municipality municipality
 }
 
 class Settings {
@@ -81,14 +84,11 @@ class Settings {
 Role -- Employment
 Role - User
 User - Settings
-User -- Municipality
-OrgUnit -- Municipality
 OrgUnit - OrgUnit
 OrgUnit - OrgUnitsProperty
 OrgUnit -- DistributionRule
 Employment -- DistributionRule
 KLE - DistributionRule
-DistributionRule - Municipality
 Employment - OrgUnit
 DistributionRule -- FilterRule
 

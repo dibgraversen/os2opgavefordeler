@@ -40,7 +40,7 @@ public class OrgUnitServiceImpl implements OrgUnitService {
 	@Override
 	public OrgUnit saveOrgUnit(OrgUnit orgUnit) {
 		EntityManager em = persistence.getEm();
-		Long currentMunicipality = orgUnit.getMunicipality().get().getId();
+		Municipality currentMunicipality = orgUnit.getMunicipality().get();
 		List<Employment> newEmployments = new ArrayList<>();
 
 		// check for existence.
@@ -63,7 +63,7 @@ public class OrgUnitServiceImpl implements OrgUnitService {
 		// fix parent reference.
 		Optional<OrgUnit> givenParent = orgUnit.getParent();
 		if (givenParent.isPresent()){
-			Optional<OrgUnit> parent = getOrgUnitFromBusinessKey(givenParent.get().getBusinessKey(), currentMunicipality);
+			Optional<OrgUnit> parent = getOrgUnitFromBusinessKey(givenParent.get().getBusinessKey(), currentMunicipality.getId());
 			if (parent.isPresent()){
 				orgUnit.setParent(parent.get());
 			} else {
@@ -73,40 +73,83 @@ public class OrgUnitServiceImpl implements OrgUnitService {
 		}
 
 		// fix up manager.
+		// TODO check if collection is deprecated.
+		List<Employment> newEmployeesCollection = new ArrayList<>();
 		Optional<Employment> givenManager = orgUnit.getManager();
 		if(givenManager.isPresent()){
-			Optional<Employment> manager = getEmploymentFromBusinessKey(givenManager.get().getBusinessKey(), currentMunicipality);
+			Optional<Employment> manager = getEmploymentFromBusinessKey(givenManager.get().getBusinessKey(), currentMunicipality.getId());
 			if(manager.isPresent()){
-				// TODO make sure changes are handled.
-				orgUnit.setManager(manager.get());
+				Employment managerEntity = manager.get();
+				updateEmployment(givenManager.get(), managerEntity);
+				result.setManager(managerEntity);
+				if(updating){
+					managerEntity.setEmployedIn(result);
+				} else {
+					managerEntity.setEmployedIn(null);
+					newEmployments.add(managerEntity);
+				}
+				em.merge(managerEntity);
 			} else {
-				em.persist(givenManager.get());
-				newEmployments.add(givenManager.get());
+				Employment newManager = givenManager.get();
+				if(newManager.getMunicipality() == null) {
+					newManager.setMunicipality(currentMunicipality);
+				}
+				em.persist(newManager);
+				newEmployments.add(newManager);
 			}
 		}
 
 		// employees
-		if(result.getEmployees() != null && !result.getEmployees().isEmpty()){
-			List<Employment> newEmployees = new ArrayList<>();
-			for (Employment employment : result.getEmployees()) {
-				Optional<Employment> employmentLookup = getEmploymentFromBusinessKey(employment.getBusinessKey(), currentMunicipality);
+		if(result.getEmployees() != null && !result.getEmployees().isEmpty()) {
+			// remove by setting employed in = blank if no longer part of employees.
+			List<Employment> removedEmployees = new ArrayList<>();
+			if(orgUnit.getEmployees() != null && !orgUnit.getEmployees().isEmpty()){
+				for (Employment employment : result.getEmployees()) {
+					boolean found = false;
+					for (Employment newEmployment : orgUnit.getEmployees()) {
+						if(employment.getBusinessKey().equals(newEmployment.getBusinessKey()) ||
+								employment.getBusinessKey().equals(result.getManager().get().getBusinessKey())){
+							found = true;
+						}
+					}
+					if(!found){
+						Query query = em.createQuery("UPDATE Employment e SET e.employedIn = NULL WHERE e.id = :employmentId");
+						query.setParameter("employmentId", employment.getId());
+						query.executeUpdate();
+					}
+				}
+			}
+		}
+		if(orgUnit.getEmployees() != null && !orgUnit.getEmployees().isEmpty()){
+			for (Employment employment : orgUnit.getEmployees()) {
+				Optional<Employment> employmentLookup = getEmploymentFromBusinessKey(employment.getBusinessKey(), currentMunicipality.getId());
 				if(employmentLookup.isPresent()){
 					Employment existingEmployment = employmentLookup.get();
-					existingEmployment.setIsActive(employment.isActive());
-					existingEmployment.setName(employment.getName());
-					existingEmployment.setEmail(employment.getEmail());
-					existingEmployment.setEsdhId(employment.getEsdhId());
-					existingEmployment.setPhone(employment.getPhone());
-					existingEmployment.setInitials(employment.getInitials());
-					existingEmployment.setJobTitle(employment.getJobTitle());
+					updateEmployment(employment, existingEmployment);
+					if(updating){
+						existingEmployment.setEmployedIn(result);
+					} else {
+						existingEmployment.setEmployedIn(null);
+						newEmployments.add(existingEmployment);
+					}
 					em.merge(existingEmployment);
+					newEmployeesCollection.add(existingEmployment);
 				} else {
-					employment.setEmployedIn(null);
+					if(updating) {
+						employment.setEmployedIn(result);
+					} else {
+						employment.setEmployedIn(null);
+						newEmployments.add(employment);
+					}
+					employment.setMunicipality(currentMunicipality);
 					em.persist(employment);
+					newEmployeesCollection.add(employment);
 					newEmployments.add(employment);
 				}
 			}
-			result.setEmployees(newEmployees);
+			if(updating){
+				result.setEmployees(newEmployeesCollection);
+			}
 		}
 
 		if(updating){
@@ -122,6 +165,16 @@ public class OrgUnitServiceImpl implements OrgUnitService {
 		return result;
 	}
 
+	private void updateEmployment(Employment from, Employment to){
+		to.setIsActive(from.isActive());
+		to.setName(from.getName());
+		to.setEmail(from.getEmail());
+		to.setEsdhId(from.getEsdhId());
+		to.setPhone(from.getPhone());
+		to.setInitials(from.getInitials());
+		to.setJobTitle(from.getJobTitle());
+	}
+
 	private Optional<OrgUnit> getOrgUnitFromBusinessKey(String businessKey, long municipalityId){
 		Query query = persistence.getEm().createQuery("SELECT org FROM OrgUnit org WHERE org.businessKey = :businessKey AND org.municipality.id = :municipalityId");
 		query.setParameter("businessKey", businessKey);
@@ -135,7 +188,7 @@ public class OrgUnitServiceImpl implements OrgUnitService {
 	}
 
 	private Optional<Employment> getEmploymentFromBusinessKey(String businessKey, long municipalityId){
-		Query query = persistence.getEm().createQuery("SELECT emp FROM Employment emp WHERE emp.businessKey = :businessKey AND emp.employedIn.municipality.id = :municipalityId");
+		Query query = persistence.getEm().createQuery("SELECT emp FROM Employment emp WHERE emp.businessKey = :businessKey AND emp.municipality.id = :municipalityId");
 		query.setParameter("businessKey", businessKey);
 		query.setParameter("municipalityId", municipalityId);
 		try{
@@ -215,7 +268,6 @@ public class OrgUnitServiceImpl implements OrgUnitService {
 	@Override
 	public void importOrganization(OrgUnit orgUnit) {
 		// TODO MUY IMPORTANTE! The given orgUnit must bee top level orgUnit.
-		logger.warn("in #createOrgUnit with orgUnit: "+orgUnit);
 		fixRelations(orgUnit);
 		Municipality currentMunicipality = orgUnit.getMunicipality().get();
 		Optional<OrgUnit> existing = getOrgUnitFromBusinessKey(orgUnit.getBusinessKey(), currentMunicipality.getId());
@@ -307,9 +359,10 @@ public class OrgUnitServiceImpl implements OrgUnitService {
 
 	@Override
 	public Optional<Employment> getEmploymentByName(long municipalityId,  String name) {
-		final List<Employment> results = persistence.criteriaFind(Employment.class,
-			(cb, cq, ou) -> cq.where(cb.equal(ou.get(Employment_.name), name))
-		);
+		Query query = persistence.getEm().createQuery("SELECT e FROM Employment e WHERE e.name = :name AND e.municipality.id = :municipalityId");
+		query.setParameter("name", name);
+		query.setParameter("municipalityId", municipalityId);
+		final List<Employment> results = query.getResultList();
 
 		return results.isEmpty() ?
 			Optional.empty() :

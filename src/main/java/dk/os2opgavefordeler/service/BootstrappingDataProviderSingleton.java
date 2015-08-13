@@ -28,7 +28,8 @@ public class BootstrappingDataProviderSingleton {
 	private static final String DEVELOPMENT = "Udvikling";
 	private static final String CULTURE = "Kultur";
 
-
+	private static final String MIRACLE_NAME = "Miracle";
+	private static final String SYDDJURS_NAME = "Syddjurs Kommune";
 
 	@Inject
 	private Logger log;
@@ -69,8 +70,13 @@ public class BootstrappingDataProviderSingleton {
 	}
 
 	private void addMunicipalities() {
-		miracle = addMunicipality("Miracle");
-		syddjurs = addMunicipality("Syddjurs Kommune");
+		if(mService.getMunicipalities().size() == 0){
+			miracle = addMunicipality("Miracle");
+			syddjurs = addMunicipality("Syddjurs Kommune");
+		} else {
+			miracle = mService.findByName(MIRACLE_NAME);
+			syddjurs = mService.findByName(SYDDJURS_NAME);
+		}
 	}
 
 	private Municipality addMunicipality(String name) {
@@ -98,13 +104,13 @@ public class BootstrappingDataProviderSingleton {
 		final Employment borge = employmentService.findByEmail("borge@kommune.dk").get(0);
 		final Employment kodah = employmentService.findByEmail("kodah@kommune.dk").get(0);
 		final Employment admin = employmentService.findByEmail("admin@kommune.dk").get(0);
-		final Employment menig = employmentService.findByEmail("menig@kommune.dk").get(0);
+		final Employment jj = employmentService.findByEmail("jj@kommune.dk").get(0);
 
 		final List<Role> roles = ImmutableList.of(
 			Role.builder().name(borge.getName()).employment(borge).manager(true).build(),
 			Role.builder().name(kodah.getName()).employment(kodah).manager(true).build(),
 			Role.builder().name(admin.getName() + " (Kommuneadmin)").employment(admin).municipalityAdmin(true).build(),
-			Role.builder().name(menig.getName() + " (Upriviligeret)").employment(menig).build(),
+			Role.builder().name(jj.getName() + " (Upriviligeret)").employment(jj).build(),
 			Role.builder().name("Sysadmin").admin(true).build()
 		);
 
@@ -145,70 +151,72 @@ public class BootstrappingDataProviderSingleton {
 	private void buildDistributionRulesForMunicipality(Municipality municipality,
 																										 OrgUnit org1,
 																										 OrgUnit org2) {
-		createRules(
-				// === Fully unassigned group
-				DistributionRule.builder()
-						.responsibleOrg(null)
-						.kle(kleService.fetchMainGroup("00").get())
-						.municipality(municipality)
-						.children(
-								DistributionRule.builder()
-										.responsibleOrg(null)
-										.kle(kleService.fetchMainGroup("00.01").get())
-										.municipality(municipality)
-										.children(
-												DistributionRule.builder()
-														.responsibleOrg(null)
-														.kle(kleService.fetchMainGroup("00.01.00").get())
-														.municipality(municipality)
-														.build()
-										)
-										.build()
-						)
-						.build(),
+		if(distService.getDistributionsAll(municipality.getId()).size()<1){
+			createRules(
+					// === Fully unassigned group
+					DistributionRule.builder()
+							.responsibleOrg(null)
+							.kle(kleService.fetchMainGroup("00").get())
+							.municipality(municipality)
+							.children(
+									DistributionRule.builder()
+											.responsibleOrg(null)
+											.kle(kleService.fetchMainGroup("00.01").get())
+											.municipality(municipality)
+											.children(
+													DistributionRule.builder()
+															.responsibleOrg(null)
+															.kle(kleService.fetchMainGroup("00.01.00").get())
+															.municipality(municipality)
+															.build()
+											)
+											.build()
+							)
+							.build(),
 
-				// === Group with assigned toplevel
-				DistributionRule.builder()
-						.responsibleOrg(org1)
-						.kle(kleService.fetchMainGroup("13").get())
-						.municipality(municipality)
-						.children(
-								DistributionRule.builder()
-										.responsibleOrg(null)
-										.kle(kleService.fetchMainGroup("13.00").get())
-										.municipality(municipality)
-										.children(
-												DistributionRule.builder()
-														.responsibleOrg(null)
-														.kle(kleService.fetchMainGroup("13.00.00").get())
-														.municipality(municipality)
-														.build()
-										)
-										.build()
-						)
-						.build(),
+					// === Group with assigned toplevel
+					DistributionRule.builder()
+							.responsibleOrg(org1)
+							.kle(kleService.fetchMainGroup("13").get())
+							.municipality(municipality)
+							.children(
+									DistributionRule.builder()
+											.responsibleOrg(null)
+											.kle(kleService.fetchMainGroup("13.00").get())
+											.municipality(municipality)
+											.children(
+													DistributionRule.builder()
+															.responsibleOrg(null)
+															.kle(kleService.fetchMainGroup("13.00.00").get())
+															.municipality(municipality)
+															.build()
+											)
+											.build()
+							)
+							.build(),
 
-				// Group with two assigned levels
-				DistributionRule.builder()
-						.responsibleOrg(org2)
-						.kle(kleService.fetchMainGroup("14").get())
-						.municipality(municipality)
-						.children(
-								DistributionRule.builder()
-										.responsibleOrg(org2)
-										.kle(kleService.fetchMainGroup("14.00").get())
-										.municipality(municipality)
-										.children(
-												DistributionRule.builder()
-														.responsibleOrg(null)
-														.kle(kleService.fetchMainGroup("14.00.01").get())
-														.municipality(municipality)
-														.build()
-										)
-										.build()
-						)
-						.build()
-		);
+					// Group with two assigned levels
+					DistributionRule.builder()
+							.responsibleOrg(org2)
+							.kle(kleService.fetchMainGroup("14").get())
+							.municipality(municipality)
+							.children(
+									DistributionRule.builder()
+											.responsibleOrg(org2)
+											.kle(kleService.fetchMainGroup("14.00").get())
+											.municipality(municipality)
+											.children(
+													DistributionRule.builder()
+															.responsibleOrg(null)
+															.kle(kleService.fetchMainGroup("14.00.01").get())
+															.municipality(municipality)
+															.build()
+											)
+											.build()
+							)
+							.build()
+			);
+		}
 	}
 
 	// =================================================================================================================
