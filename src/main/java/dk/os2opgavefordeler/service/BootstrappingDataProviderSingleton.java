@@ -28,7 +28,8 @@ public class BootstrappingDataProviderSingleton {
 	private static final String DEVELOPMENT = "Udvikling";
 	private static final String CULTURE = "Kultur";
 
-
+	private static final String MIRACLE_NAME = "Miracle";
+	private static final String SYDDJURS_NAME = "Syddjurs Kommune";
 
 	@Inject
 	private Logger log;
@@ -69,8 +70,13 @@ public class BootstrappingDataProviderSingleton {
 	}
 
 	private void addMunicipalities() {
-		miracle = addMunicipality("Miracle");
-		syddjurs = addMunicipality("Syddjurs Kommune");
+		if(mService.getMunicipalities().size() == 0){
+			miracle = addMunicipality("Miracle");
+			syddjurs = addMunicipality("Syddjurs Kommune");
+		} else {
+			miracle = mService.findByName(MIRACLE_NAME);
+			syddjurs = mService.findByName(SYDDJURS_NAME);
+		}
 	}
 
 	private Municipality addMunicipality(String name) {
@@ -145,70 +151,72 @@ public class BootstrappingDataProviderSingleton {
 	private void buildDistributionRulesForMunicipality(Municipality municipality,
 																										 OrgUnit org1,
 																										 OrgUnit org2) {
-		createRules(
-				// === Fully unassigned group
-				DistributionRule.builder()
-						.responsibleOrg(null)
-						.kle(kleService.fetchMainGroup("00").get())
-						.municipality(municipality)
-						.children(
-								DistributionRule.builder()
-										.responsibleOrg(null)
-										.kle(kleService.fetchMainGroup("00.01").get())
-										.municipality(municipality)
-										.children(
-												DistributionRule.builder()
-														.responsibleOrg(null)
-														.kle(kleService.fetchMainGroup("00.01.00").get())
-														.municipality(municipality)
-														.build()
-										)
-										.build()
-						)
-						.build(),
+		if(distService.getDistributionsAll(municipality.getId()).size()<1){
+			createRules(
+					// === Fully unassigned group
+					DistributionRule.builder()
+							.responsibleOrg(null)
+							.kle(kleService.fetchMainGroup("00").get())
+							.municipality(municipality)
+							.children(
+									DistributionRule.builder()
+											.responsibleOrg(null)
+											.kle(kleService.fetchMainGroup("00.01").get())
+											.municipality(municipality)
+											.children(
+													DistributionRule.builder()
+															.responsibleOrg(null)
+															.kle(kleService.fetchMainGroup("00.01.00").get())
+															.municipality(municipality)
+															.build()
+											)
+											.build()
+							)
+							.build(),
 
-				// === Group with assigned toplevel
-				DistributionRule.builder()
-						.responsibleOrg(org1)
-						.kle(kleService.fetchMainGroup("13").get())
-						.municipality(municipality)
-						.children(
-								DistributionRule.builder()
-										.responsibleOrg(null)
-										.kle(kleService.fetchMainGroup("13.00").get())
-										.municipality(municipality)
-										.children(
-												DistributionRule.builder()
-														.responsibleOrg(null)
-														.kle(kleService.fetchMainGroup("13.00.00").get())
-														.municipality(municipality)
-														.build()
-										)
-										.build()
-						)
-						.build(),
+					// === Group with assigned toplevel
+					DistributionRule.builder()
+							.responsibleOrg(org1)
+							.kle(kleService.fetchMainGroup("13").get())
+							.municipality(municipality)
+							.children(
+									DistributionRule.builder()
+											.responsibleOrg(null)
+											.kle(kleService.fetchMainGroup("13.00").get())
+											.municipality(municipality)
+											.children(
+													DistributionRule.builder()
+															.responsibleOrg(null)
+															.kle(kleService.fetchMainGroup("13.00.00").get())
+															.municipality(municipality)
+															.build()
+											)
+											.build()
+							)
+							.build(),
 
-				// Group with two assigned levels
-				DistributionRule.builder()
-						.responsibleOrg(org2)
-						.kle(kleService.fetchMainGroup("14").get())
-						.municipality(municipality)
-						.children(
-								DistributionRule.builder()
-										.responsibleOrg(org2)
-										.kle(kleService.fetchMainGroup("14.00").get())
-										.municipality(municipality)
-										.children(
-												DistributionRule.builder()
-														.responsibleOrg(null)
-														.kle(kleService.fetchMainGroup("14.00.01").get())
-														.municipality(municipality)
-														.build()
-										)
-										.build()
-						)
-						.build()
-		);
+					// Group with two assigned levels
+					DistributionRule.builder()
+							.responsibleOrg(org2)
+							.kle(kleService.fetchMainGroup("14").get())
+							.municipality(municipality)
+							.children(
+									DistributionRule.builder()
+											.responsibleOrg(org2)
+											.kle(kleService.fetchMainGroup("14.00").get())
+											.municipality(municipality)
+											.children(
+													DistributionRule.builder()
+															.responsibleOrg(null)
+															.kle(kleService.fetchMainGroup("14.00.01").get())
+															.municipality(municipality)
+															.build()
+											)
+											.build()
+							)
+							.build()
+			);
+		}
 	}
 
 	// =================================================================================================================
