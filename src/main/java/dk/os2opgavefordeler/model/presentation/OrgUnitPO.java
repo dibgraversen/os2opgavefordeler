@@ -11,6 +11,7 @@ public class OrgUnitPO {
 
 	private String name;
 	private String esdhId;
+	private String esdhName;
 	private String email;
 	private String phone;
 	private Municipality municipality;
@@ -22,6 +23,7 @@ public class OrgUnitPO {
 
 		this.name = from.getName();
 		this.esdhId = from.getEsdhId();
+		this.esdhName = from.getEsdhLabel();
 		this.email = from.getEmail();
 		this.phone = from.getPhone();
 		this.municipality = from.getMunicipality().orElse(null);
@@ -41,6 +43,14 @@ public class OrgUnitPO {
 
 	public String getEsdhId() {
 		return esdhId;
+	}
+
+	public String getEsdhName() {
+		return esdhName;
+	}
+
+	public void setEsdhName(String esdhName) {
+		this.esdhName = esdhName;
 	}
 
 	public String getEmail() {

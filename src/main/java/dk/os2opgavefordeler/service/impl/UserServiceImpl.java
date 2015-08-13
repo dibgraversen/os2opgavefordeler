@@ -82,9 +82,16 @@ public class UserServiceImpl implements UserService {
 			throw new RuntimeException("No employments found");				//TODO: proper exception. Unathorized.
 		}
 
+		//TODO: the following code has somewhat of a smell to it. Probably 99% of the time, there will be a single
+		//employment associated with an email address - but it feels a bit icky simply grabbing the first employment
+		//for the other cases.
 		final List<Role> roles = createRolesFromEmployments(employments);
-		final String name = employments.get(0).getName();					//TODO: better approach than grabbing name from first employment?
+		final Employment firstEmp = employments.get(0);
+
+		final String name = firstEmp.getName();
 		final User user = new User(name, email, roles);
+
+		firstEmp.getEmployedIn().getMunicipality().ifPresent(user::setMunicipality);
 
 		log.info("Persising {} with roles={}", user, roles);
 		return createUser(user);

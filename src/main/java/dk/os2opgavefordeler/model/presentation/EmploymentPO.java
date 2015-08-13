@@ -9,6 +9,7 @@ public class EmploymentPO {
 	private String name;
 	private String email;
 	private String esdhId;
+	private String esdhName;
 	private String initials;
 	private String jobTitle;
 
@@ -19,6 +20,7 @@ public class EmploymentPO {
 		this.name = source.getName();
 		this.email = source.getEmail();
 		this.esdhId = source.getEsdhId();
+		this.esdhName = source.getEsdhLabel();
 		this.initials = source.getInitials();
 		this.jobTitle = source.getJobTitle();
 	}
@@ -37,6 +39,10 @@ public class EmploymentPO {
 
 	public String getEsdhId() {
 		return esdhId;
+	}
+
+	public String getEsdhName() {
+		return esdhName;
 	}
 
 	public String getInitials() {

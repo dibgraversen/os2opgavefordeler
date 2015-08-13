@@ -151,13 +151,13 @@ public class OrgUnitEndpoint {
 
 	private void fixupEmployee(Employment employee) {
 		if(Strings.isNullOrEmpty(employee.getInitials())) {
-			employee.setInitials("jdoe");
+			employee.setInitials("");
 		}
 		if(Strings.isNullOrEmpty(employee.getEmail())) {
 			employee.setEmail(employee.getInitials() + "@syddjurs.dk");
 		}
 		if(Strings.isNullOrEmpty(employee.getPhone())) {
-			employee.setPhone("12345678");
+			employee.setPhone("");
 		}
 	}
 
