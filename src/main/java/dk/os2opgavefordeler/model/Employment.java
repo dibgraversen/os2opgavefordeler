@@ -15,7 +15,7 @@ public class Employment implements Serializable {
 	@Id @GeneratedValue(strategy = GenerationType.AUTO)
 	private long id;
 
-	private boolean isActive;
+	private boolean isActive = true;
 
 	@ManyToOne
 	private OrgUnit employedIn;
@@ -28,6 +28,9 @@ public class Employment implements Serializable {
 	private String phone;
 	private String initials;
 	private String jobTitle;
+
+	@ManyToOne
+	private Municipality municipality;
 
 	public Employment() {
 	}
@@ -44,6 +47,7 @@ public class Employment implements Serializable {
 		this.phone = builder.phone;
 		this.initials = builder.initials;
 		this.jobTitle = builder.jobTitle;
+		this.municipality = builder.municipality;
 	}
 
 	//--------------------------------------------------------------------------
@@ -96,12 +100,12 @@ public class Employment implements Serializable {
 		return esdhId;
 	}
 
-	public String getEsdhLabel() {
-		return esdhLabel;
-	}
-
 	public void setEsdhId(String esdhId) {
 		this.esdhId = esdhId;
+	}
+
+	public String getEsdhLabel() {
+		return esdhLabel;
 	}
 
 	public String getPhone() {
@@ -128,7 +132,13 @@ public class Employment implements Serializable {
 		this.jobTitle = jobTitle;
 	}
 
+	public Municipality getMunicipality() {
+		return municipality;
+	}
 
+	public void setMunicipality(Municipality municipality) {
+		this.municipality = municipality;
+	}
 
 	//--------------------------------------------------------------------------
 	// Builder
@@ -147,6 +157,7 @@ public class Employment implements Serializable {
 		private String phone;
 		private String initials;
 		private String jobTitle;
+		private Municipality municipality;
 
 		public Employment build() {
 			return new Employment(this);
@@ -188,6 +199,11 @@ public class Employment implements Serializable {
 			this.jobTitle = jobTitle;
 			return this;
 		}
+
+		public Builder municipality(Municipality municipality){
+			this.municipality = municipality;
+			return this;
+		}
 	}
 
 	@Override
@@ -195,8 +211,9 @@ public class Employment implements Serializable {
 		return MoreObjects.toStringHelper(this)
 			.add("id", id)
 			.add("name", name)
-			.add("esdh", esdhId)
+			.add("esdhId", esdhId)
 			.add("email", email)
+			.add("municipality", municipality)
 			.toString();
 	}
 
@@ -214,11 +231,12 @@ public class Employment implements Serializable {
 			Objects.equals(esdhId, that.esdhId) &&
 			Objects.equals(phone, that.phone) &&
 			Objects.equals(initials, that.initials) &&
-			Objects.equals(jobTitle, that.jobTitle);
+			Objects.equals(jobTitle, that.jobTitle) &&
+			Objects.equals(municipality, that.municipality);
 	}
 
 	@Override
 	public int hashCode() {
-		return java.util.Objects.hash(id, isActive, employedIn, businessKey, name, email, esdhId, phone, initials, jobTitle);
+		return java.util.Objects.hash(id, isActive, employedIn, businessKey, name, email, esdhId, phone, initials, jobTitle, municipality);
 	}
 }
