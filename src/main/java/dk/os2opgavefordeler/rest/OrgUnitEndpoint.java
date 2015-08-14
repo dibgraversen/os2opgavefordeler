@@ -3,11 +3,14 @@ package dk.os2opgavefordeler.rest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
 import dk.os2opgavefordeler.model.Employment;
+import dk.os2opgavefordeler.model.Municipality;
 import dk.os2opgavefordeler.model.OrgUnit;
+import dk.os2opgavefordeler.model.User;
 import dk.os2opgavefordeler.model.presentation.OrgUnitPO;
 import dk.os2opgavefordeler.model.presentation.SimpleMessage;
 import dk.os2opgavefordeler.service.BadRequestArgumentException;
 import dk.os2opgavefordeler.service.OrgUnitService;
+import dk.os2opgavefordeler.service.UserService;
 import dk.os2opgavefordeler.util.Validate;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
@@ -15,7 +18,9 @@ import org.slf4j.Logger;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
@@ -32,6 +37,12 @@ public class OrgUnitEndpoint {
 
 	@Inject
 	OrgUnitService orgUnitService;
+
+	@Inject
+	UserService userService;
+
+	@Context
+	private HttpServletRequest request;
 
 	@GET
 	@Path("/")
@@ -96,7 +107,9 @@ public class OrgUnitEndpoint {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response importOrg(OrgUnit input) {
-		fixupOrgUnit(input);
+		User currentUser = (User) request.getSession().getAttribute(AuthEndpoint.S_AUTHENTICATED_USER);
+		Municipality currentMunicipality = currentUser.getMunicipality();
+		fixupOrgUnit(input, currentMunicipality);
 
 		orgUnitService.importOrganization(input);
 
@@ -121,7 +134,11 @@ public class OrgUnitEndpoint {
 		try {
 			ObjectMapper mapper = new ObjectMapper();
 			OrgUnit input = mapper.readValue(completeString.toString(), OrgUnit.class);
-			fixupOrgUnit(input);
+			log.info("session: "+request.getSession());
+			User currentUser = (User) request.getSession().getAttribute(AuthEndpoint.S_AUTHENTICATED_USER);
+			log.info("user: {}",currentUser);
+			Municipality currentMunicipality = currentUser.getMunicipality();
+			fixupOrgUnit(input, currentMunicipality);
 			orgUnitService.importOrganization(input);
 		} catch (IOException e) {
 			return Response.status(Response.Status.BAD_REQUEST).build();
@@ -129,13 +146,15 @@ public class OrgUnitEndpoint {
 		return Response.ok().build();
 	}
 
-	private void fixupOrgUnit(OrgUnit input) {
+	private void fixupOrgUnit(OrgUnit input, Municipality municipality) {
 		deduplicateManager(input);
 
 		input.getEmployees().stream().forEach(this::fixupEmployee);
 
+		input.setMunicipality(municipality);
+
 		for (OrgUnit orgUnit : input.getChildren()) {
-			fixupOrgUnit(orgUnit);
+			fixupOrgUnit(orgUnit, municipality);
 		}
 	}
 
