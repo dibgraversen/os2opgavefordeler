@@ -19,4 +19,6 @@ public interface DistributionService {
 	List<DistributionRule> getDistributionsForOrg(long orgId, long municipalityId, boolean includeUnassigned, boolean includeImplicit);
 
 	List<DistributionRulePO> getPoDistributions(OrgUnit orgUnit, DistributionRuleScope scope);
+
+	void buildRulesForMunicipality(long municipalityId);
 }

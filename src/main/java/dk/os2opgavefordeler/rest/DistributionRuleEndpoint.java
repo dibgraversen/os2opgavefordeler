@@ -90,6 +90,17 @@ public class DistributionRuleEndpoint {
 		);
 	}
 
+	@GET
+	@Path("/buildRules")
+	public Response buildRulesForMunicipality(@QueryParam("municipalityId") long municipalityId){
+		if(municipalityId < 0) {
+			log.info("buildRules - bad request[{},{}]", municipalityId);
+			return Response.status(Response.Status.BAD_REQUEST).build();
+		}
+		distributionService.buildRulesForMunicipality(municipalityId);
+		return Response.ok().build();
+	}
+
 	//TODO: code below this point should probably be refactored to service methods.
 	private Response doUpdateResponsibleOrganization(DistributionRule existing, DistributionRulePO updated) {
 		if(!allowedToUpdate(existing)) {

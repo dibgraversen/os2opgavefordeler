@@ -11,6 +11,7 @@ import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
+import javax.persistence.NonUniqueResultException;
 import javax.persistence.Query;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Predicate;
@@ -61,9 +62,13 @@ public class DistributionServiceImpl implements DistributionService {
 	@Override
 	@SuppressWarnings("unchecked")
 	public List<DistributionRule> getDistributionsAll(long municipalityId) {
-		Query query = persistence.getEm().createQuery("SELECT r FROM DistributionRule r LEFT JOIN r.kle LEFT JOIN r.municipality WHERE r.municipality.id = :municipalityId ORDER BY r.kle.number ASC");
+		log.info("here with muncipalityId: {}", municipalityId);
+		Query query = persistence.getEm().createQuery("SELECT r FROM DistributionRule r WHERE r.municipality.id = :municipalityId ORDER BY r.kle.number ASC");
 		query.setParameter("municipalityId", municipalityId);
-		return query.getResultList();
+//		query.setMaxResults(300);
+		List<DistributionRule> result = query.getResultList();
+		log.error("result size: {}", result.size());
+		return result;
 	}
 
 	@Override
@@ -118,6 +123,34 @@ public class DistributionServiceImpl implements DistributionService {
 		return distributions.stream()
 			.map(DistributionRulePO::new)
 			.collect(Collectors.toList());
+	}
+
+	@Override
+	public void buildRulesForMunicipality(long municipalityId) {
+		log.info("Building rules");
+		// get a list of all kle's for which there are no distributionRule.
+		Query municipalityQuery = persistence.getEm().createQuery("SELECT m FROM Municipality m WHERE m.id = :municipalityId");
+		municipalityQuery.setParameter("municipalityId", municipalityId);
+		try {
+			// find municipality
+			Municipality municipality = (Municipality) municipalityQuery.getSingleResult();
+			Query query = persistence.getEm().createQuery("SELECT k FROM Kle k WHERE k.id NOT IN ( SELECT dr.kle.id FROM DistributionRule dr WHERE municipality.id = :municipalityId)");
+			query.setParameter("municipalityId", municipalityId);
+			// find kle's for which there is no rule...
+			List<Kle> klesWithNoRule = query.getResultList();
+			if(klesWithNoRule != null && klesWithNoRule.size() > 0){
+				// create rules.
+				for (Kle kle : klesWithNoRule) {
+					DistributionRule rule = new DistributionRule();
+					rule.setKle(kle);
+					rule.setMunicipality(municipality);
+					log.info("creating rule: {}", rule);
+					createDistributionRule(rule);
+				}
+			}
+		} catch	(NonUniqueResultException nonUniqueResultException) {
+			log.error("duplicate result on municipalityId lookup", nonUniqueResultException);
+		}
 	}
 
 	//--------------------------------------------------------------------------
