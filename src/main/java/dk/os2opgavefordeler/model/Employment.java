@@ -213,7 +213,9 @@ public class Employment implements Serializable {
 			.add("name", name)
 			.add("esdhId", esdhId)
 			.add("email", email)
+			.add("businessKey", businessKey)
 			.add("municipality", municipality)
+			.add("employedIn", employedIn)
 			.toString();
 	}
 
