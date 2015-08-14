@@ -235,9 +235,11 @@ public class OrgUnitServiceImpl implements OrgUnitService {
 		Query assignedRuleIdsQuery = em.createQuery("SELECT rule.id FROM DistributionRule rule LEFT JOIN rule.assignedOrg as org WHERE rule.assignedOrg.id = org.id AND org.id IN (:orgIds)");
 		assignedRuleIdsQuery.setParameter("orgIds", orgIds);
 		List<Long> assignedRuleIds = (List<Long>)assignedRuleIdsQuery.getResultList();
-		Query unrefAssignedOrg = em.createQuery("UPDATE DistributionRule rule SET rule.assignedOrg = NULL WHERE rule.id IN (:assignedRuleIds)");
-		unrefAssignedOrg.setParameter("assignedRuleIds", assignedRuleIds);
-		unrefAssignedOrg.executeUpdate();
+		if(assignedRuleIds.size() > 0){
+			Query unrefAssignedOrg = em.createQuery("UPDATE DistributionRule rule SET rule.assignedOrg = NULL WHERE rule.id IN (:assignedRuleIds)");
+			unrefAssignedOrg.setParameter("assignedRuleIds", assignedRuleIds);
+			unrefAssignedOrg.executeUpdate();
+		}
 	}
 
 	@SuppressWarnings("unchecked")
@@ -246,9 +248,11 @@ public class OrgUnitServiceImpl implements OrgUnitService {
 		Query responsibleRuleIdsQuery = em.createQuery("SELECT rule.id FROM DistributionRule rule LEFT JOIN rule.responsibleOrg as org WHERE rule.responsibleOrg.id = org.id AND org.id IN (:orgIds)");
 		responsibleRuleIdsQuery.setParameter("orgIds", orgIds);
 		List<Long> responsibleRuleIds = (List<Long>) responsibleRuleIdsQuery.getResultList();
-		Query unrefAssignedOrg = em.createQuery("UPDATE DistributionRule rule SET rule.responsibleOrg = NULL WHERE rule.id IN (:responsibleRuleIds)");
-		unrefAssignedOrg.setParameter("responsibleRuleIds", responsibleRuleIds);
-		unrefAssignedOrg.executeUpdate();
+		if(responsibleRuleIds.size() > 0){
+			Query unrefAssignedOrg = em.createQuery("UPDATE DistributionRule rule SET rule.responsibleOrg = NULL WHERE rule.id IN (:responsibleRuleIds)");
+			unrefAssignedOrg.setParameter("responsibleRuleIds", responsibleRuleIds);
+			unrefAssignedOrg.executeUpdate();
+		}
 	}
 
 	public void unlinkEmployments(List<Long> orgIds){
