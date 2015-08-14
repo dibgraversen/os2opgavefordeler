@@ -126,8 +126,9 @@
 		 * Returns a list of orgUnits to choose from.
 		 * @returns {Object[]} OrgUnit - A list of all OrgUnits.
 		 */
-		function getOrgUnitsForResponsibility(municipalityId){
+		function getOrgUnitsForResponsibility(municipalityId, currentEmploymentId){
 			return httpGet('/org-units', { municipalityId: municipalityId }).then(function(orgUnits){
+				// fetch manager employments
 				_.each(orgUnits, function(orgUnit){
 					if(orgUnit.managerId > 0){
 						getEmployment(orgUnit.managerId).then(function(employment){
@@ -135,8 +136,34 @@
 						});
 					}
 				});
+				if(currentEmploymentId){
+					setSubordinate(orgUnits, currentEmploymentId);
+				}
 				return orgUnits;
 			});
+		}
+
+		function setSubordinate(orgUnits, currentEmploymentId){
+			if(orgUnits && orgUnits.length && orgUnits.length > 0){
+				var orgUnitMap = {};
+				_.each(orgUnits, function(orgUnit){
+					orgUnitMap[orgUnit.id] = orgUnit;
+				});
+				_.each(orgUnits, function(orgUnit){
+					isSubordinate(orgUnit, currentEmploymentId, orgUnitMap);
+				});
+			}
+		}
+
+		function isSubordinate(orgUnit, currentEmploymentId, orgUnitMap){
+			if(orgUnit.managerId === currentEmploymentId) orgUnit.subordinate = true;
+			else if(orgUnit.parentId > 0) {
+				var parent = orgUnitMap[orgUnit.parentId];
+				orgUnit.subordinate = isSubordinate(parent, currentEmploymentId, orgUnitMap);
+			} else {
+				orgUnit.subordinate = false;
+			}
+			return orgUnit.subordinate;
 		}
 
 		function getEmployments(municipalityId){

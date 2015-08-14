@@ -164,6 +164,7 @@
 
 		function editResponsibility(topic){
 			$modal.open({
+				scope: $scope,
 				resolve: {
 					topic: function(){
 						return topic;

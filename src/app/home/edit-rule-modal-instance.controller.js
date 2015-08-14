@@ -5,15 +5,16 @@
 
 	app.controller('EditRuleModalInstanceCtrl', EditRuleModalInstanceCtrl);
 
-	EditRuleModalInstanceCtrl.$inject = ['$scope', '$modalInstance', 'topicRouterApi', 'topic', 'municipality'];
+	EditRuleModalInstanceCtrl.$inject = ['$scope', '$modalInstance', '$log', 'topicRouterApi', 'topic', 'municipality'];
 
-	function EditRuleModalInstanceCtrl($scope, $modalInstance, topicRouterApi, topic, municipality){
+	function EditRuleModalInstanceCtrl($scope, $modalInstance, $log, topicRouterApi, topic, municipality){
 		$scope.topic = topic;
 		$scope.orgUnits = [];
 		$scope.employments = [];
 		$scope.orgFilter = "";
 		$scope.empFilter = "";
 		$scope.ruleAlerts = [];
+		$scope.showSubordinate = false;
 
 		$scope.ok = ok;
 		$scope.cancel = cancel;
@@ -21,21 +22,22 @@
 		$scope.setSelectedEmp = setSelectedEmp;
 		$scope.closeAlert = closeAlert;
 
+		var currentEmployment = $scope.user.currentRole.employment;
+
 		activate();
 
 		function activate(){
 			// load some org. stuff.
-			topicRouterApi.getOrgUnitsForResponsibility(municipality.id).then(function(orgUnits){
+			topicRouterApi.getOrgUnitsForResponsibility(municipality.id, currentEmployment).then(function(orgUnits){
 				$scope.orgUnits = orgUnits;
 			});
 
-			topicRouterApi.getEmployments(municipality.id).then(function(employments){
+			topicRouterApi.getEmployments(municipality.id, currentEmployment).then(function(employments){
 				$scope.employments = employments;
 			});
 		}
 
 		function ok(){
-			// TODO below, add topic parent org unit presence validation.
 			if($scope.topic.org || $scope.selectedOrgUnit){ // validate org unit either present or selected.
 				if($scope.selectedOrgUnit || $scope.selectedEmp){ // validate something has been selected.
 					if($scope.selectedOrgUnit){

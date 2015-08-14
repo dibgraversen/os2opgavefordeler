@@ -17,11 +17,12 @@
 		$scope.setCurrentOrgUnit = setCurrentOrgUnit;
 		$scope.closeAlert = closeAlert;
 
+		var currentEmployment = $scope.user.currentRole.employment;
 
 		activate();
 
 		function activate(){
-			topicRouterApi.getOrgUnitsForResponsibility(municipality.id).then(function(orgUnits){
+			topicRouterApi.getOrgUnitsForResponsibility(municipality.id, currentEmployment).then(function(orgUnits){
 				$scope.orgUnits = orgUnits;
 			});
 		}
