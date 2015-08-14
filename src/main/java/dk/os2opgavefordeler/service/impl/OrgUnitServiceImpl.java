@@ -39,6 +39,7 @@ public class OrgUnitServiceImpl implements OrgUnitService {
 
 	@Override
 	public OrgUnit saveOrgUnit(OrgUnit orgUnit) {
+		logger.info("orgUnit: {}", orgUnit);
 		EntityManager em = persistence.getEm();
 		Municipality currentMunicipality = orgUnit.getMunicipality().get();
 		List<Employment> newEmployments = new ArrayList<>();
@@ -91,9 +92,11 @@ public class OrgUnitServiceImpl implements OrgUnitService {
 				em.merge(managerEntity);
 			} else {
 				Employment newManager = givenManager.get();
+				newManager.setEmployedIn(null);
 				if(newManager.getMunicipality() == null) {
 					newManager.setMunicipality(currentMunicipality);
 				}
+				logger.info("manager: {}", newManager);
 				em.persist(newManager);
 				newEmployments.add(newManager);
 			}
@@ -102,14 +105,15 @@ public class OrgUnitServiceImpl implements OrgUnitService {
 		// employees
 		if(result.getEmployees() != null && !result.getEmployees().isEmpty()) {
 			// remove by setting employed in = blank if no longer part of employees.
-			List<Employment> removedEmployees = new ArrayList<>();
 			if(orgUnit.getEmployees() != null && !orgUnit.getEmployees().isEmpty()){
 				for (Employment employment : result.getEmployees()) {
 					boolean found = false;
 					for (Employment newEmployment : orgUnit.getEmployees()) {
-						if(employment.getBusinessKey().equals(newEmployment.getBusinessKey()) ||
-								employment.getBusinessKey().equals(result.getManager().get().getBusinessKey())){
-							found = true;
+						if(result.getManager().isPresent()){
+							if(employment.getBusinessKey().equals(newEmployment.getBusinessKey()) ||
+									employment.getBusinessKey().equals(result.getManager().get().getBusinessKey())){
+								found = true;
+							}
 						}
 					}
 					if(!found){
@@ -124,6 +128,7 @@ public class OrgUnitServiceImpl implements OrgUnitService {
 			for (Employment employment : orgUnit.getEmployees()) {
 				Optional<Employment> employmentLookup = getEmploymentFromBusinessKey(employment.getBusinessKey(), currentMunicipality.getId());
 				if(employmentLookup.isPresent()){
+					logger.info("employment found.");
 					Employment existingEmployment = employmentLookup.get();
 					updateEmployment(employment, existingEmployment);
 					if(updating){
@@ -135,6 +140,7 @@ public class OrgUnitServiceImpl implements OrgUnitService {
 					em.merge(existingEmployment);
 					newEmployeesCollection.add(existingEmployment);
 				} else {
+					logger.info("creating new");
 					if(updating) {
 						employment.setEmployedIn(result);
 					} else {
@@ -142,6 +148,7 @@ public class OrgUnitServiceImpl implements OrgUnitService {
 						newEmployments.add(employment);
 					}
 					employment.setMunicipality(currentMunicipality);
+					logger.info("employment: {}", employment);
 					em.persist(employment);
 					newEmployeesCollection.add(employment);
 					newEmployments.add(employment);
