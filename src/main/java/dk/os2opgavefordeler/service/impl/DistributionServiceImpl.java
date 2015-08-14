@@ -67,7 +67,7 @@ public class DistributionServiceImpl implements DistributionService {
 		query.setParameter("municipalityId", municipalityId);
 //		query.setMaxResults(300);
 		List<DistributionRule> result = query.getResultList();
-		log.error("result size: {}", result.size());
+		log.info("result size: {}", result.size());
 		return result;
 	}
 
