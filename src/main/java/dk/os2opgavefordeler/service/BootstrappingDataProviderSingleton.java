@@ -64,7 +64,7 @@ public class BootstrappingDataProviderSingleton {
 		buildOrgUnits();
 		buildUsers();
 
-		final List<Kle> groups = loadBootstrapKle();
+		loadBootstrapKle();
 		buildDistributionRulesForMunicipality(miracle, findOrg(DIGITALISERING), findOrg(MODERN_ART));
 		buildDistributionRulesForMunicipality(syddjurs, findOrg(DEVELOPMENT), findOrg(CULTURE));
 	}
@@ -107,11 +107,11 @@ public class BootstrappingDataProviderSingleton {
 		final Employment jj = employmentService.findByEmail("jj@kommune.dk").get(0);
 
 		final List<Role> roles = ImmutableList.of(
-			Role.builder().name(borge.getName()).employment(borge).manager(true).build(),
-			Role.builder().name(kodah.getName()).employment(kodah).manager(true).build(),
-			Role.builder().name(admin.getName() + " (Kommuneadmin)").employment(admin).municipalityAdmin(true).build(),
-			Role.builder().name(jj.getName() + " (Upriviligeret)").employment(jj).build(),
-			Role.builder().name("Sysadmin").admin(true).build()
+				Role.builder().name(borge.getName()).employment(borge).manager(true).build(),
+				Role.builder().name(kodah.getName()).employment(kodah).manager(true).build(),
+				Role.builder().name(admin.getName() + " (Kommuneadmin)").employment(admin).municipalityAdmin(true).build(),
+				Role.builder().name(jj.getName() + " (Upriviligeret)").employment(jj).build(),
+				Role.builder().name("Sysadmin").admin(true).build()
 		);
 
 		return roles;
@@ -123,15 +123,15 @@ public class BootstrappingDataProviderSingleton {
 		orgUnitService.importOrganization(rootOrg);
 	}
 
-	private List<Kle> loadBootstrapKle() {
+	private void loadBootstrapKle() {
 		log.info("Loading bootstrap KLE");
-		try (final InputStream resource = getResource("KLE-valid-data.xml")) {
-			final List<Kle> groups = importer.importFromXml(resource);
-			kleService.storeAllKleMainGroups(groups);
-			return groups;
-		} catch (Exception ex) {
-			log.error("Couldn't load KLE", ex);
-			return Collections.emptyList();
+		if(kleService.fetchAllKleMainGroups().size() < 1){
+			try (final InputStream resource = getResource("KLE-valid-data.xml")) {
+				final List<Kle> groups = importer.importFromXml(resource);
+				kleService.storeAllKleMainGroups(groups);
+			} catch (Exception ex) {
+				log.error("Couldn't load KLE", ex);
+			}
 		}
 	}
 
