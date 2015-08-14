@@ -41,7 +41,6 @@
 			}
 			$scope.$watch("user.currentRole", function(newValue, oldValue){
 				$log.info('Home:: user.currentRole changed', oldValue, " --> ", newValue);
-
 				if(newValue && newValue.employment > 0) {
 					refreshSubstitutes();
 					refreshTopicRoutes();
@@ -221,7 +220,6 @@
 		 * @return {boolean} true if edit allowed.
 		 */
 		function responsibilityChangeAllowed(distributionRule){
-			$log.info($scope.user.currentRole.employment);
 			if(!responsibility(distributionRule)) return true; // not already handled.
 			if($scope.user.currentRole.municipalityAdmin) return true;
 			if(canManage(distributionRule)) return true;
