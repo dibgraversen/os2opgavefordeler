@@ -188,6 +188,7 @@ public class OrgUnit implements Serializable, IHasChildren<OrgUnit> {
 				.add("name", name)
 				.add("email", email)
 				.add("phone", phone)
+				.add("businessKey", businessKey)
 				.toString();
 	}
 
