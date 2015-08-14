@@ -48,6 +48,9 @@
 				uiUploader.startUpload({
 					url: serverUrl+'/org-units/fileImport',
 					concurrency: 1,
+					data: {
+						withCredentials: true
+					},
 					onProgress: function(file){
 						$log.info(file.name + '=' + file.humanSize);
 						$scope.$apply();
