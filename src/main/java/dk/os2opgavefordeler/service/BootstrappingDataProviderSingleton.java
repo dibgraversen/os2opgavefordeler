@@ -11,6 +11,7 @@ import javax.ejb.Startup;
 import javax.inject.Inject;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
@@ -22,6 +23,9 @@ import java.util.stream.Stream;
 @Singleton
 @Startup
 public class BootstrappingDataProviderSingleton {
+	// flag for bootstrap enabled or disabled.
+	private static final boolean BOOTSTRAP = true;
+
 	private static final String DIGITALISERING = "Digitalisering";
 	private static final String MODERN_ART = "Moderne kunst";
 
@@ -60,13 +64,15 @@ public class BootstrappingDataProviderSingleton {
 
 	@PostConstruct
 	public void bootstrap() {
-		addMunicipalities();
-		buildOrgUnits();
-		buildUsers();
+		if(BOOTSTRAP){
+			addMunicipalities();
+			buildOrgUnits();
+			buildUsers();
 
-		loadBootstrapKle();
-		buildDistributionRulesForMunicipality(miracle, findOrg(DIGITALISERING), findOrg(MODERN_ART));
-		buildDistributionRulesForMunicipality(syddjurs, findOrg(DEVELOPMENT), findOrg(CULTURE));
+			loadBootstrapKle();
+			buildDistributionRulesForMunicipality(miracle, findOrg(DIGITALISERING), findOrg(MODERN_ART));
+		}
+
 	}
 
 	private void addMunicipalities() {
@@ -87,16 +93,19 @@ public class BootstrappingDataProviderSingleton {
 	}
 
 	private void buildUsers() {
-		addUser("Helle Friis Pedersen", "hfp@miracle.dk", buildRoles());
-		addUser("Hans Ehlert Thomsen", "het@miracle.dk", buildRoles());
-		addUser("Henrik Løvborg", "hlo@miracle.dk", buildRoles());
-		addUser("Simon Møgelvang Bang", "smb@miracle.dk", buildRoles());
-		addUser("Sune Marcher", "sum@miracle.dk", buildRoles());
+		addUser("Helle Friis Pedersen", "hfp@miracle.dk", miracle, buildRoles());
+		addUser("Hans Ehlert Thomsen", "het@miracle.dk", miracle, buildRoles());
+		addUser("Henrik Løvborg", "hlo@miracle.dk", miracle, buildRoles());
+		addUser("Simon Møgelvang Bang", "smb@miracle.dk", miracle, buildRoles());
+		addUser("Sune Marcher", "sum@miracle.dk", miracle, buildRoles());
+		List<Role> syddsjursRoles = new ArrayList<>();
+		syddsjursRoles.add(Role.builder().name("Henrik (Syddjurs)").municipalityAdmin(true).build());
+		addUser("Henrik", "henrikloevborg@syddjurs.dk", syddjurs, syddsjursRoles);
 	}
 
-	private User addUser(String name, String email, List<Role> roles) {
+	private User addUser(String name, String email, Municipality municipality, List<Role> roles) {
 		final User user = new User(name, email, roles);
-		user.setMunicipality(miracle);
+		user.setMunicipality(municipality);
 		return usersService.createUser(user);
 	}
 
