@@ -52,6 +52,7 @@ public class EmploymentServiceImpl implements EmploymentService {
 	@SuppressWarnings("unchecked")
 	public List<Employment> getAll(long municipalityId) {
 		Query query = persistence.getEm().createQuery("SELECT emp FROM Employment emp WHERE emp.employedIn.municipality.id = :municipalityId");
+		query.setMaxResults(200);
 		query.setParameter("municipalityId", municipalityId);
 		return query.getResultList();
 	}
