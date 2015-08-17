@@ -99,6 +99,10 @@ public class DistributionRule implements Serializable {
 		return Optional.ofNullable(parent);
 	}
 
+	public void setParent(DistributionRule parent) {
+		this.parent = parent;
+	}
+
 	public long getId() {
 		return id;
 	}

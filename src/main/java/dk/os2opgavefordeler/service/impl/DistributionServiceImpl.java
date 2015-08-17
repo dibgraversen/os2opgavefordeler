@@ -128,7 +128,12 @@ public class DistributionServiceImpl implements DistributionService {
 	@Override
 	public void buildRulesForMunicipality(long municipalityId) {
 		log.info("Building rules");
-		// get a list of all kle's for which there are no distributionRule.
+		createMissingDistributionRules(municipalityId);
+		updateParentsForDistributionRules(municipalityId);
+	}
+
+	@SuppressWarnings("unchecked")
+	private void createMissingDistributionRules(long municipalityId){
 		Query municipalityQuery = persistence.getEm().createQuery("SELECT m FROM Municipality m WHERE m.id = :municipalityId");
 		municipalityQuery.setParameter("municipalityId", municipalityId);
 		try {
@@ -150,6 +155,33 @@ public class DistributionServiceImpl implements DistributionService {
 			}
 		} catch	(NonUniqueResultException nonUniqueResultException) {
 			log.error("duplicate result on municipalityId lookup", nonUniqueResultException);
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	private void updateParentsForDistributionRules(long municipalityId){
+		Query getOrphanedRuleIdsQuery = persistence.getEm().createQuery("SELECT rule FROM DistributionRule rule WHERE rule.municipality.id = :municipalityId AND rule.parent IS NULL AND LENGTH(rule.kle.number) > 2");
+		getOrphanedRuleIdsQuery.setParameter("municipalityId", municipalityId);
+		List<DistributionRule> orphanedRuleIds = getOrphanedRuleIdsQuery.getResultList();
+		if(orphanedRuleIds != null && orphanedRuleIds.size() > 0){
+			for (DistributionRule orphanedRule : orphanedRuleIds) {
+				Query findParentQuery = persistence.getEm()
+						.createQuery("SELECT parent FROM DistributionRule parent WHERE parent.municipality.id = :municipalityId AND parent.kle.number = :parentNumber");
+				findParentQuery.setParameter("municipalityId", municipalityId);
+				String parentNumber = orphanedRule.getKle().getNumber().substring(0, orphanedRule.getKle().getNumber().length() - 3);
+				findParentQuery.setParameter("parentNumber", parentNumber);
+				List<DistributionRule> parents = findParentQuery.getResultList();
+				if(parents.size() == 1){
+					orphanedRule.setParent(parents.get(0));
+					persistence.getEm().merge(orphanedRule);
+				} else {
+					log.warn("parent size NOT 1 for: {}", orphanedRule);
+					for (DistributionRule parent : parents) {
+						log.warn("parent found: {} for orphan: {}", parent, orphanedRule);
+					}
+
+				}
+			}
 		}
 	}
 
