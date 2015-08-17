@@ -4,3 +4,4 @@
 dist.dev
 dist.dev.zip
 src/app/constants.js
+src/lib
