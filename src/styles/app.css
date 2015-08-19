@@ -77,6 +77,10 @@ button.btn.btn-default.toggle-side:focus {
   outline: none;
   box-shadow: none;
 }
+.modal-body {
+  max-height: 80vh;
+  overflow-y: auto;
+}
 .page-splash {
   z-index: 99999 !important;
   position: fixed;
