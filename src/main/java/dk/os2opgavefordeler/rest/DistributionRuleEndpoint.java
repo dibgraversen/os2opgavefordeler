@@ -94,7 +94,7 @@ public class DistributionRuleEndpoint {
 	@Path("/buildRules")
 	public Response buildRulesForMunicipality(@QueryParam("municipalityId") long municipalityId){
 		if(municipalityId < 0) {
-			log.info("buildRules - bad request[{},{}]", municipalityId);
+			log.info("buildRules - bad request[{}]", municipalityId);
 			return Response.status(Response.Status.BAD_REQUEST).build();
 		}
 		distributionService.buildRulesForMunicipality(municipalityId);
