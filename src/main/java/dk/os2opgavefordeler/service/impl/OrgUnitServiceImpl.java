@@ -330,12 +330,42 @@ public class OrgUnitServiceImpl implements OrgUnitService {
 		return result;
 	}
 
+	private Optional<OrgUnit> getManagedOrgUnit(long municipalityId, long employmentId){
+		TypedQuery<OrgUnit> query = persistence.getEm().createQuery("SELECT org FROM OrgUnit org WHERE org.manager.id = :managerId AND org.municipality.id = :municipalityId", OrgUnit.class);
+		query.setParameter("managerId", employmentId);
+		query.setParameter("municipalityId", municipalityId);
+		Optional<OrgUnit> result;
+		try {
+			final OrgUnit orgUnit = query.getSingleResult();
+			orgUnit.getEmployees();
+			touchChildren(orgUnit.getChildren());
+			result = Optional.of(orgUnit);
+		} catch (NoResultException nre){
+			result = Optional.empty();
+		}
+		return result;
+	}
+
 	@Override
+	public List<OrgUnit> getManagedOrgUnits(long municipalityId, long employmentId){
+		final Optional<OrgUnit> managedOrgUnit = getManagedOrgUnit(municipalityId, employmentId);
+		return managedOrgUnit.map( ou -> ou.flattened().collect(Collectors.toList()) )
+				.orElse(Collections.emptyList());
+	}
+
+	@Override
+	public List<OrgUnitPO> getManagedOrgUnitsPO(long municipalityId, long employmentId){
+		final Optional<OrgUnit> managedOrgUnit = getManagedOrgUnit(municipalityId, employmentId);
+		return managedOrgUnit.map( ou -> ou.flattened().map(OrgUnitPO::new).collect(Collectors.toList()) )
+				.orElse(Collections.emptyList());
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
 	public List<OrgUnit> findByName(String name) {
 		final List<OrgUnit> results = persistence.criteriaFind(OrgUnit.class,
 			(cb, cq, ou) -> cq.where( cb.like(ou.get(OrgUnit_.name), name))
 		);
-
 		return results;
 	}
 

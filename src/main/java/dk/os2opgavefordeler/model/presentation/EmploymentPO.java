@@ -12,7 +12,7 @@ public class EmploymentPO {
 	private String esdhName;
 	private String initials;
 	private String jobTitle;
-
+	private boolean subordinate;
 
 	public EmploymentPO(Employment source) {
 		this.id = source.getId();
@@ -51,5 +51,13 @@ public class EmploymentPO {
 
 	public String getJobTitle() {
 		return jobTitle;
+	}
+
+	public boolean isSubordinate() {
+		return subordinate;
+	}
+
+	public void setSubordinate(boolean subordinate) {
+		this.subordinate = subordinate;
 	}
 }

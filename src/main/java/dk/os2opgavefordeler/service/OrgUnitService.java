@@ -30,6 +30,10 @@ public interface OrgUnitService {
 	Optional<OrgUnit> getOrgUnit(long id);
 
 	Optional<OrgUnit> getToplevelOrgUnit(long municipalityId);
+
+	List<OrgUnit> getManagedOrgUnits(long municipalityId, long employmentId);
+
+	List<OrgUnitPO> getManagedOrgUnitsPO(long municipalityId, long employmentId);
 	List<OrgUnit> findByName(String name);
 
 	List<OrgUnitPO> getToplevelOrgUnitPO(long municipalityId);

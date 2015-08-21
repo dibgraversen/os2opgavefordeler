@@ -12,5 +12,6 @@ public interface EmploymentService {
 	List<Employment> findByEmail(String email);
 
 	List<Employment> getAll(long municipalityId);
-	List<EmploymentPO> getAllPO(long municipalityId);
+	List<EmploymentPO> getManagedAsPO(long municipalityId, long employmentId);
+	List<EmploymentPO> getAllPO(long municipalityId, long employmentId);
 }
