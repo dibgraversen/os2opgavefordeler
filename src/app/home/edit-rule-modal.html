@@ -21,7 +21,7 @@
 						<div class="padded-top col-md-4">
 							<div class="checkbox">
 								<label>
-									<input type="checkbox" ng-model="showSubordinate"> Vis alle
+									<input type="checkbox" ng-model="showSubordinate" ng-click="loadAllOrgUnits()"> Vis alle
 								</label>
 							</div>
 						</div>
@@ -63,6 +63,13 @@
 								Viser {{ employments.length }} af {{ searchResult.totalMatches }} resultater
 							</div>
 						</div>
+						<div class="padded-top col-md-4">
+							<div class="checkbox">
+								<label>
+									<input type="checkbox" ng-model="showSubordinateEmployees" ng-click="loadAllEmployees()"> Vis alle
+								</label>
+							</div>
+						</div>
 					</div>
 					<table class="table table-hover">
 						<thead>
@@ -74,7 +81,7 @@
 							<th>Esdh id</th>
 						</tr>
 						</thead>
-						<tbody ng-repeat="emp in employments | filter:empFilter">
+						<tbody ng-repeat="emp in employments | filter:empFilter | filter:( !showSubordinateEmployees || subordinate)">
 						<tr ng-class="selectedEmp === emp ? 'success' : ''" ng-click="setSelectedEmp(emp)">
 							<td>{{ emp.name }}</td>
 							<td>{{ emp.initials }}</td>

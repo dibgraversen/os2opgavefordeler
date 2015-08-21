@@ -16,15 +16,29 @@
 		$scope.cancel = cancel;
 		$scope.setCurrentOrgUnit = setCurrentOrgUnit;
 		$scope.closeAlert = closeAlert;
+		$scope.loadAll = loadAll;
+		$scope.loading = false;
 
 		var currentEmployment = $scope.user.currentRole.employment;
+		var allMissing = true;
 
 		activate();
 
 		function activate(){
-			topicRouterApi.getOrgUnitsForResponsibility(municipality.id, currentEmployment).then(function(orgUnits){
+			topicRouterApi.getOrgUnitsForResponsibility(municipality.id, currentEmployment, true).then(function(orgUnits) {
 				$scope.orgUnits = orgUnits;
 			});
+		}
+
+		function loadAll(){
+			if(allMissing){
+				$scope.loading = true;
+				topicRouterApi.getOrgUnitsForResponsibility(municipality.id, currentEmployment, false).then(function (orgUnits) {
+					$scope.loading = false;
+					$scope.orgUnits = orgUnits;
+				});
+				allMissing = false;
+			}
 		}
 
 		function ok(){

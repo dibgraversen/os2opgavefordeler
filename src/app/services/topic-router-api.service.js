@@ -128,8 +128,12 @@
 		 * Returns a list of orgUnits to choose from.
 		 * @returns {Object[]} OrgUnit - A list of all OrgUnits.
 		 */
-		function getOrgUnitsForResponsibility(municipalityId, currentEmploymentId){
-			return httpGet('/org-units', { municipalityId: municipalityId }).then(function(orgUnits){
+		function getOrgUnitsForResponsibility(municipalityId, currentEmploymentId, managedOnly){
+			var params = { municipalityId: municipalityId };
+			if(managedOnly && currentEmploymentId){
+				params.employmentId = currentEmploymentId;
+			}
+			return httpGet('/org-units', params).then(function(orgUnits){
 				// fetch manager employments
 				_.each(orgUnits, function(orgUnit){
 					if(orgUnit.managerId > 0){
@@ -168,8 +172,15 @@
 			return orgUnit.subordinate;
 		}
 
-		function getEmployments(municipalityId){
-			return httpGet('/employments', { municipalityId: municipalityId });
+		function getEmployments(municipalityId, employmentId, managedOnly){
+			var params = {
+				municipalityId: municipalityId,
+				employmentId: employmentId
+			};
+			if(employmentId && managedOnly){
+				params.managedOnly = true;
+			}
+			return httpGet('/employments', params);
 		}
 
 		function getEmployment(empId){

@@ -15,6 +15,8 @@
 		$scope.empFilter = "";
 		$scope.ruleAlerts = [];
 		$scope.showSubordinate = false;
+		$scope.showSubordinateEmployees = false;
+
 		$scope.search = {
 			municipalityId: $scope.user.municipality.id,
 			offset: 0,
@@ -33,20 +35,41 @@
 		$scope.employmentSearch = employmentSearch;
 		$scope.loadMoreEmployments = loadMoreEmployments;
 		$scope.closeAlert = closeAlert;
+		$scope.loadAllOrgUnits = loadAllOrgUnits;
+		$scope.loadAllEmployees = loadAllEmployees;
 
+		var orgUnitsMissing = true;
+		var employeesMissing = true;
 		var currentEmployment = $scope.user.currentRole.employment;
 
 		activate();
 
 		function activate(){
 			// load some org. stuff.
-			topicRouterApi.getOrgUnitsForResponsibility(municipality.id, currentEmployment).then(function(orgUnits){
+			topicRouterApi.getOrgUnitsForResponsibility(municipality.id, currentEmployment, true).then(function(orgUnits){
 				$scope.orgUnits = orgUnits;
 			});
-
-			topicRouterApi.getEmployments(municipality.id, currentEmployment).then(function(employments){
+			topicRouterApi.getEmployments(municipality.id, currentEmployment, true).then(function(employments){
 				$scope.employments = employments;
 			});
+		}
+
+		function loadAllOrgUnits(){
+			if(orgUnitsMissing){
+				topicRouterApi.getOrgUnitsForResponsibility(municipality.id, currentEmployment, false).then(function(orgUnits){
+					$scope.orgUnits = orgUnits;
+					orgUnitsMissing = false;
+				});
+			}
+		}
+
+		function loadAllEmployees(){
+			if(employeesMissing){
+				topicRouterApi.getEmployments(municipality.id, currentEmployment, false).then(function(employments){
+					$scope.employments = employments;
+				});
+				employeesMissing = false;
+			}
 		}
 
 		function ok(){
