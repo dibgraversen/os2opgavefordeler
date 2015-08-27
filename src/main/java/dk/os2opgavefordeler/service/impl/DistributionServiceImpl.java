@@ -4,6 +4,7 @@ import dk.os2opgavefordeler.model.*;
 import dk.os2opgavefordeler.model.presentation.DistributionRulePO;
 import dk.os2opgavefordeler.rest.DistributionRuleScope;
 import dk.os2opgavefordeler.service.DistributionService;
+import dk.os2opgavefordeler.service.EmploymentService;
 import dk.os2opgavefordeler.service.PersistenceService;
 import org.slf4j.Logger;
 
@@ -11,6 +12,7 @@ import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
+import javax.persistence.NoResultException;
 import javax.persistence.NonUniqueResultException;
 import javax.persistence.Query;
 import javax.persistence.criteria.Join;
@@ -36,6 +38,9 @@ public class DistributionServiceImpl implements DistributionService {
 
 	@Inject
 	PersistenceService persistence;
+
+	@Inject
+	EmploymentService employmentService;
 
 	@Override
 	public DistributionRule createDistributionRule(DistributionRule rule) {
@@ -132,6 +137,33 @@ public class DistributionServiceImpl implements DistributionService {
 		updateParentsForDistributionRules(municipalityId);
 	}
 
+	@Override
+	public DistributionRule findAssigned(Kle kle, Municipality municipality) {
+		Query responsibleQuery = persistence.getEm().createQuery("SELECT r FROM DistributionRule r WHERE r.kle = :kle AND r.municipality = :municipality");
+		responsibleQuery.setParameter("kle", kle);
+		responsibleQuery.setParameter("municipality", municipality);
+		try {
+			DistributionRule rule = (DistributionRule) responsibleQuery.getSingleResult();
+			return findResponsible(rule);
+		} catch (NoResultException nre) {
+			// TODO make one?
+			log.warn("Did not find a DistributionRule for kle: {} and municipality: {}", kle, municipality);
+		} catch (NonUniqueResultException nure) {
+			log.error("Too many distributionrules for kle: {} and municipality: {}", kle, municipality);
+		}
+		return null;
+	}
+
+	private DistributionRule findResponsible(DistributionRule rule){
+		if(rule.getAssignedOrg().isPresent()){
+			return rule;
+		} else if (rule.getParent().isPresent()) {
+			return findResponsible(rule.getParent().get());
+		} else {
+			return null;
+		}
+	}
+
 	@SuppressWarnings("unchecked")
 	private void createMissingDistributionRules(long municipalityId){
 		Query municipalityQuery = persistence.getEm().createQuery("SELECT m FROM Municipality m WHERE m.id = :municipalityId");
@@ -183,6 +215,15 @@ public class DistributionServiceImpl implements DistributionService {
 				}
 			}
 		}
+	}
+
+	public Optional<Employment> findResponsibleEmployee(DistributionRule rule){
+		if(rule.getAssignedEmp() > 0l){
+			return employmentService.getEmployment(rule.getAssignedEmp());
+		} else if(rule.getParent().isPresent()){
+			return findResponsibleEmployee(rule.getParent().get());
+		}
+		return Optional.empty();
 	}
 
 	//--------------------------------------------------------------------------

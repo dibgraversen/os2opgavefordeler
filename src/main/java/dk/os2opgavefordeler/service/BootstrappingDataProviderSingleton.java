@@ -88,6 +88,7 @@ public class BootstrappingDataProviderSingleton {
 	private Municipality addMunicipality(String name) {
 		Municipality m = new Municipality();
 		m.setName(name);
+		m.setActive(true);
 		mService.createMunicipality(m);
 		return m;
 	}

@@ -1,6 +1,9 @@
 package dk.os2opgavefordeler.service;
 
 import dk.os2opgavefordeler.model.DistributionRule;
+import dk.os2opgavefordeler.model.Employment;
+import dk.os2opgavefordeler.model.Kle;
+import dk.os2opgavefordeler.model.Municipality;
 import dk.os2opgavefordeler.model.OrgUnit;
 import dk.os2opgavefordeler.model.presentation.DistributionRulePO;
 import dk.os2opgavefordeler.rest.DistributionRuleScope;
@@ -21,4 +24,7 @@ public interface DistributionService {
 	List<DistributionRulePO> getPoDistributions(OrgUnit orgUnit, DistributionRuleScope scope);
 
 	void buildRulesForMunicipality(long municipalityId);
+
+	DistributionRule findAssigned(Kle kle, Municipality municipality);
+	Optional<Employment> findResponsibleEmployee(DistributionRule rule);
 }

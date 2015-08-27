@@ -304,8 +304,8 @@ public class OrgUnitServiceImpl implements OrgUnitService {
 	@Override
 	public Optional<OrgUnit> getOrgUnit(long id) {
 		final List<OrgUnit> results = persistence.criteriaFind(OrgUnit.class,
-			(cb, cq, ou) -> cq.where(cb.equal(ou.get(OrgUnit_.id), id)
-			)
+				(cb, cq, ou) -> cq.where(cb.equal(ou.get(OrgUnit_.id), id)
+				)
 		);
 
 		return results.isEmpty() ?
@@ -425,5 +425,17 @@ public class OrgUnitServiceImpl implements OrgUnitService {
 			child.setParent(input);
 			fixRelations(child);
 		});
+	}
+
+	public Optional<Employment> findResponsibleManager(OrgUnit orgUnit){
+		if(orgUnit.getManager().isPresent()){
+			return orgUnit.getManager();
+		} else {
+			if (orgUnit.getParent().isPresent()){
+				return findResponsibleManager(orgUnit.getParent().get());
+			}
+		}
+		logger.warn("Found OrgUnit parent without manager: {}", orgUnit);
+		return Optional.empty();
 	}
 }
