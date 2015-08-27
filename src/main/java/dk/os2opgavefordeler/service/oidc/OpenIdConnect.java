@@ -10,6 +10,6 @@ public interface OpenIdConnect {
 	URI beginAuthenticationFlow(IdentityProvider idp, String token, String callbackUrl)
 	throws AuthenticationException;
 
-	ReadOnlyJWTClaimsSet finalizeAuthenticationFlow(IdentityProvider idp, String token, String callbackUrl, URI requestUri)
+	String finalizeAuthenticationFlow(IdentityProvider idp, String token, String callbackUrl, URI requestUri)
 	throws AuthenticationException;
 }

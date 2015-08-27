@@ -1,5 +1,6 @@
 package dk.os2opgavefordeler.service.oidc;
 
+import com.google.common.base.Strings;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.crypto.RSASSAVerifier;
 import com.nimbusds.jose.jwk.RSAKey;
@@ -7,13 +8,16 @@ import com.nimbusds.jose.util.JSONObjectUtils;
 import com.nimbusds.jwt.JWT;
 import com.nimbusds.jwt.ReadOnlyJWTClaimsSet;
 import com.nimbusds.oauth2.sdk.*;
+import com.nimbusds.oauth2.sdk.ParseException;
 import com.nimbusds.oauth2.sdk.auth.ClientAuthentication;
 import com.nimbusds.oauth2.sdk.auth.ClientSecretBasic;
 import com.nimbusds.oauth2.sdk.auth.Secret;
 import com.nimbusds.oauth2.sdk.http.HTTPResponse;
 import com.nimbusds.oauth2.sdk.id.ClientID;
 import com.nimbusds.oauth2.sdk.id.State;
+import com.nimbusds.oauth2.sdk.token.BearerAccessToken;
 import com.nimbusds.openid.connect.sdk.*;
+import com.nimbusds.openid.connect.sdk.claims.UserInfo;
 import com.nimbusds.openid.connect.sdk.op.OIDCProviderMetadata;
 import com.nimbusds.openid.connect.sdk.util.DefaultJWTDecoder;
 import dk.os2opgavefordeler.model.IdentityProvider;
@@ -32,6 +36,7 @@ import java.net.URL;
 import java.security.NoSuchAlgorithmException;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
+import java.text.*;
 import java.util.Scanner;
 
 public class OpenIdConnectImpl implements OpenIdConnect {
@@ -69,7 +74,7 @@ public class OpenIdConnectImpl implements OpenIdConnect {
 	}
 
 	@Override
-	public ReadOnlyJWTClaimsSet finalizeAuthenticationFlow(IdentityProvider idp, String token, String callbackUrl, URI requestUri)
+	public String finalizeAuthenticationFlow(IdentityProvider idp, String token, String callbackUrl, URI requestUri)
 	throws AuthenticationException
 	{
 		//TODO: loads of cleanup, refactoring and error handling
@@ -90,47 +95,51 @@ public class OpenIdConnectImpl implements OpenIdConnect {
 		ReadOnlyJWTClaimsSet claims = verifyIdToken(accessTokenResponse.getIDToken(), pmd);
 		log.info("Verified, claims: {}", claims);
 
-//		dumpUserEndpointInfo(pmd, accessTokenResponse);
-
-		return claims;
+		try {
+			String email = claims.getStringClaim("email");
+			if(Strings.isNullOrEmpty(email)) {
+				log.info("email claim empty - trying UserInfo endpoint");
+				return getEmailFromUserInfoEndpoint(pmd, accessTokenResponse);
+			} else {
+				return email;
+			}
+		} catch(java.text.ParseException ex) {
+			throw new AuthenticationException("Error parsing OpenID claims", ex);
+		}
 	}
 
-	/*
-	private JSONObject dumpUserEndpointInfo(OIDCProviderMetadata providerMetadata, OIDCAccessTokenResponse accessToken) {
+	private String getEmailFromUserInfoEndpoint(OIDCProviderMetadata providerMetadata, OIDCAccessTokenResponse accessToken)
+	throws AuthenticationException
+	{
 		//TODO: is there a way to get this information as a signed JWT?
-
-		UserInfoRequest userInfoReq = new UserInfoRequest(
+		final UserInfoRequest userInfoReq = new UserInfoRequest(
 			providerMetadata.getUserInfoEndpointURI(),
 			(BearerAccessToken) accessToken.getAccessToken() );
 
-		HTTPResponse userInfoHTTPResp = null;
+		final HTTPResponse userInfoHTTPResp;
 		try {
 			userInfoHTTPResp = userInfoReq.toHTTPRequest().send();
 		} catch (SerializeException | IOException e) {
-			log.error("Meh(1)", e);
+			throw new AuthenticationException("UserInfo endpoint error", e);
 		}
 
-		UserInfoResponse userInfoResponse = null;
+		final UserInfoResponse userInfoResponse;
 		try {
 			userInfoResponse = UserInfoResponse.parse(userInfoHTTPResp);
 		} catch (ParseException e) {
-			log.error("Meh(2)", e);
+			throw new AuthenticationException("UserInfo parsing error", e);
 		}
 
 		if (userInfoResponse instanceof UserInfoErrorResponse) {
 			ErrorObject error = ((UserInfoErrorResponse) userInfoResponse).getErrorObject();
-			log.error("Meh(3)");
-			// TODO error handling
+			throw new AuthenticationException(error.getDescription());
 		}
 
-		UserInfoSuccessResponse sresp = (UserInfoSuccessResponse) userInfoResponse;
-		UserInfo userInfo = sresp.getUserInfo();
+		final UserInfoSuccessResponse sresp = (UserInfoSuccessResponse) userInfoResponse;
+		final UserInfo userInfo = sresp.getUserInfo();
 
-		log.info("user(1): USERINFO.email{}", userInfo.getEmail());
-
-		return sresp.getUserInfo().toJSONObject();
+		return userInfo.getEmail().toString();
 	}
-	*/
 
 	private void validateReponseToken(AuthenticationSuccessResponse successResponse, String token)
 	throws AuthenticationException
