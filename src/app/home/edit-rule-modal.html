@@ -66,7 +66,7 @@
 						<div class="padded-top col-md-4">
 							<div class="checkbox">
 								<label>
-									<input type="checkbox" ng-model="showSubordinateEmployees" ng-click="loadAllEmployees()"> Vis alle
+									<input type="checkbox" ng-model="showSubordinateEmployees" ng-click="loadAllEmployees()"> Vis udenfor egen organisation
 								</label>
 							</div>
 						</div>
@@ -91,7 +91,7 @@
 						</tr>
 						</tbody>
 					</table>
-					<div class="row" ng-show="searchResult.totalMatches > employments.length">
+					<div class="row" ng-show="searchResult.totalMatches > employments.length && employments.totalmatches > 0">
 						<div class="col-md-8 col-md-offset-2">
 							<button class="btn btn-primary btn-block" ng-click="loadMoreEmployments()">Hent flere</button>
 						</div>
