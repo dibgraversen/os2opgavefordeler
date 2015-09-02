@@ -2,9 +2,13 @@ package dk.os2opgavefordeler.service.impl;
 
 import dk.os2opgavefordeler.model.Employment;
 import dk.os2opgavefordeler.model.Employment_;
+import dk.os2opgavefordeler.model.Municipality;
 import dk.os2opgavefordeler.model.OrgUnit;
 import dk.os2opgavefordeler.model.presentation.EmploymentPO;
+import dk.os2opgavefordeler.model.search.EmploymentSearch;
+import dk.os2opgavefordeler.model.search.SearchResult;
 import dk.os2opgavefordeler.service.EmploymentService;
+import dk.os2opgavefordeler.service.MunicipalityService;
 import dk.os2opgavefordeler.service.OrgUnitService;
 import dk.os2opgavefordeler.service.PersistenceService;
 import org.slf4j.Logger;
@@ -13,8 +17,13 @@ import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
+import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import java.util.ArrayList;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -22,6 +31,8 @@ import java.util.stream.Collectors;
 @Stateless
 @TransactionAttribute(TransactionAttributeType.REQUIRED)
 public class EmploymentServiceImpl implements EmploymentService {
+	public static final int MAX_RESULTS = 20;
+
 	@Inject
 	PersistenceService persistence;
 
@@ -30,6 +41,11 @@ public class EmploymentServiceImpl implements EmploymentService {
 
 	@Inject
 	Logger log;
+
+	@Inject
+	MunicipalityService municipalityService;
+
+	EntityManager em;
 
 	@Override
 	public Optional<Employment> getEmployment(long id) {
@@ -46,8 +62,8 @@ public class EmploymentServiceImpl implements EmploymentService {
 	@Override
 	public List<Employment> findByEmail(String email) {
 		final List<Employment> results = persistence.criteriaFind(Employment.class,
-			(cb, cq, ou) -> cq.where(cb.equal(ou.get(Employment_.email), email)
-			)
+				(cb, cq, ou) -> cq.where(cb.equal(ou.get(Employment_.email), email)
+				)
 		);
 
 		return results;
@@ -98,8 +114,8 @@ public class EmploymentServiceImpl implements EmploymentService {
 	@Override
 	@SuppressWarnings("unchecked")
 	public List<Employment> getAll(long municipalityId) {
-		Query query = persistence.getEm().createQuery("SELECT emp FROM Employment emp WHERE emp.employedIn.municipality.id = :municipalityId");
-		query.setMaxResults(100);
+		Query query = persistence.getEm().createQuery("SELECT emp FROM Employment emp WHERE emp.employedIn.municipality.id = :municipalityId ORDER BY emp.name ASC");
+		query.setMaxResults(MAX_RESULTS);
 		query.setParameter("municipalityId", municipalityId);
 		return query.getResultList();
 	}
@@ -119,5 +135,69 @@ public class EmploymentServiceImpl implements EmploymentService {
 		return result;
 	}
 
+	@SuppressWarnings("unchecked")
+	public SearchResult<EmploymentPO> search(EmploymentSearch search){
+		SearchResult<EmploymentPO> result = new SearchResult();
+		Municipality municipality = municipalityService.getMunicipality(search.getMunicipalityId());
+		result.setTotalMatches(getSearchCount(search, municipality));
+		result.setResults(getSearchResults(search, municipality));
+		return result;
+	}
+
+	private long getSearchCount(EmploymentSearch search, Municipality municipality){
+		CriteriaBuilder builder = getEm().getCriteriaBuilder();
+		CriteriaQuery<Long> criteriaQuery = builder.createQuery(Long.class);
+		Root root = criteriaQuery.from(Employment.class);
+		criteriaQuery.select(builder.count(root));
+
+		List<Predicate> predicates = new ArrayList<Predicate>();
+		predicates.add(builder.equal(root.get(Employment_.municipality), municipality));
+		if(search.getNameTerm() != null && !search.getNameTerm().isEmpty()){
+			String nameTerm = "%"+search.getNameTerm().toUpperCase()+"%";
+			predicates.add(builder.like(builder.upper(root.get(Employment_.name)), nameTerm));
+		}
+		if(search.getInitialsTerm() != null && !search.getInitialsTerm().isEmpty()){
+			String initialsTerm = "%"+search.getInitialsTerm().toUpperCase()+"%";
+			predicates.add(builder.like(builder.upper(root.get(Employment_.initials)), initialsTerm));
+		}
+		criteriaQuery.where(predicates.toArray(new Predicate[]{}));
+		Query countQuery = getEm().createQuery(criteriaQuery);
+
+		return (long) countQuery.getSingleResult();
+	}
+
+	private List<EmploymentPO> getSearchResults(EmploymentSearch search, Municipality municipality){
+		CriteriaBuilder builder = getEm().getCriteriaBuilder();
+		CriteriaQuery<Employment> criteriaQuery = builder.createQuery(Employment.class);
+		Root<Employment> root = criteriaQuery.from(Employment.class);
+
+		List<Predicate> predicates = new ArrayList<Predicate>();
+		predicates.add(builder.equal(root.get(Employment_.municipality), municipality));
+		if(search.getNameTerm() != null && !search.getNameTerm().isEmpty()){
+			String nameTerm = "%"+search.getNameTerm().toUpperCase()+"%";
+			predicates.add(builder.like(builder.upper(root.get(Employment_.name)), nameTerm));
+		}
+		if(search.getInitialsTerm() != null && !search.getInitialsTerm().isEmpty()){
+			String initialsTerm = "%"+search.getInitialsTerm().toUpperCase()+"%";
+			predicates.add(builder.like(builder.upper(root.get(Employment_.initials)), initialsTerm));
+		}
+		criteriaQuery.orderBy(builder.asc(root.get(Employment_.name)));
+		criteriaQuery.where(predicates.toArray(new Predicate[]{}));
+		Query resultsQuery = getEm().createQuery(criteriaQuery);
+
+		// results query
+		resultsQuery.setFirstResult(search.getOffset());
+		resultsQuery.setMaxResults(search.getPageSize());
+
+		List<Employment> employments = resultsQuery.getResultList();
+		return employments.stream().map(EmploymentPO::new).collect(Collectors.toList());
+	}
+
+	private EntityManager getEm(){
+		if(em == null){
+			em = persistence.getEm();
+		}
+		return em;
+	}
 
 }
