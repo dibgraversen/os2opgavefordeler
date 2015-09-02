@@ -119,21 +119,14 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	public User finalizeAuthenticationFlow(IdentityProvider idp, String token, String callbackUrl, URI requestUri)
 	throws AuthenticationException
 	{
-		try {
-			ReadOnlyJWTClaimsSet claims = openIdConnect.finalizeAuthenticationFlow(idp, token, callbackUrl, requestUri);
+		final String email = openIdConnect.finalizeAuthenticationFlow(idp, token, callbackUrl, requestUri);
+		log.info("finalizeAuthenticationFlow: email is {}", email);
 
-			final String email = claims.getStringClaim("email");
-			log.info("Email from claim: {}", email);
-
-			if(Strings.isNullOrEmpty(email)) {
-				throw new AuthenticationException("IDP returned empty email claim");
-			}
-
-			return findOrCreateUserFromEmail(email);
+		if(Strings.isNullOrEmpty(email)) {
+			throw new AuthenticationException("IDP returned empty email claim");
 		}
-		catch(java.text.ParseException e) {
-			throw new AuthenticationException("Error parsing OpenID claims", e);
-		}
+
+		return findOrCreateUserFromEmail(email);
 	}
 
 	@Override
