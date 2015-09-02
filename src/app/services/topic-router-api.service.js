@@ -20,12 +20,14 @@
 			getOrgUnitsForResponsibility: getOrgUnitsForResponsibility,
 			getEmployments: getEmployments,
 			getEmployment: getEmployment,
+			employmentSearch: employmentSearch,
 			updateDistributionRule: updateDistributionRule,
 			getSubstitutes: getSubstitutes,
 			addSubstitute: addSubstitute,
 			removeSubstitute: removeSubstitute,
 			getMunicipalities: getMunicipalities,
-			createMunicipality: createMunicipality
+			createMunicipality: createMunicipality,
+			updateMunicipality: updateMunicipality
 		};
 
 		var baseUrl = serverUrl;
@@ -174,6 +176,10 @@
 			return httpGet('/employments/'+empId);
 		}
 
+		function employmentSearch(search){
+			return httpPost('/search/employments', search);
+		}
+
 		function updateDistributionRule(distributionRule){
 			var distRule = new DistributionRule(distributionRule.id, distributionRule.parent.id,
 					new KLE(distributionRule.kle.id, distributionRule.number, distributionRule.name, distributionRule.serviceText),
@@ -205,7 +211,49 @@
 			return httpPost('/municipalities', { name: name });
 		}
 
+		function updateMunicipality(municipality){
+			return httpPost('/municipalities/'+municipality.id, { municipality: municipality });
+		}
+
 		// DTO classes.
+
+		/**
+		 * @class User
+		 * @private
+		 * @type {Object}
+		 * @param id {number}
+		 * @param name {string}
+		 * @param loggedIn {boolean}
+		 * @param municipality {Municipality}
+		 * @returns {{id: *, name: *, loggedIn: *, municipality: *}}
+		 * @constructor
+		 */
+		function User(id, name, loggedIn, municipality){
+			return {
+				id: id,
+				name: name,
+				loggedIn: loggedIn,
+				municipality: municipality
+			};
+		}
+
+		/**
+		 * @class Municipality
+		 * @private
+		 * @type {Object}
+		 * @param id {number}
+		 * @param name {string}
+		 * @param active {boolean}
+		 * @returns {{id: *, name: *, active: *}}
+		 * @constructor
+		 */
+		function Municipality(id, name, active){
+			return {
+				id: id,
+				name: name,
+				active: active
+			};
+		}
 
 		/**
 		 @class OrgUnit
@@ -293,6 +341,26 @@
 			};
 		}
 
+		/**
+		 * @class EmploymentSearch
+		 * @private
+		 * @type Object
+		 * @param page {number} page for the search
+		 * @param pageSize {number} pageSize
+		 * @param nameTerm {string}
+		 * @param initialsTerm {string}
+		 * @returns {{page: *, pageSize: *, nameTerm: *, initialsTerm: *}}
+		 * @constructor
+		 */
+		function EmploymentSearch(page, pageSize, nameTerm, initialsTerm, totalMatches, results){
+			return {
+				page: page,
+				pageSize: pageSize,
+				nameTerm: nameTerm,
+				initialsTerm: initialsTerm
+			};
+		}
+
 		// private methods
 
 		function httpGet(url, params) {
@@ -335,6 +403,7 @@
 					function(reason){
 						appSpinner.hideSpinner();
 						$log.info('**response from EXECUTE', reason);
+						return $q.reject(reason);
 					});
 		}
 	}

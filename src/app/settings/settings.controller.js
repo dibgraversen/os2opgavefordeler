@@ -8,8 +8,11 @@
 		/* jshint validthis: true */
 		var vm = this;
 		$scope.municipalities = [];
+		$scope.settingsMessages = [];
 
 		$scope.openCreateMunicipality = openCreateMunicipality;
+		$scope.toggleActive = toggleActive;
+		$scope.closeAlert = closeAlert;
 
 		activate();
 
@@ -36,6 +39,31 @@
 			modalInstance.result.then(function(municipality){
 				$scope.municipalities.push(municipality);
 			});
+		}
+
+		function toggleActive(municipality){
+			municipality.active = !municipality.active;
+			topicRouterApi.updateMunicipality(municipality)
+					.then(function(response) {
+						addMessage({
+							type: 'success',
+							msg: 'Kommunen blev opdateret.'
+						});
+					}, function(){
+						municipality.active = !municipality.active;
+						addMessage({
+							type: "danger",
+							msg: "opdatering af kommune fejlede, prøv igen senere."
+						});
+					});
+		}
+
+		function addMessage(message){
+			$scope.settingsMessages.push(message);
+		}
+
+		function closeAlert(index) {
+			$scope.settingsMessages.splice(index, 1);
 		}
 	}
 })();

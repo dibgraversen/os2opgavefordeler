@@ -15,11 +15,23 @@
 		$scope.empFilter = "";
 		$scope.ruleAlerts = [];
 		$scope.showSubordinate = false;
-
+		$scope.search = {
+			municipalityId: $scope.user.municipality.id,
+			offset: 0,
+			pageSize: 10,
+			nameTerm: '',
+			initialsTerm: ''
+		};
+		$scope.searchResult = {
+			totalMatches: 0,
+			results: []
+		};
 		$scope.ok = ok;
 		$scope.cancel = cancel;
 		$scope.setSelectedOrgUnit = setSelectedOrgUnit;
 		$scope.setSelectedEmp = setSelectedEmp;
+		$scope.employmentSearch = employmentSearch;
+		$scope.loadMoreEmployments = loadMoreEmployments;
 		$scope.closeAlert = closeAlert;
 
 		var currentEmployment = $scope.user.currentRole.employment;
@@ -72,6 +84,24 @@
 
 		function setSelectedEmp(emp){
 			$scope.selectedEmp = emp;
+		}
+
+		function employmentSearch(){
+			$log.warn("searching");
+			$scope.search.offset = 0;
+			topicRouterApi.employmentSearch($scope.search).then(function(result){
+				$scope.searchResult = result;
+				$scope.employments = result.results;
+			});
+		}
+
+		function loadMoreEmployments(){
+			$log.warn('fetching more employments...');
+			$scope.search.offset = $scope.search.offset + $scope.search.pageSize;
+			topicRouterApi.employmentSearch($scope.search).then(function(result){
+				$scope.searchResult = result;
+				$scope.employments = $scope.employments.concat(result.results);
+			});
 		}
 
 		function addAlert(alert) {
