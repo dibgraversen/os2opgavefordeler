@@ -30,6 +30,16 @@ public class MunicipalityServiceImpl implements MunicipalityService {
 	}
 
 	@Override
+	public Municipality createOrUpdateMunicipality(Municipality municipality) {
+		if(municipality.getId() > 0l){
+			persistence.merge(municipality);
+		} else {
+			persistence.persist(municipality);
+		}
+		return municipality;
+	}
+
+	@Override
 	public Municipality getMunicipality(long id) {
 		return getEm().find(Municipality.class, id);
 	}
