@@ -12,6 +12,7 @@ public class EmploymentPO {
 	private String esdhName;
 	private String initials;
 	private String jobTitle;
+	private OrgUnitPO employedIn;
 	private boolean subordinate;
 
 	public EmploymentPO(Employment source) {
@@ -23,6 +24,7 @@ public class EmploymentPO {
 		this.esdhName = source.getEsdhLabel();
 		this.initials = source.getInitials();
 		this.jobTitle = source.getJobTitle();
+		this.employedIn = new OrgUnitPO(source.getEmployedIn());
 	}
 
 	public long getId() {
@@ -59,5 +61,13 @@ public class EmploymentPO {
 
 	public void setSubordinate(boolean subordinate) {
 		this.subordinate = subordinate;
+	}
+
+	public OrgUnitPO getEmployedIn() {
+		return employedIn;
+	}
+
+	public void setEmployedIn(OrgUnitPO employedIn) {
+		this.employedIn = employedIn;
 	}
 }
