@@ -85,8 +85,8 @@
 						<tr ng-class="selectedEmp === emp ? 'success' : ''" ng-click="setSelectedEmp(emp)">
 							<td>{{ emp.name }}</td>
 							<td>{{ emp.initials }}</td>
-							<td>{{ emp.title }}</td>
-							<td>{{  }}</td>
+							<td>{{ emp.jobTitle }}</td>
+							<td>{{ emp.employedIn.name }}</td>
 							<td>{{ emp.esdhId }}</td>
 						</tr>
 						</tbody>
