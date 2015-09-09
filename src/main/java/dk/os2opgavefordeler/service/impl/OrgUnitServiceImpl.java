@@ -438,4 +438,17 @@ public class OrgUnitServiceImpl implements OrgUnitService {
 		logger.warn("Found OrgUnit parent without manager: {}", orgUnit);
 		return Optional.empty();
 	}
+
+	public Optional<Employment> getActualManager(Long orgId){
+		Optional<OrgUnit> orgMaybe = getOrgUnit(orgId);
+		if(orgMaybe.isPresent()){
+			OrgUnit org = orgMaybe.get();
+			if(org.getManager().isPresent()){
+				return org.getManager();
+			} else if(org.getParent().isPresent()){
+				return getActualManager(org.getParent().get().getId());
+			}
+		}
+		return Optional.empty();
+	}
 }

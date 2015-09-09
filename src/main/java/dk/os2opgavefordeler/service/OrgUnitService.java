@@ -43,4 +43,6 @@ public interface OrgUnitService {
 	Optional<Employment> getEmploymentByName(long municipalityId, String name);
 
 	Optional<Employment> findResponsibleManager(OrgUnit orgUnit);
+
+	Optional<Employment> getActualManager(Long orgId);
 }

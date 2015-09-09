@@ -24,7 +24,9 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -75,7 +77,7 @@ public class EmploymentServiceImpl implements EmploymentService {
 	}
 
 	private List<Employment> getManaged(long municipalityId, long employmentId){
-		List<Employment> result = new ArrayList<>();
+		Map<Long, Employment> resultMap = new HashMap<>();
 		Optional<Employment> managerMaybe = getEmployment(employmentId);
 		if(managerMaybe.isPresent()){
 			Employment manager = managerMaybe.get();
@@ -87,16 +89,22 @@ public class EmploymentServiceImpl implements EmploymentService {
 			for (OrgUnit managedOrgunit : managedOrgunits) {
 				// Add manager.
 				if(managedOrgunit.getManager().isPresent()){
-					result.add(managedOrgunit.getManager().get());
+					Employment currentManager = managedOrgunit.getManager().get();
+					if(!resultMap.containsKey(currentManager.getId())) {
+						resultMap.put(currentManager.getId(), currentManager);
+					}
 				}
 				// Add employees.
 				if(!managedOrgunit.getChildren().isEmpty()){
-					result.addAll(managedOrgunit.getEmployees());
-				} else {
+					for (Employment employee : managedOrgunit.getEmployees()) {
+						if (!resultMap.containsKey(employee.getId())) {
+							resultMap.put(employee.getId(), employee);
+						}
+					}
 				}
 			}
 		}
-		return result;
+		return new ArrayList<>(resultMap.values());
 	}
 
 	@Override
@@ -108,6 +116,8 @@ public class EmploymentServiceImpl implements EmploymentService {
 					newEmp.setSubordinate(true);
 					return newEmp;
 				})
+				.limit(MAX_RESULTS)
+				.sorted( (e1, e2) -> e1.getName().compareTo(e2.getName()) )
 				.collect(Collectors.toList());
 	}
 

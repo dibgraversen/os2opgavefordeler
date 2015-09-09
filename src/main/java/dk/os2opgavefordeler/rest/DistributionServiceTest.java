@@ -193,7 +193,7 @@ public class DistributionServiceTest {
 			orgId = org.getId();
 		}
 
-		return distributionService.getDistributionsForOrg(orgId, MUNICIPALITY_ID, includeUnowned, includeImplicit)
+		return distributionService.getDistributionsForOrg(orgId, MUNICIPALITY_ID, includeImplicit)
 			.stream()
 			.map(d -> d.getKle().getNumber());
 	}

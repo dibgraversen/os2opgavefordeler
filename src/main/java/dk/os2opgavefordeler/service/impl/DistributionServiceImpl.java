@@ -5,6 +5,7 @@ import dk.os2opgavefordeler.model.presentation.DistributionRulePO;
 import dk.os2opgavefordeler.rest.DistributionRuleScope;
 import dk.os2opgavefordeler.service.DistributionService;
 import dk.os2opgavefordeler.service.EmploymentService;
+import dk.os2opgavefordeler.service.OrgUnitService;
 import dk.os2opgavefordeler.service.PersistenceService;
 import org.slf4j.Logger;
 
@@ -18,7 +19,9 @@ import javax.persistence.Query;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Predicate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -41,6 +44,9 @@ public class DistributionServiceImpl implements DistributionService {
 
 	@Inject
 	EmploymentService employmentService;
+
+	@Inject
+	OrgUnitService orgUnitService;
 
 	@Override
 	public DistributionRule createDistributionRule(DistributionRule rule) {
@@ -68,22 +74,28 @@ public class DistributionServiceImpl implements DistributionService {
 	@SuppressWarnings("unchecked")
 	public List<DistributionRule> getDistributionsAll(long municipalityId) {
 		log.info("here with muncipalityId: {}", municipalityId);
-		Query query = persistence.getEm().createQuery("SELECT r FROM DistributionRule r WHERE r.municipality.id = :municipalityId ORDER BY r.kle.number ASC");
+		Query query = persistence.getEm().createQuery("SELECT r FROM DistributionRule r WHERE r.municipality.id = :municipalityId " +
+				"AND LENGTH(r.kle.number) = 2 ORDER BY r.kle.number ASC");
 		query.setParameter("municipalityId", municipalityId);
-//		query.setMaxResults(300);
-		List<DistributionRule> result = query.getResultList();
-		log.info("result size: {}", result.size());
-		return result;
+		return query.getResultList();
+	}
+
+	/**
+	 * Finds DistributionRules for that are top level and unassigned.
+	 * @param municipalityId restricts DistributionRules to given municipality
+	 * @return List of top level, unassigned DistributionRules.
+	 */
+	@SuppressWarnings("unchecked")
+	private List<DistributionRule> getUnassignedDistributionRules(long municipalityId){
+		Query query = persistence.getEm().createQuery("SELECT r FROM DistributionRule r WHERE r.municipality.id = :municipalityId " +
+				"AND LENGTH(r.kle.number) = 2 AND r.responsibleOrg IS NULL ORDER BY r.kle.number ASC");
+		query.setParameter("municipalityId", municipalityId);
+		return query.getResultList();
 	}
 
 	@Override
-	public List<DistributionRule> getDistributionsForOrg(long orgId, long municipalityId, boolean includeUnassigned) {
-		return getDistributionsForOrg(orgId, municipalityId, includeUnassigned, false);
-	}
-
-	@Override
-	public List<DistributionRule> getDistributionsForOrg(long orgId, long municipalityId, boolean includeUnassigned, boolean includeImplicit) {
-		//TODO: implement a query-only solution instead of the current mix of query and subsequent collection filtering.
+	@SuppressWarnings("unchecked")
+	public List<DistributionRule> getDistributionsForOrg(long orgId, long municipalityId, boolean includeImplicit) {
 		List<DistributionRule> results = persistence.criteriaFind(DistributionRule.class, (cb, cq, root) ->
 		{
 			// Implicit querying currently needs to include not directly owned rules, since their (possible) implicit
@@ -91,23 +103,49 @@ public class DistributionServiceImpl implements DistributionService {
 			List<Predicate> predicates = new ArrayList<Predicate>();
 			// filter by municipality.
 			Join<DistributionRule, Municipality> ruleMunicipalityJoin = root.join(DistributionRule_.municipality);
+			Join<DistributionRule, Kle> ruleKleJoin = root.join(DistributionRule_.kle);
 			final Predicate inMunicipality = cb.equal(ruleMunicipalityJoin.get(Municipality_.id), municipalityId);
 			predicates.add(inMunicipality);
 			final Predicate main = cb.equal(root.get(DistributionRule_.responsibleOrg), orgId);
-			if (includeUnassigned || includeImplicit) {
-				// TODO stop including all with no responsible org.
-				final Predicate mainOrUnassigned = cb.or(main, cb.isNull(root.get(DistributionRule_.responsibleOrg)));
-				predicates.add(mainOrUnassigned);
+			if (includeImplicit) {
+				Optional<OrgUnit> org = orgUnitService.getOrgUnit(orgId);
+				if(org.isPresent()){
+					Optional<Employment> manager = orgUnitService.getActualManager(orgId);
+					if(manager.isPresent()){
+						List<OrgUnit> managedUnits = orgUnitService.getManagedOrgUnits(municipalityId, manager.get().getId());
+						final Predicate implicit = root.get(DistributionRule_.responsibleOrg).in(managedUnits);
+						predicates.add(implicit);
+					}
+				}
 			} else {
 				predicates.add(main);
 			}
-			cq.where(predicates.toArray(new Predicate[]{}));
-			Join<DistributionRule, Kle> ruleKleJoin = root.join(DistributionRule_.kle);
-			cq.orderBy(cb.asc(ruleKleJoin.get("number")));
+			cq.where(predicates.toArray(new Predicate[predicates.size()]));
+			cq.orderBy(cb.asc(ruleKleJoin.get(Kle_.number)));
 		});
-		return results.stream()
-			.filter(getFilter(orgId, includeUnassigned, includeImplicit))
-			.collect(Collectors.toList());
+		Map<Long, DistributionRule> resultsMap = new HashMap<>();
+		for (DistributionRule result : results) {
+			resultsMap.put(result.getId(), result);
+			// TODO this is strictly presentational...
+			if(result.getParent().isPresent()){
+				if(!results.contains(result.getParent().get())){
+					resultsMap.put(result.getParent().get().getId(), result.getParent().get());
+				}
+//				Query siblingsQuery = persistence.getEm().createQuery("SELECT rule FROM DistributionRule rule WHERE rule.parent = :parent");
+//				siblingsQuery.setParameter("parent", result.getParent().get());
+//				List<DistributionRule> siblings = siblingsQuery.getResultList();
+//				for (DistributionRule sibling : siblings) {
+//					resultsMap.put(sibling.getId(), sibling);
+//				}
+			}
+		}
+		List<DistributionRule> unassigned = getUnassignedDistributionRules(municipalityId);
+		for (DistributionRule unassignedRule : unassigned) {
+			resultsMap.put(unassignedRule.getId(), unassignedRule);
+		}
+		return resultsMap.values().stream()
+				.sorted((o1, o2) -> o1.getKle().getNumber().compareTo(o2.getKle().getNumber()))
+				.collect(Collectors.toList());
 	}
 
 	@Override
@@ -115,10 +153,10 @@ public class DistributionServiceImpl implements DistributionService {
 		final List<DistributionRule> distributions;
 		switch(scope) {
 			case INHERITED:
-				distributions = getDistributionsForOrg(orgUnit.getId(), orgUnit.getMunicipality().get().getId(), true, true);
+				distributions = getDistributionsForOrg(orgUnit.getId(), orgUnit.getMunicipality().get().getId(), true);
 				break;
 			case RESPONSIBLE:
-				distributions = getDistributionsForOrg(orgUnit.getId(), orgUnit.getMunicipality().get().getId(), true, false);
+				distributions = getDistributionsForOrg(orgUnit.getId(), orgUnit.getMunicipality().get().getId(), false);
 				break;
 			case ALL:
 			default:/* intentional fallthrough */
@@ -132,7 +170,7 @@ public class DistributionServiceImpl implements DistributionService {
 
 	@Override
 	public void buildRulesForMunicipality(long municipalityId) {
-		log.info("Building rules");
+		log.debug("Building rules");
 		createMissingDistributionRules(municipalityId);
 		updateParentsForDistributionRules(municipalityId);
 	}
@@ -181,7 +219,7 @@ public class DistributionServiceImpl implements DistributionService {
 					DistributionRule rule = new DistributionRule();
 					rule.setKle(kle);
 					rule.setMunicipality(municipality);
-					log.info("creating rule: {}", rule);
+					log.debug("creating rule: {}", rule);
 					createDistributionRule(rule);
 				}
 			}
@@ -226,6 +264,22 @@ public class DistributionServiceImpl implements DistributionService {
 		return Optional.empty();
 	}
 
+	/**
+	 * Fetches children to a DistributionRule.
+	 * @param ruleId The id of the parent rule.
+	 * @return A list of children rules, matching the given parent.
+	 */
+	@SuppressWarnings("unchecked")
+	public List<DistributionRule> getChildren(Long ruleId){
+		if(ruleId == null){
+			return new ArrayList<>();
+		} else {
+			Query query = persistence.getEm().createQuery("SELECT rule FROM DistributionRule rule WHERE rule.parent.id = :parentId");
+			query.setParameter("parentId", ruleId);
+			return query.getResultList();
+		}
+	}
+
 	//--------------------------------------------------------------------------
 	// Helpers
 	//--------------------------------------------------------------------------
@@ -233,32 +287,30 @@ public class DistributionServiceImpl implements DistributionService {
 	/**
 	 * Returns a predicate suitable for post-query filtering of DistributionRules.
 	 * @param orgId the orgId we're querying for
-	 * @param includeUnassigned whether to include unassigned DistributionRules
 	 * @param includeImplicit whether to include implicitly owned DistributionRules
 	 * @return
 	 */
-	private java.util.function.Predicate<DistributionRule> getFilter(long orgId, boolean includeUnassigned, boolean includeImplicit) {
-		if (includeImplicit) {
-			// Include if implicitly owned by orgId, filter root-unowned based on 'includeUnassigned'
-			return dr -> getImplicitOwner(dr).map(id -> id == orgId).orElse(includeUnassigned);
-		} else {
-			// Include if explicitly owned by orgId, filter out implicitly owned, leave root-unowned.
-			return dr -> ( orgId == dr.getResponsibleOrg().map(OrgUnit::getId).orElse(-1L)) || !getImplicitOwner(dr).isPresent();
-		}
-	}
+//	private java.util.function.Predicate<DistributionRule> getFilter(long orgId, boolean includeImplicit) {
+//		if (includeImplicit) {
+//			return dr -> getImplicitOwner(dr).map(id -> id == orgId).orElse(false);
+//		} else {
+//			 Include if explicitly owned by orgId, filter out implicitly owned, leave root-unowned.
+//			return dr -> ( orgId == dr.getResponsibleOrg().map(OrgUnit::getId).orElse(-1L)) || !getImplicitOwner(dr).isPresent();
+//		}
+//	}
 
 	/**
 	 * Returns the implicit owner of a DistributionRule.
 	 * @param dr DisitrbutionRule to find implicit owner for.
 	 * @return implicit owner, or Optional.empty for dr with no top-level owner.
 	 */
-	private Optional<Long> getImplicitOwner(DistributionRule dr) {
-		if(dr == null) {
-			return Optional.empty();
-		} else if(dr.getResponsibleOrg().isPresent()) {
-			return dr.getResponsibleOrg().map(OrgUnit::getId);
-		} else {
-			return getImplicitOwner(dr.getParent().orElse(null));
-		}
-	}
+//	private Optional<Long> getImplicitOwner(DistributionRule dr) {
+//		if(dr == null) {
+//			return Optional.empty();
+//		} else if(dr.getResponsibleOrg().isPresent()) {
+//			return dr.getResponsibleOrg().map(OrgUnit::getId);
+//		} else {
+//			return getImplicitOwner(dr.getParent().orElse(null));
+//		}
+//	}
 }

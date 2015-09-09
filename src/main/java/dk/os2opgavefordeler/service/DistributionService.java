@@ -18,8 +18,7 @@ public interface DistributionService {
 	Optional<DistributionRule> getDistribution(long id);
 	List<DistributionRule> getDistributionsAll(long municipalityId);
 
-	List<DistributionRule> getDistributionsForOrg(long orgId, long municipalityId, boolean includeUnassigned);
-	List<DistributionRule> getDistributionsForOrg(long orgId, long municipalityId, boolean includeUnassigned, boolean includeImplicit);
+	List<DistributionRule> getDistributionsForOrg(long orgId, long municipalityId, boolean includeImplicit);
 
 	List<DistributionRulePO> getPoDistributions(OrgUnit orgUnit, DistributionRuleScope scope);
 
@@ -27,4 +26,6 @@ public interface DistributionService {
 
 	DistributionRule findAssigned(Kle kle, Municipality municipality);
 	Optional<Employment> findResponsibleEmployee(DistributionRule rule);
+
+	List<DistributionRule> getChildren(Long ruleId);
 }
