@@ -23,7 +23,7 @@
 				class="{{ topic.kle.type }} animate-show" ng-class="">
 				<td class="indent">
 					<span class="glyphicon" ng-click="toggle(topic)"
-						ng-show="topic.children.length > 0"
+						ng-show="topic.kle.type !== 'topic'"
 						ng-class="topic.open ? 'glyphicon-chevron-down' : 'glyphicon-chevron-right' "></span>
 				</td>
 				<td class="indent">

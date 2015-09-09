@@ -10,7 +10,7 @@
 
 		$scope.topicRoutes = [];
 		$scope.filteredTopicRoutes = [];
-		var nodes = {};
+		//var nodes = {};
 
 		activate();
 
@@ -31,6 +31,7 @@
 		$scope.distribution = distribution;
 		$scope.responsibilityChangeAllowed = responsibilityChangeAllowed;
 		$scope.distributionChangeAllowed = distributionChangeAllowed;
+		$scope.getChildren = getChildren;
 
 		////////////////
 
@@ -87,11 +88,18 @@
 		}
 
 		function refreshTopicRoutes(){
-			getTopicRoutes().then(function(data){
-				$scope.topicRoutes = data;
-				$scope.filteredTopicRoutes = data;
-				_.each(data, function(item){
-					nodes[item.id] = item;
+			getTopicRoutes().then(function(rules){
+				$scope.topicRoutes = rules;
+				$scope.filteredTopicRoutes = rules;
+				_.each(rules, function(rule){
+					if(rule.parent){
+						if(!rule.parent.childrenLoaded){
+							getChildren(rule.parent, true).then(function(children){
+								rule.parent.childrenLoaded = true;
+								toggleChildren(children, true);
+							});
+						}
+					}
 				});
 			});
 		}
@@ -112,8 +120,10 @@
 		}
 
 		function toggle(node){
-			node.open = !node.open;
-			toggleChildren(node.children, node.open);
+			getChildren(node).then(function(){
+				node.open = !node.open;
+				toggleChildren(node.children, node.open);
+			});
 		}
 
 		/**
@@ -130,11 +140,20 @@
 		}
 
 		function toggleChildren(children, visible){
-			if(children){
-				_.each(children, function(childId){
-					var child = nodes[childId];
-					child.visible = visible;
-					toggleChildren(child.children, child.open && visible);
+			$log.debug('visible: '+ visible);
+			if(children && children.length > 0){
+				$log.debug('there are children!');
+				_.each(children, function(child){
+					if(typeof child === 'number'){
+						$log.debug('child by number!');
+						child = _.find($scope.topicRoutes, { 'id': child });
+						child.visible = visible;
+						toggleChildren(child.children, child.open && visible);
+					} else if(typeof child === 'object'){
+						$log.debug('child by object! '+ child.open);
+						child.visible = visible;
+						toggleChildren(child.children, child.open && visible);
+					}
 				});
 			}
 		}
@@ -206,7 +225,7 @@
 		 * Returns first org name for current or parent node.
 		 */
 		function distribution(distributionRule){
-			if(distributionRule.org.name){
+			if(distributionRule.org && distributionRule.org.name){
 				return distributionRule.org.name;
 			} else if(distributionRule.parent){
 				return distribution(distributionRule.parent);
@@ -221,7 +240,9 @@
 		 * @return {boolean} true if edit allowed.
 		 */
 		function responsibilityChangeAllowed(distributionRule){
-			if(!responsibility(distributionRule)) return true; // not already handled.
+			if(!responsibility(distributionRule)){
+				return true; // not already handled.
+			}
 			if($scope.user.currentRole.municipalityAdmin) return true;
 			if(canManage(distributionRule)) return true;
 			return false;
@@ -237,6 +258,52 @@
 			if($scope.user.currentRole.municipalityAdmin) return true;
 			if(canManage(distributionRule)) return true;
 			return false;
+		}
+
+		function getChildren(rule, force){
+			var deferred = $q.defer();
+			if(rule.type != 'topic'){
+				if(force || !rule.children || rule.children.length < 1){
+					topicRouterApi.getRuleChildren(rule.id).then(function(children){
+						rule.children = _.collect(children, 'id');
+						var promises = [];
+						_.each(children, function(child){
+							promises.push(prepareRule(child));
+							child.parent = rule;
+						});
+						$q.all(promises).then(function(){
+							addRules(children);
+							deferred.resolve(children);
+						});
+					});
+				} else {
+					deferred.resolve();
+				}
+			} else {
+				deferred.resolve();
+			}
+			return deferred.promise;
+		}
+
+		function addRules(newRules){
+			$scope.topicRoutes = _.sortBy(_.uniq(_.flatten([$scope.topicRoutes, newRules]), 'id'),
+					function(rule) { return rule.kle.number; });
+		}
+
+		function prepareRule(rule){
+			//nodes[rule.id] = rule;
+			rule.open = false;
+			$log.debug('rule.open set: '+rule.open);
+			rule.visible = true;
+			if(typeof rule.org === "number" && rule.org > 0){
+				return topicRouterApi.getOrgUnit(rule.org).then(function(org){
+					rule.org = org;
+				});
+			} else {
+				var deferred = $q.defer();
+			  deferred.resolve();
+				return deferred.promise;
+			}
 		}
 	}
 })();

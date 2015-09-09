@@ -14,14 +14,16 @@
 			getUserInfo: getUserInfo,
 			logoutUser: logoutUser,
 			getTopicRoutes: getTopicRoutes,
+			updateDistributionRule: updateDistributionRule,
+			getRuleChildren: getRuleChildren,
 			getRoles: getRoles,
 			getSettings: getSettings,
 			updateSettings: updateSettings,
 			getOrgUnitsForResponsibility: getOrgUnitsForResponsibility,
+			getOrgUnit: getOrgUnit,
 			getEmployments: getEmployments,
 			getEmployment: getEmployment,
 			employmentSearch: employmentSearch,
-			updateDistributionRule: updateDistributionRule,
 			getSubstitutes: getSubstitutes,
 			addSubstitute: addSubstitute,
 			removeSubstitute: removeSubstitute,
@@ -63,11 +65,6 @@
 		}
 
 		function getTopicRoutes(employment, scope) {
-			//MOCK
-			//var deferred = $q.defer();
-			//deferred.resolve(mockTopicRoutes());
-			//return deferred.promise;
-			//MOCK
 			var deferred = $q.defer();
 
 			httpGet('/distribution-rules', {
@@ -80,33 +77,42 @@
 					rule.children = [];
 				});
 				_.each(data, function (rule) {
-					if (rule.parent) {
-						var parent = objectMap[rule.parent];
-						rule.parent = parent;
-						parent.children.push(rule.id);
-					}
-					if(rule.employee > 0){
-						getEmployment(rule.employee).then(function(employee){
-							rule.employee = employee;
-						});
-					}
-					if(rule.org > 0){
-						getOrgUnit(rule.org).then(function(orgUnit){
-							rule.org = orgUnit;
-						});
-					}
-					rule.open = true;
-					rule.visible = true;
-					if(rule.responsible > 0) {
-						getOrgUnit(rule.responsible).then(function(orgUnit){
-							rule.responsible = orgUnit;
-						});
-					}
-					rule.kle.serviceTextPopover = htmlsave.truncate(rule.kle.serviceText, maxPopoverLength, { breakword:false });
+					processRule(rule, objectMap);
 				});
 				deferred.resolve(data);
 			});
 			return deferred.promise;
+		}
+
+		function getRuleChildren(ruleId){
+			return httpGet('/distribution-rules/'+ruleId+'/children');
+		}
+
+		function processRule(rule, objectMap){
+			rule.visible = true;
+			rule.open = (rule.children && rule.children.length > 0);
+			rule.kle.serviceTextPopover = htmlsave.truncate(rule.kle.serviceText, maxPopoverLength, { breakword:false });
+			if(rule.org > 0){
+				getOrgUnit(rule.org).then(function(orgUnit){
+					rule.org = orgUnit;
+				});
+			}
+			if(rule.responsible > 0) {
+				getOrgUnit(rule.responsible).then(function(orgUnit){
+					rule.responsible = orgUnit;
+				});
+			}
+			if(rule.employee > 0){
+				getEmployment(rule.employee).then(function(employee){
+					rule.employee = employee;
+				});
+			}
+			if (rule.parent) {
+				var parent = objectMap[rule.parent];
+				rule.parent = parent;
+				parent.children.push(rule.id);
+				parent.open = true;
+			}
 		}
 
 		function getOrgUnit(orgId){
@@ -404,7 +410,6 @@
 			};
 			angular.extend(options, defaults); // merge defaults into options.
 			appSpinner.showSpinner();
-			//TODO: replace the following with Interceptor, so calling code can use success/error.
 			return $http(options).then(
 					function (response) {
 						appSpinner.hideSpinner();
