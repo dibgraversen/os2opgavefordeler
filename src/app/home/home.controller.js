@@ -140,17 +140,13 @@
 		}
 
 		function toggleChildren(children, visible){
-			$log.debug('visible: '+ visible);
 			if(children && children.length > 0){
-				$log.debug('there are children!');
 				_.each(children, function(child){
 					if(typeof child === 'number'){
-						$log.debug('child by number!');
 						child = _.find($scope.topicRoutes, { 'id': child });
 						child.visible = visible;
 						toggleChildren(child.children, child.open && visible);
 					} else if(typeof child === 'object'){
-						$log.debug('child by object! '+ child.open);
 						child.visible = visible;
 						toggleChildren(child.children, child.open && visible);
 					}
@@ -293,7 +289,6 @@
 		function prepareRule(rule){
 			//nodes[rule.id] = rule;
 			rule.open = false;
-			$log.debug('rule.open set: '+rule.open);
 			rule.visible = true;
 			if(typeof rule.org === "number" && rule.org > 0){
 				return topicRouterApi.getOrgUnit(rule.org).then(function(org){
