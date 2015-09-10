@@ -1,5 +1,7 @@
 package dk.os2opgavefordeler.model;
 
+import com.google.common.base.MoreObjects;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -14,8 +16,9 @@ public class Municipality implements Serializable {
 	@Id @GeneratedValue(strategy = GenerationType.AUTO)
 	private long id;
 
-
 	private String name;
+
+	private boolean active;
 
 	public long getId() {
 		return id;
@@ -33,11 +36,20 @@ public class Municipality implements Serializable {
 		this.name = name;
 	}
 
+	public boolean isActive() {
+		return active;
+	}
+
+	public void setActive(boolean active) {
+		this.active = active;
+	}
+
 	@Override
 	public String toString() {
-		return "Municipality{" +
-				"id=" + id +
-				", name='" + name + '\'' +
-				'}';
+		return MoreObjects.toStringHelper(this)
+				.add("id", id)
+				.add("name", name)
+				.add("active", active)
+				.toString();
 	}
 }

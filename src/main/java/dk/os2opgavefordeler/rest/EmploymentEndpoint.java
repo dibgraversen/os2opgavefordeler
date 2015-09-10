@@ -27,11 +27,18 @@ public class EmploymentEndpoint {
 	@GET
 	@Path("/")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response listAll(@QueryParam("municipalityId") Long municipalityId) {
+	public Response listAll(@QueryParam("municipalityId") Long municipalityId,
+													@QueryParam("employmentId") Long employmentId,
+													@QueryParam("managedOnly") boolean managedOnly) {
 		try {
 			Validate.nonZero(municipalityId, "Invalid municipalityId");
-			final List<EmploymentPO> employees = employmentService.getAllPO(municipalityId);
-
+			Validate.nonZero(employmentId, "Invalid employmentId");
+			List<EmploymentPO> employees;
+			if(managedOnly){
+				employees = employmentService.getManagedAsPO(municipalityId, employmentId);
+			} else {
+				employees = employmentService.getAllPO(municipalityId, employmentId);
+			}
 			if(!employees.isEmpty()) {
 				return Response.ok().entity(employees).build();
 			} else {

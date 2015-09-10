@@ -9,6 +9,9 @@ import java.util.List;
  */
 public interface MunicipalityService {
 	Municipality createMunicipality(Municipality municipality);
+
+	Municipality createOrUpdateMunicipality(Municipality municipality);
+
 	Municipality getMunicipality(long id);
 	List<Municipality> getMunicipalities();
 

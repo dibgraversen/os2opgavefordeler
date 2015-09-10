@@ -34,6 +34,8 @@ public class BootstrappingDataProviderSingleton {
 
 	private static final String MIRACLE_NAME = "Miracle";
 	private static final String SYDDJURS_NAME = "Syddjurs Kommune";
+//	public static final String KLE_FILE = "KLE-valid-data.xml";
+	public static final String KLE_FILE = "KLE-Emneplan_Version2-0_2015-08-01.xml";
 
 	@Inject
 	private Logger log;
@@ -88,6 +90,7 @@ public class BootstrappingDataProviderSingleton {
 	private Municipality addMunicipality(String name) {
 		Municipality m = new Municipality();
 		m.setName(name);
+		m.setActive(true);
 		mService.createMunicipality(m);
 		return m;
 	}
@@ -99,7 +102,7 @@ public class BootstrappingDataProviderSingleton {
 		addUser("Simon Møgelvang Bang", "smb@miracle.dk", miracle, buildRoles());
 		addUser("Sune Marcher", "sum@miracle.dk", miracle, buildRoles());
 		List<Role> syddsjursRoles = new ArrayList<>();
-		syddsjursRoles.add(Role.builder().name("Henrik (Syddjurs)").municipalityAdmin(true).build());
+		syddsjursRoles.add(Role.builder().name("Henrik (Syddjurs)").admin(true).municipalityAdmin(true).build());
 		addUser("Henrik", "henrikloevborg@syddjurs.dk", syddjurs, syddsjursRoles);
 	}
 
@@ -135,7 +138,7 @@ public class BootstrappingDataProviderSingleton {
 	private void loadBootstrapKle() {
 		log.info("Loading bootstrap KLE");
 		if(kleService.fetchAllKleMainGroups().size() < 1){
-			try (final InputStream resource = getResource("KLE-valid-data.xml")) {
+			try (final InputStream resource = getResource(KLE_FILE)) {
 				final List<Kle> groups = importer.importFromXml(resource);
 				kleService.storeAllKleMainGroups(groups);
 			} catch (Exception ex) {
@@ -147,7 +150,7 @@ public class BootstrappingDataProviderSingleton {
 	private OrgUnit loadBootstrapOrgUnit() {
 		final ObjectMapper mapper = new ObjectMapper();
 
-		try (final InputStream resource = getResource("KLE-valid-data.xml")) {
+		try (final InputStream resource = getResource(KLE_FILE)) {
 			return mapper.readValue(getResource("bootstrap-organization.json"), OrgUnit.class);
 		} catch (IOException e) {
 			log.error("Couldn't deserialize bootstrap org", e);

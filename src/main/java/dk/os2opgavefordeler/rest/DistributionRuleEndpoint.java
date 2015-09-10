@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 @Path("/distribution-rules")
 @RequestScoped
@@ -84,17 +85,32 @@ public class DistributionRuleEndpoint {
 				return doUpdateResponsibleOrganization(existing, distribution);
 			})
 			.orElseGet(() -> {
-				log.info("updateResponsibleOrganization - nonexisting distributionRule[{}]", distId);
-				return Response.status(Response.Status.NOT_FOUND).build();
-			}
-		);
+						log.info("updateResponsibleOrganization - nonexisting distributionRule[{}]", distId);
+						return Response.status(Response.Status.NOT_FOUND).build();
+					}
+			);
+	}
+
+	@GET
+	@Path("/{distId}/children")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getChildren(@PathParam("distId") Long distId){
+		if(distId == null){
+			log.info("#getChildren with no distId");
+			return Response.status(Response.Status.BAD_REQUEST).type(MediaType.TEXT_PLAIN_TYPE)
+					.entity("You need to specify valid distributionId as part of the url.").build();
+		} else {
+			List<DistributionRulePO> result = distributionService.getChildren(distId)
+					.stream().map(DistributionRulePO::new).collect(Collectors.toList());
+			return Response.ok().entity(result).build();
+		}
 	}
 
 	@GET
 	@Path("/buildRules")
 	public Response buildRulesForMunicipality(@QueryParam("municipalityId") long municipalityId){
 		if(municipalityId < 0) {
-			log.info("buildRules - bad request[{},{}]", municipalityId);
+			log.info("buildRules - bad request[{}]", municipalityId);
 			return Response.status(Response.Status.BAD_REQUEST).build();
 		}
 		distributionService.buildRulesForMunicipality(municipalityId);

@@ -24,6 +24,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -47,11 +48,18 @@ public class OrgUnitEndpoint {
 	@GET
 	@Path("/")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response listAll(@QueryParam("municipalityId") Long municipalityId) {
+	public Response listAll(@QueryParam("municipalityId") Long municipalityId, @QueryParam("employmentId") Long employmentId) {
+		// if employment, scope by that.
 		try {
 			Validate.nonZero(municipalityId, "Invalid municipalityId");
+			List<OrgUnitPO> ou = new ArrayList<>();
+			if(employmentId != null && employmentId > 0l){
+				ou = orgUnitService.getManagedOrgUnitsPO(municipalityId, employmentId);
+			} else {
+				ou = orgUnitService.getToplevelOrgUnitPO(municipalityId);
+			}
 
-			final List<OrgUnitPO> ou = orgUnitService.getToplevelOrgUnitPO(municipalityId);
+
 
 			if (!ou.isEmpty()) {
 				return Response.ok().entity(ou).build();

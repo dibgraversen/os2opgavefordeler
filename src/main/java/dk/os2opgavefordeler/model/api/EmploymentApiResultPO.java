@@ -1,34 +1,23 @@
-package dk.os2opgavefordeler.model.presentation;
+package dk.os2opgavefordeler.model.api;
 
 import dk.os2opgavefordeler.model.Employment;
 
-public class EmploymentPO {
-	private long id;
-
-//	private boolean isActive;
+public class EmploymentApiResultPO {
 	private String name;
 	private String email;
 	private String esdhId;
 	private String esdhName;
 	private String initials;
 	private String jobTitle;
-	private OrgUnitPO employedIn;
-	private boolean subordinate;
 
-	public EmploymentPO(Employment source) {
-		this.id = source.getId();
-//		this.isActive = source.a
+
+	public EmploymentApiResultPO(Employment source) {
 		this.name = source.getName();
 		this.email = source.getEmail();
 		this.esdhId = source.getEsdhId();
 		this.esdhName = source.getEsdhLabel();
 		this.initials = source.getInitials();
 		this.jobTitle = source.getJobTitle();
-		this.employedIn = new OrgUnitPO(source.getEmployedIn());
-	}
-
-	public long getId() {
-		return id;
 	}
 
 	public String getName() {
@@ -53,21 +42,5 @@ public class EmploymentPO {
 
 	public String getJobTitle() {
 		return jobTitle;
-	}
-
-	public boolean isSubordinate() {
-		return subordinate;
-	}
-
-	public void setSubordinate(boolean subordinate) {
-		this.subordinate = subordinate;
-	}
-
-	public OrgUnitPO getEmployedIn() {
-		return employedIn;
-	}
-
-	public void setEmployedIn(OrgUnitPO employedIn) {
-		this.employedIn = employedIn;
 	}
 }

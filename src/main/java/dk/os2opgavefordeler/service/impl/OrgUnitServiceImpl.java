@@ -304,8 +304,8 @@ public class OrgUnitServiceImpl implements OrgUnitService {
 	@Override
 	public Optional<OrgUnit> getOrgUnit(long id) {
 		final List<OrgUnit> results = persistence.criteriaFind(OrgUnit.class,
-			(cb, cq, ou) -> cq.where(cb.equal(ou.get(OrgUnit_.id), id)
-			)
+				(cb, cq, ou) -> cq.where(cb.equal(ou.get(OrgUnit_.id), id)
+				)
 		);
 
 		return results.isEmpty() ?
@@ -330,12 +330,42 @@ public class OrgUnitServiceImpl implements OrgUnitService {
 		return result;
 	}
 
+	private Optional<OrgUnit> getManagedOrgUnit(long municipalityId, long employmentId){
+		TypedQuery<OrgUnit> query = persistence.getEm().createQuery("SELECT org FROM OrgUnit org WHERE org.manager.id = :managerId AND org.municipality.id = :municipalityId", OrgUnit.class);
+		query.setParameter("managerId", employmentId);
+		query.setParameter("municipalityId", municipalityId);
+		Optional<OrgUnit> result;
+		try {
+			final OrgUnit orgUnit = query.getSingleResult();
+			orgUnit.getEmployees();
+			touchChildren(orgUnit.getChildren());
+			result = Optional.of(orgUnit);
+		} catch (NoResultException nre){
+			result = Optional.empty();
+		}
+		return result;
+	}
+
 	@Override
+	public List<OrgUnit> getManagedOrgUnits(long municipalityId, long employmentId){
+		final Optional<OrgUnit> managedOrgUnit = getManagedOrgUnit(municipalityId, employmentId);
+		return managedOrgUnit.map( ou -> ou.flattened().collect(Collectors.toList()) )
+				.orElse(Collections.emptyList());
+	}
+
+	@Override
+	public List<OrgUnitPO> getManagedOrgUnitsPO(long municipalityId, long employmentId){
+		final Optional<OrgUnit> managedOrgUnit = getManagedOrgUnit(municipalityId, employmentId);
+		return managedOrgUnit.map( ou -> ou.flattened().map(OrgUnitPO::new).collect(Collectors.toList()) )
+				.orElse(Collections.emptyList());
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
 	public List<OrgUnit> findByName(String name) {
 		final List<OrgUnit> results = persistence.criteriaFind(OrgUnit.class,
 			(cb, cq, ou) -> cq.where( cb.like(ou.get(OrgUnit_.name), name))
 		);
-
 		return results;
 	}
 
@@ -395,5 +425,30 @@ public class OrgUnitServiceImpl implements OrgUnitService {
 			child.setParent(input);
 			fixRelations(child);
 		});
+	}
+
+	public Optional<Employment> findResponsibleManager(OrgUnit orgUnit){
+		if(orgUnit.getManager().isPresent()){
+			return orgUnit.getManager();
+		} else {
+			if (orgUnit.getParent().isPresent()){
+				return findResponsibleManager(orgUnit.getParent().get());
+			}
+		}
+		logger.warn("Found OrgUnit parent without manager: {}", orgUnit);
+		return Optional.empty();
+	}
+
+	public Optional<Employment> getActualManager(Long orgId){
+		Optional<OrgUnit> orgMaybe = getOrgUnit(orgId);
+		if(orgMaybe.isPresent()){
+			OrgUnit org = orgMaybe.get();
+			if(org.getManager().isPresent()){
+				return org.getManager();
+			} else if(org.getParent().isPresent()){
+				return getActualManager(org.getParent().get().getId());
+			}
+		}
+		return Optional.empty();
 	}
 }
