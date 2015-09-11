@@ -229,7 +229,7 @@
 		}
 
 		function updateMunicipality(municipality){
-			return httpPost('/municipalities/'+municipality.id, { municipality: municipality });
+			return httpPost('/municipalities/'+municipality.id, municipality);
 		}
 
 		// DTO classes.
