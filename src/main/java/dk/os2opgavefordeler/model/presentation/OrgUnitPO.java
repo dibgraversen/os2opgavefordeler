@@ -17,16 +17,18 @@ public class OrgUnitPO {
 	private Municipality municipality;
 
 	public OrgUnitPO(OrgUnit from) {
-		this.id = from.getId();
-		this.parentId = from.getParent().map(OrgUnit::getId).orElse(-1L);
-		this.managerId = from.getManager().map(Employment::getId).orElse(-1L);
+		if(from != null){
+			this.id = from.getId();
+			this.parentId = from.getParent().map(OrgUnit::getId).orElse(-1L);
+			this.managerId = from.getManager().map(Employment::getId).orElse(-1L);
 
-		this.name = from.getName();
-		this.esdhId = from.getEsdhId();
-		this.esdhName = from.getEsdhLabel();
-		this.email = from.getEmail();
-		this.phone = from.getPhone();
-		this.municipality = from.getMunicipality().orElse(null);
+			this.name = from.getName();
+			this.esdhId = from.getEsdhId();
+			this.esdhName = from.getEsdhLabel();
+			this.email = from.getEmail();
+			this.phone = from.getPhone();
+			this.municipality = from.getMunicipality().orElse(null);
+		}
 	}
 
 	public long getParentId() {

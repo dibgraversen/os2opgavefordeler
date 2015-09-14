@@ -1,4 +1,4 @@
 ALTER TABLE municipality
-    ADD COLUMN active BOOLEAN;
+    ADD COLUMN active BOOLEAN DEFAULT FALSE;
 
 

@@ -24,7 +24,7 @@ import java.util.stream.Stream;
 @Startup
 public class BootstrappingDataProviderSingleton {
 	// flag for bootstrap enabled or disabled.
-	private static final boolean BOOTSTRAP = true;
+	private static final boolean BOOTSTRAP = false;
 
 	private static final String DIGITALISERING = "Digitalisering";
 	private static final String MODERN_ART = "Moderne kunst";

@@ -78,7 +78,7 @@ public class ApiEndpoint {
 		// find handling rule from distService.
 		DistributionRule result = distributionService.findAssigned(kle, municipality);
 		if(result != null){
-			Optional<Employment> employeeMaybe = distributionService.findResponsibleEmployee(result);
+			Optional<Employment> employeeMaybe = employmentService.getEmployment(result.getAssignedEmp());
 			EmploymentApiResultPO manager = new EmploymentApiResultPO(orgUnitService.findResponsibleManager(result.getAssignedOrg().get()).orElse(null));
 			EmploymentApiResultPO employee = employeeMaybe.map(EmploymentApiResultPO::new).orElse(null);
 			DistributionRuleApiResultPO resultPO = new DistributionRuleApiResultPO(result, manager, employee);
