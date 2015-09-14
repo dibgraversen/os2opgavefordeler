@@ -60,7 +60,8 @@
 			$modal.open({
 				scope: $scope,
 				templateUrl: 'app/home/add-substitute-modal.html',
-				controller: 'AddSubstituteModalInstanceCtrl'
+				controller: 'AddSubstituteModalInstanceCtrl',
+				size: 'lg'
 			}).result.then(function(sub) {
 					topicRouterApi.addSubstitute($scope.user.currentRole.id, sub.id).then(
 						function(substitute) {
