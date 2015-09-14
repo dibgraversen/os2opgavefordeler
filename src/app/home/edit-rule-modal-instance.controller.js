@@ -110,7 +110,6 @@
 		}
 
 		function employmentSearch(){
-			$log.warn("searching");
 			$scope.search.offset = 0;
 			topicRouterApi.employmentSearch($scope.search).then(function(result){
 				$scope.searchResult = result;
