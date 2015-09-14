@@ -1,4 +1,4 @@
-<div ng-show="user.currentRole.manager" class="panel panel-default">
+<div ng-show="user.currentRole.manager && !user.currentRole.substitute" class="panel panel-default">
 	<div class="panel-heading">Stedfortræder</div>
 	<div class="panel-body">
 		<ul ng-repeat="sub in substitutes" class="list-unstyled">
