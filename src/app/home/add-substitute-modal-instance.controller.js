@@ -7,6 +7,7 @@
 	function AddSubstituteModalInstanceCtrl($log, $scope, $modalInstance, topicRouterApi){
 		//$scope.employeeFilter = "";
 		$scope.modalAlerts = [];
+		$scope.searchNotification = true;
 		$scope.search = {
 			municipalityId: $scope.user.municipality.id,
 			offset: 0,
@@ -38,6 +39,7 @@
 		}
 
 		function employmentSearch(){
+			$scope.searchNotification = false;
 			$scope.search.offset = 0;
 			topicRouterApi.employmentSearch($scope.search).then(function(result){
 				$scope.searchResult = result;

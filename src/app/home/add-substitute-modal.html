@@ -17,6 +17,11 @@
 					<button class="btn btn-primary btn-block" ng-click="employmentSearch()">Søg</button>
 				</div>
 			</div>
+			<div class="row" ng-show="searchNotification">
+				<div class="col-md-12 padded-top">
+					<alert type="info" close="searchNotification = false">Udfør søgning for flere resultater</alert>
+				</div>
+			</div>
 			<div class="row">
 				<div class="col-md-12">
 					<div class="alert alert-info margin-top" ng-show="searchResult.results.length">
