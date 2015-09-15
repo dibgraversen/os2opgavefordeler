@@ -1,0 +1,4 @@
+ALTER TABLE municipality
+    ADD COLUMN token CHARACTER VARYING(64);
+
+

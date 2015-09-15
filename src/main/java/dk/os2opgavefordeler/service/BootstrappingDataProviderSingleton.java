@@ -79,18 +79,19 @@ public class BootstrappingDataProviderSingleton {
 
 	private void addMunicipalities() {
 		if(mService.getMunicipalities().size() == 0){
-			miracle = addMunicipality("Miracle");
-			syddjurs = addMunicipality("Syddjurs Kommune");
+			miracle = addMunicipality("Miracle", "ABC");
+			syddjurs = addMunicipality("Syddjurs Kommune", "ABC");
 		} else {
 			miracle = mService.findByName(MIRACLE_NAME);
 			syddjurs = mService.findByName(SYDDJURS_NAME);
 		}
 	}
 
-	private Municipality addMunicipality(String name) {
+	private Municipality addMunicipality(String name, String token) {
 		Municipality m = new Municipality();
 		m.setName(name);
 		m.setActive(true);
+		m.setToken(token);
 		mService.createMunicipality(m);
 		return m;
 	}
