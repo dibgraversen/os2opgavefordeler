@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
@@ -54,25 +55,26 @@ public class ApiEndpoint {
 	@GET
 	@Path("/")
 	@Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
-	public Response lookup(@QueryParam("kle") String kleNumber, @QueryParam("municipality") long municipalityId){
-		// TODO add authentication
-		Optional<Kle> kleMaybe = kleService.fetchMainGroup(kleNumber);
-		if(!kleMaybe.isPresent()){
-			return Response.status(Response.Status.BAD_REQUEST).type(TEXT_PLAIN)
-					.entity("Did not find a Kle based on given number.").build();
+	public Response lookup(@HeaderParam("Authorization") String token, @QueryParam("kle") String kleNumber){
+		if(token == null){
+			return Response.status(Response.Status.UNAUTHORIZED).build();
 		}
-		Kle kle = kleMaybe.get();
-		Municipality municipality = null;
-		if(municipalityId > 0l){
-			municipality = municipalityService.getMunicipality(municipalityId);
+		Optional<Municipality> municipalityMaybe = municipalityService.getMunicipalityFromToken(token);
+		if(!municipalityMaybe.isPresent()){
+			return Response.status(Response.Status.UNAUTHORIZED).type(TEXT_PLAIN)
+					.entity("Did not find a municipality based on given authorization.").build();
 		}
-		if(municipality == null){
-			return Response.status(Response.Status.BAD_REQUEST).type(TEXT_PLAIN)
-					.entity("Did not find a municipality based on given municipality id.").build();
-		}
+		Municipality municipality = municipalityMaybe.get();
 		if(!municipality.isActive()){
 			return Response.status(PAYMENT_REQUIRED).type(TEXT_PLAIN)
 					.entity("Your subscription is not active and therefor the api cannot be used.").build();
+		}
+
+		Optional<Kle> kleMaybe = kleService.fetchMainGroup(kleNumber);
+		Kle kle = kleMaybe.get();
+		if(!kleMaybe.isPresent()){
+			return Response.status(Response.Status.BAD_REQUEST).type(TEXT_PLAIN)
+					.entity("Did not find a Kle based on given number.").build();
 		}
 
 		// find handling rule from distService.

@@ -8,9 +8,11 @@ import org.slf4j.Logger;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.NonUniqueResultException;
 import javax.persistence.Query;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author hlo@miracle.dk
@@ -21,7 +23,7 @@ public class MunicipalityServiceImpl implements MunicipalityService {
 	PersistenceService persistence;
 
 	@Inject
-	Logger logger;
+	Logger log;
 
 	@Override
 	public Municipality createMunicipality(Municipality municipality) {
@@ -45,6 +47,21 @@ public class MunicipalityServiceImpl implements MunicipalityService {
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
+	public Optional<Municipality> getMunicipalityFromToken(String token){
+		Query query = persistence.getEm().createQuery("SELECT m FROM Municipality m WHERE m.token = :token");
+		query.setParameter("token", token);
+		try{
+			return Optional.of((Municipality)query.getSingleResult());
+		} catch(NoResultException nre){
+			log.info("trying to find by token: {}, without luck", token);
+		} catch(NonUniqueResultException nure){
+			log.error("Multiple municipalities with same token: {}", token);
+		}
+		return Optional.empty();
+	}
+
+	@Override
 	public List<Municipality> getMunicipalities() {
 		return persistence.findAll(Municipality.class);
 	}
@@ -57,7 +74,7 @@ public class MunicipalityServiceImpl implements MunicipalityService {
 		try {
 			result = (Municipality) query.getSingleResult();
 		} catch	(NonUniqueResultException nure){
-			logger.error("Duplicate name for municipality", nure);
+			log.error("Duplicate name for municipality", nure);
 		}
 		return result;
 	}

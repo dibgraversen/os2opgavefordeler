@@ -20,6 +20,8 @@ public class Municipality implements Serializable {
 
 	private boolean active;
 
+	private String token;
+
 	public long getId() {
 		return id;
 	}
@@ -42,6 +44,14 @@ public class Municipality implements Serializable {
 
 	public void setActive(boolean active) {
 		this.active = active;
+	}
+
+	public String getToken() {
+		return token;
+	}
+
+	public void setToken(String token) {
+		this.token = token;
 	}
 
 	@Override
