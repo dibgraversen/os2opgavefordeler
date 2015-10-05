@@ -20,7 +20,8 @@ import org.slf4j.Logger;
 
 @Path("/kle")
 @RequestScoped
-public class KleRestEndpoint {
+public class KleRestEndpoint extends Endpoint {
+
 	@Inject
 	private Logger log;
 
@@ -55,21 +56,18 @@ public class KleRestEndpoint {
 		}
 		out.append(String.format("Total groups: %d, subgroups: %s, topics %d", groups.size(), totalGroups, totalTopics));
 
-		return Response.status(Response.Status.OK).entity(out.toString()).build();
+		return ok(out.toString());
 	}
 
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/groups/{number}")
-	public Response getGroup(@PathParam("number") String number)
-	{
-		Optional<Kle> group = kleService.fetchMainGroup(number);
+	public Response getGroup(@PathParam("number") String number, @QueryParam("municipalityId") Long municipalityId) {
+		Optional<Kle> group = kleService.fetchMainGroup(number, municipalityId);
 		return group.isPresent() ?
-			Response.status(Response.Status.OK).entity(group.get()).build() :
+			ok(group.get()) :
 			Response.status(Response.Status.NOT_FOUND).build();
 	}
-
-
 
 	@POST @NoCache
 	@Path("/import")
@@ -81,7 +79,7 @@ public class KleRestEndpoint {
 		final InputStream xsd = request.getXsd();
 
 		if(xml == null) {
-			return Response.status(Response.Status.BAD_REQUEST).entity("Missing MXL").build();
+			return badRequest("Missing MXL");
 		}
 
 		final List<Kle> groups;
@@ -102,19 +100,21 @@ public class KleRestEndpoint {
 		final String response = String.format("KLE XML imported - group 0 is [%s/%s]",
 				groups.get(0).getNumber(),
 				groups.get(0).getTitle());
-		return Response.status(Response.Status.OK).entity(response).build();
+		return ok(response);
 	}
 
 	static private class Stats {
 		public int max = 0, num = 0, numNonZero = 0;
 		long tlen = 0;
 	}
+
 	private void visit(List<Kle> kle, Consumer<Kle> visitor) {
 		for(Kle k : kle) {
 			visitor.accept(k);
 			visit(k.getChildren(), visitor);
 		}
 	}
+
 	private void reportsStats(List<Kle> groups) {
 		final Stats stats = new Stats();
 

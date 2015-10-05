@@ -10,6 +10,7 @@ import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
+import javax.persistence.Query;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,6 +23,11 @@ public class KleServiceImpl implements KleService {
 	@Inject
 	PersistenceService persistence;
 
+	/**
+	 * Fetches all 'main groups'.
+	 * Municipality scoping not needed here since main groups cannot be municipality specific.
+	 * @return List of all 'main groups'. Groups with no parent.
+	 */
 	@Override
 	public List<Kle> fetchAllKleMainGroups() {
 		List<Kle> result = persistence.criteriaFind(Kle.class,
@@ -31,13 +37,17 @@ public class KleServiceImpl implements KleService {
 	}
 
 	@Override
-	public Optional<Kle> fetchMainGroup(final String number) {
-		List<Kle> result = persistence.criteriaFind(Kle.class,
-			(cb, cq, kle) -> cq.where( cb.equal(kle.get(Kle_.number), number))
-		);
-		return result.isEmpty() ?
-			Optional.empty() :
-			Optional.of(result.get(0));
+	public Optional<Kle> fetchMainGroup(final String number, long municipalityId) {
+		Query query = persistence.getEm().createQuery("SELECT k FROM Kle k WHERE k.number = :number AND " +
+				"(k.municipality IS NULL OR k.municipality.id = :municipalityId)");
+		query.setParameter("number", number);
+		query.setParameter("municipalityId", municipalityId);
+		try {
+			Kle result = (Kle) query.getSingleResult();
+			return Optional.of(result);
+		} catch	(Exception e){
+			return Optional.empty();
+		}
 	}
 
 	@Override
@@ -49,6 +59,12 @@ public class KleServiceImpl implements KleService {
 		groups.forEach(persistence::persist);
 	}
 
+	@Override
+	public Kle getKle(Long id) {
+		Query query = persistence.getEm().createQuery("SELECT k FROM Kle k WHERE k.id = :id");
+		query.setParameter("id", id);
+		return (Kle) query.getSingleResult();
+	}
 
 	private List<Kle> touchChildren(List<Kle> kle) {
 		kle.forEach(k -> touchChildren(k.getChildren()));

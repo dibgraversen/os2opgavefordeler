@@ -7,7 +7,10 @@ import java.util.Optional;
 
 public interface KleService {
 	List<Kle> fetchAllKleMainGroups();
-	Optional<Kle> fetchMainGroup(String number);
+
+	Optional<Kle> fetchMainGroup(String number, long municipalityId);
 
 	void storeAllKleMainGroups(List<Kle> groups);
+
+	Kle getKle(Long id);
 }

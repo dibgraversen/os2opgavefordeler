@@ -23,31 +23,32 @@ public class Kle implements Serializable {
 	private Kle parent;
 
 	@OneToMany(mappedBy = "parent", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	private final List<Kle> children = new ArrayList<>();
+	private List<Kle> children = new ArrayList<>();
 
 
 	@Column(nullable = false, updatable = false)
-	private final String number;
+	private String number;
 
 	@Column(nullable = false)
-	private final String title;
+	private String title;
 
 	@Column(nullable = false)
 	@Lob
-	private final String description;
+	private String description;
 
 	@Column(nullable = false)
 	@Temporal(TemporalType.DATE)
-	private final Date dateCreated;
+	private Date dateCreated;
 
-
+	@ManyToOne
+	private Municipality municipality;
 
 	public Kle() {
 		//for JPA
 		this.number = null;
 		this.title = null;
 		this.description = null;
-		this.dateCreated = null;
+		this.dateCreated = new Date();
 	}
 
 	public Kle(String number, String title, String description, Date dateCreated) {
@@ -62,13 +63,22 @@ public class Kle implements Serializable {
 		children.forEach(this::addChild);
 	}
 
-
-
 	public void addChild(Kle child) {
 		child.setParent(this);
 		if(!children.contains(child)) {
 			children.add(child);
 		}
+	}
+
+	public Kle getParent() {
+		return parent;
+	}
+
+	public void setParent(Kle parent) {
+		if(this.parent != null && this.parent != parent) {
+			this.parent.children.remove(this);
+		}
+		this.parent = parent;
 	}
 
 	public ImmutableList<Kle> getChildren() {
@@ -79,32 +89,45 @@ public class Kle implements Serializable {
 		return id;
 	}
 
+	public void setId(long id) {
+		this.id = id;
+	}
+
 	public String getNumber() {
 		return number;
+	}
+
+	public void setNumber(String number) {
+		this.number = number;
 	}
 
 	public String getTitle() {
 		return title;
 	}
 
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
 	public String getDescription() {
 		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
 	}
 
 	public Date getDateCreated() {
 		return new Date(dateCreated.getTime());
 	}
 
-
-
-	protected void setParent(Kle parent) {
-		if(this.parent != null && this.parent != parent) {
-			this.parent.children.remove(this);
-		}
-		this.parent = parent;
+	public Municipality getMunicipality() {
+		return municipality;
 	}
 
-
+	public void setMunicipality(Municipality municipality) {
+		this.municipality = municipality;
+	}
 
 	@Override
 	public String toString() {

@@ -28,4 +28,6 @@ public interface DistributionService {
 	Optional<Employment> findResponsibleEmployee(DistributionRule rule);
 
 	List<DistributionRule> getChildren(Long ruleId);
+
+	DistributionRule createDistributionRule(Kle kle);
 }

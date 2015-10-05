@@ -1,6 +1,8 @@
 package dk.os2opgavefordeler.service;
 
 import dk.os2opgavefordeler.model.Municipality;
+import dk.os2opgavefordeler.model.ValidationException;
+import dk.os2opgavefordeler.model.presentation.KlePO;
 
 import java.util.List;
 import java.util.Optional;
@@ -18,4 +20,8 @@ public interface MunicipalityService {
 	List<Municipality> getMunicipalities();
 
 	Municipality findByName(String name);
+
+	KlePO saveMunicipalityKle(KlePO kle) throws ValidationException;
+	void deleteMunicipalityKle(long municipalityId, long kleId) throws ValidationException;
+	List<KlePO> getMunicipalityKle(long municipalityId);
 }
