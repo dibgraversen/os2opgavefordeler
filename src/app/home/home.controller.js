@@ -10,12 +10,13 @@
 
 		$scope.topicRoutes = [];
 		$scope.filteredTopicRoutes = [];
+		$scope.substitutes = [];
+		$scope.listAlerts = [];
 		//var nodes = {};
 
 		activate();
 
 		// API
-		$scope.substitutes = [];
 		$scope.addSubstitute = addSubstitute;
 		$scope.removeSubstitute = removeSubstitute;
 
@@ -32,6 +33,9 @@
 		$scope.responsibilityChangeAllowed = responsibilityChangeAllowed;
 		$scope.distributionChangeAllowed = distributionChangeAllowed;
 		$scope.getChildren = getChildren;
+		$scope.responsibleEmployee = responsibleEmployee;
+		$scope.closeAlert = closeAlert;
+		$scope.showServiceText = showServiceText;
 
 		////////////////
 
@@ -89,20 +93,34 @@
 		}
 
 		function refreshTopicRoutes(){
-			getTopicRoutes().then(function(rules){
-				$scope.topicRoutes = rules;
-				$scope.filteredTopicRoutes = rules;
-				_.each(rules, function(rule){
-					if(rule.parent){
-						if(!rule.parent.childrenLoaded){
-							getChildren(rule.parent, true).then(function(children){
-								rule.parent.childrenLoaded = true;
-								toggleChildren(children, true);
+			$scope.listAlerts = [];
+			getTopicRoutes().then(
+					function(rules){
+						$scope.topicRoutes = rules;
+						$scope.filteredTopicRoutes = rules;
+						if(rules.length > 0){
+							_.each(rules, function(rule){
+								if(rule.parent){
+									if(!rule.parent.childrenLoaded){
+										getChildren(rule.parent, true).then(function(children){
+											rule.parent.childrenLoaded = true;
+											toggleChildren(children, true);
+										});
+									}
+								}
 							});
+						} else {
+							if($scope.settings.scope == 'ALL'){
+								addAlert({ type: 'info', msg: 'Der blev ikke fundet regler.' });
+							} else {
+								addAlert({ type: 'info', msg: 'Der blev ikke fundet regler for givne filtrering.' });
+							}
 						}
+					},
+					function(error){
+					  $log.error('fejl: '+ error.data);
 					}
-				});
-			});
+			);
 		}
 
 		function navigate(){
@@ -202,7 +220,7 @@
 		 */
 		function responsible(distributionRule){
 			if(distributionRule.responsible){
-				return distributionRule.responsible.name;
+				return distributionRule.responsible;
 			} else if(distributionRule.parent){
 				return responsible(distributionRule.parent);
 			} else {
@@ -237,7 +255,7 @@
 		 * @return {boolean} true if edit allowed.
 		 */
 		function responsibilityChangeAllowed(distributionRule){
-			if(!responsibility(distributionRule)){
+			if(!responsibility(distributionRule) && $scope.user.currentRole.manager){
 				return true; // not already handled.
 			}
 			if($scope.user.currentRole.municipalityAdmin) return true;
@@ -282,6 +300,14 @@
 			return deferred.promise;
 		}
 
+		function responsibleEmployee(rule){
+			// rule.org makes inherit chain break by explicit responsibility
+			// i.e. resetting employee inheritance whenever an org is set on parent.
+			if(rule.employee || rule.org) return rule.employee.name;
+			else if(rule.parent) return responsibleEmployee(rule.parent);
+			else return '';
+		}
+
 		function addRules(newRules){
 			$scope.topicRoutes = _.sortBy(_.uniq(_.flatten([$scope.topicRoutes, newRules]), 'id'),
 					function(rule) { return rule.kle.number; });
@@ -300,6 +326,27 @@
 			  deferred.resolve();
 				return deferred.promise;
 			}
+		}
+
+		function addAlert(message){
+			$scope.listAlerts.push(message);
+		}
+
+		function closeAlert(index) {
+			$scope.listAlerts.splice(index, 1);
+		}
+
+		function showServiceText(kle){
+			$modal.open({
+				templateUrl: 'app/common/kle-servicetext-modal.html',
+				controller: 'KleServicetextModalInstanceCtrl',
+				size: 'lg',
+				resolve: {
+					kle: function(){
+						return kle;
+					}
+				}
+			});
 		}
 	}
 })();
