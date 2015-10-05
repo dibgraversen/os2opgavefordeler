@@ -30,9 +30,7 @@ import java.util.Optional;
  */
 @Path("/api")
 @RequestScoped
-public class ApiEndpoint {
-	private static final int PAYMENT_REQUIRED = 402;
-	public static final String TEXT_PLAIN = "text/plain";
+public class ApiEndpoint extends Endpoint {
 
 	@Inject
 	Logger log;
@@ -70,11 +68,10 @@ public class ApiEndpoint {
 				.entity("Your subscription is not active and therefor the api cannot be used.").build();
 		}
 
-		Optional<Kle> kleMaybe = kleService.fetchMainGroup(kleNumber);
+		Optional<Kle> kleMaybe = kleService.fetchMainGroup(kleNumber, municipality.getId());
 		Kle kle = kleMaybe.get();
 		if (!kleMaybe.isPresent()) {
-			return Response.status(Response.Status.BAD_REQUEST).type(TEXT_PLAIN)
-				.entity("Did not find a Kle based on given number.").build();
+			return badRequest("Did not find a Kle based on given number.");
 		}
 
 		// find handling rule from distService.
@@ -84,7 +81,7 @@ public class ApiEndpoint {
 			EmploymentApiResultPO manager = new EmploymentApiResultPO(orgUnitService.findResponsibleManager(result.getAssignedOrg().get()).orElse(null));
 			EmploymentApiResultPO employee = employeeMaybe.map(EmploymentApiResultPO::new).orElse(null);
 			DistributionRuleApiResultPO resultPO = new DistributionRuleApiResultPO(result, manager, employee);
-			return Response.ok().entity(resultPO).build();
+			return ok(resultPO);
 		} else {
 			return Response.status(Response.Status.NOT_FOUND).type(TEXT_PLAIN).entity("Noone seems to be handling the given kle for municipality.").build();
 		}
@@ -98,7 +95,7 @@ public class ApiEndpoint {
 		boolean everythingIsOk = true;
 
 		if(everythingIsOk) {
-			return Response.ok("We get signal.").build();
+			return ok("We get signal.");
 		} else {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Somebody set up us the bomb.").build();
 		}

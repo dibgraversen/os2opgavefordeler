@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 
 @Path("/distribution-rules")
 @RequestScoped
-public class DistributionRuleEndpoint {
+public class DistributionRuleEndpoint extends Endpoint {
 	@Inject
 	Logger log;
 
@@ -51,17 +51,19 @@ public class DistributionRuleEndpoint {
 		log.info("routesForEmployment[{},{}]", employmentId, scope);
 
 		if (employmentId == null || scope == null) {
-			return Response.status(Response.Status.BAD_REQUEST).build();
+			return badRequest("need employmentId and scope");
 		}
 
 		//TODO: what if current user/role isn't the manager of the given orgunit? Should we still return results filtered
 		//by the orgunit, or should we return an empty result unless scope is 'ALL'?
 		final Optional<Employment> employment = orgUnitService.getEmployment(employmentId);
 		final Optional<OrgUnit> orgUnit = employment.map(e -> e.getEmployedIn());
-
-		final List<DistributionRulePO> result = distributionService.getPoDistributions(orgUnit.get(), scope);
-
-		return Response.ok(result).build();
+		if(orgUnit.isPresent()){
+			final List<DistributionRulePO> result = distributionService.getPoDistributions(orgUnit.get(), scope);
+			return ok(result);
+		} else {
+			return badRequest("Kunne ikke finde ansættelsessted for bruger");
+		}
 	}
 
 	@POST
@@ -72,7 +74,7 @@ public class DistributionRuleEndpoint {
 	{
 		if(distId == null || distribution == null) {
 			log.info("updateResponsibleOrganization - bad request[{},{}]", distId, distribution);
-			return Response.status(Response.Status.BAD_REQUEST).build();
+			return badRequest("need distId and distribution object");
 		}
 
 		//TODO: user/role access-check. Only Manager and Admin can modify.
@@ -97,12 +99,11 @@ public class DistributionRuleEndpoint {
 	public Response getChildren(@PathParam("distId") Long distId){
 		if(distId == null){
 			log.info("#getChildren with no distId");
-			return Response.status(Response.Status.BAD_REQUEST).type(MediaType.TEXT_PLAIN_TYPE)
-					.entity("You need to specify valid distributionId as part of the url.").build();
+			return badRequest("You need to specify valid distributionId as part of the url.");
 		} else {
 			List<DistributionRulePO> result = distributionService.getChildren(distId)
 					.stream().map(DistributionRulePO::new).collect(Collectors.toList());
-			return Response.ok().entity(result).build();
+			return ok(result);
 		}
 	}
 
@@ -111,10 +112,10 @@ public class DistributionRuleEndpoint {
 	public Response buildRulesForMunicipality(@QueryParam("municipalityId") long municipalityId){
 		if(municipalityId < 0) {
 			log.info("buildRules - bad request[{}]", municipalityId);
-			return Response.status(Response.Status.BAD_REQUEST).build();
+			return badRequest("municipalityId needed");
 		}
 		distributionService.buildRulesForMunicipality(municipalityId);
-		return Response.ok().build();
+		return ok();
 	}
 
 	//TODO: code below this point should probably be refactored to service methods.
