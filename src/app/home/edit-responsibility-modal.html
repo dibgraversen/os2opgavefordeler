@@ -37,7 +37,7 @@
 				<tbody ng-repeat="orgUnit in orgUnits | filter:orgUnitFilter | filter: showAll || { subordinate: true } ">
 				<tr ng-class="currentOrgUnit === orgUnit ? 'success' : ''" ng-click="setCurrentOrgUnit(orgUnit)">
 					<td>{{ orgUnit.name }}</td>
-					<td>{{ orgUnit.manager.name }}</td>
+					<td ng-class="orgUnit.manager ? '' : 'inherited'">{{ firstManagedParent(orgUnit).manager.name }}</td>
 				</tr>
 				</tbody>
 			</table>
