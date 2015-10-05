@@ -4,7 +4,7 @@
 		<ul ng-repeat="sub in substitutes" class="list-unstyled">
 			<li>
 				{{ sub.userName }}
-				<span class="glyphicon glyphicon-remove" ng-click="removeSubstitute(sub)"></span>
+				<span class="glyphicon glyphicon-remove hover" ng-click="removeSubstitute(sub)"></span>
 			</li>
 		</ul>
 		<button class="btn btn-primary btn-block" ng-click="addSubstitute()">
@@ -47,12 +47,12 @@
 			</div>
 			<div class="checkbox">
 				<label>
-					<input type="checkbox" ng-model="settings.showExpandedOrg" ng-click="updateSettings()"	/> Vis kontaktopl.
+					<input type="checkbox" ng-model="settings.showExpandedOrg" ng-click="updateSettings()"	/> Vis kontaktoplysninger
 				</label>
 			</div>
-			<div>
-				<input type="text" class="form-control" placeholder="Filter" ng-model="filter.text" />
-			</div>
+			<!--<div>-->
+				<!--<input type="text" class="form-control" placeholder="Filter" ng-model="filter.text" />-->
+			<!--</div>-->
 		</form>
 	</div>
 </div>
