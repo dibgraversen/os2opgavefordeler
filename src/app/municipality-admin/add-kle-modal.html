@@ -1,0 +1,35 @@
+<div>
+	<div class="modal-header">
+		<button type="button" class="close" ng-click="cancel()"><span aria-hidden="true">&times;</span></button>
+		<h4 class="modal-title">{{ titleText }}</h4>
+	</div>
+	<div class="modal-body">
+		<alert ng-repeat="alert in messages" type="{{alert.type}}"
+					 close="closeMessage($index)" class="animate-fade"
+					 style="width: 100%">{{alert.msg}}
+		</alert>
+
+		<form>
+			<div class="form-group">
+				<label for="number">Nummer:</label>
+				<input type="text" class="form-control" id="number" placeholder="00.80.00" ng-model="kle.number" />
+			</div>
+			<div class="form-group">
+				<label for="name">Titel:</label>
+				<input type="text" class="form-control" id="name" placeholder="Titel" ng-model="kle.name" />
+			</div>
+			<div class="form-group">
+				<label for="serviceText">ServiceTekst:</label>
+				<textarea class="form-control" id="serviceText" placeholder="Servicetekst" ng-model="kle.serviceText" rows="5">
+
+				</textarea>
+			</div>
+		</form>
+	</div>
+	<div class="modal-footer">
+		<div class="actions text-right">
+			<button class="btn btn-primary" ng-click="ok()">{{ saveText }}</button>
+			<button class="btn btn-default" ng-click="cancel()">Annullér</button>
+		</div>
+	</div>
+</div>

@@ -29,7 +29,10 @@
 			removeSubstitute: removeSubstitute,
 			getMunicipalities: getMunicipalities,
 			createMunicipality: createMunicipality,
-			updateMunicipality: updateMunicipality
+			updateMunicipality: updateMunicipality,
+			getKlesForMunicipality: getKlesForMunicipality,
+			saveMunicipalityKle: saveMunicipalityKle,
+			deleteMunicipalityKle: deleteMunicipalityKle
 		};
 
 		var baseUrl = serverUrl;
@@ -85,7 +88,12 @@
 		}
 
 		function getRuleChildren(ruleId){
-			return httpGet('/distribution-rules/'+ruleId+'/children');
+			return httpGet('/distribution-rules/'+ruleId+'/children').then(function(rules){
+				_.each(rules, function(rule){
+					rule.kle.serviceTextPopover = htmlsave.truncate(rule.kle.serviceText, maxPopoverLength, { breakword:false });
+				});
+				return rules;
+			});
 		}
 
 		function processRule(rule, objectMap){
@@ -230,6 +238,21 @@
 
 		function updateMunicipality(municipality){
 			return httpPost('/municipalities/'+municipality.id, municipality);
+		}
+
+		function getKlesForMunicipality(municipality){
+			if(municipality){
+				$log.info(municipality);
+				return httpGet('/municipalities/'+municipality.id+'/kle');
+			}
+		}
+
+		function saveMunicipalityKle(kle){
+			return httpPost('/municipalities/'+kle.municipalityId+'/kle', kle);
+		}
+
+		function deleteMunicipalityKle(kle){
+			return httpDelete('/municipalities/'+kle.municipalityId+'/kle/'+kle.id);
 		}
 
 		// DTO classes.
