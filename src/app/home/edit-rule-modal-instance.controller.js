@@ -18,7 +18,6 @@
 			showAll: false
 		};
 		$scope.searchNotification = true;
-		$scope.orgUnits = {};
 
 		$scope.search = {
 			municipalityId: $scope.user.municipality.id,
@@ -42,8 +41,8 @@
 		$scope.firstManagedParent = firstManagedParent;
 
 		var orgUnitsMissing = true;
-		var employeesMissing = true;
 		var currentEmployment = $scope.user.currentRole.employment;
+		var orgUnits = {};
 
 		activate();
 
@@ -61,6 +60,7 @@
 		}
 
 		function loadAllOrgUnits(){
+			orgUnits = {};
 			if(orgUnitsMissing){
 				topicRouterApi.getOrgUnitsForResponsibility(municipality.id, currentEmployment, false).then(function(orgUnits){
 					_.each(orgUnits, function(org){ loadParent(org); });
@@ -71,22 +71,23 @@
 		}
 
 		function loadParent(org){
-			if($scope.orgUnits[org.id]){
+			if(orgUnits[org.id]){
 				// make sure it's overwritten so we only use one instance of each org.
-				$log.warn('loading parent');
-				org = $scope.orgUnits[org.id];
+				org = orgUnits[org.id];
 			} else {
-				$scope.orgUnits[org.id] = org; // make sure we don't work on duplicates.
+				orgUnits[org.id] = org; // make sure we don't work on duplicates.
 				if(org.parentId && org.parent === undefined) {
-					if($scope.orgUnits[org.parentId]){
-						org.parent = $scope.orgUnits[org.parentId];
+					if(orgUnits[org.parentId]){
+						org.parent = orgUnits[org.parentId];
 					} else {
-						topicRouterApi.getOrgUnit(org.parentId).then(function (parent) {
-							org.parent = parent;
-							if (parent.parentId) {
-								loadParent(parent);
-							}
-						});
+						if(org.parentId > 0){
+							topicRouterApi.getOrgUnit(org.parentId).then(function (parent) {
+								org.parent = parent;
+								if (parent.parentId) {
+									loadParent(parent);
+								}
+							});
+						}
 					}
 				}
 			}
@@ -151,7 +152,6 @@
 		}
 
 		function loadMoreEmployments(){
-			$log.warn('fetching more employments...');
 			$scope.search.offset = $scope.search.offset + $scope.search.pageSize;
 			topicRouterApi.employmentSearch($scope.search).then(function(result){
 				$scope.searchResult = result;
