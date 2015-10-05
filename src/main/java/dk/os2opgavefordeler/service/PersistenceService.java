@@ -12,8 +12,10 @@ public interface PersistenceService {
 
 	<T> List<T> criteriaFind(Class<T> clazz, CriteriaOp op);
 	<T> List<T> findAll(Class<T> clazz);
+	<T> T find(Class<T> clazz, Object o);
 
-	void rollbackTransaction();
+
+		void rollbackTransaction();
 
 	@FunctionalInterface
 	interface CriteriaOp<T> {
