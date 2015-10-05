@@ -30,9 +30,7 @@ import java.util.Optional;
  */
 @Path("/api")
 @RequestScoped
-public class ApiEndpoint {
-	private static final int PAYMENT_REQUIRED = 402;
-	public static final String TEXT_PLAIN = "text/plain";
+public class ApiEndpoint extends Endpoint {
 
 	@Inject
 	Logger log;
@@ -55,38 +53,51 @@ public class ApiEndpoint {
 	@GET
 	@Path("/")
 	@Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
-	public Response lookup(@HeaderParam("Authorization") String token, @QueryParam("kle") String kleNumber){
-		if(token == null){
+	public Response lookup(@HeaderParam("Authorization") String token, @QueryParam("kle") String kleNumber) {
+		if (token == null) {
 			return Response.status(Response.Status.UNAUTHORIZED).build();
 		}
 		Optional<Municipality> municipalityMaybe = municipalityService.getMunicipalityFromToken(token);
-		if(!municipalityMaybe.isPresent()){
+		if (!municipalityMaybe.isPresent()) {
 			return Response.status(Response.Status.UNAUTHORIZED).type(TEXT_PLAIN)
-					.entity("Did not find a municipality based on given authorization.").build();
+				.entity("Did not find a municipality based on given authorization.").build();
 		}
 		Municipality municipality = municipalityMaybe.get();
-		if(!municipality.isActive()){
+		if (!municipality.isActive()) {
 			return Response.status(PAYMENT_REQUIRED).type(TEXT_PLAIN)
-					.entity("Your subscription is not active and therefor the api cannot be used.").build();
+				.entity("Your subscription is not active and therefor the api cannot be used.").build();
 		}
 
-		Optional<Kle> kleMaybe = kleService.fetchMainGroup(kleNumber);
+		Optional<Kle> kleMaybe = kleService.fetchMainGroup(kleNumber, municipality.getId());
 		Kle kle = kleMaybe.get();
-		if(!kleMaybe.isPresent()){
-			return Response.status(Response.Status.BAD_REQUEST).type(TEXT_PLAIN)
-					.entity("Did not find a Kle based on given number.").build();
+		if (!kleMaybe.isPresent()) {
+			return badRequest("Did not find a Kle based on given number.");
 		}
 
 		// find handling rule from distService.
 		DistributionRule result = distributionService.findAssigned(kle, municipality);
-		if(result != null){
+		if (result != null) {
 			Optional<Employment> employeeMaybe = employmentService.getEmployment(result.getAssignedEmp());
 			EmploymentApiResultPO manager = new EmploymentApiResultPO(orgUnitService.findResponsibleManager(result.getAssignedOrg().get()).orElse(null));
 			EmploymentApiResultPO employee = employeeMaybe.map(EmploymentApiResultPO::new).orElse(null);
 			DistributionRuleApiResultPO resultPO = new DistributionRuleApiResultPO(result, manager, employee);
-			return Response.ok().entity(resultPO).build();
+			return ok(resultPO);
 		} else {
 			return Response.status(Response.Status.NOT_FOUND).type(TEXT_PLAIN).entity("Noone seems to be handling the given kle for municipality.").build();
+		}
+	}
+
+	@GET
+	@Path("/healthcheck")
+	@Produces(MediaType.TEXT_PLAIN + "; charset=UTF-8")
+	public Response healthCheck() {
+		//TODO: perform (light-weight) sanity checks.
+		boolean everythingIsOk = true;
+
+		if(everythingIsOk) {
+			return ok("We get signal.");
+		} else {
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Somebody set up us the bomb.").build();
 		}
 	}
 }

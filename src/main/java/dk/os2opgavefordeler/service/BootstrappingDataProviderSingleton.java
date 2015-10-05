@@ -169,17 +169,17 @@ public class BootstrappingDataProviderSingleton {
 					// === Fully unassigned group
 					DistributionRule.builder()
 							.responsibleOrg(null)
-							.kle(kleService.fetchMainGroup("00").get())
+							.kle(kleService.fetchMainGroup("00", municipality.getId()).get())
 							.municipality(municipality)
 							.children(
 									DistributionRule.builder()
 											.responsibleOrg(null)
-											.kle(kleService.fetchMainGroup("00.01").get())
+											.kle(kleService.fetchMainGroup("00.01", municipality.getId()).get())
 											.municipality(municipality)
 											.children(
 													DistributionRule.builder()
 															.responsibleOrg(null)
-															.kle(kleService.fetchMainGroup("00.01.00").get())
+															.kle(kleService.fetchMainGroup("00.01.00", municipality.getId()).get())
 															.municipality(municipality)
 															.build()
 											)
@@ -190,17 +190,17 @@ public class BootstrappingDataProviderSingleton {
 					// === Group with assigned toplevel
 					DistributionRule.builder()
 							.responsibleOrg(org1)
-							.kle(kleService.fetchMainGroup("13").get())
+							.kle(kleService.fetchMainGroup("13", municipality.getId()).get())
 							.municipality(municipality)
 							.children(
 									DistributionRule.builder()
 											.responsibleOrg(null)
-											.kle(kleService.fetchMainGroup("13.00").get())
+											.kle(kleService.fetchMainGroup("13.00", municipality.getId()).get())
 											.municipality(municipality)
 											.children(
 													DistributionRule.builder()
 															.responsibleOrg(null)
-															.kle(kleService.fetchMainGroup("13.00.00").get())
+															.kle(kleService.fetchMainGroup("13.00.00", municipality.getId()).get())
 															.municipality(municipality)
 															.build()
 											)
@@ -211,17 +211,17 @@ public class BootstrappingDataProviderSingleton {
 					// Group with two assigned levels
 					DistributionRule.builder()
 							.responsibleOrg(org2)
-							.kle(kleService.fetchMainGroup("14").get())
+							.kle(kleService.fetchMainGroup("14", municipality.getId()).get())
 							.municipality(municipality)
 							.children(
 									DistributionRule.builder()
 											.responsibleOrg(org2)
-											.kle(kleService.fetchMainGroup("14.00").get())
+											.kle(kleService.fetchMainGroup("14.00", municipality.getId()).get())
 											.municipality(municipality)
 											.children(
 													DistributionRule.builder()
 															.responsibleOrg(null)
-															.kle(kleService.fetchMainGroup("14.00.01").get())
+															.kle(kleService.fetchMainGroup("14.00.01", municipality.getId()).get())
 															.municipality(municipality)
 															.build()
 											)

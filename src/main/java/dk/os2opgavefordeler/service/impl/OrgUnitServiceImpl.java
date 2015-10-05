@@ -34,9 +34,6 @@ public class OrgUnitServiceImpl implements OrgUnitService {
 	@Inject
 	PersistenceService persistence;
 
-	@Inject
-	MunicipalityService municipalityService;
-
 	@Override
 	public OrgUnit saveOrgUnit(OrgUnit orgUnit) {
 		logger.info("orgUnit: {}", orgUnit);
@@ -100,6 +97,8 @@ public class OrgUnitServiceImpl implements OrgUnitService {
 				em.persist(newManager);
 				newEmployments.add(newManager);
 			}
+		} else if (updating){
+			result.setManager(null);
 		}
 
 		// employees
@@ -420,7 +419,7 @@ public class OrgUnitServiceImpl implements OrgUnitService {
 	}
 
 	private void fixRelations(OrgUnit input) {
-		input.getMunicipality().ifPresent(mun -> input.setMunicipality(municipalityService.findByName(mun.getName())));
+		input.getMunicipality().ifPresent(mun -> input.setMunicipality(findMunicipalityByName(mun.getName())));
 		input.getChildren().forEach(child -> {
 			child.setParent(input);
 			fixRelations(child);
@@ -450,5 +449,11 @@ public class OrgUnitServiceImpl implements OrgUnitService {
 			}
 		}
 		return Optional.empty();
+	}
+
+	private Municipality findMunicipalityByName(String name){
+		Query query = persistence.getEm().createQuery("SELECT m FROM Municipality m WHERE m.name = :name");
+		query.setParameter("name", name);
+		return (Municipality) query.getSingleResult();
 	}
 }

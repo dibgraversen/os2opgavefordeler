@@ -44,9 +44,6 @@ public class EmploymentServiceImpl implements EmploymentService {
 	@Inject
 	Logger log;
 
-	@Inject
-	MunicipalityService municipalityService;
-
 	EntityManager em;
 
 	@Override
@@ -148,10 +145,14 @@ public class EmploymentServiceImpl implements EmploymentService {
 	@SuppressWarnings("unchecked")
 	public SearchResult<EmploymentPO> search(EmploymentSearch search){
 		SearchResult<EmploymentPO> result = new SearchResult();
-		Municipality municipality = municipalityService.getMunicipality(search.getMunicipalityId());
+		Municipality municipality = getMunicipality(search.getMunicipalityId());
 		result.setTotalMatches(getSearchCount(search, municipality));
 		result.setResults(getSearchResults(search, municipality));
 		return result;
+	}
+
+	private Municipality getMunicipality(long id){
+		return persistence.getEm().find(Municipality.class, id);
 	}
 
 	private long getSearchCount(EmploymentSearch search, Municipality municipality){

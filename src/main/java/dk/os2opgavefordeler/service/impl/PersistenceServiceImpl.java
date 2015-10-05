@@ -46,6 +46,11 @@ public class PersistenceServiceImpl implements PersistenceService {
 	}
 
 	@Override
+	public <T> T find(Class<T> clazz, Object o){
+		return em.find(clazz, o);
+	}
+
+	@Override
 	public <T> List<T> findAll(final Class<T> clazz) {
 		return criteriaFind(clazz,
 			(cb, cq, root) -> cq.select(root)

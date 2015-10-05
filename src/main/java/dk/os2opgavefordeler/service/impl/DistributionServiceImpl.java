@@ -43,9 +43,6 @@ public class DistributionServiceImpl implements DistributionService {
 	PersistenceService persistence;
 
 	@Inject
-	EmploymentService employmentService;
-
-	@Inject
 	OrgUnitService orgUnitService;
 
 	@Override
@@ -109,9 +106,9 @@ public class DistributionServiceImpl implements DistributionService {
 			final Predicate main = cb.equal(root.get(DistributionRule_.responsibleOrg), orgId);
 			if (includeImplicit) {
 				Optional<OrgUnit> org = orgUnitService.getOrgUnit(orgId);
-				if(org.isPresent()){
+				if (org.isPresent()) {
 					Optional<Employment> manager = orgUnitService.getActualManager(orgId);
-					if(manager.isPresent()){
+					if (manager.isPresent()) {
 						List<OrgUnit> managedUnits = orgUnitService.getManagedOrgUnits(municipalityId, manager.get().getId());
 						final Predicate implicit = root.get(DistributionRule_.responsibleOrg).in(managedUnits);
 						predicates.add(implicit);
@@ -202,6 +199,10 @@ public class DistributionServiceImpl implements DistributionService {
 		}
 	}
 
+	/**
+	 * Checks for KLE's for which the given municipality does not have any matching rule, and creates it.
+	 * @param municipalityId the id of the municipality for which this operation is done.
+	 */
 	@SuppressWarnings("unchecked")
 	private void createMissingDistributionRules(long municipalityId){
 		Query municipalityQuery = persistence.getEm().createQuery("SELECT m FROM Municipality m WHERE m.id = :municipalityId");
@@ -209,8 +210,10 @@ public class DistributionServiceImpl implements DistributionService {
 		try {
 			// find municipality
 			Municipality municipality = (Municipality) municipalityQuery.getSingleResult();
-			Query query = persistence.getEm().createQuery("SELECT k FROM Kle k WHERE k.id NOT IN ( SELECT dr.kle.id FROM DistributionRule dr WHERE municipality.id = :municipalityId)");
-			query.setParameter("municipalityId", municipalityId);
+			Query query = persistence.getEm().createQuery("SELECT k FROM Kle k WHERE k.id NOT IN " +
+					"( SELECT dr.kle.id FROM DistributionRule dr WHERE municipality = :municipality) " +
+					"AND (k.municipality IS NULL OR k.municipality = :municipality)"); // municipality specific KLE handling.
+			query.setParameter("municipality", municipality);
 			// find kle's for which there is no rule...
 			List<Kle> klesWithNoRule = query.getResultList();
 			if(klesWithNoRule != null && klesWithNoRule.size() > 0){
@@ -228,9 +231,14 @@ public class DistributionServiceImpl implements DistributionService {
 		}
 	}
 
+	/**
+	 * Utility method in case non-top level rules do not have a parent assigned.
+	 * @param municipalityId id of municipality for which to do the update.
+	 */
 	@SuppressWarnings("unchecked")
 	private void updateParentsForDistributionRules(long municipalityId){
-		Query getOrphanedRuleIdsQuery = persistence.getEm().createQuery("SELECT rule FROM DistributionRule rule WHERE rule.municipality.id = :municipalityId AND rule.parent IS NULL AND LENGTH(rule.kle.number) > 2");
+		Query getOrphanedRuleIdsQuery = persistence.getEm().createQuery("SELECT rule FROM DistributionRule rule " +
+				"WHERE rule.municipality.id = :municipalityId AND rule.parent IS NULL AND LENGTH(rule.kle.number) > 2");
 		getOrphanedRuleIdsQuery.setParameter("municipalityId", municipalityId);
 		List<DistributionRule> orphanedRuleIds = getOrphanedRuleIdsQuery.getResultList();
 		if(orphanedRuleIds != null && orphanedRuleIds.size() > 0){
@@ -257,7 +265,7 @@ public class DistributionServiceImpl implements DistributionService {
 
 	public Optional<Employment> findResponsibleEmployee(DistributionRule rule){
 		if(rule.getAssignedEmp() > 0l){
-			return employmentService.getEmployment(rule.getAssignedEmp());
+			return getEmployment(rule.getAssignedEmp());
 		} else if(rule.getParent().isPresent()){
 			return findResponsibleEmployee(rule.getParent().get());
 		}
@@ -280,9 +288,37 @@ public class DistributionServiceImpl implements DistributionService {
 		}
 	}
 
+	@Override
+	public DistributionRule createDistributionRule(Kle kle){
+		DistributionRule.Builder builder = DistributionRule.builder();
+		builder.municipality(kle.getMunicipality()).kle(kle);
+		DistributionRule rule = builder.build();
+		Query parentQuery = persistence.getEm().createQuery("SELECT r from DistributionRule r WHERE r.kle = :parentKle AND r.municipality = :municipality");
+		parentQuery.setParameter("parentKle", kle.getParent());
+		parentQuery.setParameter("municipality", kle.getMunicipality());
+		DistributionRule parentRule = (DistributionRule) parentQuery.getSingleResult();
+		rule.setParent(parentRule);
+		persistence.persist(rule);
+		return rule;
+	}
+
 	//--------------------------------------------------------------------------
 	// Helpers
 	//--------------------------------------------------------------------------
+
+	/**
+	 * Employment lookup to avoid injecting employment service.
+	 * @param id of employment
+	 * @return employment if found, otherwise empty Optional.
+	 */
+	private Optional<Employment> getEmployment(long id){
+		try	{
+			Employment employment = persistence.getEm().find(Employment.class, id);
+			return Optional.of(employment);
+		} catch (Exception e){
+			return Optional.empty();
+		}
+	}
 
 	/**
 	 * Returns a predicate suitable for post-query filtering of DistributionRules.

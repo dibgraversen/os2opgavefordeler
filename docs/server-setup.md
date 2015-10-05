@@ -81,3 +81,11 @@ And finally, clean up:
     /subsystem=web/configuration=jsp-configuration:write-attribute(name="x-powered-by", value=false)
     /subsystem=web/configuration=jsp-configuration:write-attribute(name="display-source-fragment", value=false)
 
+### TLS config af JBoss
+insert
+    JAVA_OPTS="-Djdk.tls.client.protocols=TLSv1"
+
+into file: /etc/jbossas/jbossas.conf
+
+Reboot server for changes to take effect.
+                                       
