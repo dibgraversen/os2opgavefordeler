@@ -1,10 +1,10 @@
 <div id="responsible-modal">
 	<div class="modal-header">
 		<button type="button" class="close" ng-click="cancel()"><span aria-hidden="true">&times;</span></button>
-		<h4 class="modal-title">Vedlighold ansvar</h4>
+		<h4 class="modal-title">Vedligehold ansvar</h4>
 	</div>
 	<div class="modal-body">
-		<div>Vedlighold af ansvar for: '{{ topic.kle.number }} {{ topic.kle.name }}'</div>
+		<div>Vedligehold af ansvar for: '{{ topic.kle.number }} {{ topic.kle.name }}'</div>
 		<dl class="dl-horizontal">
 			<dt>Ansvarlig enhed:</dt>
 			<dd>{{ topic.responsible.name }}</dd>
@@ -20,7 +20,7 @@
 					<div class="col-md-3">
 						<div class="checkbox">
 							<label>
-								<input type="checkbox" ng-model="showSubordinate" ng-click="loadAll()" ng-disabled="loading"> Vis alle
+								<input type="checkbox" ng-model="showAll" ng-click="loadAll()" ng-disabled="loading"> Vis alle
 							</label>
 						</div>
 					</div>
@@ -34,21 +34,20 @@
 					<th>Leder</th>
 				</tr>
 				</thead>
-				<tbody ng-repeat="orgUnit in orgUnits | filter:orgUnitFilter | filter:( !showSubordinate || subordinate) ">
+				<tbody ng-repeat="orgUnit in orgUnits | filter:orgUnitFilter | filter: showAll || { subordinate: true } ">
 				<tr ng-class="currentOrgUnit === orgUnit ? 'success' : ''" ng-click="setCurrentOrgUnit(orgUnit)">
 					<td>{{ orgUnit.name }}</td>
 					<td>{{ orgUnit.manager.name }}</td>
 				</tr>
 				</tbody>
 			</table>
-			<alert ng-repeat="alert in modalAlerts" type="{{alert.type}}"
-						 close="closeAlert($index)" class="animate-fade"
-						 style="width: 100%">{{alert.msg}}
-			</alert>
 		</div>
 	</div>
-
 	<div class="modal-footer">
+		<alert ng-repeat="alert in modalAlerts" type="{{alert.type}}"
+					 close="closeAlert($index)" class="animate-fade"
+					 style="width: 100%">{{alert.msg}}
+		</alert>
 		<button class="btn btn-primary" ng-click="ok()">Sæt ansvar</button>
 		<button class="btn btn-default" ng-click="cancel()">Annuller</button>
 	</div>
