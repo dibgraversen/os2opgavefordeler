@@ -84,6 +84,16 @@ button.btn.btn-default.toggle-side:focus {
   max-height: 80vh;
   overflow-y: auto;
 }
+.modal-footer .alert {
+  text-align: left;
+}
+.large-tooltip .tooltip-inner {
+  text-align: left;
+  max-width: 100vw;
+}
+.hover {
+  cursor: pointer;
+}
 .page-splash {
   z-index: 99999 !important;
   position: fixed;
