@@ -14,9 +14,11 @@
 		$scope.orgFilter = "";
 		$scope.empFilter = "";
 		$scope.ruleAlerts = [];
-		$scope.showSubordinate = false;
-		$scope.showSubordinateEmployees = false;
+		$scope.scopeFilter = {
+			showAll: false
+		};
 		$scope.searchNotification = true;
+		$scope.orgUnits = {};
 
 		$scope.search = {
 			municipalityId: $scope.user.municipality.id,
@@ -37,6 +39,7 @@
 		$scope.loadMoreEmployments = loadMoreEmployments;
 		$scope.closeAlert = closeAlert;
 		$scope.loadAllOrgUnits = loadAllOrgUnits;
+		$scope.firstManagedParent = firstManagedParent;
 
 		var orgUnitsMissing = true;
 		var employeesMissing = true;
@@ -47,6 +50,9 @@
 		function activate(){
 			// load some org. stuff.
 			topicRouterApi.getOrgUnitsForResponsibility(municipality.id, currentEmployment, true).then(function(orgUnits){
+				_.each(orgUnits, function(org){
+					loadParent(org);
+				});
 				$scope.orgUnits = orgUnits;
 			});
 			topicRouterApi.getEmployments(municipality.id, currentEmployment, true).then(function(employments){
@@ -57,9 +63,44 @@
 		function loadAllOrgUnits(){
 			if(orgUnitsMissing){
 				topicRouterApi.getOrgUnitsForResponsibility(municipality.id, currentEmployment, false).then(function(orgUnits){
+					_.each(orgUnits, function(org){ loadParent(org); });
 					$scope.orgUnits = orgUnits;
 					orgUnitsMissing = false;
 				});
+			}
+		}
+
+		function loadParent(org){
+			if($scope.orgUnits[org.id]){
+				// make sure it's overwritten so we only use one instance of each org.
+				$log.warn('loading parent');
+				org = $scope.orgUnits[org.id];
+			} else {
+				$scope.orgUnits[org.id] = org; // make sure we don't work on duplicates.
+				if(org.parentId && org.parent === undefined) {
+					if($scope.orgUnits[org.parentId]){
+						org.parent = $scope.orgUnits[org.parentId];
+					} else {
+						topicRouterApi.getOrgUnit(org.parentId).then(function (parent) {
+							org.parent = parent;
+							if (parent.parentId) {
+								loadParent(parent);
+							}
+						});
+					}
+				}
+			}
+		}
+
+		function firstManagedParent(org){
+			if(org && typeof org.manager === 'object'){
+				return org;
+			} else if(org.parent){
+				if(org.parent){
+					return firstManagedParent(org.parent);
+				}
+			} else {
+				return  { manager: {name: 'ingen leder fundet...' }};
 			}
 		}
 

@@ -1,10 +1,10 @@
 <div>
 	<div class="modal-header">
 		<button type="button" class="close" ng-click="cancel()"><span aria-hidden="true">&times;</span></button>
-		<h4 class="modal-title">Vedlighold fordelingsregel</h4>
+		<h4 class="modal-title">Vedligehold fordelingsregel</h4>
 	</div>
 	<div class="modal-body">
-		<div>Vedlighold af regel for: '{{ topic.kle.number }} {{ topic.kle.name }}'</div>
+		<div>Vedligehold af regel for: '{{ topic.kle.number }} {{ topic.kle.name }}'</div>
 		<dl class="dl-horizontal">
 			<dt>Ansvarlig enhed:</dt>
 			<dd>{{ topic.rule.orgUnit }}</dd>
@@ -21,7 +21,7 @@
 						<div class="padded-top col-md-4">
 							<div class="checkbox">
 								<label>
-									<input type="checkbox" ng-model="showSubordinate" ng-click="loadAllOrgUnits()"> Vis alle
+									<input type="checkbox" ng-model="scopeFilter.showAll" ng-click="loadAllOrgUnits()"> Vis alle {{ scopeFilter.showAll }}
 								</label>
 							</div>
 						</div>
@@ -35,10 +35,10 @@
 							<th>Esdh betegnelse</th>
 						</tr>
 						</thead>
-						<tbody ng-repeat="orgUnit in orgUnits | filter:orgFilter | filter:( !showSubordinate || subordinate) ">
+						<tbody ng-repeat="orgUnit in orgUnits | filter:orgFilter | filter: scopeFilter.showAll || { subordinate: true }  ">
 						<tr ng-class="selectedOrgUnit === orgUnit ? 'success' : ''" ng-click="setSelectedOrgUnit(orgUnit)">
 							<td>{{ orgUnit.name }}</td>
-							<td>{{ orgUnit.manager.name }}</td>
+							<td ng-class="orgUnit.manager ? '' : 'inherited'">{{ firstManagedParent(orgUnit).manager.name }}</td>
 							<td>{{ orgUnit.esdhId }}</td>
 							<td>{{ orgUnit.esdhName }}</td>
 						</tr>
@@ -79,7 +79,7 @@
 							<th>Esdh id</th>
 						</tr>
 						</thead>
-						<tbody ng-repeat="emp in employments | filter:empFilter | filter:( !showSubordinateEmployees || subordinate)">
+						<tbody ng-repeat="emp in employments">
 						<tr ng-class="selectedEmp === emp ? 'success' : ''" ng-click="setSelectedEmp(emp)">
 							<td>{{ emp.name }}</td>
 							<td>{{ emp.initials }}</td>
@@ -96,13 +96,13 @@
 					</div>
 				</tab>
 			</tabset>
-			<alert ng-repeat="alert in ruleAlerts" type="{{alert.type}}"
-						 close="closeAlert($index)" class="animate-fade"
-						 style="width: 100%">{{alert.msg}}
-			</alert>
 		</div>
 	</div>
 	<div class="modal-footer">
+		<alert ng-repeat="alert in ruleAlerts" type="{{alert.type}}"
+					 close="closeAlert($index)" class="animate-fade"
+					 style="width: 100%">{{alert.msg}}
+		</alert>
 		<button class="btn btn-primary" ng-click="ok()">Gem</button>
 		<button class="btn btn-default" ng-click="cancel()">Annuller</button>
 	</div>
