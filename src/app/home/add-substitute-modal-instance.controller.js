@@ -28,22 +28,39 @@
 		$scope.closeAlert = closeAlert;
 
 		var currentEmployment = $scope.user.currentRole.employment;
+		var includesSelf = false;
 
 		activate();
 
 		function activate(){
 			$log.info("AddSubstituteModal::activate");
 			topicRouterApi.getEmployments($scope.user.municipality.id, currentEmployment, true).then(function(employments){
+				removeSelf(employments);
 				$scope.employments = employments;
 			});
 		}
 
 		function employmentSearch(){
+			includesSelf = false;
 			$scope.searchNotification = false;
 			$scope.search.offset = 0;
 			topicRouterApi.employmentSearch($scope.search).then(function(result){
+				removeSelf(result.results);
+				if(includesSelf){	result.totalMatches--; }
 				$scope.searchResult = result;
 				$scope.employments = result.results;
+			});
+		}
+
+		function removeSelf(employments){
+			_.remove(employments, function(employment) {
+				if(employment.id === $scope.user.currentRole.employment){
+					// To account for removing self.
+					includesSelf = true;
+					return true;
+				} else {
+					return false;
+				}
 			});
 		}
 
@@ -51,6 +68,8 @@
 			$log.warn('fetching more employments...');
 			$scope.search.offset = $scope.search.offset + $scope.search.pageSize;
 			topicRouterApi.employmentSearch($scope.search).then(function(result){
+				removeSelf(result.results);
+				if(includesSelf) { result.totalMatches--; }
 				$scope.searchResult = result;
 				$scope.employments = $scope.employments.concat(result.results);
 			});
