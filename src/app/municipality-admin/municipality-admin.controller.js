@@ -55,7 +55,7 @@
 		}
 
 		function upload(){
-			$scope.mAdminAlerts = [];
+			clearMessages();
 			if($scope.uploadFile){
 				appSpinner.showSpinner();
 				uiUploader.addFiles([$scope.uploadFile]);
@@ -104,6 +104,7 @@
 		}
 
 		function editKle(kle){
+			clearMessages();
 			$modal.open({
 				resolve: {
 					municipality: function(){
@@ -123,6 +124,7 @@
 		}
 
 		function addKle(){
+			clearMessages();
 			$modal.open({
 				resolve: {
 					municipality: function(){
@@ -138,7 +140,12 @@
 					});
 		}
 
+		function clearMessages(){
+			$scope.mAdminAlerts = [];
+		}
+
 		function deleteKle(kle){
+			clearMessages();
 			$modal.open({
 				templateUrl: 'app/common/confirmation-modal.html',
 				controller: 'ConfirmationModalInstanceCtrl',
