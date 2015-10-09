@@ -36,8 +36,12 @@
 		$scope.responsibleEmployee = responsibleEmployee;
 		$scope.closeAlert = closeAlert;
 		$scope.showServiceText = showServiceText;
+		$scope.getManager = getManager;
 
 		////////////////
+
+		// keep all for data integrity;
+		var orgUnits = {};
 
 		function activate() {
 			$log.info("Home::activate");
@@ -69,7 +73,6 @@
 			}).result.then(function(sub) {
 					topicRouterApi.addSubstitute($scope.user.currentRole.id, sub.id).then(
 						function(substitute) {
-							$log.info("Substitute was added: ", substitute);
 							$scope.substitutes.push(substitute);
 						}
 					);
@@ -92,6 +95,16 @@
 				});
 		}
 
+		function addToOrgCache(org){
+			var existing = orgUnits[org.id];
+			if(existing){
+				org = existing;
+			} else {
+				orgUnits[org.id] = org;
+			}
+			return org;
+		}
+
 		function refreshTopicRoutes(){
 			$scope.listAlerts = [];
 			getTopicRoutes().then(
@@ -99,6 +112,10 @@
 						$scope.topicRoutes = rules;
 						$scope.filteredTopicRoutes = rules;
 						if(rules.length > 0){
+							_.each(rules, function(rule){
+								if(rule.org){ rule.org = addToOrgCache(rule.org); }
+								if(rule.responsible){ rule.responsible = addToOrgCache(rule.responsible); }
+							});
 							_.each(rules, function(rule){
 								if(rule.parent){
 									if(!rule.parent.childrenLoaded){
@@ -255,6 +272,7 @@
 		 * @return {boolean} true if edit allowed.
 		 */
 		function responsibilityChangeAllowed(distributionRule){
+			// handles case where none has taken responsibility
 			if(!responsibility(distributionRule) && $scope.user.currentRole.manager){
 				return true; // not already handled.
 			}
@@ -263,10 +281,21 @@
 			return false;
 		}
 
-		function canManage(distributionRule){
-			return (distributionRule.responsible && distributionRule.responsible.managerId > 0 &&
-			distributionRule.responsible.managerId === $scope.user.currentRole.employment) ||
-					(distributionRule.parent && canManage(distributionRule.parent));
+		function canManage(rule){
+			if(rule.responsible){ // org is set, chain stops here.
+				return getManager(rule.responsible).id === $scope.user.currentRole.employment;
+			} else {
+				return rule.parent && canManage(rule.parent);
+			}
+		}
+
+		function getManager(org){
+			org = addToOrgCache(org);
+			if(org.manager){
+				return org.manager;
+			} else if(org.parent) {
+				return getManager(org.parent);
+			}
 		}
 
 		function distributionChangeAllowed(distributionRule){
