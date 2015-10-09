@@ -30,7 +30,7 @@
 
     <init-param>
       <param-name>cors.supportedHeaders</param-name>
-      <param-value>Accept, Cache-Control, Content-Type</param-value>
+      <param-value>Accept, Cache-Control, Content-Type, Expires, Pragma</param-value>
     </init-param>
 
     <init-param>
