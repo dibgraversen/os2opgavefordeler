@@ -39,7 +39,9 @@
 		var requestConfig = {
 			headers: {
 				'Content-Type': 'application/json',
-				'Cache-Control': 'no-cache'
+				'Cache-Control': 'no-cache',
+				'Pragma': 'no-cache',
+				'Expires': '-1'
 			}
 		};
 
@@ -79,10 +81,13 @@
 					objectMap[rule.id] = rule;
 					rule.children = [];
 				});
+				var rulePromises = [];
 				_.each(data, function (rule) {
-					processRule(rule, objectMap);
+					rulePromises.push(processRule(rule, objectMap));
 				});
-				deferred.resolve(data);
+				$q.all(rulePromises).then(function(){
+					deferred.resolve(data);
+				});
 			});
 			return deferred.promise;
 		}
@@ -97,23 +102,25 @@
 		}
 
 		function processRule(rule, objectMap){
+			var deferred = $q.defer();
 			rule.visible = true;
 			rule.open = (rule.children && rule.children.length > 0);
 			rule.kle.serviceTextPopover = htmlsave.truncate(rule.kle.serviceText, maxPopoverLength, { breakword:false });
+			var promises = [];
 			if(rule.org > 0){
-				getOrgUnit(rule.org).then(function(orgUnit){
+				promises.push(getOrgUnit(rule.org).then(function(orgUnit){
 					rule.org = orgUnit;
-				});
+				}));
 			}
 			if(rule.responsible > 0) {
-				getOrgUnit(rule.responsible).then(function(orgUnit){
+				promises.push(getOrgUnit(rule.responsible).then(function(orgUnit){
 					rule.responsible = orgUnit;
-				});
+				}));
 			}
 			if(rule.employee > 0){
-				getEmployment(rule.employee).then(function(employee){
+				promises.push(getEmployment(rule.employee).then(function(employee){
 					rule.employee = employee;
-				});
+				}));
 			}
 			if (rule.parent) {
 				var parent = objectMap[rule.parent];
@@ -121,17 +128,31 @@
 				parent.children.push(rule.id);
 				parent.open = true;
 			}
+			$q.all(promises).then(function(){
+				deferred.resolve();
+			});
+			return deferred.promise;
 		}
 
 		function getOrgUnit(orgId){
-			return httpGet('/org-units/'+orgId).then(function(orgUnit){
+			var deferred = $q.defer();
+			var promises = [];
+			promises.push(httpGet('/org-units/'+orgId).then(function(orgUnit){
 				if(orgUnit.managerId > 0){
-					getEmployment(orgUnit.managerId).then(function(employment){
+					promises.push(getEmployment(orgUnit.managerId).then(function(employment){
 						orgUnit.manager = employment;
-					});
+					}));
 				}
-				return orgUnit;
-			});
+				if(orgUnit.parentId > 0 && orgUnit.parent === undefined){
+					promises.push(getOrgUnit(orgUnit.parentId).then(function(loadedParent){
+						orgUnit.parent = loadedParent;
+					}));
+				}
+				$q.all(promises).then(function(){
+					deferred.resolve(orgUnit);
+				});
+			}));
+			return deferred.promise;
 		}
 
 		function getRoles(userId) {
