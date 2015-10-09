@@ -5,6 +5,7 @@ import dk.os2opgavefordeler.model.presentation.SimpleMessage;
 import dk.os2opgavefordeler.model.presentation.SubstitutePO;
 import dk.os2opgavefordeler.service.*;
 import dk.os2opgavefordeler.util.Validate;
+import org.jboss.resteasy.annotations.cache.NoCache;
 import org.slf4j.Logger;
 
 import javax.inject.Inject;
@@ -53,6 +54,7 @@ public class RoleEndpoint {
 	@GET
 	@Path("/{id}/substitutes")
 	@Produces(MediaType.APPLICATION_JSON)
+	@NoCache
 	public Response getSubstitutes(@PathParam("id") Long roleId) {
 		log.info("getSubstitutes({})", roleId);
 		try {
