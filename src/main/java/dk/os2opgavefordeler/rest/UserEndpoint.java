@@ -5,6 +5,7 @@ import dk.os2opgavefordeler.model.presentation.RolePO;
 import dk.os2opgavefordeler.model.presentation.UserInfoPO;
 import dk.os2opgavefordeler.model.presentation.UserSettingsPO;
 import dk.os2opgavefordeler.service.UserService;
+import org.jboss.resteasy.annotations.cache.NoCache;
 import org.slf4j.Logger;
 
 import javax.inject.Inject;
@@ -33,6 +34,7 @@ public class UserEndpoint {
 	@GET
 	@Path("/me")
 	@Produces(MediaType.APPLICATION_JSON)
+	@NoCache
 	public Response getUserInfo() {
 		//Since we do the following lookup-from-db-and-verify dance (to avoid stale sessions), we might perhaps as well
 		//store just the userid. This is going the be changed to access tokens anyway, so leave be for now.
@@ -61,6 +63,7 @@ public class UserEndpoint {
 	@GET
 	@Path("/{userId}/roles")
 	@Produces(MediaType.APPLICATION_JSON)
+	@NoCache
 	public List<RolePO> getRolesForUser(@PathParam("userId") long userId) {
 		List<RolePO> result = userService.getRoles(userId);
 		return result;
@@ -69,6 +72,7 @@ public class UserEndpoint {
 	@GET
 	@Path("/{userId}/settings")
 	@Produces(MediaType.APPLICATION_JSON)
+	@NoCache
 	public Response getSettingsForUser(@PathParam("userId") long userId) {
 		if(userId == 0) {
 			log.warn("invalid userId");

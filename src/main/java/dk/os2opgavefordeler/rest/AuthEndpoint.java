@@ -7,6 +7,7 @@ import dk.os2opgavefordeler.model.presentation.SimpleMessage;
 import dk.os2opgavefordeler.service.AuthenticationException;
 import dk.os2opgavefordeler.service.AuthenticationService;
 import dk.os2opgavefordeler.service.ConfigService;
+import org.jboss.resteasy.annotations.cache.NoCache;
 import org.slf4j.Logger;
 
 import javax.enterprise.context.RequestScoped;
@@ -52,12 +53,14 @@ public class AuthEndpoint {
 	@GET
 	@Path("/providers")
 	@Produces(MediaType.APPLICATION_JSON)
+	@NoCache
 	public Response listIdp() {
 		return Response.ok().entity(authenticationService.identityProviderPOList()).build();
 	}
 
 	@GET
 	@Path("/providers/{providerId}/signin")
+	@NoCache
 	public Response beginAuthentication(@PathParam(value = "providerId") int providerId) {
 		try {
 			final HttpSession session = request.getSession();
@@ -82,6 +85,7 @@ public class AuthEndpoint {
 	@GET
 	@Path("/authenticate")
 	@Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
+	@NoCache
 	public Response finishAuthentication(@Context UriInfo ui) {
 		final HttpSession session = request.getSession();
 
@@ -120,6 +124,7 @@ public class AuthEndpoint {
 	@GET
 	@Path("/iddqd")
 	@Produces(MediaType.TEXT_HTML + "; charset=UTF-8")
+	@NoCache
 	public Response godModeLogin(@QueryParam(value = "email") String email) {
 		if(!config.isGodModeLoginEnabled()) {
 			log.warn("IDDQD Auth endpoint hit but not enabled!");

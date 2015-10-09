@@ -26,13 +26,12 @@ public class Kle implements Serializable {
 	private List<Kle> children = new ArrayList<>();
 
 
-	@Column(nullable = false, updatable = false)
+	@Column(nullable = false)
 	private String number;
 
 	@Column(nullable = false)
 	private String title;
 
-	@Column(nullable = false)
 	@Lob
 	private String description;
 
