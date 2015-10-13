@@ -128,6 +128,16 @@ public class MunicipalityServiceImpl implements MunicipalityService {
 			existing.setDescription(kle.getServiceText());
 			existing.setParent(parent);
 			getEm().merge(existing);
+			if(existing.getChildren() != null && existing.getChildren().size() > 0){
+				String main = existing.getNumber().split("\\.")[0];
+				String group = existing.getNumber().split("\\.")[1];
+				for (Kle child : existing.getChildren()) {
+					String topic = child.getNumber().split("\\.")[2];
+					String newNumber = main + "." + group + "." + topic;
+					child.setNumber(newNumber);
+					getEm().merge(child);
+				}
+			}
 			result = new KlePO(existing);
 		} else {  // new object
 			Kle newKle = (kle.asKle());
