@@ -11,6 +11,7 @@
 		$scope.settingsMessages = [];
 
 		$scope.openCreateMunicipality = openCreateMunicipality;
+		$scope.openEditMunicipality = openEditMunicipality;
 		$scope.toggleActive = toggleActive;
 		$scope.closeAlert = closeAlert;
 
@@ -33,11 +34,31 @@
 			var modalInstance = $modal.open({
 				templateUrl: 'app/settings/add-municipality-modal.html',
 				controller: 'AddMunicipalityModalInstanceCtrl',
-				size: 'md'
+				size: 'md',
+				resolve: {
+					municipality: false
+				}
 			});
 
 			modalInstance.result.then(function(municipality){
 				$scope.municipalities.push(municipality);
+			});
+		}
+
+		function openEditMunicipality(municipality){
+			var modalInstance = $modal.open({
+				templateUrl: 'app/settings/add-municipality-modal.html',
+				controller: 'AddMunicipalityModalInstanceCtrl',
+				size: 'md',
+				resolve: {
+					municipality: function(){
+						return municipality;
+					}
+				}
+			});
+
+			modalInstance.result.then(function(updatedMunicipality){
+				municipality = updatedMunicipality;
 			});
 		}
 
