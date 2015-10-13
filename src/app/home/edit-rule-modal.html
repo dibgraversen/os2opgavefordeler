@@ -31,7 +31,6 @@
 						<tr>
 							<th>Afdelingsnavn</th>
 							<th>Leder</th>
-							<th>parent</th>
 							<th>Esdh id</th>
 							<th>Esdh betegnelse</th>
 						</tr>
@@ -40,7 +39,6 @@
 						<tr ng-class="selectedOrgUnit === orgUnit ? 'success' : ''" ng-click="setSelectedOrgUnit(orgUnit)">
 							<td>{{ orgUnit.name }}</td>
 							<td ng-class="orgUnit.manager ? '' : 'inherited'">{{ firstManagedParent(orgUnit).manager.name }}</td>
-							<td>{{ org.parent }}</td>
 							<td>{{ orgUnit.esdhId }}</td>
 							<td>{{ orgUnit.esdhName }}</td>
 						</tr>
