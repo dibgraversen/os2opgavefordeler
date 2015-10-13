@@ -36,7 +36,7 @@
 				// populate locals
 				$scope.newNumber = kle.number;
 				$scope.newName = kle.name;
-				$scope.newServiceSext = kle.serviceText;
+				$scope.newServiceText = kle.serviceText;
 			}
 		}
 
@@ -47,6 +47,7 @@
 			var numberValid = validateNumber($scope.newNumber);
 			var nameValid = validateName($scope.newName);
 			if(numberValid && nameValid){
+				var oldGroup = kle.number.split('.')[1];
 				kle = $scope.kle;
 				kle.municipalityId = municipality.id;
 				kle.number = $scope.newNumber;
@@ -54,6 +55,7 @@
 				kle.serviceText = $scope.newServiceText;
 				topicRouterApi.saveMunicipalityKle(kle).then(
 						function(savedKle){
+							savedKle.oldGroup = oldGroup;
 							$modalInstance.close(savedKle);
 						},
 						function(error){

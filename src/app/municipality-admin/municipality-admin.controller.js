@@ -120,6 +120,18 @@
 			}).result.then(
 					function(updatedKle){
 						kle = updatedKle;
+						var newGroup = kle.number.split('.')[1];
+						// if group number changed, check for topics to update.
+						if(kle.type == 'GROUP' && newGroup != kle.oldGroup){
+							_.each($scope.kles, function(item){
+								var splitted = item.number.split('.');
+								if(splitted[1] == kle.oldGroup){
+									item.number = splitted[0] + '.' + newGroup + '.' + splitted[2];
+								}
+							});
+							// clean up object for re-edit to avoid parse error on backend.
+							delete kle.oldGroup;
+						}
 					});
 		}
 
