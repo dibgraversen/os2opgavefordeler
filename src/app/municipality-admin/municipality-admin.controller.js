@@ -119,19 +119,32 @@
 				controller: 'AddKleModalInstanceCtrl'
 			}).result.then(
 					function(updatedKle){
-						kle = updatedKle;
-						var newGroup = kle.number.split('.')[1];
-						// if group number changed, check for topics to update.
-						if(kle.type == 'GROUP' && newGroup != kle.oldGroup){
-							_.each($scope.kles, function(item){
-								var splitted = item.number.split('.');
-								if(splitted[1] == kle.oldGroup){
-									item.number = splitted[0] + '.' + newGroup + '.' + splitted[2];
+						if(kle.number !== updatedKle.number){
+							var oldSplitted = kle.number.split('.');
+							var newSplitted = updatedKle.number.split('.');
+							if(kle.type == 'GROUP'){
+								if(oldSplitted[0] !== newSplitted[0]){ // change 'main'
+									_.each($scope.kles, function(item){
+										var split = item.number.split('.');
+										if(split[0] == oldSplitted[0] && split[1] == oldSplitted[1]){
+											item.number = newSplitted[0] + '.' + split[1] + '.' + split[2];
+										}
+									});
 								}
-							});
-							// clean up object for re-edit to avoid parse error on backend.
-							delete kle.oldGroup;
+								if(oldSplitted[1] !== newSplitted[1]){ // change 'topic'
+								// if group number changed, check for topics to update.
+									_.each($scope.kles, function(item){
+										var split = item.number.split('.');
+										if(split[0] == newSplitted[0] && split[1] == oldSplitted[1]){
+											item.number = split[0] + '.' + newSplitted[1] + '.' + split[2];
+										}
+									});
+								}
+							}
 						}
+						kle.name = updatedKle.name;
+						kle.number = updatedKle.number;
+						kle.serviceText = updatedKle.serviceText;
 					});
 		}
 

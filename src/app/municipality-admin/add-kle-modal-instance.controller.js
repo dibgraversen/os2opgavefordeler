@@ -12,11 +12,6 @@
 		$scope.newName = '';
 		$scope.newNumber = '';
 		$scope.newServiceText = '';
-		$scope.kle = {
-			name: '',
-			number: '',
-			serviceText: ''
-		};
 
 		$scope.ok = ok;
 		$scope.cancel = cancel;
@@ -24,15 +19,13 @@
 
 		activate();
 
-		var edit = false;
+		var oldGroup = false;
 
 		function activate(){
 			if(kle){
 				// phrasing
 				$scope.titleText = 'Opdatér kle';
 				$scope.saveText = 'Gem';
-				$scope.kle = kle;
-				edit = true;
 				// populate locals
 				$scope.newNumber = kle.number;
 				$scope.newName = kle.name;
@@ -47,15 +40,19 @@
 			var numberValid = validateNumber($scope.newNumber);
 			var nameValid = validateName($scope.newName);
 			if(numberValid && nameValid){
-				var oldGroup = kle.number.split('.')[1];
-				kle = $scope.kle;
-				kle.municipalityId = municipality.id;
-				kle.number = $scope.newNumber;
-				kle.name = $scope.newName;
-				kle.serviceText = $scope.newServiceText;
-				topicRouterApi.saveMunicipalityKle(kle).then(
+				var newKle = {
+					municipalityId: municipality.id,
+					number: $scope.newNumber,
+					name: $scope.newName,
+					serviceText: $scope.newServiceText
+				};
+				if(kle){
+					newKle.id = kle.id;
+				} else {
+					newKle.id = 0;
+				}
+				topicRouterApi.saveMunicipalityKle(newKle).then(
 						function(savedKle){
-							savedKle.oldGroup = oldGroup;
 							$modalInstance.close(savedKle);
 						},
 						function(error){
