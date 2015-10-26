@@ -39,3 +39,5 @@ SHUTDOWN_WAIT=30
 #
 JBOSS_CONSOLE_LOG=<%= scope.lookupvar('wildfly::console_log') %>
 
+JBOSS_OPTS="-b 0.0.0.0 -bmanagement 0.0.0.0 --debug 8787"
+

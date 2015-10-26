@@ -8,11 +8,11 @@ node default {
 # Operating Sytem settings
 class my_os {
 
-  host{'localhost':
+  host{ 'localhost':
     ip           => "127.0.0.1",
     host_aliases => ['localhost.localdomain',
-                     'localhost4',
-                     'localhost4.localdomain4'],
+      'localhost4',
+      'localhost4.localdomain4'],
   }
 
   service { iptables:
@@ -42,7 +42,7 @@ class my_apache {
     vhost_name       => '*',
     port             => '81',
     docroot          => '/var/www/petshop',
-    proxy_pass => [
+    proxy_pass       => [
       { 'path' => '/petshop', 'url' => 'ajp://localhost:8009' },
     ],
   }
@@ -64,6 +64,7 @@ class my_postgresql {
 
   postgresql::server::role { 'topicrouter_managers':
     password_hash => postgresql_password('topicrouter_managers', 'SuperSaltFisk'),
+    superuser     => true,
   }
 
   postgresql::server::database_grant { 'test1':
@@ -90,14 +91,7 @@ class my_wildfly{
     install_source    => 'http://download.jboss.org/wildfly/8.2.0.Final/wildfly-8.2.0.Final.tar.gz',
     java_home         => '/usr/lib/jvm/java-1.8.0-openjdk',
     dirname           => '/opt/wildfly',
-    mode              => 'standalone',
-    config            => 'standalone-full-ha.xml',
-    users_mgmt        => { 'wildfly' => { username => 'wildfly', password => 'wildfly'}},
-  }
-
-  wildfly::deploy { 'sample.war':
-    source   => 'https://tomcat.apache.org/tomcat-7.0-doc/appdev/sample/sample.war',
-    require  => Class['wildfly'],
+    users_mgmt        => { 'wildfly' => { username => 'wildfly', password => 'wildfly' } },
   }
 
   wildfly::config::add_mgmt_user { 'Adding mgmtuser':
@@ -124,17 +118,6 @@ class my_wildfly{
     require  => Wildfly::Config::Add_app_user['Adding appuser'],
   }
 
-  wildfly::messaging::queue { 'DemoQueue':
-    durable => true,
-    entries => ['java:/jms/queue/DemoQueue'],
-    require => Class['wildfly'],
-  }
-
-  wildfly::messaging::topic { 'DemoTopic':
-    entries => ['java:/jms/topic/DemoTopic'],
-    require => Class['wildfly'],
-  }
-
   wildfly::config::module { 'org.postgresql':
     source       => 'http://central.maven.org/maven2/org/postgresql/postgresql/9.3-1103-jdbc4/postgresql-9.3-1103-jdbc4.jar',
     dependencies => ['javax.api', 'javax.transaction.api'],
@@ -148,10 +131,10 @@ class my_wildfly{
   wildfly::datasources::datasource { 'OS2TopicRouterDS datasource':
     name           => 'OS2TopicRouterDS',
     config         => { 'driver-name'    => 'postgresql',
-                        'connection-url' => 'jdbc:postgresql://localhost/topicrouter',
-                        'jndi-name'      => 'java:/OS2TopicRouterDS',
-                        'user-name'      => 'topicrouter',
-                        'password'       => 'SuperSaltFisk'
-                      }
+      'connection-url'                   => 'jdbc:postgresql://localhost/topicrouter',
+      'jndi-name'                        => 'java:/OS2TopicRouterDS',
+      'user-name'                        => 'topicrouter',
+      'password'                         => 'SuperSaltFisk'
+    }
   }
 }

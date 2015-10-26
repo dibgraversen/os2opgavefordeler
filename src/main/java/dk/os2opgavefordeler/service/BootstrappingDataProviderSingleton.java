@@ -3,6 +3,7 @@ package dk.os2opgavefordeler.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 import dk.os2opgavefordeler.model.*;
+import org.flywaydb.core.Flyway;
 import org.slf4j.Logger;
 
 import javax.annotation.PostConstruct;
@@ -80,7 +81,7 @@ public class BootstrappingDataProviderSingleton {
 	private void addMunicipalities() {
 		if(mService.getMunicipalities().size() == 0){
 			miracle = addMunicipality("Miracle", "ABC");
-			syddjurs = addMunicipality("Syddjurs Kommune", "ABC");
+			syddjurs = addMunicipality("Syddjurs Kommune", "DEF");
 		} else {
 			miracle = mService.findByName(MIRACLE_NAME);
 			syddjurs = mService.findByName(SYDDJURS_NAME);
