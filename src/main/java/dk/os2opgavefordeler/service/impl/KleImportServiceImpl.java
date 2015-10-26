@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.ejb.Stateless;
 import javax.enterprise.context.Dependent;
+import javax.enterprise.inject.Default;
 import javax.inject.Inject;
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;

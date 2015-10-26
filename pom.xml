@@ -190,7 +190,25 @@
         </dependency>
 
         <dependency>
-            <!-- JUnit CDI support -->
+            <groupId>org.apache.deltaspike.cdictrl</groupId>
+            <artifactId>deltaspike-cdictrl-api</artifactId>
+            <version>1.5.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.deltaspike.modules</groupId>
+            <artifactId>deltaspike-test-control-module-impl</artifactId>
+            <version>1.5.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+        <groupId>org.apache.deltaspike.cdictrl</groupId>
+        <artifactId>deltaspike-cdictrl-weld</artifactId>
+        <version>1.5.0</version>
+        <scope>test</scope>
+    </dependency>
+
+        <!--dependency>
             <groupId>org.jglue.cdi-unit</groupId>
             <artifactId>cdi-unit</artifactId>
             <version>3.1.2</version>
@@ -201,7 +219,7 @@
                 </exclusion>
             </exclusions>
             <scope>test</scope>
-        </dependency>
+        </dependency-->
         <dependency>
             <groupId>org.jboss.weld.se</groupId>
             <artifactId>weld-se-core</artifactId>
@@ -218,14 +236,6 @@
             <version>1.0.0.CR4</version>
             <scope>test</scope>
         </dependency>
-
-        <!--
-        <dependency>
-            <groupId>com.wordnik</groupId>
-            <artifactId>swagger-jaxrs_2.10</artifactId>
-            <version>1.3.12</version>
-        </dependency>
-        -->
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-jaxrs</artifactId>
