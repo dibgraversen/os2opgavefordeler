@@ -54,10 +54,6 @@ public class DistributionRule implements Serializable {
 	@ManyToOne(fetch = FetchType.EAGER)
 	private Municipality municipality;
 
-	@OneToMany(fetch = FetchType.LAZY)
-	private List<DistributionRuleFilter> filters;
-
-
 	public Optional<OrgUnit> getResponsibleOrg() {
 		return Optional.ofNullable(responsibleOrg);
 	}
@@ -145,7 +141,7 @@ public class DistributionRule implements Serializable {
 	}
 
 	public List<DistributionRuleFilter> getFilters() {
-		return filters;
+		return null;
 	}
 
 	public static class Builder {

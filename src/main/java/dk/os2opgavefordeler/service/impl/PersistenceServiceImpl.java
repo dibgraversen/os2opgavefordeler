@@ -20,7 +20,7 @@ public class PersistenceServiceImpl implements PersistenceService {
 	@Inject
 	private Logger log;
 
-	@PersistenceContext(unitName = "OS2TopicRouter")
+	@Inject
 	private EntityManager em;
 
 	@Override

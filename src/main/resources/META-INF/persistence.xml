@@ -6,7 +6,18 @@
         http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd">
    <persistence-unit name="OS2TopicRouter">
       <jta-data-source>java:/OS2TopicRouterDS</jta-data-source>
+      <class>dk.os2opgavefordeler.model.DistributionRuleFilter</class>
+      <class>dk.os2opgavefordeler.model.Employment</class>
       <class>dk.os2opgavefordeler.model.Kle</class>
+      <class>dk.os2opgavefordeler.model.OrgUnit</class>
+      <class>dk.os2opgavefordeler.model.Role</class>
+      <class>dk.os2opgavefordeler.model.User</class>
+      <class>dk.os2opgavefordeler.model.DistributionAssignment</class>
+      <class>dk.os2opgavefordeler.model.DistributionRule</class>
+      <class>dk.os2opgavefordeler.model.IdentityProvider</class>
+      <class>dk.os2opgavefordeler.model.Municipality</class>
+      <class>dk.os2opgavefordeler.model.UserSettings</class>
+
       <properties>
          <!-- Properties for Hibernate -->
          <!--<property name="hibernate.hbm2ddl.auto" value="create-drop" />-->

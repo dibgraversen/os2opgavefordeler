@@ -13,53 +13,64 @@ import java.io.Serializable;
  */
 @Entity
 public class Municipality implements Serializable {
-	@Id @GeneratedValue(strategy = GenerationType.AUTO)
-	private long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private long id;
 
-	private String name;
+    private String name;
 
-	private boolean active;
+    private boolean active;
 
-	private String token;
+    private String token;
 
-	public long getId() {
-		return id;
-	}
+    public Municipality() {
 
-	public void setId(long id) {
-		this.id = id;
-	}
+    }
 
-	public String getName() {
-		return name;
-	}
+    public Municipality(String name) {
+        this.name = name;
+        this.token = name;
+        this.active = true;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public long getId() {
+        return id;
+    }
 
-	public boolean isActive() {
-		return active;
-	}
+    public void setId(long id) {
+        this.id = id;
+    }
 
-	public void setActive(boolean active) {
-		this.active = active;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public String getToken() {
-		return token;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public void setToken(String token) {
-		this.token = token;
-	}
+    public boolean isActive() {
+        return active;
+    }
 
-	@Override
-	public String toString() {
-		return MoreObjects.toStringHelper(this)
-				.add("id", id)
-				.add("name", name)
-				.add("active", active)
-				.toString();
-	}
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("id", id)
+                .add("name", name)
+                .add("active", active)
+                .toString();
+    }
 }
