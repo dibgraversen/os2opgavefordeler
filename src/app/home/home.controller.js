@@ -24,6 +24,7 @@
 		$scope.toggle = toggle;
 		$scope.responsibility = responsibility;
 		$scope.editRule = editRule;
+		$scope.addExtendedRule = addExtendedRule;
 		$scope.deleteRule = deleteRule;
 		$scope.editResponsibility = editResponsibility;
 		$scope.deleteResponsibility = deleteResponsibility;
@@ -211,6 +212,23 @@
 			topic.org = 0;
 			topic.employee = 0;
 			topicRouterApi.updateDistributionRule(topic);
+		}
+
+		function addExtendedRule(topic) {
+			$modal.open({
+				scope: $scope,
+				resolve: {
+					topic: function(){
+						return topic;
+					},
+					municipality: function(){
+						return $scope.user.municipality;
+					}
+				},
+				templateUrl: 'app/home/add-extended-responsibility-modal.html',
+				controller: 'EditResponsibilityModalInstanceCtrl',
+				size: 'lg'
+			});
 		}
 
 		function editResponsibility(topic){
