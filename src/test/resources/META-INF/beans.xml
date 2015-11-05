@@ -1,0 +1,6 @@
+<beans>
+    <alternatives>
+        <class>dk.os2opgavefordeler.test.TestEntityManagerProducer</class>
+    </alternatives>
+</beans>
+

@@ -8,9 +8,6 @@ Vagrant.configure(2) do |config|
         puppet.module_path = "environment/puppet/modules"
     end
     config.vm.provision :shell, inline: 'chmod a+x /home/vagrant'
-    config.vm.provision :shell, inline: '/opt/wildfly/bin/jboss-cli.sh --connect -u=mgmtuser -p=mgmtuser \'/system-property=topicrouter.url.home:write-attribute(name=value, value="http://localhost:9001")\''
-    config.vm.provision :shell, inline: '/opt/wildfly/bin/jboss-cli.sh --connect -u=mgmtuser -p=mgmtuser \'/system-property=topicrouter.url.openid.callback:write-attribute(name=value, value="http://localhost:8080/TopicRouter/rest/auth/authenticate")\''
-    config.vm.provision :shell, inline: '/opt/wildfly/bin/jboss-cli.sh --connect -u=mgmtuser -p=mgmtuser \'/system-property=topicrouter.url.home:write-attribute(name=value, value="http://localhost:9001")\''
 
     config.vm.network "forwarded_port", guest: 80, host: 1080
     config.vm.network "forwarded_port", guest: 81, host: 1081

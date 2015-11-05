@@ -4,9 +4,11 @@
    xsi:schemaLocation="
         http://java.sun.com/xml/ns/persistence
         http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd">
-   <persistence-unit name="OS2TopicRouter">
+   <persistence-unit name="OS2TopicRouter" transaction-type="JTA">
+
       <jta-data-source>java:/OS2TopicRouterDS</jta-data-source>
       <class>dk.os2opgavefordeler.model.DistributionRuleFilter</class>
+      <class>dk.os2opgavefordeler.model.CprDistributionRuleFilter</class>
       <class>dk.os2opgavefordeler.model.Employment</class>
       <class>dk.os2opgavefordeler.model.Kle</class>
       <class>dk.os2opgavefordeler.model.OrgUnit</class>
@@ -19,11 +21,12 @@
       <class>dk.os2opgavefordeler.model.UserSettings</class>
 
       <properties>
+         <property name="hibernate.generate_statistics" value="true"/>
          <!-- Properties for Hibernate -->
-         <!--<property name="hibernate.hbm2ddl.auto" value="create-drop" />-->
+         <!--property name="hibernate.hbm2ddl.auto" value="create-drop" /-->
          <property name="hibernate.show_sql" value="true" />
          <!--<property name="hibernate.hbm2ddl.auto" value="update" />-->
-         <property name="hibernate.hbm2ddl.auto" value="validate" />
+         <property name="hibernate.hbm2ddl.auto" value="validate"/>
       </properties>
    </persistence-unit>
 </persistence>

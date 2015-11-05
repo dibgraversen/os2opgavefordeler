@@ -6,10 +6,12 @@ import dk.os2opgavefordeler.model.Kle;
 import dk.os2opgavefordeler.model.kle_import.*;
 import dk.os2opgavefordeler.service.KleImportMapper;
 import dk.os2opgavefordeler.util.FilteringXMLStreamWriter;
+import org.apache.deltaspike.jpa.api.transaction.Transactional;
 import org.slf4j.Logger;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.Stateless;
+import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 import javax.xml.bind.JAXBContext;
@@ -35,8 +37,8 @@ import java.util.List;
  * <p>
  * TODO: should we drop entries with a non-empty 'Udgaaet' date, or should we add dateExpired to the model?
  */
-@Stateless
-@Dependent
+@ApplicationScoped
+@Transactional
 public class KleImportMapperImpl implements KleImportMapper {
     private static final String FAKE_ROOT = "FakeRoot";
     private static final String REAL_ROOT = "VejledningTekst";

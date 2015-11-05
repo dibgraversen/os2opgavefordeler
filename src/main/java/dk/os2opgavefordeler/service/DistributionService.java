@@ -13,7 +13,6 @@ import java.util.Optional;
 
 public interface DistributionService {
 	DistributionRule createDistributionRule(DistributionRule rule);
-	DistributionRule merge(DistributionRule rule);
 
 	Optional<DistributionRule> getDistribution(long id);
 	List<DistributionRule> getDistributionsAll(long municipalityId);

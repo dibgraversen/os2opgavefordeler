@@ -61,7 +61,7 @@ public class AuthEndpoint {
 	@GET
 	@Path("/providers/{providerId}/signin")
 	@NoCache
-	public Response beginAuthentication(@PathParam(value = "providerId") int providerId) {
+	public Response beginAuthentication(@PathParam(value = "providerId") long providerId) {
 		try {
 			final HttpSession session = request.getSession();
 
@@ -94,7 +94,7 @@ public class AuthEndpoint {
 		log.info("finishAuthentication: {}, query parameters: {}", ui.getRequestUri(), qp);
 
 		try {
-			int idpId = Optional.ofNullable((Integer) session.getAttribute(S_IDP_ID))
+			long idpId = Optional.ofNullable((Long) session.getAttribute(S_IDP_ID))
 				.orElseThrow( () -> new AuthenticationException("S_IDP_ID not set"));
 			String token = Optional.ofNullable((String) session.getAttribute(S_CSRF_TOKEN))
 				.orElseThrow( () -> new AuthenticationException("S_CSRF_TOKEN not set") );

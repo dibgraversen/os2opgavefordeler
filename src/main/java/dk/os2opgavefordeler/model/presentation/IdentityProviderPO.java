@@ -3,7 +3,7 @@ package dk.os2opgavefordeler.model.presentation;
 import dk.os2opgavefordeler.model.IdentityProvider;
 
 public class IdentityProviderPO {
-	private int id;
+	private long id;
 	private String name;
 
 	public IdentityProviderPO(IdentityProvider source) {
@@ -11,7 +11,7 @@ public class IdentityProviderPO {
 		this.name = source.getName();
 	}
 
-	public int getId() {
+	public long getId() {
 		return id;
 	}
 

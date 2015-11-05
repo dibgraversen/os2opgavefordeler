@@ -2,11 +2,9 @@ package dk.os2opgavefordeler.model;
 
 import com.google.common.base.MoreObjects;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * @author hlo@miracle.dk
@@ -14,7 +12,7 @@ import java.io.Serializable;
 @Entity
 public class Municipality implements Serializable {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     private String name;
@@ -22,6 +20,9 @@ public class Municipality implements Serializable {
     private boolean active;
 
     private String token;
+
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<User> users;
 
     public Municipality() {
 

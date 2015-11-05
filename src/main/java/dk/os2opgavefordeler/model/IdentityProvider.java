@@ -9,8 +9,8 @@ import java.io.Serializable;
 @Entity
 public class IdentityProvider implements Serializable {
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	private int id;
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private long id;
 
 	private String name;
 	private String idpUrl;
@@ -31,7 +31,7 @@ public class IdentityProvider implements Serializable {
 	//--------------------------------------------------------------------------
 	// Getters/setters
 	//--------------------------------------------------------------------------
-	public int getId() {
+	public long getId() {
 		return id;
 	}
 
@@ -59,7 +59,7 @@ public class IdentityProvider implements Serializable {
 	}
 
 	public static class Builder {
-		private int id;
+		private long id;
 		private String name;
 		private String url;
 		private String clientId;
@@ -69,7 +69,7 @@ public class IdentityProvider implements Serializable {
 			return new IdentityProvider(this);
 		}
 
-		public Builder id(int id) {
+		public Builder id(long id) {
 			this.id = id;
 			return this;
 		}

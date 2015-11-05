@@ -21,7 +21,9 @@ class my_os {
     hasstatus => true,
   }
 
-  $install = ['binutils.x86_64','wget', 'java-1.8.0-openjdk-devel']
+  include epel
+
+  $install = ['binutils.x86_64','wget', 'java-1.8.0-openjdk-devel', 'liquibase']
 
   package { $install:
     ensure  => present,
@@ -92,31 +94,31 @@ class my_wildfly{
     java_home         => '/usr/lib/jvm/java-1.8.0-openjdk',
     dirname           => '/opt/wildfly',
     users_mgmt        => { 'wildfly' => { username => 'wildfly', password => 'wildfly' } },
-  }
+  }->
 
   wildfly::config::add_mgmt_user { 'Adding mgmtuser':
     username => 'mgmtuser',
     password => 'mgmtuser',
     require  => Class['wildfly'],
-  }
+  }->
 
   wildfly::config::add_app_user { 'Adding appuser':
     username => 'appuser',
     password => 'appuser',
     require  => Class['wildfly'],
-  }
+  }->
 
   wildfly::config::associate_groups_to_user { 'Associate groups to mgmtuser':
     username => 'mgmtuser',
     groups   => 'admin,mygroup',
     require  => Wildfly::Config::Add_mgmt_user['Adding mgmtuser'],
-  }
+  }->
 
   wildfly::config::associate_roles_to_user { 'Associate roles to app user':
     username => 'appuser',
     roles    => 'guest,ejb',
     require  => Wildfly::Config::Add_app_user['Adding appuser'],
-  }
+  }->
 
   wildfly::config::module { 'org.postgresql':
     source       => 'http://central.maven.org/maven2/org/postgresql/postgresql/9.3-1103-jdbc4/postgresql-9.3-1103-jdbc4.jar',
@@ -136,5 +138,30 @@ class my_wildfly{
       'user-name'                        => 'topicrouter',
       'password'                         => 'SuperSaltFisk'
     }
+  } ->
+  exec{ 'home add':
+    command => '/opt/wildfly/bin/jboss-cli.sh --connect -u=mgmtuser -p=mgmtuser "/system-property=topicrouter.url.home:add()"'
+  }->
+
+  exec{ 'home set':
+    command => '/opt/wildfly/bin/jboss-cli.sh --connect -u=mgmtuser -p=mgmtuser "/system-property=topicrouter.url.home:write-attribute(name=value, value="http://localhost:9001")"'
+  }->
+
+  exec{ 'openid add':
+    command => '/opt/wildfly/bin/jboss-cli.sh --connect -u=mgmtuser -p=mgmtuser "/system-property=topicrouter.url.openid.callback:add()"'
+  }->
+
+  exec{ 'openid set':
+    command => '/opt/wildfly/bin/jboss-cli.sh --connect -u=mgmtuser -p=mgmtuser "/system-property=topicrouter.url.openid.callback:write-attribute(name=value, value="http://localhost:8080/TopicRouter/rest/auth/authenticate")"'
+  }->
+
+  exec{ 'godmode add':
+    command => '/opt/wildfly/bin/jboss-cli.sh --connect -u=mgmtuser -p=mgmtuser "/system-property=topicrouter.login.godmode.enabled:add()"'
+  }->
+
+  exec{ 'godmode set':
+    command => '/opt/wildfly/bin/jboss-cli.sh --connect -u=mgmtuser -p=mgmtuser "/system-property=topicrouter.login.godmode.enabled:write-attribute(name=value, value=true)"'
   }
+
+
 }

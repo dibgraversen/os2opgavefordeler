@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+    <changeSet author="Kresten" id="create_table_distributionassignment">
+        <!-- distributionassignment -->
+        <createTable tableName="distributionassignment">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true" unique="true"/>
+            </column>
+            <column name="isactive" type="boolean">
+                <constraints nullable="false"/>
+            </column>
+            <column name="validfrom" type="date"/>
+            <column name="validto" type="date"/>
+            <column name="employee_id" type="bigint"/>
+            <column name="org_id" type="bigint"/>
+        </createTable>
+
+        <!-- distribution rule -->
+        <createTable tableName="distributionrule">
+            <column name="id" autoIncrement="true" type="bigint">
+                <constraints nullable="false" primaryKey="true" unique="true"/>
+            </column>
+            <column name="assignedemp" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="assignedorg_id" type="bigint"/>
+            <column name="kle_id" type="bigint"/>
+            <column name="municipality_id" type="bigint"/>
+            <column name="parent_id" type="bigint"/>
+            <column name="responsibleorg_id" type="bigint"/>
+        </createTable>
+
+        <!-- identityprovider -->
+        <createTable tableName="identityprovider">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true" unique="true"/>
+            </column>
+            <column name="clientid" type="text">
+                <constraints nullable="false"/>
+            </column>
+            <column name="clientsecret" type="text">
+                <constraints nullable="false"/>
+            </column>
+            <column name="idpurl" type="text">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="text">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <!-- kle -->
+        <createTable tableName="kle">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true" unique="true"/>
+            </column>
+            <column name="datecreated" type="date">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="text">
+                <constraints nullable="false"/>
+            </column>
+            <column name="number" type="varchar">
+                <constraints nullable="false"/>
+            </column>
+            <column name="title" type="varchar">
+                <constraints nullable="false"/>
+            </column>
+            <column name="parent_id" type="bigint"/>
+        </createTable>
+
+        <!-- municipality -->
+        <createTable tableName="municipality">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true" unique="true"/>
+            </column>
+            <column name="name" type="varchar">
+                <constraints nullable="false"/>
+            </column>
+            <column name="active" type="boolean" defaultValueBoolean="true"/>
+        </createTable>
+
+        <createTable tableName="orgunit">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true" unique="true"/>
+            </column>
+            <column name="businesskey" type="varchar">
+                <constraints nullable="false"/>
+            </column>
+            <column name="email" type="varchar"/>
+            <column name="esdhid" type="varchar"/>
+            <column name="esdhlabel" type="varchar"/>
+            <column name="isactive" type="boolean" defaultValueBoolean="false"/>
+            <column name="name" type="varchar"/>
+            <column name="phone" type="varchar"/>
+            <column name="manager_id" type="bigint"/>
+            <column name="municipality_id" type="bigint"/>
+            <column name="parent_id" type="bigint"/>
+        </createTable>
+
+        <!-- role -->
+        <createTable tableName="role">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true" unique="true"/>
+            </column>
+            <column name="admin" type="boolean">
+                <constraints nullable="false"/>
+            </column>
+            <column name="manager" type="boolean">
+                <constraints nullable="false"/>
+            </column>
+            <column name="municipalityadmin" type="boolean">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="varchar">
+                <constraints nullable="false"/>
+            </column>
+            <column name="substitute" type="boolean">
+                <constraints nullable="false"/>
+            </column>
+            <column name="employment_id" type="bigint"/>
+            <column name="owner_id" type="bigint"/>
+        </createTable>
+
+        <!-- tr_user -->
+        <createTable tableName="tr_user">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true" unique="true"/>
+            </column>
+            <column name="email" type="varchar">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="varchar">
+                <constraints nullable="false"/>
+            </column>
+            <column name="municipality_id" type="bigint"/>
+            <column name="settings_id" type="bigint"/>
+        </createTable>
+
+        <createTable tableName="employment">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true" unique="true"/>
+            </column>
+            <column name="businesskey" type="varchar"/>
+            <column name="email" type="varchar"/>
+            <column name="esdhid" type="varchar"/>
+            <column name="esdhlabel" type="varchar"/>
+            <column name="initials" type="varchar"/>
+            <column name="isactive" type="boolean"/>
+            <column name="jobtitle" type="varchar"/>
+            <column name="name" type="varchar"/>
+            <column name="phone" type="varchar"/>
+            <column name="employedin_id" type="bigint"/>
+            <column name="municipality_id" type="bigint"/>
+        </createTable>
+
+
+        <!-- usersettings -->
+        <createTable tableName="usersettings">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true" unique="true"/>
+            </column>
+            <column name="scope" type="varchar">
+                <constraints nullable="false"/>
+            </column>
+            <column name="showexpandedorg" type="boolean" defaultValue="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="showresponsible" type="boolean" defaultValue="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="userid" type="bigint"/>
+            <column name="settings_id" type="bigint"/>
+        </createTable>
+
+        <createTable tableName="hibernate_sequence">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true" unique="true"/>
+            </column>
+        </createTable>
+
+
+
+
+        <addForeignKeyConstraint constraintName="orgunit->municipality"
+                                 baseTableName="orgunit"
+                                 baseColumnNames="municipality_id"
+                                 referencedTableName="municipality"
+                                 referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint constraintName="employment->orgunit"
+                                 baseTableName="employment"
+                                 baseColumnNames="employedin_id"
+                                 referencedTableName="orgunit"
+                                 referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint constraintName="role->employment"
+                                 baseTableName="role"
+                                 baseColumnNames="employment_id"
+                                 referencedTableName="employment"
+                                 referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint constraintName="distributionrule->orgunit"
+                                 baseTableName="distributionrule"
+                                 baseColumnNames="responsibleorg_id"
+                                 referencedTableName="orgunit"
+                                 referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint constraintName="orgunit->orgunit"
+                                 baseTableName="orgunit"
+                                 baseColumnNames="parent_id"
+                                 referencedTableName="orgunit"
+                                 referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint constraintName="distributionrule->kle"
+                                 baseTableName="distributionrule"
+                                 baseColumnNames="kle_id"
+                                 referencedTableName="kle"
+                                 referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint constraintName="tr_user->municipality"
+                                 baseTableName="tr_user"
+                                 baseColumnNames="municipality_id"
+                                 referencedTableName="municipality"
+                                 referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint constraintName="kle->kle"
+                                 baseTableName="kle"
+                                 baseColumnNames="parent_id"
+                                 referencedTableName="kle"
+                                 referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint constraintName="distributionassignment->employment"
+                                 baseTableName="distributionassignment"
+                                 baseColumnNames="employee_id"
+                                 referencedTableName="employment"
+                                 referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint constraintName="role->tr_user"
+                                 baseTableName="role"
+                                 baseColumnNames="owner_id"
+                                 referencedTableName="tr_user"
+                                 referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint constraintName="distributionrule->orgunit(assigned)"
+                                 baseTableName="distributionrule"
+                                 baseColumnNames="assignedorg_id"
+                                 referencedTableName="orgunit"
+                                 referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint constraintName="orgunit->employment"
+                                 baseTableName="orgunit"
+                                 baseColumnNames="manager_id"
+                                 referencedTableName="employment"
+                                 referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint constraintName="employment->municipality"
+                                 baseTableName="employment"
+                                 baseColumnNames="municipality_id"
+                                 referencedTableName="municipality"
+                                 referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint constraintName="distributionassignment->orgunit"
+                                 baseTableName="distributionassignment"
+                                 baseColumnNames="org_id"
+                                 referencedTableName="orgunit"
+                                 referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint constraintName="distributionrule->distributionrule"
+                                 baseTableName="distributionrule"
+                                 baseColumnNames="parent_id"
+                                 referencedTableName="distributionrule"
+                                 referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint constraintName="distributionrule->municipality"
+                                 baseTableName="distributionrule"
+                                 baseColumnNames="municipality_id"
+                                 referencedTableName="municipality"
+                                 referencedColumnNames="id"/>
+
+
+        <rollback>
+            <dropTable tableName="distributionassignment"/>
+            <dropTable tableName="distributionrule"/>
+            <dropTable tableName="identityprovider"/>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

@@ -15,11 +15,10 @@ public class Kle implements Serializable {
 	public static final String TABLE_NAME = "Kle";
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	long id;
 
-	@ManyToOne
-	@JoinColumn
+	@ManyToOne(cascade = CascadeType.ALL)
 	private Kle parent;
 
 	@OneToMany(mappedBy = "parent", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
@@ -39,7 +38,7 @@ public class Kle implements Serializable {
 	@Temporal(TemporalType.DATE)
 	private Date dateCreated;
 
-	@ManyToOne
+	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private Municipality municipality;
 
 	public Kle() {
