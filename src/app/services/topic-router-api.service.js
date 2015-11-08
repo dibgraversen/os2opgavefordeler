@@ -32,7 +32,12 @@
 			updateMunicipality: updateMunicipality,
 			getKlesForMunicipality: getKlesForMunicipality,
 			saveMunicipalityKle: saveMunicipalityKle,
-			deleteMunicipalityKle: deleteMunicipalityKle
+			deleteMunicipalityKle: deleteMunicipalityKle,
+
+			//
+			getFiltersForRule: getFiltersForRule,
+			removeFilter: removeFilter,
+			createFilter: createFilter
 		};
 
 		var baseUrl = serverUrl;
@@ -48,6 +53,22 @@
 		var cache = $cacheFactory('cache');
 
 		return service;
+
+		function getFiltersForRule(ruleId){
+			return httpGet("/distributionrulefilter/"+ruleId+"/filters");
+		}
+
+		function createFilter(model){
+			return httpPost("/distributionrulefilter/", model);
+		}
+
+		function removeFilter(ruleId, filterId){
+			return httpDelete("/distributionrulefilter/"+ruleId+"/"+filterId);
+		}
+
+		function updateFilter(model){
+			return post("/distributionrulefilter/"+model.distributionRuleId+"/filters/"+model.filterId, model);
+		}
 
 		function getIdentityProviders() {
 			return httpGet("/auth/providers");

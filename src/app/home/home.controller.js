@@ -24,7 +24,7 @@
 		$scope.toggle = toggle;
 		$scope.responsibility = responsibility;
 		$scope.editRule = editRule;
-		$scope.addExtendedRule = addExtendedRule;
+		$scope.listFilters = listFilters;
 		$scope.deleteRule = deleteRule;
 		$scope.editResponsibility = editResponsibility;
 		$scope.deleteResponsibility = deleteResponsibility;
@@ -214,7 +214,7 @@
 			topicRouterApi.updateDistributionRule(topic);
 		}
 
-		function addExtendedRule(topic) {
+		function listFilters(topic) {
 			$modal.open({
 				scope: $scope,
 				resolve: {
