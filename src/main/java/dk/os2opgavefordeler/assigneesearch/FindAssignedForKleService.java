@@ -44,19 +44,18 @@ public class FindAssignedForKleService {
 
     }
 
-    private Assignee createAssignee(OrgUnit orgUnit, long employmentId) {
-        if (employmentId == 0) {
-            return new Assignee(orgUnit);
+    private Assignee createAssignee(DistributionRule rule, OrgUnit orgUnit, Optional<Employment> employment) {
+        if (!employment.isPresent()) {
+            return new Assignee(rule,orgUnit);
         }
-        Optional<Employment> employment = employementService.getEmployment(employmentId);
-        return new Assignee(orgUnit, employment.get());
+        return new Assignee(rule, orgUnit, employment.get());
     }
 
     private Assignee matchByFilter(DistributionRule distributionRule, Map<String, String> filterParameters) {
         Iterable<DistributionRuleFilter> filters = distributionRule.getFilters();
         for (DistributionRuleFilter filter : filters) {
             if (filter.matches(filterParameters)) {
-                return createAssignee(filter.getAssignedOrg(), filter.getAssignedEmp());
+                return createAssignee(distributionRule, filter.getAssignedOrg(), Optional.ofNullable(filter.getAssignedEmployee()));
             }
         }
         return null;
@@ -68,7 +67,7 @@ public class FindAssignedForKleService {
             return byFilter;
         }
         if (rule.getAssignedOrg().isPresent()) {
-            return createAssignee(rule.getAssignedOrg().get(), rule.getAssignedEmp());
+            return createAssignee(rule, rule.getAssignedOrg().get(), employementService.getEmployment(rule.getAssignedEmp()));
         } else if (rule.getParent().isPresent()) {
             return findResponsible(rule.getParent().get(), filterParameters);
         } else {

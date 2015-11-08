@@ -165,7 +165,7 @@ public class DistributionRuleControllerTest {
         assertTrue(repository.findAll().size() == 1);
         assertEquals(Iterables.size(repository.findBy(rule.getId()).getFilters()), 1);
 
-        controller.deleteFilter(rule.getId(), "TestFilter");
+        controller.deleteFilter(rule.getId(), Iterables.get(rule.getFilters(), 0).getId());
         assertEquals(Iterables.size(repository.findBy(rule.getId()).getFilters()), 0);
 
     }

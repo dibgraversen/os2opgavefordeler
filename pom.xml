@@ -316,6 +316,12 @@
             <version>18.0</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>org.jboss.jbossts</groupId>
+            <artifactId>jbossjta</artifactId>
+            <version>4.16.6.Final</version>
+        </dependency>
+
 
         <!-- TODO: slf4j-in-jboss, how? -->
         <dependency>

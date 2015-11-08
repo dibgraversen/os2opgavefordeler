@@ -1,8 +1,6 @@
 package dk.os2opgavefordeler.model;
 
 import com.google.common.base.MoreObjects;
-import com.google.common.base.Predicate;
-import com.google.common.collect.Iterables;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -144,15 +142,17 @@ public class DistributionRule implements Serializable {
         this.filters = filters;
     }
 
-    public void addFilter(DistributionRuleFilter filter) throws AlreadyHaveFilterWithNameException {
+    public void addFilter(DistributionRuleFilter filter) {
+        filters.add(filter);
+    }
 
-        for(DistributionRuleFilter f : getFilters()){
-            if(f.getName().equals(filter.getName())){
-                throw new AlreadyHaveFilterWithNameException("There is already a filter with that name." + f.getName());
+    public DistributionRuleFilter getFilterByName(String name) {
+        for (DistributionRuleFilter f : getFilters()) {
+            if (f.getName().equals(name)) {
+                return f;
             }
         }
-
-        filters.add(filter);
+        return null;
     }
 
     public void removeFilter(DistributionRuleFilter filter) {
@@ -194,12 +194,6 @@ public class DistributionRule implements Serializable {
         public Builder children(DistributionRule... children) {
             Collections.addAll(this.children, children);
             return this;
-        }
-    }
-
-    public class AlreadyHaveFilterWithNameException extends Exception {
-        public AlreadyHaveFilterWithNameException(String msg) {
-            super(msg);
         }
     }
 }

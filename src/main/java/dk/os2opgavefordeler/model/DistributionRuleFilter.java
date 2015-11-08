@@ -23,7 +23,9 @@ public abstract class DistributionRuleFilter {
     @ManyToOne
     private OrgUnit assignedOrg;
 
-    private long assignedEmp;
+    @ManyToOne()
+    @JoinColumn(name = "assignedEmp")
+    private Employment assignedEmp;
 
     public DistributionRuleFilter() {
 
@@ -61,13 +63,14 @@ public abstract class DistributionRuleFilter {
         this.assignedOrg = assignedOrg;
     }
 
-    public long getAssignedEmp() {
+    public Employment getAssignedEmployee() {
         return assignedEmp;
     }
 
-    public void setAssignedEmp(long assignedEmp) {
+    public void setAssignedEmployee(Employment assignedEmp) {
         this.assignedEmp = assignedEmp;
     }
 
     public abstract boolean matches(Map<String, String> parameters);
+
 }

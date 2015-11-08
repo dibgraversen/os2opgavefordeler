@@ -25,32 +25,31 @@ public class CprDistributionRuleFilter extends DistributionRuleFilter {
      */
     private String months;
 
-    public CprDistributionRuleFilter(){
+    public CprDistributionRuleFilter() {
 
     }
 
-    public CprDistributionRuleFilter(String days, String months){
+    public CprDistributionRuleFilter(String days, String months) {
 
     }
 
-    private List<Integer> stringAsIntRangeList(String s){
+    private List<Integer> stringAsIntRangeList(String s) {
         List<Integer> res = new ArrayList<>();
         String[] daysArray = days.split(",");
-        for(String d : daysArray){
+        for (String d : daysArray) {
             // range
-            if(d.contains("-")){
+            if (d.contains("-")) {
                 int begin = Integer.parseInt(d.split("-")[0]);
                 int end = Integer.parseInt(d.split("-")[1]);
-                if(end < begin){
+                if (end < begin) {
                     int tmp = begin;
                     begin = end;
                     end = tmp;
                 }
-                for(int i = begin; i <= end; i++){
+                for (int i = begin; i <= end; i++) {
                     res.add(i);
                 }
-            }
-            else {
+            } else {
                 res.add(Integer.parseInt(d));
             }
         }
@@ -60,18 +59,18 @@ public class CprDistributionRuleFilter extends DistributionRuleFilter {
     @Override
     public boolean matches(Map<String, String> parameters) {
 
-        if(!parameters.containsKey("cpr")){
+        if (!parameters.containsKey(getName())) {
             return false;
         }
-        String cpr = parameters.get("cpr");
-        if(cpr.length()<5){
+        String param = parameters.get(getName());
+        if (param.length() < 5) {
             return false;
         }
 
-        int day = Integer.parseInt(cpr.substring(0,2));
-        int month = Integer.parseInt(cpr.substring(2,4));
+        int day = Integer.parseInt(param.substring(0, 2));
+        int month = Integer.parseInt(param.substring(2, 4));
 
-        if(!stringAsIntRangeList(days).contains(day)){
+        if (!stringAsIntRangeList(days).contains(day)) {
             return false;
         }
 

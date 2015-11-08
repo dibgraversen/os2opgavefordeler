@@ -3,6 +3,8 @@ package dk.os2opgavefordeler.test;
 import dk.os2opgavefordeler.Kle.KleRepository;
 import dk.os2opgavefordeler.assigneesearch.Assignee;
 import dk.os2opgavefordeler.assigneesearch.FindAssignedForKleService;
+import dk.os2opgavefordeler.distribution.DistributionRuleController;
+import dk.os2opgavefordeler.distribution.DistributionRuleRepository;
 import dk.os2opgavefordeler.model.*;
 import dk.os2opgavefordeler.service.BootstrappingDataProviderSingleton;
 import dk.os2opgavefordeler.service.DistributionService;
@@ -55,6 +57,9 @@ public class DistributionRuleFilterTest {
 
     @Inject
     private BootstrappingDataProviderSingleton bootstrap;
+
+    @Inject
+    private DistributionRuleRepository repository;
 
     @Test
     public void testIfNoRulesUseDefault() throws Exception {
@@ -124,6 +129,10 @@ public class DistributionRuleFilterTest {
 
         municipalityService.createMunicipality(municipality);
 
+        entityManager.persist(orgUnit);
+        entityManager.persist(correctOrgUnit);
+
+
 
         DistributionRule distributionRule = new DistributionRule.Builder()
                 .kle(kle)
@@ -139,8 +148,14 @@ public class DistributionRuleFilterTest {
         dateFilter.setDays("1-31");
         dateFilter.setMonths("1-12");
 
+
+
+        //repository.save(distributionRule);
+
+        //entityManager.persist(dateFilter);
         distributionRule.addFilter(dateFilter);
-        distributionService.createDistributionRule(distributionRule);
+
+        repository.save(distributionRule);
 
         Map<String,String> filterParameters = new HashMap<>();
         filterParameters.put("cpr", "141186-1145");

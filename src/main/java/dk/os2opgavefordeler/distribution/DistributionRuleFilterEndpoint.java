@@ -1,5 +1,6 @@
 package dk.os2opgavefordeler.distribution;
 
+import dk.os2opgavefordeler.model.CprDistributionRuleFilter;
 import dk.os2opgavefordeler.model.DistributionRule;
 import dk.os2opgavefordeler.model.DistributionRuleFilter;
 import dk.os2opgavefordeler.model.presentation.DistributionRulePO;
@@ -10,9 +11,10 @@ import org.apache.deltaspike.jpa.api.transaction.Transactional;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
+import java.util.ArrayList;
+import java.util.List;
 
 @Path("/distributionrulefilter")
 @Transactional
@@ -22,7 +24,7 @@ public class DistributionRuleFilterEndpoint extends Endpoint {
     private BootstrappingDataProviderSingleton bootstrap;
 
     @Inject
-    private DistributionRuleRepository distributionRuleRepository;
+    private DistributionRuleRepository ruleRepository;
 
     @Inject
     private OrgUnitService orgUnitService;
@@ -41,9 +43,33 @@ public class DistributionRuleFilterEndpoint extends Endpoint {
     }
 
     @GET
-    @Path("/")
-    public Response list() {
-        return ok();
+    @Path("/{ruleId}/filters")
+    @Produces("application/json")
+    public Response list(@PathParam("ruleId") long ruleId) {
+
+        DistributionRule rule = ruleRepository.findBy(ruleId);
+        Iterable<DistributionRuleFilter> filters = rule.getFilters();
+        List<CprDistributionRuleFilterDTO> result = new ArrayList<>();
+
+        for (DistributionRuleFilter f : filters) {
+            result.add(new CprDistributionRuleFilterDTO((CprDistributionRuleFilter) f));
+        }
+
+        return ok(result);
+    }
+
+    @POST
+    @Path("/{ruleId}/filters/{filterId}")
+    public Response updateFilter(
+            @PathParam("ruleId") long ruleId,
+            @PathParam("filterId") long filterId,
+            CprDistributionRuleFilterDTO dto) {
+        try {
+            controller.updateFilter(ruleId, filterId, dto);
+            return ok();
+        } catch (Exception e) {
+            return badRequest(e.getMessage());
+        }
     }
 
     @POST
@@ -58,23 +84,16 @@ public class DistributionRuleFilterEndpoint extends Endpoint {
     }
 
     @DELETE
-    @Path("/{distributionRuleId}/{name}")
+    @Path("/{distributionRuleId}/{id}")
     public Response deleteFilter(
             @PathParam("distributionRuleId") long distributionRuleId,
-            @PathParam("name") String name) {
+            @PathParam("id") long filterId) {
 
-        DistributionRule rule;
         try {
-            rule = distributionRuleRepository.findBy(distributionRuleId);
-        } catch (NoResultException e) {
-            return badRequest(
-                    String.format("Distribution rule with id %s could not be found!",
-                            distributionRuleId));
+            controller.deleteFilter(distributionRuleId, filterId);
+        } catch (Exception e) {
+            return badRequest(e.getMessage());
         }
-
-
-        rule.removeFiltersWithName(name);
-        distributionRuleRepository.save(rule);
 
         return ok();
 

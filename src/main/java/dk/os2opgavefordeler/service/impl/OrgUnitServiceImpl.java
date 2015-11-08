@@ -1,10 +1,6 @@
 package dk.os2opgavefordeler.service.impl;
 
-import dk.os2opgavefordeler.model.Employment;
-import dk.os2opgavefordeler.model.Employment_;
-import dk.os2opgavefordeler.model.Municipality;
-import dk.os2opgavefordeler.model.OrgUnit;
-import dk.os2opgavefordeler.model.OrgUnit_;
+import dk.os2opgavefordeler.model.*;
 import dk.os2opgavefordeler.model.presentation.OrgUnitPO;
 import dk.os2opgavefordeler.service.MunicipalityService;
 import dk.os2opgavefordeler.service.OrgUnitService;
@@ -272,7 +268,7 @@ public class OrgUnitServiceImpl implements OrgUnitService {
 
 	public void deleteOrgs(List<Long> orgIds){
 		EntityManager em = persistence.getEm();
-		Query unlinkEmploymentsQuery = em.createQuery("DELETE OrgUnit org WHERE org.id IN (:orgIds)");
+		Query unlinkEmploymentsQuery = em.createQuery("DELETE FROM OrgUnit org WHERE org.id IN (:orgIds)");
 		unlinkEmploymentsQuery.setParameter("orgIds", orgIds);
 		unlinkEmploymentsQuery.executeUpdate();
 	}

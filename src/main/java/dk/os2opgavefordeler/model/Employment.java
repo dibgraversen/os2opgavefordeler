@@ -4,6 +4,7 @@ import com.google.common.base.MoreObjects;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Objects;
 
 /**
