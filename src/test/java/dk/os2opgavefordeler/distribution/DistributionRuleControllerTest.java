@@ -93,51 +93,6 @@ public class DistributionRuleControllerTest {
     }
 
     @Test
-    public void testFilterNameIsUniqueForRule() throws Exception {
-
-        Municipality m = new Municipality("test");
-        OrgUnit o = OrgUnit.builder()
-                .businessKey("123")
-                .municipality(m)
-                .build();
-
-        DistributionRule rule = new DistributionRule();
-        rule.setMunicipality(m);
-        rule.setAssignedOrg(o);
-        rule.setResponsibleOrg(o);
-
-        repository.save(rule);
-
-        CprDistributionRuleFilterDTO dto = new CprDistributionRuleFilterDTO();
-        dto.name = "TestFilter";
-        dto.assignedEmployeeId = -1;
-        dto.assignedOrgId = o.getId();
-        dto.days = "1-15";
-        dto.months = "1-3";
-        dto.distributionRuleId = rule.getId();
-
-        CprDistributionRuleFilterDTO dto2 = new CprDistributionRuleFilterDTO();
-        dto2.name = "TestFilter";
-        dto2.assignedEmployeeId = -1;
-        dto2.assignedOrgId = o.getId();
-        dto2.days = "12-15";
-        dto2.months = "2-3";
-        dto2.distributionRuleId = rule.getId();
-
-        controller.createFilter(dto);
-
-        boolean called = false;
-
-        try {
-            controller.createFilter(dto2);
-        } catch (DistributionRule.AlreadyHaveFilterWithNameException e) {
-            called = true;
-        }
-
-        assertTrue(called);
-    }
-
-    @Test
     public void testCanDeleteFilter() throws Exception {
         Municipality m = new Municipality("test");
         OrgUnit o = OrgUnit.builder()

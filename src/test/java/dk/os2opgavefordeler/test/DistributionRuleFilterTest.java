@@ -144,7 +144,7 @@ public class DistributionRuleFilterTest {
         CprDistributionRuleFilter dateFilter = new CprDistributionRuleFilter();
         dateFilter.setAssignedOrg(correctOrgUnit);
         dateFilter.setDistributionRule(distributionRule);
-        dateFilter.setName("Test filter");
+        dateFilter.setName("cpr");
         dateFilter.setDays("1-31");
         dateFilter.setMonths("1-12");
 
