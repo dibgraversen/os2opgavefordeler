@@ -26,11 +26,11 @@
             <column name="months" type="varchar"/>
         </createTable>
 
-        <addForeignKeyConstraint constraintName="distributionrulefilter->assignedOrg"
+        <addForeignKeyConstraint constraintName="distributionrulefilter2assignedOrg"
                                  baseTableName="distributionrulefilter" baseColumnNames="assignedorg_id"
                                  referencedTableName="orgunit" referencedColumnNames="id"/>
 
-        <addForeignKeyConstraint constraintName="distributionrulefilter->assignedemp"
+        <addForeignKeyConstraint constraintName="distributionrulefilter2assignedemp"
                                  baseTableName="distributionrulefilter" baseColumnNames="assignedemp"
                                  referencedTableName="employment" referencedColumnNames="id"/>
 
@@ -44,11 +44,11 @@
         </createTable>
 
 
-        <addForeignKeyConstraint constraintName="distributionrule_distributionrulefilter->DistributionRule"
+        <addForeignKeyConstraint constraintName="distributionrule_distributionrulefilter2DistributionRule"
                                  baseTableName="distributionrule_distributionrulefilter" baseColumnNames="distributionrule_id"
                                  referencedTableName="distributionrule" referencedColumnNames="id"/>
 
-        <addForeignKeyConstraint constraintName="distributionrule_distributionrulefilter->filters"
+        <addForeignKeyConstraint constraintName="distributionrule_distributionrulefilter2filters"
                                  baseTableName="distributionrule_distributionrulefilter" baseColumnNames="filters_id"
                                  referencedTableName="distributionrulefilter" referencedColumnNames="id"/>
 

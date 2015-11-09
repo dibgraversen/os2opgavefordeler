@@ -186,97 +186,97 @@
 
 
 
-        <addForeignKeyConstraint constraintName="orgunit->municipality"
+        <addForeignKeyConstraint constraintName="orgunit2municipality"
                                  baseTableName="orgunit"
                                  baseColumnNames="municipality_id"
                                  referencedTableName="municipality"
                                  referencedColumnNames="id"/>
 
-        <addForeignKeyConstraint constraintName="employment->orgunit"
+        <addForeignKeyConstraint constraintName="employment2orgunit"
                                  baseTableName="employment"
                                  baseColumnNames="employedin_id"
                                  referencedTableName="orgunit"
                                  referencedColumnNames="id"/>
 
-        <addForeignKeyConstraint constraintName="role->employment"
+        <addForeignKeyConstraint constraintName="role2employment"
                                  baseTableName="role"
                                  baseColumnNames="employment_id"
                                  referencedTableName="employment"
                                  referencedColumnNames="id"/>
 
-        <addForeignKeyConstraint constraintName="distributionrule->orgunit"
+        <addForeignKeyConstraint constraintName="distributionrule2orgunit"
                                  baseTableName="distributionrule"
                                  baseColumnNames="responsibleorg_id"
                                  referencedTableName="orgunit"
                                  referencedColumnNames="id"/>
 
-        <addForeignKeyConstraint constraintName="orgunit->orgunit"
+        <addForeignKeyConstraint constraintName="orgunit2orgunit"
                                  baseTableName="orgunit"
                                  baseColumnNames="parent_id"
                                  referencedTableName="orgunit"
                                  referencedColumnNames="id"/>
 
-        <addForeignKeyConstraint constraintName="distributionrule->kle"
+        <addForeignKeyConstraint constraintName="distributionrule2kle"
                                  baseTableName="distributionrule"
                                  baseColumnNames="kle_id"
                                  referencedTableName="kle"
                                  referencedColumnNames="id"/>
 
-        <addForeignKeyConstraint constraintName="tr_user->municipality"
+        <addForeignKeyConstraint constraintName="tr_user2municipality"
                                  baseTableName="tr_user"
                                  baseColumnNames="municipality_id"
                                  referencedTableName="municipality"
                                  referencedColumnNames="id"/>
 
-        <addForeignKeyConstraint constraintName="kle->kle"
+        <addForeignKeyConstraint constraintName="kle2kle"
                                  baseTableName="kle"
                                  baseColumnNames="parent_id"
                                  referencedTableName="kle"
                                  referencedColumnNames="id"/>
 
-        <addForeignKeyConstraint constraintName="distributionassignment->employment"
+        <addForeignKeyConstraint constraintName="distributionassignment2employment"
                                  baseTableName="distributionassignment"
                                  baseColumnNames="employee_id"
                                  referencedTableName="employment"
                                  referencedColumnNames="id"/>
 
-        <addForeignKeyConstraint constraintName="role->tr_user"
+        <addForeignKeyConstraint constraintName="role2tr_user"
                                  baseTableName="role"
                                  baseColumnNames="owner_id"
                                  referencedTableName="tr_user"
                                  referencedColumnNames="id"/>
 
-        <addForeignKeyConstraint constraintName="distributionrule->orgunit(assigned)"
+        <addForeignKeyConstraint constraintName="distributionrule2orgunit4assigned"
                                  baseTableName="distributionrule"
                                  baseColumnNames="assignedorg_id"
                                  referencedTableName="orgunit"
                                  referencedColumnNames="id"/>
 
-        <addForeignKeyConstraint constraintName="orgunit->employment"
+        <addForeignKeyConstraint constraintName="orgunit2employment"
                                  baseTableName="orgunit"
                                  baseColumnNames="manager_id"
                                  referencedTableName="employment"
                                  referencedColumnNames="id"/>
 
-        <addForeignKeyConstraint constraintName="employment->municipality"
+        <addForeignKeyConstraint constraintName="employment2municipality"
                                  baseTableName="employment"
                                  baseColumnNames="municipality_id"
                                  referencedTableName="municipality"
                                  referencedColumnNames="id"/>
 
-        <addForeignKeyConstraint constraintName="distributionassignment->orgunit"
+        <addForeignKeyConstraint constraintName="distributionassignment2orgunit"
                                  baseTableName="distributionassignment"
                                  baseColumnNames="org_id"
                                  referencedTableName="orgunit"
                                  referencedColumnNames="id"/>
 
-        <addForeignKeyConstraint constraintName="distributionrule->distributionrule"
+        <addForeignKeyConstraint constraintName="distributionrule2distributionrule"
                                  baseTableName="distributionrule"
                                  baseColumnNames="parent_id"
                                  referencedTableName="distributionrule"
                                  referencedColumnNames="id"/>
 
-        <addForeignKeyConstraint constraintName="distributionrule->municipality"
+        <addForeignKeyConstraint constraintName="distributionrule2municipality"
                                  baseTableName="distributionrule"
                                  baseColumnNames="municipality_id"
                                  referencedTableName="municipality"
