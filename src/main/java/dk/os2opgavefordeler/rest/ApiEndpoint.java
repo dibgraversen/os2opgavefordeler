@@ -1,5 +1,7 @@
 package dk.os2opgavefordeler.rest;
 
+import dk.os2opgavefordeler.assigneesearch.Assignee;
+import dk.os2opgavefordeler.assigneesearch.FindAssignedForKleService;
 import dk.os2opgavefordeler.model.DistributionRule;
 import dk.os2opgavefordeler.model.Employment;
 import dk.os2opgavefordeler.model.Kle;
@@ -20,8 +22,13 @@ import javax.ws.rs.HeaderParam;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -50,10 +57,14 @@ public class ApiEndpoint extends Endpoint {
 	@Inject
 	EmploymentService employmentService;
 
+	@Inject
+	private FindAssignedForKleService findAssignedForKleService;
+
 	@GET
 	@Path("/")
 	@Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
-	public Response lookup(@HeaderParam("Authorization") String token, @QueryParam("kle") String kleNumber) {
+	public Response lookup(@HeaderParam("Authorization") String token, @QueryParam("kle") String kleNumber, @Context UriInfo uriInfo) {
+		token = "ABC";
 		if (token == null) {
 			return Response.status(Response.Status.UNAUTHORIZED).build();
 		}
@@ -74,17 +85,22 @@ public class ApiEndpoint extends Endpoint {
 			return badRequest("Did not find a Kle based on given number.");
 		}
 
-		// find handling rule from distService.
-		DistributionRule result = distributionService.findAssigned(kle, municipality);
-		if (result != null) {
-			Optional<Employment> employeeMaybe = employmentService.getEmployment(result.getAssignedEmp());
-			EmploymentApiResultPO manager = new EmploymentApiResultPO(orgUnitService.findResponsibleManager(result.getAssignedOrg().get()).orElse(null));
-			EmploymentApiResultPO employee = employeeMaybe.map(EmploymentApiResultPO::new).orElse(null);
-			DistributionRuleApiResultPO resultPO = new DistributionRuleApiResultPO(result, manager, employee);
-			return ok(resultPO);
-		} else {
+		Map<String, String> parameters = new HashMap<>();
+		for(Map.Entry<String, List<String>> m : uriInfo.getQueryParameters().entrySet() ){
+			parameters.put(m.getKey(), m.getValue().get(0));
+		}
+
+		Assignee assignee = findAssignedForKleService.findAssignedForKle(kle, municipality, parameters);
+		if(assignee == null){
 			return Response.status(Response.Status.NOT_FOUND).type(TEXT_PLAIN).entity("Noone seems to be handling the given kle for municipality.").build();
 		}
+
+		//DistributionRule result = distributionService.findAssigned(kle, municipality);
+		EmploymentApiResultPO manager = new EmploymentApiResultPO(orgUnitService.findResponsibleManager(assignee.getOrgUnit()).orElse(null));
+		EmploymentApiResultPO employee = assignee.getEmployment().map(EmploymentApiResultPO::new).orElse(null);
+		DistributionRuleApiResultPO resultPO = new DistributionRuleApiResultPO(assignee.getRule(), manager, employee);
+
+		return ok(resultPO);
 	}
 
 	@GET

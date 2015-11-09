@@ -10,7 +10,7 @@ import java.io.Serializable;
  */
 @Entity
 public class UserSettings implements Serializable {
-	@Id @GeneratedValue(strategy = GenerationType.AUTO)
+	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
 
 	private long userId;

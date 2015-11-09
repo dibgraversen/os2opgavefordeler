@@ -1,5 +1,6 @@
 package dk.os2opgavefordeler.service.impl;
 
+import dk.os2opgavefordeler.employment.MunicipalityRepository;
 import dk.os2opgavefordeler.model.DistributionRule;
 import dk.os2opgavefordeler.model.Kle;
 import dk.os2opgavefordeler.model.Municipality;
@@ -9,9 +10,11 @@ import dk.os2opgavefordeler.service.DistributionService;
 import dk.os2opgavefordeler.service.KleService;
 import dk.os2opgavefordeler.service.MunicipalityService;
 import dk.os2opgavefordeler.service.PersistenceService;
+import org.apache.deltaspike.jpa.api.transaction.Transactional;
 import org.slf4j.Logger;
 
 import javax.ejb.Stateless;
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -24,10 +27,9 @@ import java.util.stream.Collectors;
 /**
  * @author hlo@miracle.dk
  */
-@Stateless
+@ApplicationScoped
+@Transactional
 public class MunicipalityServiceImpl implements MunicipalityService {
-	@Inject
-	PersistenceService persistence;
 
 	@Inject
 	Logger log;
@@ -38,20 +40,20 @@ public class MunicipalityServiceImpl implements MunicipalityService {
 	@Inject
 	DistributionService distributionService;
 
+	@Inject
+	private EntityManager em;
+
+	@Inject
+	private MunicipalityRepository municipalityRepository;
+
 	@Override
 	public Municipality createMunicipality(Municipality municipality) {
-		persistence.persist(municipality);
-		return municipality;
+		return  municipalityRepository.save(municipality);
 	}
 
 	@Override
 	public Municipality createOrUpdateMunicipality(Municipality municipality) {
-		if(municipality.getId() > 0l){
-			persistence.merge(municipality);
-		} else {
-			persistence.persist(municipality);
-		}
-		return municipality;
+		return municipalityRepository.save(municipality);
 	}
 
 	@Override
@@ -62,7 +64,7 @@ public class MunicipalityServiceImpl implements MunicipalityService {
 	@Override
 	@SuppressWarnings("unchecked")
 	public Optional<Municipality> getMunicipalityFromToken(String token){
-		Query query = persistence.getEm().createQuery("SELECT m FROM Municipality m WHERE m.token = :token");
+		Query query = em.createQuery("SELECT m FROM Municipality m WHERE m.token = :token");
 		query.setParameter("token", token);
 		try{
 			return Optional.of((Municipality)query.getSingleResult());
@@ -76,7 +78,7 @@ public class MunicipalityServiceImpl implements MunicipalityService {
 
 	@Override
 	public List<Municipality> getMunicipalities() {
-		return persistence.findAll(Municipality.class);
+		return municipalityRepository.findAll();
 	}
 
 	@Override
@@ -93,7 +95,7 @@ public class MunicipalityServiceImpl implements MunicipalityService {
 	}
 
 	private EntityManager getEm(){
-		return persistence.getEm();
+		return em;
 	}
 
 	/**
@@ -154,7 +156,7 @@ public class MunicipalityServiceImpl implements MunicipalityService {
 	public void deleteMunicipalityKle(long municipalityId, long kleId) throws ValidationException {
 		Kle kle = null;
 		try	{
-			Query query = persistence.getEm().createQuery("SELECT k from Kle k WHERE municipality.id = :municipalityId AND id = :kleId");
+			Query query = em.createQuery("SELECT k from Kle k WHERE municipality.id = :municipalityId AND id = :kleId");
 			query.setParameter("municipalityId", municipalityId);
 			query.setParameter("kleId", kleId);
 			kle = (Kle) query.getSingleResult();
@@ -167,14 +169,14 @@ public class MunicipalityServiceImpl implements MunicipalityService {
 			Optional<DistributionRule> ruleMaybe = getRule(kle);
 			if(ruleMaybe.isPresent()){
 				DistributionRule rule = ruleMaybe.get();
-				persistence.getEm().remove(rule);
+				em.remove(rule);
 			}
-			persistence.getEm().remove(kle);
+			em.remove(kle);
 		}
 	}
 
 	private Optional<DistributionRule> getRule(Kle kle){
-		Query query = persistence.getEm().createQuery("SELECT r FROM DistributionRule r WHERE r.kle = :kle");
+		Query query = em.createQuery("SELECT r FROM DistributionRule r WHERE r.kle = :kle");
 		query.setParameter("kle", kle);
 		try {
 			return Optional.of((DistributionRule) query.getSingleResult());

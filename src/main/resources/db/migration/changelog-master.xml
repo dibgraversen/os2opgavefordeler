@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+    <!--includeAll path="*.xml" relativeToChangelogFile="true" /-->
+    <include file="/WEB-INF/classes/db/migration/V1_initial.xml"/>
+    <include file="/WEB-INF/classes/db/migration/V2_create_distributionassignment.xml"/>
+    <include file="/WEB-INF/classes/db/migration/V3_add_token_to_municipality.xml"/>
+    <include file="/WEB-INF/classes/db/migration/V4_add_municipality_to_kle.xml"/>
+    <include file="/WEB-INF/classes/db/migration/V5_add_distribution_rule_filter.xml"/>
+    <include file="/WEB-INF/classes/db/migration/V6_create_municipality_to_user_relation.xml"/>
+</databaseChangeLog>

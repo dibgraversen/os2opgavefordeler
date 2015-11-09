@@ -176,7 +176,7 @@ public class DistributionRuleEndpoint extends Endpoint {
 			existing.setAssignedEmp(newEmpId);
 		});
 
-		distributionService.merge(existing); // if we move logic to DistributionService, 'existing' is managed and this shouldn't be necessary.
+		distributionService.createDistributionRule(existing); // if we move logic to DistributionService, 'existing' is managed and this shouldn't be necessary.
 	}
 
 	private<T extends Comparable<T>> void updateIfChanged(T oldVal, T newVal, Consumer<T> updater) {

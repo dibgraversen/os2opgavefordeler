@@ -6,3 +6,5 @@ target
 rakefile
 .settings
 local.zsh
+.vagrant
+environment/puppet/modules/wildfly/spec/fixtures/modules/archive

@@ -11,12 +11,13 @@ import dk.os2opgavefordeler.service.oidc.OpenIdConnect;
 import org.slf4j.Logger;
 
 import javax.ejb.Stateless;
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import java.net.URI;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Stateless
+@ApplicationScoped
 public class AuthenticationServiceImpl implements AuthenticationService {
 	@Inject
 	private Logger log;
@@ -27,16 +28,16 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	@Inject
 	private OpenIdConnect openIdConnect;
 
-	static private final Map<Integer, IdentityProvider> providers = new HashMap<>();
+	static private final Map<Long, IdentityProvider> providers = new HashMap<>();
 	static {
-		providers.put(1, IdentityProvider.builder()
+		providers.put(1L, IdentityProvider.builder()
 			.id(1).name("Google account")
 			.url("https://accounts.google.com/")
 			.clientId("89170361789-mg8l3t3f11vo0cf0hce4h85epi0qqq3q.apps.googleusercontent.com")
 			.clientSecret("itCIp2JGR2NKBAu4Se9LCAjp")
 			.build()
 		);
-		providers.put(2, IdentityProvider.builder()
+		providers.put(2L, IdentityProvider.builder()
 			.id(2).name("Kitos SSO")
 			.url("https://kitos.roskilde.dk/gateway/")
 			.clientId("suneclient")
@@ -92,7 +93,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
 
 	@Override
-	public Optional<IdentityProvider> findProvider(int id) {
+	public Optional<IdentityProvider> findProvider(long id) {
 		return Optional.ofNullable(providers.get(id));
 	}
 

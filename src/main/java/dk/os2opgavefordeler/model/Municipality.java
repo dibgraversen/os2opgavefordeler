@@ -2,64 +2,76 @@ package dk.os2opgavefordeler.model;
 
 import com.google.common.base.MoreObjects;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * @author hlo@miracle.dk
  */
 @Entity
 public class Municipality implements Serializable {
-	@Id @GeneratedValue(strategy = GenerationType.AUTO)
-	private long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
 
-	private String name;
+    private String name;
 
-	private boolean active;
+    private boolean active;
 
-	private String token;
+    private String token;
 
-	public long getId() {
-		return id;
-	}
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<User> users;
 
-	public void setId(long id) {
-		this.id = id;
-	}
+    public Municipality() {
 
-	public String getName() {
-		return name;
-	}
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public Municipality(String name) {
+        this.name = name;
+        this.token = name;
+        this.active = true;
+    }
 
-	public boolean isActive() {
-		return active;
-	}
+    public long getId() {
+        return id;
+    }
 
-	public void setActive(boolean active) {
-		this.active = active;
-	}
+    public void setId(long id) {
+        this.id = id;
+    }
 
-	public String getToken() {
-		return token;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public void setToken(String token) {
-		this.token = token;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	@Override
-	public String toString() {
-		return MoreObjects.toStringHelper(this)
-				.add("id", id)
-				.add("name", name)
-				.add("active", active)
-				.toString();
-	}
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("id", id)
+                .add("name", name)
+                .add("active", active)
+                .toString();
+    }
 }
