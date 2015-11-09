@@ -6,3 +6,4 @@ target
 rakefile
 .settings
 local.zsh
+.vagrant
