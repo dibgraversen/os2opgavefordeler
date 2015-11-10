@@ -29,28 +29,47 @@
             </table>
         </div>
         <div ng-show="currentTab=='add' || currentTab=='show'">
-            {{model}}
             <form method="post">
-                <p>
-                    <label for="filter_name">Navn:
-                        <input type="text" class="form-control" ng-model="model.name" name="filter_name"
-                               id="filter_name">
-                    </label>
-                </p>
+                <tabset justified="true">
+                    <tab ng-click="model.type='cpr'" heading="Dato">
+                        <p>
+                            <label for="filter_name">Navn:
+                                <input type="text" class="form-control" ng-model="model.name" name="filter_name"
+                                       id="filter_name">
+                            </label>
+                        </p>
 
-                <p>
-                    <label for="filter_days">Dage: <span>(1,3-5 betyder dagene 1,3,4,5)</span>
-                        <input type="text" class="form-control" ng-model="model.days" name="filter_days"
-                               id="filter_days">
-                    </label>
-                </p>
+                        <p>
+                            <label for="filter_days">Dage: <span>(1,3-5 betyder dagene 1,3,4,5)</span>
+                                <input type="text" class="form-control" ng-model="model.days" name="filter_days"
+                                       id="filter_days">
+                            </label>
+                        </p>
 
-                <p><label for="filter_months">Måneder: <span>(1,4-7 betyder månederne 1,4,5,6,7)</span>
-                    <input type="text" class="form-control" ng-model="model.months" name="filter_months"
-                           id="filter_months">
-                </label>
+                        <p>
+                            <label for="filter_months">Måneder: <span>(1,4-7 betyder månederne 1,4,5,6,7)</span>
+                                <input type="text" class="form-control" ng-model="model.months" name="filter_months"
+                                       id="filter_months">
+                            </label>
+                        </p>
+                    </tab>
+                    <tab heading="Tekst" ng-click="model.type='text'">
+                        <p>
+                            <label for="filter_name2">Navn:
+                                <input type="text" class="form-control" ng-model="model.name" name="filter_name"
+                                       id="filter_name2">
+                            </label>
+                        </p>
 
-                </p>
+                        <p>
+                            <label for="filter_text">Text: <span>(Brug * til wildcard søgning. * kan placeres først og sidst i teksten.)</span>
+                                <input type="text" class="form-control" ng-model="model.text" name="filter_text"
+                                       id="filter_text">
+                            </label>
+                        </p>
+                    </tab>
+                </tabset>
+
 
                 <div>
                     <tabset justified="true">
@@ -161,6 +180,6 @@
     </div>
     <div class="modal-footer" ng-show="currentTab=='show'">
         <a href="" class="btn btn-primary" ng-click="currentTab='list'">Annuller</a>
-        <a href="" class="btn btn-primary" ng-click="updateFilter()">Opdater</a>
+        <a href="" class="btn btn-primary" ng-click="createFilter()">Opdater</a>
     </div>
 </div>

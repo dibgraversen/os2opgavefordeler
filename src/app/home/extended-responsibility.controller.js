@@ -8,20 +8,33 @@
         //$scope.employeeFilter = "";
 
         $scope.close = close;
+        $scope.type = "cpr";
         $scope.removeFilter = removeFilter;
         $scope.add = add;
         $scope.currentTab = 'list';
-        $scope.model = {distributionRuleId: $scope.topic.id};
+
+        function cleanModel() {
+            $scope.selectedOrgUnit = {};
+            return {
+            distributionRuleId: $scope.topic.id,
+            type: 'cpr'
+            };
+        }
+
+        $scope.model = {
+            distributionRuleId: $scope.topic.id,
+            type: 'cpr'
+        };
         //$scope.orgUnits = [];
         $scope.loadAllOrgUnits = loadAllOrgUnits;
         $scope.selectedOrgUnit = {};
         $scope.setSelectedOrgUnit = setSelectedOrgUnit;
         $scope.employmentSearch = employmentSearch;
+        $scope.updateFilterd = updateFilterd;
         $scope.createFilter = createFilter;
         $scope.loadMoreEmployments = loadMoreEmployments;
         $scope.setSelectedEmp = setSelectedEmp;
         $scope.show = show;
-        $scope.updateFilter = updateFilter;
         $scope.search = {
             municipalityId: $scope.user.municipality.id,
             offset: 0,
@@ -34,6 +47,7 @@
 
         function show(filterId){
             $log.info("ExtendedResponsibilityController::show " + filterId);
+            $scope.model = cleanModel();
             $scope.currentTab='show';
             $scope.model.filterId = filterId;
             topicRouterApi.getFiltersForRule($scope.topic.id).then(function(res){
@@ -50,7 +64,8 @@
             });
         }
 
-        function updateFilter(){
+        function updateFilterd(){
+            $log.info("ExtendedResponsibilityController::updateFilter");
             topicRouterApi.updateFilter($scope.model).then(function(){
                 _refresh();
                 $scope.currentTab = 'list'
@@ -116,6 +131,7 @@
         }
 
         function add() {
+            $scope.model = cleanModel();
             $scope.currentTab = "add";
         }
 
