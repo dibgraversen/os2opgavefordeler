@@ -287,7 +287,7 @@
 
 	gulp.task('constants', function () {
 		var myConfig = require('./src/config.json');
-		var env = argv.env || 'dev';
+		var env = argv.env || 'test'; //'dev';
 		var envConfig = myConfig[env];
 		return plugins.ngConstant({
 			constants: envConfig,
