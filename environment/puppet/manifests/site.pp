@@ -144,7 +144,7 @@ class my_wildfly{
   }->
 
   exec{ 'home set':
-    command => '/opt/wildfly/bin/jboss-cli.sh --connect -u=mgmtuser -p=mgmtuser "/system-property=topicrouter.url.home:write-attribute(name=value, value="http://localhost:9001")"'
+    command => '/opt/wildfly/bin/jboss-cli.sh --connect -u=mgmtuser -p=mgmtuser "/system-property=topicrouter.url.home:write-attribute(name=value, value="http://topicrouter.miracle.dk")"'
   }->
 
   exec{ 'openid add':
@@ -152,7 +152,7 @@ class my_wildfly{
   }->
 
   exec{ 'openid set':
-    command => '/opt/wildfly/bin/jboss-cli.sh --connect -u=mgmtuser -p=mgmtuser "/system-property=topicrouter.url.openid.callback:write-attribute(name=value, value="http://localhost:8080/TopicRouter/rest/auth/authenticate")"'
+    command => '/opt/wildfly/bin/jboss-cli.sh --connect -u=mgmtuser -p=mgmtuser "/system-property=topicrouter.url.openid.callback:write-attribute(name=value, value="http://topicrouter.miracle.dk/rest/auth/authenticate")"'
   }->
 
   exec{ 'godmode add':
