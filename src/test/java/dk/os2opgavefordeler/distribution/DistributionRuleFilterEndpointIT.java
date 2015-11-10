@@ -2,6 +2,7 @@ package dk.os2opgavefordeler.distribution;
 
 import com.jayway.restassured.RestAssured;
 import com.jayway.restassured.http.ContentType;
+import dk.os2opgavefordeler.distribution.dto.CprDistributionRuleFilterDTO;
 import dk.os2opgavefordeler.test.IntegrationTest;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;

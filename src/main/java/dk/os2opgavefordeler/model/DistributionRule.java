@@ -134,6 +134,15 @@ public class DistributionRule implements Serializable {
                 .toString();
     }
 
+    public DistributionRuleFilter getFilterById(long id) {
+        for (DistributionRuleFilter filter : getFilters()) {
+            if (filter.getId() == id) {
+                return filter;
+            }
+        }
+        return null;
+    }
+
     public Iterable<DistributionRuleFilter> getFilters() {
         return filters;
     }

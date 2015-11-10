@@ -1,6 +1,7 @@
 package dk.os2opgavefordeler.distribution;
 
 import com.google.common.collect.Iterables;
+import dk.os2opgavefordeler.distribution.dto.CprDistributionRuleFilterDTO;
 import dk.os2opgavefordeler.model.DistributionRule;
 import dk.os2opgavefordeler.model.Municipality;
 import dk.os2opgavefordeler.model.OrgUnit;

@@ -1,23 +1,13 @@
-package dk.os2opgavefordeler.distribution;
+package dk.os2opgavefordeler.distribution.dto;
 
 import dk.os2opgavefordeler.model.CprDistributionRuleFilter;
 
 /**
  * DTO to transfer cpr distribution rules
  */
-public class CprDistributionRuleFilterDTO {
+public class CprDistributionRuleFilterDTO extends DistributionRuleFilterDTO{
 
-    public String type = "cpr";
-    public long filterId;
-    public long distributionRuleId;
-    public long assignedOrgId;
-    public String assignedOrgName;
-    public long assignedEmployeeId;
-    public String assignedEmployeeName;
-    public String name;
-    public String days;
-    public String months;
-
+    public static String TYPE = "cpr";
 
     public CprDistributionRuleFilterDTO() {
     }
@@ -36,6 +26,7 @@ public class CprDistributionRuleFilterDTO {
             assignedEmployeeName = filter.getAssignedEmployee().getName();
         }
         name = filter.getName();
+        type = TYPE;
     }
 
 }
