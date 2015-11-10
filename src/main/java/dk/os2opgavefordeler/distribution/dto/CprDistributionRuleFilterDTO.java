@@ -10,6 +10,7 @@ public class CprDistributionRuleFilterDTO extends DistributionRuleFilterDTO{
     public static String TYPE = "cpr";
 
     public CprDistributionRuleFilterDTO() {
+        type = TYPE;
     }
 
     public CprDistributionRuleFilterDTO(CprDistributionRuleFilter filter) {

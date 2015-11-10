@@ -7,7 +7,7 @@ public class TextDistributionRuleFilterDTO extends DistributionRuleFilterDTO{
     public static String TYPE = "text";
 
     public TextDistributionRuleFilterDTO() {
-
+        type = TYPE;
     }
 
     public TextDistributionRuleFilterDTO(TextDistributionRuleFilter filter) {
