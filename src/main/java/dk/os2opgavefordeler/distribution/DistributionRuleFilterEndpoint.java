@@ -1,8 +1,12 @@
 package dk.os2opgavefordeler.distribution;
 
+import dk.os2opgavefordeler.distribution.dto.CprDistributionRuleFilterDTO;
+import dk.os2opgavefordeler.distribution.dto.DistributionRuleFilterDTO;
+import dk.os2opgavefordeler.distribution.dto.TextDistributionRuleFilterDTO;
 import dk.os2opgavefordeler.model.CprDistributionRuleFilter;
 import dk.os2opgavefordeler.model.DistributionRule;
 import dk.os2opgavefordeler.model.DistributionRuleFilter;
+import dk.os2opgavefordeler.model.TextDistributionRuleFilter;
 import dk.os2opgavefordeler.model.presentation.DistributionRulePO;
 import dk.os2opgavefordeler.rest.Endpoint;
 import dk.os2opgavefordeler.service.BootstrappingDataProviderSingleton;
@@ -49,10 +53,15 @@ public class DistributionRuleFilterEndpoint extends Endpoint {
 
         DistributionRule rule = ruleRepository.findBy(ruleId);
         Iterable<DistributionRuleFilter> filters = rule.getFilters();
-        List<CprDistributionRuleFilterDTO> result = new ArrayList<>();
+        List<DistributionRuleFilterDTO> result = new ArrayList<>();
 
         for (DistributionRuleFilter f : filters) {
-            result.add(new CprDistributionRuleFilterDTO((CprDistributionRuleFilter) f));
+
+            if(f instanceof CprDistributionRuleFilter) {
+                result.add(new CprDistributionRuleFilterDTO((CprDistributionRuleFilter) f));
+            } else if(f instanceof TextDistributionRuleFilter){
+                result.add(new TextDistributionRuleFilterDTO((TextDistributionRuleFilter) f));
+            }
         }
 
         return ok(result);
@@ -63,7 +72,7 @@ public class DistributionRuleFilterEndpoint extends Endpoint {
     public Response updateFilter(
             @PathParam("ruleId") long ruleId,
             @PathParam("filterId") long filterId,
-            CprDistributionRuleFilterDTO dto) {
+            DistributionRuleFilterDTO dto) {
         try {
             controller.updateFilter(ruleId, filterId, dto);
             return ok();
@@ -74,9 +83,13 @@ public class DistributionRuleFilterEndpoint extends Endpoint {
 
     @POST
     @Path("/")
-    public Response createFilter(CprDistributionRuleFilterDTO dto) {
+    public Response createFilter(DistributionRuleFilterDTO dto) {
         try {
-            controller.createFilter(dto);
+            if(dto.filterId == 0) {
+                controller.createFilter(dto);
+            } else {
+                controller.updateFilter(dto.distributionRuleId, dto.filterId, dto);
+            }
             return ok();
         } catch (Exception e) {
             return badRequest(e.getMessage());
