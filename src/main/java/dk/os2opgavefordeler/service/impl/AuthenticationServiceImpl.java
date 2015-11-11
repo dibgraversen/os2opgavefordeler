@@ -38,7 +38,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 		);
 		providers.put(2, IdentityProvider.builder()
 			.id(2).name("Kitos SSO")
-			.url("https://os2saml.syddjurs.dk/.well-known/openid-configuration")
+			.url("https://os2saml.syddjurs.dk/")
 			.clientId("suneclient")
 			.clientSecret("secret")
 			.build()
