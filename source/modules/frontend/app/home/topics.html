@@ -1,0 +1,94 @@
+<div id="topics" style="margin-left: 70px">
+	<h2 class="page-title">Opgavefordelinger</h2>
+
+	<alert ng-repeat="alert in listAlerts" type="{{alert.type}}"
+				 close="closeAlert($index)" class="animate-fade"
+				 style="width: 100%">{{alert.msg}}
+	</alert>
+	<div ng-show="topicRoutes.length > 0" style="">
+		<table class="table table-stripez table-hover">
+			<tr>
+				<th></th>
+				<th>Opgave</th>
+				<th>Organisationsenhed</th>
+				<th ng-show="settings.showExpandedOrg">Email</th>
+				<th ng-show="settings.showExpandedOrg">Telefonnummer</th>
+				<th>Medarbejder</th>
+				<th></th>
+				<th ng-show="settings.showResponsible">Ansvarlig </th>
+				<th ng-show="settings.showResponsible"></th>
+			</tr>
+
+			<tr ng-repeat="topic in topicRoutes | filter:filter.text"
+				ng-show="topic.visible"
+				class="{{ topic.kle.type }} animate-show" ng-class="">
+				<td class="indent">
+					<span class="glyphicon hover" ng-click="toggle(topic)"
+						ng-show="topic.kle.type !== 'topic'"
+						ng-class="topic.open ? 'glyphicon-chevron-down' : 'glyphicon-chevron-right' "></span>
+				</td>
+				<td class="indent large-tooltip">
+					{{ topic.kle.number }} {{ topic.kle.name }}
+					<span ng-hide="responsibility(topic)"
+						class="glyphicon glyphicon-exclamation-sign"
+						style="color:red"
+						popover-trigger="mouseenter" popover-append-to-body="true"
+						popover="Der er ikke taget ansvar for denne opgave"></span>
+					<span ng-hide="distributed(topic)"
+						class="glyphicon glyphicon-exclamation-sign"
+						style="color:red"
+						popover-trigger="mouseenter" popover-append-to-body="true"
+						popover="Der er ikke nogen fordeling for denne opgave"></span>
+					<span ng-show="topic.kle.serviceText" ng-click="showServiceText(topic.kle)"
+						class="glyphicon glyphicon-info-sign"
+						tooltip-html-unsafe="{{ topic.kle.serviceTextPopover }}">
+					</span>
+				</td>
+				<td ng-class="topic.org ? '' : 'inherited'">{{ topic.org.name || distribution(topic) }}</td>
+				<td ng-show="settings.showExpandedOrg">{{ topic.org.email }}</td>
+				<td ng-show="settings.showExpandedOrg">{{ topic.org.phone }}</td>
+				<td ng-class="topic.employee ? '' : 'inherited'">{{ responsibleEmployee(topic) }}</td>
+				<td class="button">
+					<div class="btn-group" ng-show="distributionChangeAllowed(topic)" dropdown style="width:120px">
+						<button class="btn btn-primary"
+								popover="klik her for at vedligeholde fordelingsregler" popover-append-to-body="true"
+								popover-placement="left" popover-trigger="mouseenter" popover-popup-delay="1000"
+								ng-click="editRule(topic)">
+							Fordeling
+						</button>
+						<button ng-if="topic.org" type="button" class="btn btn-primary dropdown-toggle" dropdown-toggle>
+							<span class="caret"></span>
+						</button>
+						<ul ng-if="topic.org" class="dropdown-menu">
+							<li><a href="#" ng-click="listFilters(topic)">Udvidet fordeling</a></li>
+							<li><a href="#" class="danger" ng-click="deleteRule(topic)">Fjern fordeling</a></li>
+						</ul>
+					</div>
+				</td>
+
+				<td ng-show="settings.showResponsible" ng-class=" topic.responsible ? '' : 'inherited' ">
+					{{ responsible(topic).name }}
+					<span ng-show="getManager(responsible(topic))">({{ getManager(responsible(topic)).name }})</span>
+				</td>
+
+				<td ng-show="settings.showResponsible" class="button">
+					<div class="btn-group" ng-show="responsibilityChangeAllowed(topic)" dropdown style="width:110px">
+						<button type="button" class="btn btn-primary"
+								popover="klik her for at vedligeholde ansvar" popover-append-to-body="true"
+								popover-placement="left" popover-trigger="mouseenter" popover-popup-delay="1000"
+								ng-click="editResponsibility(topic)">
+							Ansvar
+						</button>
+						<button ng-if="topic.responsible" type="button" class="btn btn-primary dropdown-toggle" dropdown-toggle>
+							<span class="caret"></span>
+						</button>
+						<ul ng-if="topic.responsible" class="dropdown-menu">
+							<li><a href="#" class="danger" ng-click="deleteResponsibility(topic)">Fjern ansvar</a></li>
+						</ul>
+					</div>
+				</td>
+
+			</tr>
+		</table>
+	</div>
+</div>
