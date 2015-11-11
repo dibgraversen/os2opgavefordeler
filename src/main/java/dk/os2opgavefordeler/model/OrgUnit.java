@@ -13,7 +13,7 @@ import java.util.Optional;
 
 @Entity
 public class OrgUnit implements Serializable, IHasChildren<OrgUnit> {
-	@Id @GeneratedValue(strategy = GenerationType.AUTO)
+	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
 
 	private boolean isActive;
@@ -40,7 +40,7 @@ public class OrgUnit implements Serializable, IHasChildren<OrgUnit> {
 	private List<Employment> employees;
 
 	@NotNull
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	private Municipality municipality;
 
 	public OrgUnit() {
@@ -54,6 +54,9 @@ public class OrgUnit implements Serializable, IHasChildren<OrgUnit> {
 		this.name = builder.name;
 		this.esdhId = builder.esdhId;
 		this.manager = builder.manager;
+		this.businessKey = builder.businessKey;
+		this.email = builder.email;
+		this.phone = builder.phone;
 		if(builder.employees != null) {
 			this.employees = builder.employees;
 			this.employees.stream().forEach(emp -> emp.setEmployedIn(this));

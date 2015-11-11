@@ -11,7 +11,7 @@ import java.util.Date;
  */
 @Entity
 public class DistributionAssignment implements Serializable {
-	@Id @GeneratedValue(strategy = GenerationType.AUTO)
+	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
 	long id;
 
 	private boolean isActive;

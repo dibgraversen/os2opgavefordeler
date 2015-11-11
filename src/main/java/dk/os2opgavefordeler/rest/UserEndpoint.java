@@ -37,7 +37,7 @@ public class UserEndpoint {
 	@NoCache
 	public Response getUserInfo() {
 		//Since we do the following lookup-from-db-and-verify dance (to avoid stale sessions), we might perhaps as well
-		//store just the userid. This is going the be changed to access tokens anyway, so leave be for now.
+		//store just the userId. This is going the be changed to access tokens anyway, so leave be for now.
 
 		final User user = (User) request.getSession().getAttribute("authenticated-user");
 		final Optional<User> verifiedUser = (user == null) ? Optional.empty() : userService.findById(user.getId());

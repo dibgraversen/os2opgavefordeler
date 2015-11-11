@@ -4,18 +4,20 @@ import dk.os2opgavefordeler.model.Kle;
 import dk.os2opgavefordeler.model.Kle_;
 import dk.os2opgavefordeler.service.KleService;
 import dk.os2opgavefordeler.service.PersistenceService;
+import org.apache.deltaspike.jpa.api.transaction.Transactional;
 import org.slf4j.Logger;
 
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.persistence.Query;
 import java.util.List;
 import java.util.Optional;
 
-@Stateless
-@TransactionAttribute(TransactionAttributeType.REQUIRED)
+@ApplicationScoped
+@Transactional
 public class KleServiceImpl implements KleService {
 	@Inject
 	private Logger log;
@@ -51,6 +53,7 @@ public class KleServiceImpl implements KleService {
 	}
 
 	@Override
+	@Transactional
 	public void storeAllKleMainGroups(List<Kle> groups) {
 		//TODO: do we want to drop existing KLEs here? Probably not. For production, we need more complex logic than
 		//a simple drop-and-create - this method, as it is now, is suitable only for testing.

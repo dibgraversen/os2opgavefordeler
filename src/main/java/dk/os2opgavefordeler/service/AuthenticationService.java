@@ -13,7 +13,7 @@ public interface AuthenticationService {
 	User getCurrentUser() throws AuthenticationException;	//TODO: should probably be handled with @Inject and managed by container.
 	void setCurrentUser(User user);							//TODO: no, no and no.
 
-	Optional<IdentityProvider> findProvider(int id);
+	Optional<IdentityProvider> findProvider(long id);
 
 	List<IdentityProvider> identityProviderList();
 	List<IdentityProviderPO> identityProviderPOList();
