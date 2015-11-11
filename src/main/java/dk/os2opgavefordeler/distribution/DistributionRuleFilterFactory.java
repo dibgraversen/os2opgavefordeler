@@ -64,6 +64,8 @@ public class DistributionRuleFilterFactory {
             filter.setAssignedOrg(orgUnitRepository.findBy(dto.assignedOrgId));
             filter.setDistributionRule(rule);
 
+            return filter;
+
 
         }
         throw new RuntimeException("Bad data");

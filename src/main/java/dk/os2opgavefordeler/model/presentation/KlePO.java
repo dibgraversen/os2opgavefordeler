@@ -1,5 +1,6 @@
 package dk.os2opgavefordeler.model.presentation;
 
+import com.google.common.base.MoreObjects;
 import dk.os2opgavefordeler.model.Kle;
 
 /**
@@ -114,5 +115,17 @@ public class KlePO {
 
 	public void setMunicipalityId(long municipalityId) {
 		this.municipalityId = municipalityId;
+	}
+
+	@Override
+	public String toString() {
+		return MoreObjects.toStringHelper(this)
+				.add("id", id)
+				.add("number", number)
+				.add("name", name)
+				.add("type", type)
+				.add("serviceText", serviceText)
+				.add("municipalityId", municipalityId)
+				.toString();
 	}
 }
