@@ -36,8 +36,9 @@ def deploy_backend(version):
             "http://nexus.miracle.local/nexus/service/local/artifact/maven/redirect?r=releases&g=dk.os2opgavefordeler&a=TopicRouter&v={}&e=war".format(
                 version), "TopicRouter.war")
 
+    liquibase('clearCheckSums')
     liquibase('update')
-    jboss_cli("deploy TopicRouter.war".format(version))
+    jboss_cli("deploy TopicRouter.war --force".format(version))
 
 
 def deploy(version):

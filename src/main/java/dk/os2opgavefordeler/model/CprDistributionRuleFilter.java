@@ -35,7 +35,7 @@ public class CprDistributionRuleFilter extends DistributionRuleFilter {
 
     private List<Integer> stringAsIntRangeList(String s) {
         List<Integer> res = new ArrayList<>();
-        String[] daysArray = days.split(",");
+        String[] daysArray = s.split(",");
         for (String d : daysArray) {
             // range
             if (d.contains("-")) {
