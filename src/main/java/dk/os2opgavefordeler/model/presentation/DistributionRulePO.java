@@ -40,6 +40,10 @@ public class DistributionRulePO {
 	 */
 	private long responsible;
 
+	// Hack, sorry
+	private String responsibleOrgName;
+	private String responsibleManagerName;
+
 	public DistributionRulePO() {
 	}
 
@@ -49,8 +53,22 @@ public class DistributionRulePO {
 
 		this.kle = kleFrom(source.getKle());
 		this.responsible = source.getResponsibleOrg().map(OrgUnit::getId).orElse(0L);
+		if(source.getResponsibleOrg().isPresent()) {
+			this.responsibleOrgName = source.getResponsibleOrg().get().getName();
+			if(source.getResponsibleOrg().get().getManager().isPresent()) {
+				this.responsibleManagerName = source.getResponsibleOrg().get().getManager().get().getName();
+			}
+		}
 		this.employee = source.getAssignedEmp();
 		this.org = source.getAssignedOrg().map(OrgUnit::getId).orElse(0L);
+	}
+
+	public String getResponsibleOrgName(){
+		return responsibleOrgName;
+	}
+
+	public void setResponsibleOrgName(String r){
+		this.responsibleOrgName = r;
 	}
 
 	public long getId() {
