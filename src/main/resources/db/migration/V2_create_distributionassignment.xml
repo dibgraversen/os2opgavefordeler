@@ -178,9 +178,16 @@
         </createTable>
 
         <createTable tableName="hibernate_sequence">
-            <column name="id" type="bigint" autoIncrement="true">
-                <constraints nullable="false" primaryKey="true" unique="true"/>
-            </column>
+        <column name="sequence_name" type="name" value="hibernate_sequence" />
+        <column name="last_value" type="bigint" value="19803" />
+        <column name="start_value" type="bigint" value="1" />
+        <column name="increment_by" type="bigint" value="1" />
+        <column name="max_value" type="bigint" value="9223372036854775807" />
+        <column name="min_value" type="bigint" value="1" />
+        <column name="cache_value" type="bigint" value="1" />
+        <column name="log_cnt" type="bigint" value="1" />
+        <column name="is_cycled" type="boolean" valueBoolean="false" />
+        <column name="is_called" type="boolean" valueBoolean="true" />
         </createTable>
 
 
