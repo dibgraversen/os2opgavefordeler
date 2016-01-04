@@ -2,7 +2,6 @@
 
 from fabric.api import *
 
-
 def download(url, destination):
     run("wget '{}' -O {}".format(url, destination))
 
@@ -21,20 +20,24 @@ def deploy_webapp(version):
     :return:
     """
 
+def get_war(version):
+    if "local" in version.lower():
+        put("target/TopicRouter.war")
+    elif "snapshot" in version.lower():
+        download(
+        "http://nexus.miracle.local/nexus/service/local/artifact/maven/redirect?r=snapshots&g=dk.os2opgavefordeler&a=TopicRouter&v={}&e=war".format(
+                version), "TopicRouter.war")
+    else:
+        download(
+        "http://nexus.miracle.local/nexus/service/local/artifact/maven/redirect?r=releases&g=dk.os2opgavefordeler&a=TopicRouter&v={}&e=war".format(
+                version), "TopicRouter.war")
 
 def deploy_backend(version):
     """
     :param version: Version of TopicRouter to deploy
     :return:
     """
-    if "snapshot" in version.lower():
-        download(
-            "http://nexus.miracle.local/nexus/service/local/artifact/maven/redirect?r=snapshots&g=dk.os2opgavefordeler&a=TopicRouter&v={}&e=war".format(
-                version), "TopicRouter.war")
-    else:
-        download(
-            "http://nexus.miracle.local/nexus/service/local/artifact/maven/redirect?r=releases&g=dk.os2opgavefordeler&a=TopicRouter&v={}&e=war".format(
-                version), "TopicRouter.war")
+    get_war(version)
 
     liquibase('clearCheckSums')
     liquibase('update')
