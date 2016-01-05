@@ -1,0 +1,37 @@
+<div class="col-md-8 col-md-offset-2">
+	<alert ng-repeat="alert in settingsMessages" type="{{alert.type}}"
+				 close="closeAlert($index)" class="animate-fade"
+				 style="width: 100%">{{alert.msg}}
+	</alert>
+	<h2 class="page-title">Kommuner</h2>
+	<table class="table table-striped table-hover">
+		<thead>
+		<tr>
+			<th>
+				Navn
+			</th>
+			<th style="width: 70px">id</th>
+			<th style="width: 50px">aktiv</th>
+			<th style="width: 25px"></th>
+		</tr>
+		</thead>
+		<tbody>
+		<tr ng-repeat="municipality in municipalities">
+			<td>{{ municipality.name }}</td>
+			<td>{{ municipality.id }}</td>
+			<td>
+				<a ng-click="toggleActive(municipality)">{{ municipality.active ? 'Ja' : 'Nej' }}</a>
+			</td>
+			<td><span class="glyphicon glyphicon-edit" tooltip="rediger"
+								ng-click="openEditMunicipality(municipality)"></span></td>
+		</tr>
+		</tbody>
+	</table>
+
+	<div class="actions text-right">
+		<button type="button" class="btn btn-primary" ng-click="openCreateMunicipality()">
+			<span class="glyphicon glyphicon-plus"></span> Tilføj kommune
+		</button>
+	</div>
+
+</div>
