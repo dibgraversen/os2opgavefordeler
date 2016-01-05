@@ -9,3 +9,11 @@ local.zsh
 .vagrant
 environment/puppet/modules/wildfly/spec/fixtures/modules/archive
 *.pyc
+.idea
+*.iml
+dist.dev
+dist.dev.zip
+src/app/constants.js
+src/lib
+local.zsh
+source/modules/frontend/node_modules

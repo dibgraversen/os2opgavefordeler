@@ -1,0 +1,87 @@
+<div class="col-md-12">
+	<div class="col-md-8 col-md-offset-2">
+		<alert ng-repeat="alert in mAdminAlerts" type="{{alert.type}}"
+					 close="closeAlert($index)" class="animate-fade"
+					 style="width: 100%">{{alert.msg}}
+		</alert>
+		<tabset justified="true">
+			<tab heading="Vedligehold org-struktur">
+				<div class="panel panel-default margin-top">
+					<div class="panel-heading">
+						Upload ny organisationsstruktur
+					</div>
+					<div class="panel-body">
+						Her kan du uploade en ny fil med organisationsstruktur.
+						Klik <a target="_blank" href="/public/org_example.json">her</a> for eksempel.
+						<form>
+							<div class="form-group">
+								<label for="orgFileInput">Vælg fil</label>
+								<input type="file" id="orgFileInput" file-model="uploadFile" multiple>
+							</div>
+							<div class="text-right">
+								<button type="button" class="btn btn-primary" ng-click="upload()">Upload</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			</tab>
+			<tab heading="Kommunespecifikke KLE'er">
+				<div class="panel panel-default margin-top">
+					<div class="panel-heading">Kommunespecifikke KLE'er</div>
+					<div class="panel-body">
+						<p>
+							Her kan du oprette og vedligeholde kommunespecifikke KLE'er. <br/>
+							Du kan oprette <strong>grupper</strong> og <strong>emner</strong> i spændet 80-99.
+						</p>
+						<p>
+							Skulle der være sammenfald mellem kommunespecifik gruppe eller et emne,
+							mens der opdateres KLE systembredt, vil det kommunespecifikke blive slettet.
+						</p>
+						<table class="table table-hover" style="table-layout: fixed">
+							<thead>
+							<tr>
+								<th style="width: 95px">Nummer</th>
+								<th style="width: 290px">Titel</th>
+								<th>Beskrivelse</th>
+								<th style="width: 50px"></th>
+							</tr>
+							</thead>
+							<tbody ng-repeat="kle in kles">
+							<tr>
+								<td>{{ kle.number }}</td>
+								<td popover-trigger="mouseenter" popover="{{ kle.name }}" popover-append-to-body="true">
+									{{ kle.name | limitTo: 40 }}{{ kle.name.length > 40 ? '&hellip;' : ''}}
+								</td>
+								<td style="overflow: hidden; white-space: nowrap"
+										popover-trigger="mouseenter" popover="{{ kle.serviceText }}" popover-append-to-body="true">
+									{{ kle.serviceText | limitTo: 50 }}{{ kle.serviceText.length > 50 ? '&hellip;' : ''}}
+								</td>
+								<td>
+									<span class="glyphicon glyphicon-edit" tooltip="Redigér" ng-click="editKle(kle)"></span>
+									<span class="glyphicon glyphicon-remove" tooltip="Slet" ng-click="deleteKle(kle)"></span>
+								</td>
+							</tr>
+							</tbody>
+						</table>
+						<div class="actions">
+							<div class="text-right">
+								<button class="btn btn-default" ng-click="addKle()">Tilføj KLE</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</tab>
+		</tabset>
+	</div>
+
+	<!--
+	TODO:
+	*) Upload new KLE
+	*) Show status for upload-processing
+	*) List of municipalities, edit
+	*) Add new municipality (including primary responsible - set as email? Pick from OrgUnit tree?)
+	*) Delete (type in name to confirm)
+	*) Add / remove administrators
+
+	-->
+</div>

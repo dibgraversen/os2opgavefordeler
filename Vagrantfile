@@ -17,4 +17,10 @@ Vagrant.configure(2) do |config|
     config.vm.network "forwarded_port", guest: 8787, host: 8787
     config.vm.network "forwarded_port", guest: 9990, host: 9990
 
+    config.vm.synced_folder "./sources/frontend/src/main/webapp/app", "/var/www/html/app", owner: "apache", group: "apache"
+    config.vm.synced_folder "./sources/frontend/src/main/webapp/assets", "/var/www/html/assets", owner: "apache", group: "apache"
+    config.vm.synced_folder "./sources/frontend/src/main/webapp/styles", "/var/www/html/styles", owner: "apache", group: "apache"
+    config.vm.synced_folder "./sources/frontend/src/main/webapp/lib", "/var/www/html/lib", owner: "apache", group: "apache"
+    config.vm.synced_folder "./sources/frontend/target/generated-sources/libraries/META-INF/resources/webjars", "/var/www/html/libraries", owner: "apache", group: "apache"
+
 end

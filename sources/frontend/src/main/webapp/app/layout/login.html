@@ -1,0 +1,31 @@
+<div class="row">
+	<div class="col-md-2"></div>
+
+	<div ng-show="!user.loggedIn" class="col-md-8">
+		<div class="page-header">
+			<h1>Du er ikke logget ind - <small>vælg en identity provider nedenfor.</small></h1>
+		</div>
+
+		<div class="panel panel-default">
+			<div class="panel-body">
+				<div class="form-inline">
+					<a href="{{provider.url}}" ng-repeat="provider in providers">
+						<button class="btn btn-primary btn-lg">{{provider.name}}</button>
+					</a>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div ng-show="user.loggedIn" class="col-md-8">
+		<div class="jumbotron">
+			<h1>Du er allerede logget ind.</h1>
+			<p>Du er logget ind som <i>{{user.name}}</i>.</p>
+			<p>Hvis du ønsker at skifte bruger, kan du logge ud i menuen i toppen af siden, eller ved at klikke her:</p>
+
+			<button type="button" class="btn btn-primary" ng-click="logoutUser()">Log ud</button>
+		</div>
+	</div>
+
+	<div class="col-md-2"></div>
+</div>

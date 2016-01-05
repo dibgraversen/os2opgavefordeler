@@ -1,0 +1,54 @@
+<div id="responsible-modal">
+	<div class="modal-header">
+		<button type="button" class="close" ng-click="cancel()"><span aria-hidden="true">&times;</span></button>
+		<h4 class="modal-title">Vedligehold ansvar</h4>
+	</div>
+	<div class="modal-body">
+		<div>Vedligehold af ansvar for: '{{ topic.kle.number }} {{ topic.kle.name }}'</div>
+		<dl class="dl-horizontal">
+			<dt>Ansvarlig enhed:</dt>
+			<dd>{{ topic.responsible.name }}</dd>
+		</dl>
+		<div>
+			<form class="form-horizontal">
+				<div class="form-group">
+					<label class="control-label col-sm-4">Vælg ny ansvarlig enhed</label>
+					<div class="col-sm-5">
+						<input type="text" placeholder="filter" class="form-control"
+									 ng-model="orgUnitFilter" />
+					</div>
+					<div class="col-md-3">
+						<div class="checkbox">
+							<label>
+								<input type="checkbox" ng-model="showAll" ng-click="loadAll()" ng-disabled="loading"> Vis alle
+							</label>
+						</div>
+					</div>
+
+				</div>
+			</form>
+			<table class="table table-hover">
+				<thead>
+				<tr>
+					<th>Navn</th>
+					<th>Leder</th>
+				</tr>
+				</thead>
+				<tbody ng-repeat="orgUnit in orgUnits | filter:orgUnitFilter | filter: showAll || { subordinate: true } ">
+				<tr ng-class="currentOrgUnit === orgUnit ? 'success' : ''" ng-click="setCurrentOrgUnit(orgUnit)">
+					<td>{{ orgUnit.name }}</td>
+					<td ng-class="orgUnit.manager ? '' : 'inherited'">{{ firstManagedParent(orgUnit).manager.name }}</td>
+				</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+	<div class="modal-footer">
+		<alert ng-repeat="alert in modalAlerts" type="{{alert.type}}"
+					 close="closeAlert($index)" class="animate-fade"
+					 style="width: 100%">{{alert.msg}}
+		</alert>
+		<button class="btn btn-primary" ng-click="ok()">Sæt ansvar</button>
+		<button class="btn btn-default" ng-click="cancel()">Annuller</button>
+	</div>
+</div>
