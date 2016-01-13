@@ -9,8 +9,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface AuthenticationService {
-	User getCurrentUser() throws AuthenticationException;	//TODO: should probably be handled with @Inject and managed by container.
-	void setCurrentUser(User user);							//TODO: no, no and no.
 
 	Optional<IdentityProvider> findProvider(long id);
 

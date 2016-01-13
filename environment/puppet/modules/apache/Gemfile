@@ -39,7 +39,7 @@ else
   gem 'facter', :require => false
 end
 
-if puppetversion = ENV['PUPPET_GEM_VERSION']
+if puppetversion = '4.2.0'
   gem 'puppet', puppetversion, :require => false
 else
   gem 'puppet', :require => false

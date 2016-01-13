@@ -52,6 +52,10 @@ public class DistributionRuleFilterEndpoint extends Endpoint {
     public Response list(@PathParam("ruleId") long ruleId) {
 
         DistributionRule rule = ruleRepository.findBy(ruleId);
+        if(rule == null){
+            return ok();
+        }
+
         Iterable<DistributionRuleFilter> filters = rule.getFilters();
         List<DistributionRuleFilterDTO> result = new ArrayList<>();
 

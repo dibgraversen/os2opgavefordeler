@@ -2,6 +2,7 @@ package dk.os2opgavefordeler.service.impl;
 
 import com.google.common.base.Strings;
 import com.nimbusds.oauth2.sdk.id.State;
+import dk.os2opgavefordeler.employment.UserRepository;
 import dk.os2opgavefordeler.model.IdentityProvider;
 import dk.os2opgavefordeler.model.User;
 import dk.os2opgavefordeler.model.presentation.IdentityProviderPO;
@@ -22,6 +23,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
 	@Inject
 	private UserService userService;
+
+	@Inject
+	private UserRepository userRepository;
 
 	@Inject
 	private OpenIdConnect openIdConnect;
@@ -48,47 +52,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	public String generateCsrfToken() {
 		return new State().toString();
 	}
-
-	@Override
-	public User getCurrentUser() throws AuthenticationException {
-		log.error("auth.getCurrentUser: not really implemented yet!");
-		final User user = null;
-
-		/*
-		//Since we do the following lookup-from-db-and-verify dance (to avoid stale sessions), we might perhaps as well
-		//store just the userid. This is going the be changed to access tokens anyway, so leave be for now.
-
-		final User user = (User) request.getSession().getAttribute("authenticated-user");
-
-		if(user == null) {
-			throw new AuthenticationException("user not logged ind");
-		}
-
-		final Optional<User> verifiedUser = userService.findById(user.getId());
-
-		log.info("User from session: {}, db-verified: {}" , user, verifiedUser);
-
-		final boolean valid = verifiedUser.map(u -> u.equals(user)).orElse(false);
-
-		if(!valid) {
-			throw new AuthenticationException("stale user");
-		}
-		*/
-
-		return user;
-	}
-
-	@Override
-	public void setCurrentUser(User user) {
-		/*
-		if(user != null) {
-			request.getSession().setAttribute(S_AUTHENTICATED_USER, user);
-		} else {
-			request.getSession().removeAttribute(S_AUTHENTICATED_USER);
-		}
-		*/
-	}
-
 
 	@Override
 	public Optional<IdentityProvider> findProvider(long id) {

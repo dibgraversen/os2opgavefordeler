@@ -1,5 +1,7 @@
 package dk.os2opgavefordeler.rest;
 
+import dk.os2opgavefordeler.auth.CurrentUser;
+import dk.os2opgavefordeler.auth.LoginController;
 import dk.os2opgavefordeler.model.User;
 import dk.os2opgavefordeler.model.presentation.RolePO;
 import dk.os2opgavefordeler.model.presentation.UserInfoPO;
@@ -15,7 +17,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * @author hlo@miracle.dk
@@ -31,33 +32,22 @@ public class UserEndpoint {
 	@Context
 	private HttpServletRequest request;
 
+	@Inject
+	private LoginController loginController;
+
+	@Inject
+	@CurrentUser
+	private User currentUser;
+
 	@GET
 	@Path("/me")
 	@Produces(MediaType.APPLICATION_JSON)
 	@NoCache
 	public Response getUserInfo() {
-		//Since we do the following lookup-from-db-and-verify dance (to avoid stale sessions), we might perhaps as well
-		//store just the userId. This is going the be changed to access tokens anyway, so leave be for now.
-
-		final User user = (User) request.getSession().getAttribute("authenticated-user");
-		final Optional<User> verifiedUser = (user == null) ? Optional.empty() : userService.findById(user.getId());
-
-		log.info("User from session: {}, db-verified: {}" , user, verifiedUser);
-
-		final boolean valid = verifiedUser.map(u -> u.equals(user)).orElse(false);
-
-		return valid ?
-			Response.ok().entity(new UserInfoPO(user)).build() :
-			Response.ok().entity(UserInfoPO.INVALID).build();
-		/*
-		try {
-			final User user = authenticationService.getCurrentUser();
-			return Response.ok().entity(new UserInfoPO(user)).build();
-		}
-		catch(AuthenticationException e) {
+		if(currentUser == null){
 			return Response.ok().entity(UserInfoPO.INVALID).build();
 		}
-		*/
+		return Response.ok().entity(new UserInfoPO(currentUser)).build();
 	}
 
 	@GET

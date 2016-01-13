@@ -22,7 +22,7 @@ def deploy_webapp(version):
 
 def get_war(version):
     if "local" in version.lower():
-        put("target/TopicRouter.war")
+        put("sources/TopicRouter/target/TopicRouter.war")
     elif "snapshot" in version.lower():
         download(
         "http://nexus.miracle.local/nexus/service/local/artifact/maven/redirect?r=snapshots&g=dk.os2opgavefordeler&a=TopicRouter&v={}&e=war".format(

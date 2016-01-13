@@ -1,6 +1,7 @@
 package dk.os2opgavefordeler.rest;
 
 import com.google.common.base.Strings;
+import dk.os2opgavefordeler.auth.LoginController;
 import dk.os2opgavefordeler.model.IdentityProvider;
 import dk.os2opgavefordeler.model.User;
 import dk.os2opgavefordeler.model.presentation.SimpleMessage;
@@ -27,7 +28,6 @@ public class AuthEndpoint {
 	private static final String S_IDP_ID = "auth-idp-id";
 	public static final String S_AUTHENTICATED_USER = "authenticated-user";
 
-
 	@Inject
 	private Logger log;
 
@@ -40,13 +40,19 @@ public class AuthEndpoint {
 	@Inject
 	private ConfigService config;
 
+	@Inject
+	private LoginController loginController;
+
 	@POST
 	@Path("/logout")
 	@Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
 	public Response logout() {
 		log.info("Logging out user");
+
+		loginController.logout();
+
 //		authenticationService.setCurrentUser(null);
-		request.getSession().removeAttribute(S_AUTHENTICATED_USER);
+		//request.getSession().removeAttribute(S_AUTHENTICATED_USER);
 		return Response.ok().entity(new SimpleMessage("logged out")).build();
 	}
 
@@ -104,9 +110,9 @@ public class AuthEndpoint {
 
 			final User user = authenticationService.finalizeAuthenticationFlow(idp, token, config.getOpenIdCallbackUrl(), ui.getRequestUri());
 
-			request.getSession().setAttribute(S_AUTHENTICATED_USER, user);
-			authenticationService.setCurrentUser(user);
+			//request.getSession().setAttribute(S_AUTHENTICATED_USER, user);
 
+			loginController.loginAs(user);
 
 			log.info("finishAuthentication: {} is now logged in, redirecting to {}", user, config.getHomeUrl());
 			return Response.temporaryRedirect(URI.create(config.getHomeUrl())).build();
@@ -130,14 +136,14 @@ public class AuthEndpoint {
 			log.warn("IDDQD Auth endpoint hit but not enabled!");
 			return Response.status(Response.Status.NOT_FOUND).build();
 		}
+
 		if(Strings.isNullOrEmpty(email)) {
 			return Response.status(Response.Status.BAD_REQUEST).entity("No email supplied").build();
 		}
 
 		log.info("IDDQD Auth - attempting to log in [{}]", email);
 		final User user = authenticationService.findOrCreateUserFromEmail(email);
-		request.getSession().setAttribute(S_AUTHENTICATED_USER, user);
-		authenticationService.setCurrentUser(user);
+		loginController.loginAs(user);
 		return Response.temporaryRedirect(URI.create(config.getHomeUrl())).build();
 	}
 }

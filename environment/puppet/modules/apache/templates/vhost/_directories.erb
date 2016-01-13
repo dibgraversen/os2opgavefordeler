@@ -198,6 +198,9 @@
     ExpiresByType <%= rule %>
     <%- end -%>
     <%- end -%>
+    <%- if directory['ext_filter_options'] -%>
+    ExtFilterOptions <%= directory['ext_filter_options'] %>
+    <%- end -%>
     <%- if directory['force_type'] -%>
     ForceType <%= directory['force_type'] %>
     <%- end -%>
@@ -239,6 +242,9 @@
     SetEnv <%= setenv %>
       <%- end -%>
     <%- end -%>
+    <%- if directory['set_output_filter'] -%>
+    SetOutputFilter <%= directory['set_output_filter'] %>
+    <%- end -%>
     <%- if @shibboleth_enabled -%>
       <%- if directory['shib_require_session'] and ! directory['shib_require_session'].empty? -%>
     ShibRequireSession <%= directory['shib_require_session'] %>
@@ -250,6 +256,37 @@
       <%- end -%>
       <%- if directory['shib_use_headers'] and ! directory['shib_use_headers'].empty? -%>
     ShibUseHeaders <%= directory['shib_use_headers'] %>
+      <%- end -%>
+    <%- end -%>
+    <%- if directory['mellon_enable'] -%>
+    MellonEnable "<%= directory['mellon_enable'] %>"
+      <%- if directory['mellon_endpoint_path'] -%>
+    MellonEndpointPath "<%= directory['mellon_endpoint_path'] %>"
+      <%- end -%>
+      <%- if directory['mellon_sp_private_key_file'] -%>
+    MellonSPPrivateKeyFile "<%= directory['mellon_sp_private_key_file'] %>"
+      <%- end -%>
+      <%- if directory['mellon_sp_cert_file'] -%>
+    MellonSPCertFile "<%= directory['mellon_sp_cert_file'] %>"
+      <%- end -%>
+      <%- if directory['mellon_idp_metadata_file'] -%>
+    MellonIDPMetadataFile "<%= directory['mellon_idp_metadata_file'] %>"
+      <%- end -%>
+      <%- if directory['mellon_set_env_no_prefix'] -%>
+        <%- directory['mellon_set_env_no_prefix'].each do |key, value| -%>
+    MellonSetEnvNoPrefix "<%= key %>" "<%= value %>"
+        <%- end -%>
+      <%- end -%>
+      <%- if directory['mellon_user'] -%>
+    MellonUser "<%= directory['mellon_user'] %>"
+      <%- end -%>
+      <%- if directory['mellon_saml_response_dump'] -%>
+    MellonSamlResponseDump "<%= directory['mellon_saml_response_dump'] %>"
+      <%- end -%>
+      <%- if directory['mellon_cond'] -%>
+        <%- Array(directory['mellon_cond']).each do |cond| -%>
+    MellonCond <%= cond %>
+         <%- end -%>
       <%- end -%>
     <%- end -%>
     <%- if directory['custom_fragment'] -%>

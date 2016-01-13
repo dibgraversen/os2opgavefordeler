@@ -206,8 +206,6 @@
         </dependency>
 
         <!-- Delta spike -->
-
-
         <dependency>
             <groupId>org.apache.deltaspike.core</groupId>
             <artifactId>deltaspike-core-api</artifactId>
@@ -271,6 +269,22 @@
             <version>${version.deltaspike}</version>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>org.apache.deltaspike.modules</groupId>
+            <artifactId>deltaspike-security-module-api</artifactId>
+            <version>${version.deltaspike}</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.deltaspike.modules</groupId>
+            <artifactId>deltaspike-security-module-impl</artifactId>
+            <version>${version.deltaspike}</version>
+            <scope>runtime</scope>
+        </dependency>
+
+
 
         <dependency>
             <groupId>org.jboss.weld.se</groupId>
