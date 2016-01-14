@@ -2,6 +2,7 @@ package dk.os2opgavefordeler.rest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
+import dk.os2opgavefordeler.auth.CurrentUser;
 import dk.os2opgavefordeler.model.Employment;
 import dk.os2opgavefordeler.model.Municipality;
 import dk.os2opgavefordeler.model.OrgUnit;
@@ -44,6 +45,10 @@ public class OrgUnitEndpoint {
 
 	@Context
 	private HttpServletRequest request;
+
+	@Inject
+	@CurrentUser
+	private User currentUser;
 
 	@GET
 	@Path("/")
@@ -115,7 +120,6 @@ public class OrgUnitEndpoint {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response importOrg(OrgUnit input) {
-		User currentUser = (User) request.getSession().getAttribute(AuthEndpoint.S_AUTHENTICATED_USER);
 		Municipality currentMunicipality = currentUser.getMunicipality();
 		fixupOrgUnit(input, currentMunicipality);
 
@@ -142,8 +146,6 @@ public class OrgUnitEndpoint {
 		try {
 			ObjectMapper mapper = new ObjectMapper();
 			OrgUnit input = mapper.readValue(completeString.toString(), OrgUnit.class);
-			log.info("session: "+request.getSession());
-			User currentUser = (User) request.getSession().getAttribute(AuthEndpoint.S_AUTHENTICATED_USER);
 			log.info("user: {}",currentUser);
 			Municipality currentMunicipality = currentUser.getMunicipality();
 			fixupOrgUnit(input, currentMunicipality);

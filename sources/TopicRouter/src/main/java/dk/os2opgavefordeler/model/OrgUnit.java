@@ -40,7 +40,7 @@ public class OrgUnit implements Serializable, IHasChildren<OrgUnit> {
 	private List<Employment> employees;
 
 	@NotNull
-	@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@ManyToOne(fetch = FetchType.EAGER)
 	private Municipality municipality;
 
 	public OrgUnit() {

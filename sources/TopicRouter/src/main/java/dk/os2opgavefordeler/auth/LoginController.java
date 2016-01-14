@@ -8,6 +8,7 @@ import javax.enterprise.context.SessionScoped;
 import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.persistence.Transient;
 import java.io.Serializable;
 
 @SessionScoped
@@ -16,10 +17,12 @@ public class LoginController implements Serializable {
     private Long currentUserid;
 
     @Inject
-    private Logger logger;
+    @Transient
+    private transient Logger logger;
 
     @Inject
-    private UserRepository userRepository;
+    @Transient
+    private transient UserRepository userRepository;
 
     public void loginAs(User user) {
         currentUserid = user.getId();

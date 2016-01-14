@@ -28,6 +28,8 @@ public class RoleEndpoint {
 	@Inject
 	private AuthenticationService authenticationService;
 
+
+
 	@DELETE
 	@Path("/{roleId}")
 	@Produces(MediaType.APPLICATION_JSON)
