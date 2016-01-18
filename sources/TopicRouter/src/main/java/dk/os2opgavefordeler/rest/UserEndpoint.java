@@ -1,7 +1,7 @@
 package dk.os2opgavefordeler.rest;
 
 import dk.os2opgavefordeler.auth.ActiveUser;
-import dk.os2opgavefordeler.auth.LoginController;
+import dk.os2opgavefordeler.auth.BasicAuthFilter;
 import dk.os2opgavefordeler.employment.MunicipalityRepository;
 import dk.os2opgavefordeler.employment.UserRepository;
 import dk.os2opgavefordeler.model.Role;
@@ -36,27 +36,24 @@ public class UserEndpoint {
     private HttpServletRequest request;
 
     @Inject
-    private LoginController loginController;
-
-    @Inject
     private UserRepository userRepository;
 
     @Inject
     private MunicipalityRepository municipalityRepository;
 
-    @Inject
-    @ActiveUser
-    private LoginController.ActiveUser activeUser;
+    private ActiveUser activeUser(){
+        return (ActiveUser) request.getSession().getAttribute(BasicAuthFilter.SESSION_ACTIVE_USER);
+    }
 
     @GET
     @Path("/me")
     @Produces(MediaType.APPLICATION_JSON)
     @NoCache
     public Response getUserInfo() {
-        if (!activeUser.isLoggedIn()) {
+        if (!activeUser().isLoggedIn()) {
             return Response.ok().entity(UserInfoPO.INVALID).build();
         }
-        return Response.ok().entity(new UserInfoPO(userRepository.findByEmail(activeUser.getEmail()))).build();
+        return Response.ok().entity(new UserInfoPO(userRepository.findByEmail(activeUser().getEmail()))).build();
     }
 
     @POST

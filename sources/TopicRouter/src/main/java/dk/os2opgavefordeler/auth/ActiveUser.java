@@ -1,14 +1,24 @@
 package dk.os2opgavefordeler.auth;
 
+import java.io.Serializable;
 
-import org.apache.deltaspike.security.api.authorization.SecurityBindingType;
+public class ActiveUser implements Serializable {
 
-import javax.inject.Qualifier;
-import java.lang.annotation.*;
+    private static final long serialVersionUID = -45304076583325578L;
+    private String email;
+    private boolean isLoggedIn;
 
-@Retention(value = RetentionPolicy.RUNTIME)
-@Target({ElementType.FIELD, ElementType.METHOD, ElementType.PARAMETER})
-@Documented
-@Qualifier
-public @interface ActiveUser {
+    public ActiveUser(String email, boolean isLoggedIn) {
+
+        this.email = email;
+        this.isLoggedIn = isLoggedIn;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public boolean isLoggedIn() {
+        return isLoggedIn;
+    }
 }

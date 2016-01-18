@@ -1,7 +1,8 @@
 package dk.os2opgavefordeler.rest;
 
 import com.google.common.base.Strings;
-import dk.os2opgavefordeler.auth.LoginController;
+import dk.os2opgavefordeler.auth.ActiveUser;
+import dk.os2opgavefordeler.auth.BasicAuthFilter;
 import dk.os2opgavefordeler.model.IdentityProvider;
 import dk.os2opgavefordeler.model.User;
 import dk.os2opgavefordeler.model.presentation.SimpleMessage;
@@ -24,126 +25,113 @@ import java.util.Optional;
 @Path("/auth")
 @RequestScoped
 public class AuthEndpoint {
-	private static final String S_CSRF_TOKEN = "auth-csrf-token";
-	private static final String S_IDP_ID = "auth-idp-id";
-	public static final String S_AUTHENTICATED_USER = "authenticated-user";
+    public static final String S_AUTHENTICATED_USER = "authenticated-user";
+    private static final String S_CSRF_TOKEN = "auth-csrf-token";
+    private static final String S_IDP_ID = "auth-idp-id";
+    @Inject
+    private Logger log;
 
-	@Inject
-	private Logger log;
+    @Inject
+    private AuthenticationService authenticationService;
 
-	@Inject
-	private AuthenticationService authenticationService;
+    @Context
+    private HttpServletRequest request;
 
-	@Context
-	private HttpServletRequest request;
+    @Inject
+    private ConfigService config;
 
-	@Inject
-	private ConfigService config;
+    @POST
+    @Path("/logout")
+    @Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
+    public Response logout() {
+        log.info("Logging out user");
+        request.getSession().setAttribute(BasicAuthFilter.SESSION_ACTIVE_USER, null);
+        return Response.ok().entity(new SimpleMessage("logged out")).build();
+    }
 
-	@Inject
-	private LoginController loginController;
+    @GET
+    @Path("/providers")
+    @Produces(MediaType.APPLICATION_JSON)
+    @NoCache
+    public Response listIdp() {
+        return Response.ok().entity(authenticationService.identityProviderPOList()).build();
+    }
 
-	@POST
-	@Path("/logout")
-	@Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
-	public Response logout() {
-		log.info("Logging out user");
+    @GET
+    @Path("/providers/{providerId}/signin")
+    @NoCache
+    public Response beginAuthentication(@PathParam(value = "providerId") long providerId) {
+        try {
+            final HttpSession session = request.getSession();
 
-		loginController.logout();
+            final IdentityProvider idp = authenticationService.findProvider(providerId).orElseThrow(RuntimeException::new);
+            final String token = authenticationService.generateCsrfToken();
+            final URI authReqURI = authenticationService.beginAuthenticationFlow(idp, token, config.getOpenIdCallbackUrl());
 
-//		authenticationService.setCurrentUser(null);
-		//request.getSession().removeAttribute(S_AUTHENTICATED_USER);
-		return Response.ok().entity(new SimpleMessage("logged out")).build();
-	}
+            session.setAttribute(S_CSRF_TOKEN, token);
+            session.setAttribute(S_IDP_ID, providerId);
 
-	@GET
-	@Path("/providers")
-	@Produces(MediaType.APPLICATION_JSON)
-	@NoCache
-	public Response listIdp() {
-		return Response.ok().entity(authenticationService.identityProviderPOList()).build();
-	}
+            log.info("beginAuthentication: redirecting to {}", authReqURI);
 
-	@GET
-	@Path("/providers/{providerId}/signin")
-	@NoCache
-	public Response beginAuthentication(@PathParam(value = "providerId") long providerId) {
-		try {
-			final HttpSession session = request.getSession();
+            return Response.temporaryRedirect(authReqURI).build();
+        } catch (Throwable t) {
+            log.error("error in beginAuthentication", t);
+            return Response.serverError().build();
+        }
+    }
 
-			final IdentityProvider idp = authenticationService.findProvider(providerId).orElseThrow(RuntimeException::new);
-			final String token = authenticationService.generateCsrfToken();
-			final URI authReqURI = authenticationService.beginAuthenticationFlow(idp, token, config.getOpenIdCallbackUrl());
+    @GET
+    @Path("/authenticate")
+    @Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
+    @NoCache
+    public Response finishAuthentication(@Context UriInfo ui) {
+        final HttpSession session = request.getSession();
 
-			session.setAttribute(S_CSRF_TOKEN, token);
-			session.setAttribute(S_IDP_ID, providerId);
+        MultivaluedMap<String, String> qp = ui.getQueryParameters();
 
-			log.info("beginAuthentication: redirecting to {}", authReqURI);
+        log.info("finishAuthentication: {}, query parameters: {}", ui.getRequestUri(), qp);
 
-			return Response.temporaryRedirect(authReqURI).build();
-		}
-		catch(Throwable t) {
-			log.error("error in beginAuthentication", t);
-			return Response.serverError().build();
-		}
-	}
+        try {
+            long idpId = Optional.ofNullable((Long) session.getAttribute(S_IDP_ID))
+                    .orElseThrow(() -> new AuthenticationException("S_IDP_ID not set"));
+            String token = Optional.ofNullable((String) session.getAttribute(S_CSRF_TOKEN))
+                    .orElseThrow(() -> new AuthenticationException("S_CSRF_TOKEN not set"));
 
-	@GET
-	@Path("/authenticate")
-	@Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
-	@NoCache
-	public Response finishAuthentication(@Context UriInfo ui) {
-		final HttpSession session = request.getSession();
+            IdentityProvider idp = authenticationService.findProvider(idpId)
+                    .orElseThrow(() -> new AuthenticationException("Invalid IDP id"));
 
-		MultivaluedMap<String, String> qp = ui.getQueryParameters();
+            final User user = authenticationService.finalizeAuthenticationFlow(idp, token, config.getOpenIdCallbackUrl(), ui.getRequestUri());
 
-		log.info("finishAuthentication: {}, query parameters: {}", ui.getRequestUri(), qp);
+            request.getSession().setAttribute(BasicAuthFilter.SESSION_ACTIVE_USER, new ActiveUser(user.getEmail(), true));
 
-		try {
-			long idpId = Optional.ofNullable((Long) session.getAttribute(S_IDP_ID))
-				.orElseThrow( () -> new AuthenticationException("S_IDP_ID not set"));
-			String token = Optional.ofNullable((String) session.getAttribute(S_CSRF_TOKEN))
-				.orElseThrow( () -> new AuthenticationException("S_CSRF_TOKEN not set") );
+            log.info("finishAuthentication: {} is now logged in, redirecting to {}", user, config.getHomeUrl());
+            return Response.temporaryRedirect(URI.create(config.getHomeUrl())).build();
+        } catch (AuthenticationException ex) {
+            log.error("Error authenticating user", ex);
+            return Response.status(Response.Status.FORBIDDEN).build();
+        } finally {
+            session.removeAttribute(S_CSRF_TOKEN);
+            session.removeAttribute(S_IDP_ID);
+        }
+    }
 
-			IdentityProvider idp = authenticationService.findProvider(idpId)
-				.orElseThrow( () -> new AuthenticationException("Invalid IDP id"));
+    @GET
+    @Path("/iddqd")
+    @Produces(MediaType.TEXT_HTML + "; charset=UTF-8")
+    @NoCache
+    public Response godModeLogin(@QueryParam(value = "email") String email) {
+        if (!config.isGodModeLoginEnabled()) {
+            log.warn("IDDQD Auth endpoint hit but not enabled!");
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
 
-			final User user = authenticationService.finalizeAuthenticationFlow(idp, token, config.getOpenIdCallbackUrl(), ui.getRequestUri());
+        if (Strings.isNullOrEmpty(email)) {
+            return Response.status(Response.Status.BAD_REQUEST).entity("No email supplied").build();
+        }
 
-			//request.getSession().setAttribute(S_AUTHENTICATED_USER, user);
-
-			loginController.loginAs(user);
-
-			log.info("finishAuthentication: {} is now logged in, redirecting to {}", user, config.getHomeUrl());
-			return Response.temporaryRedirect(URI.create(config.getHomeUrl())).build();
-		}
-		catch(AuthenticationException ex) {
-			log.error("Error authenticating user", ex);
-			return Response.status(Response.Status.FORBIDDEN).build();
-		}
-		finally {
-			session.removeAttribute(S_CSRF_TOKEN);
-			session.removeAttribute(S_IDP_ID);
-		}
-	}
-
-	@GET
-	@Path("/iddqd")
-	@Produces(MediaType.TEXT_HTML + "; charset=UTF-8")
-	@NoCache
-	public Response godModeLogin(@QueryParam(value = "email") String email) {
-		if(!config.isGodModeLoginEnabled()) {
-			log.warn("IDDQD Auth endpoint hit but not enabled!");
-			return Response.status(Response.Status.NOT_FOUND).build();
-		}
-
-		if(Strings.isNullOrEmpty(email)) {
-			return Response.status(Response.Status.BAD_REQUEST).entity("No email supplied").build();
-		}
-
-		log.info("IDDQD Auth - attempting to log in [{}]", email);
-		final User user = authenticationService.findOrCreateUserFromEmail(email);
-		loginController.loginAs(user);
-		return Response.temporaryRedirect(URI.create(config.getHomeUrl())).build();
-	}
+        log.info("IDDQD Auth - attempting to log in [{}]", email);
+        final User user = authenticationService.findOrCreateUserFromEmail(email);
+        request.getSession().setAttribute(BasicAuthFilter.SESSION_ACTIVE_USER, new ActiveUser(user.getEmail(), true));
+        return Response.temporaryRedirect(URI.create(config.getHomeUrl())).build();
+    }
 }
