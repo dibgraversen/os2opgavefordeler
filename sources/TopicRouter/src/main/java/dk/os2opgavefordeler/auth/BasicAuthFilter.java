@@ -56,7 +56,7 @@ public class BasicAuthFilter implements Filter {
         String email = credentials.substring(0, p).trim();
         String municipality_token = credentials.substring(p + 1).trim();
 
-        controller.login(email, municipality_token);
+        controller.login(email);
 
         request.setAttribute(ATTRIBUTE_USER_EMAIL, email);
         request.setAttribute(ATTRIBUTE_USER_TOKEN, municipality_token);

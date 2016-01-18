@@ -1,9 +1,10 @@
 package dk.os2opgavefordeler.orgunit;
 
-import dk.os2opgavefordeler.auth.CurrentUser;
+import dk.os2opgavefordeler.auth.ActiveUser;
+import dk.os2opgavefordeler.auth.LoginController;
+import dk.os2opgavefordeler.employment.UserRepository;
 import dk.os2opgavefordeler.model.OrgUnit;
 import dk.os2opgavefordeler.model.User;
-import dk.os2opgavefordeler.model.presentation.OrgUnitPO;
 import dk.os2opgavefordeler.rest.Endpoint;
 import org.slf4j.Logger;
 
@@ -24,8 +25,11 @@ public class ImportEndpoint extends Endpoint {
     private ImportService importService;
 
     @Inject
-    @CurrentUser
-    private User currentUser;
+    private UserRepository userRepository;
+
+    @Inject
+    @ActiveUser
+    private LoginController.ActiveUser activeUser;
 
     @POST
     @Consumes("application/json")
@@ -35,12 +39,14 @@ public class ImportEndpoint extends Endpoint {
         logger.info("Importing organizational unit");
         logger.info(orgUnitDTO.toString());
 
-        if (currentUser == null) {
+        if (!activeUser.isLoggedIn()) {
             return badRequest("No user");
         }
 
+        User u = userRepository.findByEmail(activeUser.getEmail());
+
         try {
-            OrgUnit o = importService.importOrganization(currentUser.getMunicipality().getId(), orgUnitDTO);
+            OrgUnit o = importService.importOrganization(u.getMunicipality().getId(), orgUnitDTO);
             return Response
                     .ok()
                     .entity(o.getId())

@@ -1,6 +1,6 @@
 package dk.os2opgavefordeler.rest;
 
-import dk.os2opgavefordeler.auth.CurrentUser;
+import dk.os2opgavefordeler.auth.ActiveUser;
 import dk.os2opgavefordeler.auth.LoginController;
 import dk.os2opgavefordeler.employment.MunicipalityRepository;
 import dk.os2opgavefordeler.employment.UserRepository;
@@ -45,18 +45,18 @@ public class UserEndpoint {
     private MunicipalityRepository municipalityRepository;
 
     @Inject
-    @CurrentUser
-    private User currentUser;
+    @ActiveUser
+    private LoginController.ActiveUser activeUser;
 
     @GET
     @Path("/me")
     @Produces(MediaType.APPLICATION_JSON)
     @NoCache
     public Response getUserInfo() {
-        if (currentUser == null) {
+        if (!activeUser.isLoggedIn()) {
             return Response.ok().entity(UserInfoPO.INVALID).build();
         }
-        return Response.ok().entity(new UserInfoPO(currentUser)).build();
+        return Response.ok().entity(new UserInfoPO(userRepository.findByEmail(activeUser.getEmail()))).build();
     }
 
     @POST

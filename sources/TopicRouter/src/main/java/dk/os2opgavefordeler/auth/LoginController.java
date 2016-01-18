@@ -1,60 +1,67 @@
 package dk.os2opgavefordeler.auth;
 
-import dk.os2opgavefordeler.employment.UserRepository;
 import dk.os2opgavefordeler.model.User;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.SessionScoped;
 import javax.enterprise.inject.Produces;
-import javax.inject.Inject;
 import javax.inject.Named;
-import javax.persistence.Transient;
 import java.io.Serializable;
 
 @SessionScoped
 public class LoginController implements Serializable {
 
-    private Long currentUserid;
-
-    @Inject
-    private transient Logger logger;
-
-    @Inject
-    private transient UserRepository userRepository;
+    private ActiveUser activeUser = new ActiveUser("", false);
+    private Logger logger = LoggerFactory.getLogger(LoginController.class.getName());
 
     public void loginAs(User user) {
         logger.info("Logging in as: {}", user);
-        currentUserid = user.getId();
+        activeUser = new ActiveUser(user.getEmail(), true);
     }
 
-    public void login(String email, String token) {
-        logger.info("Login, email: {} token: {}", email,token);
-        User byEmail = userRepository.findByEmail(email);
-        currentUserid = byEmail.getId();
+    public void login(String email) {
+        logger.info("Login, email: {}", email);
+        activeUser = new ActiveUser(email, true);
     }
 
     public void logout() {
         logger.info("Logout");
-        currentUserid = null;
+        activeUser = new ActiveUser("", false);
     }
 
     public boolean isLoggedIn() {
-        return currentUserid != null;
+        return activeUser.isLoggedIn();
     }
 
-    public User getUser() {
-        logger.info("Returning user: {}", currentUserid);
-        if (currentUserid == null) {
-            return null;
-        }
-        return userRepository.findBy(currentUserid);
+    public ActiveUser getUser() {
+        return activeUser;
     }
 
     @Produces
-    @CurrentUser
+    @dk.os2opgavefordeler.auth.ActiveUser
     @Named
-    public User getCurrentUser() {
+    public ActiveUser getCurrentUser() {
         return getUser();
+    }
+
+    public class ActiveUser implements Serializable {
+        private String email;
+        private boolean isLoggedIn;
+
+        public ActiveUser(String email, boolean isLoggedIn) {
+
+            this.email = email;
+            this.isLoggedIn = isLoggedIn;
+        }
+
+        public String getEmail() {
+            return email;
+        }
+
+        public boolean isLoggedIn() {
+            return isLoggedIn;
+        }
     }
 
 }

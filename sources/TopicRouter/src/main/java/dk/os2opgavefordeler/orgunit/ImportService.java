@@ -11,7 +11,9 @@ import org.slf4j.Logger;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
+import javax.persistence.Query;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,6 +32,9 @@ public class ImportService {
     @Inject
     private EmploymentRepository employmentRepository;
 
+    @Inject
+    private EntityManager entityManager;
+
     /**
      * Imports an organization into a municipality.
      *
@@ -38,9 +43,16 @@ public class ImportService {
      */
     public OrgUnit importOrganization(long municipalityId, OrgUnitDTO orgUnitDTO) throws InvalidMunicipalityException {
         Municipality municipality = municipalityRepository.findBy(municipalityId);
+
         if (municipality == null) {
             throw new InvalidMunicipalityException("No municipality with id: " + municipalityId);
         }
+
+        entityManager.getTransaction().begin();
+        Query query = entityManager.createQuery("UPDATE OrgUnit ou SET ou.isActive=false WHERE ou.municipality.id = :municipalityId");
+        query.setParameter("municipalityId", municipality.getId());
+        query.executeUpdate();
+        entityManager.getTransaction().commit();
 
         OrgUnit orgUnit = importOrgUnit(municipality, orgUnitDTO);
         return orgUnit;
@@ -57,6 +69,7 @@ public class ImportService {
         }
         orgUnit.setBusinessKey(orgUnitDTO.businessKey);
         orgUnit.setMunicipality(municipality);
+        orgUnit.setIsActive(true);
         orgUnitRepository.saveAndFlushAndRefresh(orgUnit);
         if (orgUnitDTO.manager != null) {
             orgUnit.setManager(createEmployment(orgUnit, orgUnitDTO.manager));

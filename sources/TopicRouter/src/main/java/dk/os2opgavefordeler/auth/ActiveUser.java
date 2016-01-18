@@ -10,5 +10,5 @@ import java.lang.annotation.*;
 @Target({ElementType.FIELD, ElementType.METHOD, ElementType.PARAMETER})
 @Documented
 @Qualifier
-public @interface CurrentUser {
+public @interface ActiveUser {
 }

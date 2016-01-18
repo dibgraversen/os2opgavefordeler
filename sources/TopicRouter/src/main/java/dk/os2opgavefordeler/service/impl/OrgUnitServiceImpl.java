@@ -309,7 +309,7 @@ public class OrgUnitServiceImpl implements OrgUnitService {
 	@Override
 	@SuppressWarnings("unchecked")
 	public Optional<OrgUnit> getToplevelOrgUnit(long municipalityId) {
-		TypedQuery<OrgUnit> query = persistence.getEm().createQuery("SELECT org FROM OrgUnit org WHERE org.parent IS NULL AND org.municipality.id = :municipalityId", OrgUnit.class);
+		TypedQuery<OrgUnit> query = persistence.getEm().createQuery("SELECT org FROM OrgUnit org WHERE org.parent IS NULL AND org.municipality.id = :municipalityId AND org.isActive = true", OrgUnit.class);
 		query.setParameter("municipalityId", municipalityId);
 		Optional<OrgUnit> result;
 		try {

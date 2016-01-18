@@ -2,11 +2,12 @@ package dk.os2opgavefordeler.rest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
-import dk.os2opgavefordeler.auth.CurrentUser;
+import dk.os2opgavefordeler.auth.ActiveUser;
+import dk.os2opgavefordeler.auth.LoginController;
+import dk.os2opgavefordeler.employment.UserRepository;
 import dk.os2opgavefordeler.model.Employment;
 import dk.os2opgavefordeler.model.Municipality;
 import dk.os2opgavefordeler.model.OrgUnit;
-import dk.os2opgavefordeler.model.User;
 import dk.os2opgavefordeler.model.presentation.OrgUnitPO;
 import dk.os2opgavefordeler.model.presentation.SimpleMessage;
 import dk.os2opgavefordeler.service.BadRequestArgumentException;
@@ -47,8 +48,11 @@ public class OrgUnitEndpoint {
 	private HttpServletRequest request;
 
 	@Inject
-	@CurrentUser
-	private User currentUser;
+	@ActiveUser
+	private LoginController.ActiveUser activeUser;
+
+	@Inject
+	private UserRepository userRepository;
 
 	@GET
 	@Path("/")
@@ -120,7 +124,7 @@ public class OrgUnitEndpoint {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response importOrg(OrgUnit input) {
-		Municipality currentMunicipality = currentUser.getMunicipality();
+		Municipality currentMunicipality = userRepository.findByEmail(activeUser.getEmail()).getMunicipality();
 		fixupOrgUnit(input, currentMunicipality);
 
 		orgUnitService.importOrganization(input);
@@ -146,8 +150,8 @@ public class OrgUnitEndpoint {
 		try {
 			ObjectMapper mapper = new ObjectMapper();
 			OrgUnit input = mapper.readValue(completeString.toString(), OrgUnit.class);
-			log.info("user: {}",currentUser);
-			Municipality currentMunicipality = currentUser.getMunicipality();
+			log.info("user: {}",activeUser);
+			Municipality currentMunicipality = userRepository.findByEmail(activeUser.getEmail()).getMunicipality();
 			fixupOrgUnit(input, currentMunicipality);
 			orgUnitService.importOrganization(input);
 		} catch (IOException e) {
