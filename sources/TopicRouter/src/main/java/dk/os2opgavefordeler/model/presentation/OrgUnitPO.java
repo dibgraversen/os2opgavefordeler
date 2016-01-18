@@ -16,6 +16,8 @@ public class OrgUnitPO {
 	private String phone;
 	private Municipality municipality;
 
+	private boolean isActive;
+
 	public OrgUnitPO(){
 
 	}

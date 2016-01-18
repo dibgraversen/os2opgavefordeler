@@ -73,7 +73,15 @@ public class ImportService {
         orgUnitRepository.saveAndFlushAndRefresh(orgUnit);
         if (orgUnitDTO.manager != null) {
             orgUnit.setManager(createEmployment(orgUnit, orgUnitDTO.manager));
+        } else {
+            orgUnit.setManager(null);
         }
+        for(Employment e : orgUnit.getEmployees()){
+            e.setIsActive(false);
+            employmentRepository.saveAndFlushAndRefresh(e);
+        }
+
+
         orgUnit.setEmployees(importEmployees(orgUnit, orgUnitDTO));
 
         orgUnitRepository.saveAndFlushAndRefresh(orgUnit);

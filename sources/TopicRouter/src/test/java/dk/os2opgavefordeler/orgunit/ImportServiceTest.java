@@ -1,12 +1,14 @@
 package dk.os2opgavefordeler.orgunit;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import dk.os2opgavefordeler.employment.MunicipalityRepository;
 import dk.os2opgavefordeler.employment.OrgUnitRepository;
+import dk.os2opgavefordeler.model.Employment;
 import dk.os2opgavefordeler.model.Municipality;
 import dk.os2opgavefordeler.model.OrgUnit;
 import dk.os2opgavefordeler.test.UnitTest;
-import junit.framework.Assert;
 import org.apache.deltaspike.core.api.projectstage.ProjectStage;
 import org.apache.deltaspike.testcontrol.api.TestControl;
 import org.apache.deltaspike.testcontrol.api.junit.CdiTestRunner;
@@ -18,7 +20,9 @@ import org.junit.runner.RunWith;
 
 import javax.inject.Inject;
 
-import static junit.framework.Assert.assertTrue;
+import java.util.stream.Collectors;
+
+import static junit.framework.Assert.assertFalse;
 import static junit.framework.TestCase.assertEquals;
 
 @Category(UnitTest.class)
@@ -88,7 +92,7 @@ public class ImportServiceTest {
     }
 
     @Test
-    public void managersAreImported() throws Exception{
+    public void managersAreImported() throws Exception {
         OrgUnitDTO orgUnitDTO = new OrgUnitDTO("foo");
         orgUnitDTO.manager = createEmployeeDto("flaf");
         importService.importOrganization(municipality.getId(), orgUnitDTO);
@@ -101,7 +105,27 @@ public class ImportServiceTest {
     }
 
     @Test
-    public void subOrganizationsAreImported() throws Exception{
+    public void subOrganizationsAreImported() throws Exception {
+
+    }
+
+    @Test
+    public void testNoDuplicateEmployees() throws Exception {
+
+        OrgUnitDTO orgUnitDTO = new OrgUnitDTO("foo");
+        orgUnitDTO.manager = createEmployeeDto("flaf");
+        importService.importOrganization(municipality.getId(), orgUnitDTO);
+
+
+        OrgUnitDTO o2 = new OrgUnitDTO("foo");
+        orgUnitDTO.manager = null;
+        importService.importOrganization(municipality.getId(), orgUnitDTO);
+
+        OrgUnit o = orgUnitRepository.findByBusinessKeyAndMunicipalityId("foo", municipality.getId());
+
+        assertFalse(o.getManager().isPresent());
+        assertEquals(0, o.getEmployees().stream().filter(employment -> employment.isActive()).collect(Collectors.toList()).size());
+
 
     }
 
