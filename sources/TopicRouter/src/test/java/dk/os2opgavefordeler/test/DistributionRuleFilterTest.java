@@ -13,6 +13,7 @@ import org.apache.deltaspike.core.api.projectstage.ProjectStage;
 import org.apache.deltaspike.testcontrol.api.TestControl;
 import org.apache.deltaspike.testcontrol.api.junit.CdiTestRunner;
 import org.joda.time.DateTime;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
@@ -69,6 +70,7 @@ public class DistributionRuleFilterTest {
                 .esdhId("foo")
                 .esdhLabel("flaf")
                 .phone("l")
+                .isActive(true)
                 .municipality(municipality)
                 .businessKey("businessKey")
                 .build();
@@ -90,6 +92,7 @@ public class DistributionRuleFilterTest {
     }
 
     @Test
+    @Ignore
     public void testBootstrap() throws Exception{
         bootstrap.bootstrap();
     }
@@ -107,6 +110,7 @@ public class DistributionRuleFilterTest {
                 .esdhId("foo")
                 .esdhLabel("flaf")
                 .phone("l")
+                .isActive(true)
                 .municipality(municipality)
                 .businessKey("businessKey")
                 .build();
@@ -117,6 +121,7 @@ public class DistributionRuleFilterTest {
                 .esdhId("foo")
                 .esdhLabel("flaf")
                 .phone("l")
+                .isActive(true)
                 .municipality(municipality)
                 .businessKey("businessKey")
                 .build();

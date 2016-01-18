@@ -8,6 +8,7 @@ import dk.os2opgavefordeler.model.OrgUnit;
 import dk.os2opgavefordeler.model.Role;
 import dk.os2opgavefordeler.model.User;
 import dk.os2opgavefordeler.model.presentation.OrgUnitPO;
+import dk.os2opgavefordeler.test.IntegrationTest;
 import dk.os2opgavefordeler.test.UnitTest;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.deltaspike.core.api.projectstage.ProjectStage;
@@ -24,7 +25,7 @@ import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.Persistence;
 
-@Category(UnitTest.class)
+@Category(IntegrationTest.class)
 @RunWith(CdiTestRunner.class)
 @TestControl(projectStage = ProjectStage.IntegrationTest.class)
 public class ImportEndpointIT {

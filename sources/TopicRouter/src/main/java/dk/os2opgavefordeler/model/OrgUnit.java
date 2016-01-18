@@ -173,7 +173,14 @@ public class OrgUnit implements Serializable, IHasChildren<OrgUnit> {
 	}
 
 	public ImmutableList<OrgUnit> getChildren() {
-		return ImmutableList.copyOf(children);
+		List<OrgUnit> c = new ArrayList<>();
+		for(OrgUnit child : children){
+			if(!child.isActive){
+				continue;
+			}
+			c.add(child);
+		}
+		return ImmutableList.copyOf(c);
 	}
 
 	public ImmutableList<Employment> getEmployees() {

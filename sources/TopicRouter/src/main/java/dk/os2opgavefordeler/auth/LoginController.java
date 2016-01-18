@@ -1,12 +1,9 @@
 package dk.os2opgavefordeler.auth;
 
-import dk.os2opgavefordeler.model.User;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.Serializable;
 
 public class LoginController implements Serializable {
+    private static final long serialVersionUID = 6921127441006421645L;
 
     /*private ActiveUser activeUser = new ActiveUser("", false);
     private Logger logger = LoggerFactory.getLogger(LoginController.class.getName());
@@ -37,7 +34,6 @@ public class LoginController implements Serializable {
     public ActiveUser getCurrentUser() {
         return getUser();
     }*/
-
 
 
 }
