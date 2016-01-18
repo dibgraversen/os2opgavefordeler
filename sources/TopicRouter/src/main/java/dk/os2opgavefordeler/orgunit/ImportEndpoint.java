@@ -1,7 +1,9 @@
 package dk.os2opgavefordeler.orgunit;
 
 import dk.os2opgavefordeler.auth.CurrentUser;
+import dk.os2opgavefordeler.model.OrgUnit;
 import dk.os2opgavefordeler.model.User;
+import dk.os2opgavefordeler.model.presentation.OrgUnitPO;
 import dk.os2opgavefordeler.rest.Endpoint;
 import org.slf4j.Logger;
 
@@ -33,18 +35,19 @@ public class ImportEndpoint extends Endpoint {
         logger.info("Importing organizational unit");
         logger.info(orgUnitDTO.toString());
 
-        if(currentUser == null){
+        if (currentUser == null) {
             return badRequest("No user");
         }
 
         try {
-            importService.importOrganization(currentUser.getMunicipality().getId(), orgUnitDTO);
+            OrgUnit o = importService.importOrganization(currentUser.getMunicipality().getId(), orgUnitDTO);
+            return Response
+                    .ok()
+                    .entity(o.getId())
+                    .build();
         } catch (ImportService.InvalidMunicipalityException e) {
-            return ok("ERROR");
+            return badRequest("ERROR");
         }
-
-        return ok();
-
     }
 
 }

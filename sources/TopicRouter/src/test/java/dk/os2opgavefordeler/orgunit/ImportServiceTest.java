@@ -6,6 +6,7 @@ import dk.os2opgavefordeler.employment.OrgUnitRepository;
 import dk.os2opgavefordeler.model.Municipality;
 import dk.os2opgavefordeler.model.OrgUnit;
 import dk.os2opgavefordeler.test.UnitTest;
+import junit.framework.Assert;
 import org.apache.deltaspike.core.api.projectstage.ProjectStage;
 import org.apache.deltaspike.testcontrol.api.TestControl;
 import org.apache.deltaspike.testcontrol.api.junit.CdiTestRunner;
@@ -17,6 +18,7 @@ import org.junit.runner.RunWith;
 
 import javax.inject.Inject;
 
+import static junit.framework.Assert.assertTrue;
 import static junit.framework.TestCase.assertEquals;
 
 @Category(UnitTest.class)
@@ -83,6 +85,19 @@ public class ImportServiceTest {
         OrgUnit o = orgUnitRepository.findByBusinessKeyAndMunicipalityId("foo", municipality.getId());
 
         assertEquals(orgUnitDTO.employees.size(), o.getEmployees().size());
+    }
+
+    @Test
+    public void managersAreImported() throws Exception{
+        OrgUnitDTO orgUnitDTO = new OrgUnitDTO("foo");
+        orgUnitDTO.manager = createEmployeeDto("flaf");
+        importService.importOrganization(municipality.getId(), orgUnitDTO);
+
+        OrgUnit o = orgUnitRepository.findByBusinessKeyAndMunicipalityId("foo", municipality.getId());
+
+        assertEquals(1, o.getEmployees().size());
+        assertEquals("flaf", o.getManager().get().getName());
+
     }
 
     @Test

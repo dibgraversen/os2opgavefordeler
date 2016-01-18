@@ -17,14 +17,13 @@ public class LoginController implements Serializable {
     private Long currentUserid;
 
     @Inject
-    @Transient
     private transient Logger logger;
 
     @Inject
-    @Transient
     private transient UserRepository userRepository;
 
     public void loginAs(User user) {
+        logger.info("Logging in as: {}", user);
         currentUserid = user.getId();
     }
 
@@ -35,7 +34,6 @@ public class LoginController implements Serializable {
     }
 
     public void logout() {
-
         logger.info("Logout");
         currentUserid = null;
     }
@@ -45,6 +43,7 @@ public class LoginController implements Serializable {
     }
 
     public User getUser() {
+        logger.info("Returning user: {}", currentUserid);
         if (currentUserid == null) {
             return null;
         }

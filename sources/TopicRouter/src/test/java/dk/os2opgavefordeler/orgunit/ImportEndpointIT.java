@@ -4,31 +4,46 @@ import com.jayway.restassured.RestAssured;
 import com.jayway.restassured.http.ContentType;
 import com.jayway.restassured.response.Header;
 import dk.os2opgavefordeler.model.Municipality;
+import dk.os2opgavefordeler.model.OrgUnit;
 import dk.os2opgavefordeler.model.Role;
 import dk.os2opgavefordeler.model.User;
+import dk.os2opgavefordeler.model.presentation.OrgUnitPO;
+import dk.os2opgavefordeler.test.UnitTest;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.deltaspike.core.api.projectstage.ProjectStage;
+import org.apache.deltaspike.testcontrol.api.TestControl;
+import org.apache.deltaspike.testcontrol.api.junit.CdiTestRunner;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
+import org.junit.runner.RunWith;
+import org.slf4j.Logger;
 
+import javax.inject.Inject;
+import javax.persistence.EntityManager;
+import javax.persistence.Persistence;
+
+@Category(UnitTest.class)
+@RunWith(CdiTestRunner.class)
+@TestControl(projectStage = ProjectStage.IntegrationTest.class)
 public class ImportEndpointIT {
 
-    private String municipality_endpoint = "http://localhost:1080/rest/municipalities";
-    private String orgunit_endpoint = "http://localhost:1080/rest/org-unit-import";
-    private String user_endpoint = "http://localhost:1080/rest/users";
+    public static final String ORG_UNIT_ENDPOINT = "http://localhost:1080/rest/org-unit-import";
+    @Inject
+    private Logger logger;
+    private EntityManager entityManager;
+    private Municipality municipality;
+    private User user;
 
-    @Test
-    public void testImport_() throws Exception {
+    @Before
+    public void init() {
+        entityManager = Persistence.createEntityManagerFactory("integration-test-db").createEntityManager();
 
-        Municipality municipality = new Municipality();
+        municipality = new Municipality();
         municipality.setActive(true);
         municipality.setName("test");
         municipality.setToken("test");
-
-        municipality = RestAssured.given()
-                .body(municipality)
-                .contentType(ContentType.JSON)
-                .post(municipality_endpoint)
-                .andReturn()
-                .as(Municipality.class);
 
         Role role = new Role();
         role.setName("test role");
@@ -37,50 +52,54 @@ public class ImportEndpointIT {
         role.setMunicipalityAdmin(true);
         role.setSubstitute(false);
 
-
-        User user = new User();
+        user = new User();
         user.setName("kkj");
         user.setEmail("test@foo.dk");
         user.setMunicipality(municipality);
-        //user.addRole(role);
+
+        entityManager.getTransaction().begin();
+        entityManager.persist(municipality);
+        entityManager.persist(user);
+        entityManager.getTransaction().commit();
+
+        logger.info("Created municipality {}", municipality);
+        logger.info("Created user {}", user);
+    }
+
+    @After
+    public void cleanup() {
+        entityManager.getTransaction().begin();
+        entityManager.remove(user);
+        entityManager.remove(municipality);
+        entityManager.getTransaction().commit();
+    }
+
+    private Header authHeader() {
+        return new Header(
+                "Authorization",
+                "Basic " + Base64.encodeBase64String((user.getEmail() + ":" + municipality.getToken()).getBytes()
+                )
+        );
+    }
 
 
-        user = RestAssured.given()
-                .body(user)
-                .contentType(ContentType.JSON)
-                .post(user_endpoint)
-                .andReturn().as(User.class);
-
-
+    @Test
+    public void testImport_() throws Exception {
         OrgUnitDTO dto = new OrgUnitDTO("test");
 
-        RestAssured.given()
+        Long id = RestAssured.given()
                 .body(dto)
                 .contentType(ContentType.JSON)
-                .header(
-                        new Header(
-                                "Authorization",
-                                "Basic " + Base64.encodeBase64String( (user.getEmail()+":"+municipality.getToken() ).getBytes()
-                                )
-                        )
-                )
-                .post(orgunit_endpoint)
+                .header(authHeader())
+                .post(ORG_UNIT_ENDPOINT)
+                //.andReturn().as(OrgUnit.class)
                 .then()
                 .assertThat()
-                .statusCode(200);
+                .statusCode(200).extract().as(Long.class);
 
-        RestAssured.given()
-                .delete(user_endpoint + "/" + user.getId())
-                .then()
-                .assertThat()
-                .statusCode(200);
-
-        RestAssured.given()
-                .delete(municipality_endpoint + "/" + municipality.getId())
-                .then()
-                .assertThat()
-                .statusCode(200);
-
-
+        OrgUnit orgUnit = entityManager.find(OrgUnit.class, id);
+        entityManager.getTransaction().begin();
+        entityManager.remove(orgUnit);
+        entityManager.getTransaction().commit();
     }
 }

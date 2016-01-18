@@ -16,6 +16,10 @@ public class OrgUnitPO {
 	private String phone;
 	private Municipality municipality;
 
+	public OrgUnitPO(){
+
+	}
+
 	public OrgUnitPO(OrgUnit from) {
 		if(from != null){
 			this.id = from.getId();

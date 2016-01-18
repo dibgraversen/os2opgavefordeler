@@ -1,6 +1,7 @@
 package dk.os2opgavefordeler.orgunit;
 
 import com.google.common.collect.Lists;
+import dk.os2opgavefordeler.employment.EmploymentRepository;
 import dk.os2opgavefordeler.employment.MunicipalityRepository;
 import dk.os2opgavefordeler.employment.OrgUnitRepository;
 import dk.os2opgavefordeler.model.Employment;
@@ -10,6 +11,7 @@ import org.slf4j.Logger;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import javax.persistence.NoResultException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,19 +27,23 @@ public class ImportService {
     @Inject
     private OrgUnitRepository orgUnitRepository;
 
+    @Inject
+    private EmploymentRepository employmentRepository;
+
     /**
      * Imports an organization into a municipality.
      *
      * @param municipalityId The municipality to import for
      * @param orgUnitDTO     A dto to describe the new OrgUnit structure
      */
-    public void importOrganization(long municipalityId, OrgUnitDTO orgUnitDTO) throws InvalidMunicipalityException {
+    public OrgUnit importOrganization(long municipalityId, OrgUnitDTO orgUnitDTO) throws InvalidMunicipalityException {
         Municipality municipality = municipalityRepository.findBy(municipalityId);
         if (municipality == null) {
             throw new InvalidMunicipalityException("No municipality with id: " + municipalityId);
         }
 
         OrgUnit orgUnit = importOrgUnit(municipality, orgUnitDTO);
+        return orgUnit;
     }
 
     private OrgUnit importOrgUnit(Municipality municipality, OrgUnitDTO orgUnitDTO) {
@@ -49,14 +55,15 @@ public class ImportService {
         } else {
             logger.info("OrgUnit existsed, updating.");
         }
+        orgUnit.setBusinessKey(orgUnitDTO.businessKey);
+        orgUnit.setMunicipality(municipality);
+        orgUnitRepository.saveAndFlushAndRefresh(orgUnit);
         if (orgUnitDTO.manager != null) {
             orgUnit.setManager(createEmployment(orgUnit, orgUnitDTO.manager));
         }
-        orgUnit.setBusinessKey(orgUnitDTO.businessKey);
-        orgUnit.setMunicipality(municipality);
         orgUnit.setEmployees(importEmployees(orgUnit, orgUnitDTO));
 
-        orgUnitRepository.save(orgUnit);
+        orgUnitRepository.saveAndFlushAndRefresh(orgUnit);
 
         for (OrgUnitDTO o : orgUnitDTO.children) {
             importOrgUnit(municipality, orgUnitDTO);
@@ -69,7 +76,12 @@ public class ImportService {
     }
 
     private Employment createEmployment(OrgUnit orgUnit, EmployeeDTO e) {
-        Employment employment = new Employment();
+        Employment employment;
+        try {
+            employment = employmentRepository.findByEmailAndMunicipality(e.email, orgUnit.getMunicipality().get());
+        } catch (NoResultException e1) {
+            employment = new Employment();
+        }
         employment.setMunicipality(orgUnit.getMunicipality().get());
         employment.setEmail(e.email);
         employment.setEmployedIn(orgUnit);
@@ -79,6 +91,7 @@ public class ImportService {
         employment.setJobTitle(e.jobTitle);
         employment.setName(e.name);
         employment.setPhone(e.phone);
+        employmentRepository.save(employment);
         return employment;
     }
 
@@ -93,7 +106,8 @@ public class ImportService {
         List<Employment> employments = new ArrayList<>();
 
         for (EmployeeDTO e : orgUnitDTO.employees) {
-            employments.add(createEmployment(orgUnit, e));
+            Employment employment = createEmployment(orgUnit, e);
+            employments.add(employment);
         }
 
         return employments;

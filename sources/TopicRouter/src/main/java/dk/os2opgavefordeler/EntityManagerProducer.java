@@ -4,6 +4,8 @@ import javax.enterprise.context.RequestScoped;
 import javax.enterprise.inject.Default;
 import javax.enterprise.inject.Disposes;
 import javax.enterprise.inject.Produces;
+import javax.inject.Named;
+import javax.inject.Qualifier;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceUnit;
@@ -32,6 +34,7 @@ public class EntityManagerProducer {
     public EntityManager create() {
         return emf.createEntityManager();
     }
+
 
     public void close(@Disposes EntityManager em) {
         if (em.isOpen()) {
