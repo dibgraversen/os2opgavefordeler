@@ -1,5 +1,6 @@
 package dk.os2opgavefordeler.orgunit;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import dk.os2opgavefordeler.employment.EmploymentRepository;
 import dk.os2opgavefordeler.employment.MunicipalityRepository;
@@ -54,11 +55,54 @@ public class ImportService {
         query.executeUpdate();
         entityManager.getTransaction().commit();
 
-        OrgUnit orgUnit = importOrgUnit(municipality, orgUnitDTO);
+        OrgUnit orgUnit = importOrgUnit(municipality, null, orgUnitDTO);
+
+        logger.info("Deleting employees");
+        entityManager.getTransaction().begin();
+        List resultList = entityManager.createQuery("SELECT e FROM Employment e WHERE e.isActive = false").getResultList();
+        logger.info("Employees to delete {}", resultList);
+        entityManager.getTransaction().commit();
+        entityManager.getTransaction().begin();
+
+        entityManager.createNativeQuery(
+                " DELETE FROM distributionrule WHERE assignedemp IN (SELECT id FROM employment WHERE isactive = FALSE);" +
+                        " DELETE FROM distributionrule_distributionrulefilter WHERE filters_id IN (SELECT id FROM distributionrule WHERE assignedemp IN (SELECT id FROM employment WHERE isactive = FALSE));" +
+                        " DELETE FROM distributionrulefilter drf WHERE drf.distributionrule_id IN (SELECT id FROM distributionrule WHERE assignedemp IN (SELECT id FROM employment WHERE isactive = FALSE));" +
+
+                        " DELETE FROM distributionrule_distributionrulefilter WHERE filters_id IN (SELECT id FROM distributionrulefilter drf WHERE drf.assignedemp IN (SELECT id FROM employment WHERE isactive = FALSE));" +
+                        " DELETE FROM distributionrulefilter drf WHERE drf.assignedemp IN (SELECT id FROM employment WHERE isactive = FALSE);" +
+
+                        " DELETE FROM role WHERE employment_id IN (SELECT id FROM employment WHERE isactive = FALSE); " +
+                        " UPDATE orgunit SET manager_id = NULL WHERE manager_id IN (SELECT id FROM employment WHERE isactive = FALSE);" +
+
+                        " UPDATE orgunit SET manager_id = NULL WHERE manager_id IN (SELECT id FROM employment WHERE employedin_id IN (SELECT id FROM orgunit WHERE isactive = FALSE));" +
+
+                        " DELETE FROM role WHERE employment_id IN (SELECT id FROM employment WHERE employedin_id IN (SELECT id FROM orgunit WHERE isactive = FALSE));" +
+
+                        " DELETE FROM distributionrule_distributionrulefilter WHERE distributionrule_id IN (SELECT id FROM distributionrule WHERE assignedemp IN (SELECT id FROM employment WHERE employedin_id IN (SELECT id FROM orgunit WHERE isactive = FALSE)));" +
+                        " DELETE FROM distributionrule_distributionrulefilter WHERE distributionrule_id IN (SELECT id FROM distributionrule WHERE parent_id IN (SELECT id FROM distributionrule WHERE assignedemp IN (SELECT id FROM employment WHERE employedin_id IN (SELECT id FROM orgunit WHERE isactive = FALSE))));" +
+                        " DELETE FROM distributionrule WHERE parent_id IN (SELECT id FROM distributionrule WHERE assignedemp IN (SELECT id FROM employment WHERE employedin_id IN (SELECT id FROM orgunit WHERE isactive = FALSE)));" +
+                        " DELETE FROM distributionrule WHERE assignedemp IN (SELECT id FROM employment WHERE employedin_id IN (SELECT id FROM orgunit WHERE isactive = FALSE));" +
+
+                        " DELETE FROM distributionrule_distributionrulefilter WHERE filters_id IN (SELECT id FROM distributionrulefilter WHERE assignedemp IN (SELECT id FROM employment WHERE employedin_id IN (SELECT id FROM orgunit WHERE isactive = FALSE)));" +
+                        " DELETE FROM distributionrulefilter WHERE assignedemp IN (SELECT id FROM employment WHERE employedin_id IN (SELECT id FROM orgunit WHERE isactive = FALSE));" +
+
+                        " DELETE FROM employment WHERE employedin_id IN (SELECT id FROM orgunit WHERE isactive = FALSE);" +
+                        " DELETE FROM employment WHERE isactive = FALSE;"
+        ).executeUpdate();
+
+        entityManager.getTransaction().commit();
+       /* entityManager.getTransaction().begin();
+        entityManager.createNativeQuery(
+                "DELETE FROM role WHERE owner_id IN (SELECT id FROM tr_user WHERE email NOT IN (SELECT email FROM employment));" +
+                        "DELETE FROM tr_user WHERE email NOT IN (SELECT email FROM employment)" +
+                        "").executeUpdate();
+        entityManager.getTransaction().commit();*/
+
         return orgUnit;
     }
 
-    private OrgUnit importOrgUnit(Municipality municipality, OrgUnitDTO orgUnitDTO) {
+    private OrgUnit importOrgUnit(Municipality municipality, OrgUnit parent, OrgUnitDTO orgUnitDTO) {
         logger.info("Importing OrgUnit: {}, Business key: {}", orgUnitDTO.name, orgUnitDTO.businessKey);
         OrgUnit orgUnit = orgUnitRepository.findByBusinessKeyAndMunicipalityId(orgUnitDTO.businessKey, municipality.getId());
         if (orgUnit == null) {
@@ -67,27 +111,32 @@ public class ImportService {
         } else {
             logger.info("OrgUnit existsed, updating.");
         }
+
+        if (parent != null) {
+            orgUnit.setParent(parent);
+        }
         orgUnit.setBusinessKey(orgUnitDTO.businessKey);
         orgUnit.setMunicipality(municipality);
         orgUnit.setIsActive(true);
+        orgUnit.setName(orgUnitDTO.name);
         orgUnitRepository.saveAndFlushAndRefresh(orgUnit);
+        ImmutableList<Employment> employees = orgUnit.getEmployees();
+        for (Employment e : employees) {
+            e.setIsActive(false);
+            employmentRepository.saveAndFlushAndRefresh(e);
+        }
         if (orgUnitDTO.manager != null) {
             orgUnit.setManager(createEmployment(orgUnit, orgUnitDTO.manager));
         } else {
             orgUnit.setManager(null);
         }
-        for(Employment e : orgUnit.getEmployees()){
-            e.setIsActive(false);
-            employmentRepository.saveAndFlushAndRefresh(e);
-        }
-
 
         orgUnit.setEmployees(importEmployees(orgUnit, orgUnitDTO));
 
         orgUnitRepository.saveAndFlushAndRefresh(orgUnit);
 
         for (OrgUnitDTO o : orgUnitDTO.children) {
-            importOrgUnit(municipality, orgUnitDTO);
+            importOrgUnit(municipality, orgUnit, o);
         }
 
         logger.info("Imported OrgUnit: {}", orgUnit);

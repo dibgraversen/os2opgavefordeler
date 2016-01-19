@@ -196,7 +196,7 @@ public class OrgUnitEndpoint {
         sb.append(tabs).append(String.format("%s - manager: %s\n", org, org.getManager()));
 
         sb.append(tabs).append("\tEmployees:\n");
-        org.getEmployees().forEach(e -> sb.append(tabs).append("\t\t").append(e).append("\n"));
+        org.getEmployees().stream().filter(Employment::isActive).forEach(e -> sb.append(tabs).append("\t\t").append(e).append("\n"));
 
         sb.append(tabs).append("\tChildren:\n");
         org.getChildren().forEach(t -> printOrg(sb, indent + 2, t));

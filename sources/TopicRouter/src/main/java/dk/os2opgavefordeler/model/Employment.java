@@ -29,7 +29,7 @@ public class Employment implements Serializable {
 	private String initials;
 	private String jobTitle;
 
-	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.EAGER)
 	private Municipality municipality;
 
 	public Employment() {

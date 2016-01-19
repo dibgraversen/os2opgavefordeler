@@ -21,15 +21,15 @@ public class DistributionRule implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     private DistributionRule parent;
-    @OneToMany(mappedBy = "parent", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "parent", fetch = FetchType.LAZY)
     private List<DistributionRule> children;
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private List<DistributionRuleFilter> filters = new ArrayList<>();
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     private OrgUnit responsibleOrg;
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     // if we decide to let several municipalities share the base KLE entities.
 //	@Column(nullable = false , unique = true) //TODO: add constraints when ready for them...
     private Kle kle;    // this can be a main group, subgroup or topic. Remodel model.kle, or "stringly typed" ref?

@@ -50,7 +50,7 @@ public class UserEndpoint {
     @Produces(MediaType.APPLICATION_JSON)
     @NoCache
     public Response getUserInfo() {
-        if (!activeUser().isLoggedIn()) {
+        if (activeUser() == null || !activeUser().isLoggedIn()) {
             return Response.ok().entity(UserInfoPO.INVALID).build();
         }
         return Response.ok().entity(new UserInfoPO(userRepository.findByEmail(activeUser().getEmail()))).build();
