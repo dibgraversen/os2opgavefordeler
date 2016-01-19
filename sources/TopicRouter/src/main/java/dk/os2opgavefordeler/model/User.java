@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableList;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -18,7 +19,7 @@ public class User implements Serializable {
 	private String email;
 
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "owner")
-	private List<Role> roles;
+	private List<Role> roles = new ArrayList<>();
 
 	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private UserSettings settings;

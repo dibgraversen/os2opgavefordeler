@@ -10,12 +10,12 @@ import javax.interceptor.InvocationContext;
 @ApplicationScoped
 public class LoggedInAuthorizer {
 
-    @Inject
+    /*@Inject
     private LoginController loginController;
 
     @Secures
     @LoggedInUser
     public boolean doSecuredCheck(InvocationContext invocationContext, BeanManager manager) throws Exception {
         return loginController.isLoggedIn();
-    }
+    }*/
 }

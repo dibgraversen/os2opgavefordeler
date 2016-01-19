@@ -5,9 +5,8 @@ import javax.enterprise.inject.Alternative;
 import javax.enterprise.inject.Default;
 import javax.enterprise.inject.Disposes;
 import javax.enterprise.inject.Produces;
-import javax.persistence.EntityManager;
-import javax.persistence.Persistence;
-import javax.persistence.PersistenceContext;
+import javax.inject.Named;
+import javax.persistence.*;
 
 @Default
 @Alternative
@@ -27,6 +26,4 @@ public class TestEntityManagerProducer {
             entityManager.close();
         }
     }
-
-
 }

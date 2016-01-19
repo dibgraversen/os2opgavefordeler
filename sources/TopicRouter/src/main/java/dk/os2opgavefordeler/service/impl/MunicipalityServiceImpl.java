@@ -46,12 +46,12 @@ public class MunicipalityServiceImpl implements MunicipalityService {
 
 	@Override
 	public Municipality createMunicipality(Municipality municipality) {
-		return  municipalityRepository.save(municipality);
+		return  municipalityRepository.saveAndFlushAndRefresh(municipality);
 	}
 
 	@Override
 	public Municipality createOrUpdateMunicipality(Municipality municipality) {
-		return municipalityRepository.save(municipality);
+		return municipalityRepository.saveAndFlushAndRefresh(municipality);
 	}
 
 	@Override

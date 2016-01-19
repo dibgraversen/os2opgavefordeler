@@ -2,7 +2,6 @@ package dk.os2opgavefordeler.auth;
 
 import org.apache.commons.codec.binary.Base64;
 
-import javax.inject.Inject;
 import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
@@ -15,11 +14,12 @@ import java.util.logging.Logger;
 public class BasicAuthFilter implements Filter {
     public static final String ATTRIBUTE_USER_EMAIL = "BasicAuthFilter_USER_EMAIL";
     public static final String ATTRIBUTE_USER_TOKEN = "BasicAuthFilter_USER_TOKEN";
+    public static final String SESSION_ACTIVE_USER = "SESSION_AUTH_USER";
     private static final Logger logger = Logger.getLogger(BasicAuthFilter.class.getName());
 
-    @Inject
+    /*@Inject
     private LoginController controller;
-
+*/
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
 
@@ -56,10 +56,12 @@ public class BasicAuthFilter implements Filter {
         String email = credentials.substring(0, p).trim();
         String municipality_token = credentials.substring(p + 1).trim();
 
-        controller.login(email, municipality_token);
-
         request.setAttribute(ATTRIBUTE_USER_EMAIL, email);
         request.setAttribute(ATTRIBUTE_USER_TOKEN, municipality_token);
+
+        ActiveUser activeUser = new ActiveUser(email, true);
+
+        request.getSession().setAttribute(SESSION_ACTIVE_USER, activeUser);
     }
 
     @Override

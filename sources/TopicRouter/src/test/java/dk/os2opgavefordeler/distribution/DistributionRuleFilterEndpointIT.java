@@ -10,7 +10,7 @@ import org.junit.experimental.categories.Category;
 @Category(IntegrationTest.class)
 public class DistributionRuleFilterEndpointIT {
 
-    private String endpoint = "http://localhost:8080/TopicRouter/rest/distributionrulefilter";
+    private String endpoint = "http://localhost:1080/rest/distributionrulefilter";
 
     @Test
     public void testCreateFilter() throws Exception {

@@ -1,6 +1,7 @@
 package dk.os2opgavefordeler.rest;
 
 import dk.os2opgavefordeler.distribution.DistributionRuleFilterEndpoint;
+import dk.os2opgavefordeler.orgunit.ImportEndpoint;
 
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
@@ -33,6 +34,7 @@ public class JaxRsActivator extends Application {
         s.add(SearchEndpoint.class);
         s.add(UserEndpoint.class);
         s.add(AuthEndpoint.class);
+        s.add(ImportEndpoint.class);
         return s;
     }
 

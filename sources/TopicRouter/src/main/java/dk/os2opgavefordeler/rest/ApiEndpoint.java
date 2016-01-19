@@ -11,6 +11,7 @@ import dk.os2opgavefordeler.service.EmploymentService;
 import dk.os2opgavefordeler.service.KleService;
 import dk.os2opgavefordeler.service.MunicipalityService;
 import dk.os2opgavefordeler.service.OrgUnitService;
+import org.jboss.resteasy.annotations.cache.NoCache;
 import org.slf4j.Logger;
 
 import javax.enterprise.context.RequestScoped;
@@ -104,6 +105,7 @@ public class ApiEndpoint extends Endpoint {
 	@GET
 	@Path("/healthcheck")
 	@Produces(MediaType.TEXT_PLAIN + "; charset=UTF-8")
+	@NoCache
 	public Response healthCheck() {
 		//TODO: perform (light-weight) sanity checks.
 		boolean everythingIsOk = true;

@@ -28,4 +28,29 @@
 
         </properties>
     </persistence-unit>
+
+    <persistence-unit name="integration-test-db">
+        <provider>org.hibernate.ejb.HibernatePersistence</provider>
+        <class>dk.os2opgavefordeler.model.DistributionRuleFilter</class>
+        <class>dk.os2opgavefordeler.model.CprDistributionRuleFilter</class>
+        <class>dk.os2opgavefordeler.model.Employment</class>
+        <class>dk.os2opgavefordeler.model.Kle</class>
+        <class>dk.os2opgavefordeler.model.OrgUnit</class>
+        <class>dk.os2opgavefordeler.model.Role</class>
+        <class>dk.os2opgavefordeler.model.User</class>
+        <class>dk.os2opgavefordeler.model.DistributionAssignment</class>
+        <class>dk.os2opgavefordeler.model.DistributionRule</class>
+        <class>dk.os2opgavefordeler.model.IdentityProvider</class>
+        <class>dk.os2opgavefordeler.model.Municipality</class>
+        <class>dk.os2opgavefordeler.model.UserSettings</class>
+
+        <properties>
+            <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/topicrouter"/>
+            <property name="javax.persistence.jdbc.driver" value="org.postgresql.Driver"/>
+            <property name="javax.persistence.jdbc.user" value="topicrouter"/>
+            <property name="javax.persistence.jdbc.password" value="SuperSaltFisk"/>
+            <property name="hibernate.show_sql" value="true"/>
+        </properties>
+    </persistence-unit>
+
 </persistence>

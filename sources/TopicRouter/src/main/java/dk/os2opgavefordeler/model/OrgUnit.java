@@ -40,8 +40,9 @@ public class OrgUnit implements Serializable, IHasChildren<OrgUnit> {
 	private List<Employment> employees;
 
 	@NotNull
-	@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@ManyToOne(fetch = FetchType.EAGER)
 	private Municipality municipality;
+
 
 	public OrgUnit() {
 		children = new ArrayList<>();
@@ -87,6 +88,13 @@ public class OrgUnit implements Serializable, IHasChildren<OrgUnit> {
 		}
 	}
 
+	public boolean isActive(){
+		return isActive;
+	}
+
+	public void setIsActive(boolean isActive){
+		this.isActive = isActive;
+	}
 
 
 	public long getId() {
@@ -165,7 +173,14 @@ public class OrgUnit implements Serializable, IHasChildren<OrgUnit> {
 	}
 
 	public ImmutableList<OrgUnit> getChildren() {
-		return ImmutableList.copyOf(children);
+		List<OrgUnit> c = new ArrayList<>();
+		for(OrgUnit child : children){
+			if(!child.isActive){
+				continue;
+			}
+			c.add(child);
+		}
+		return ImmutableList.copyOf(c);
 	}
 
 	public ImmutableList<Employment> getEmployees() {

@@ -136,6 +136,7 @@
                     <preProcessAggregates>true</preProcessAggregates>
                     <excludes>
                         <exclude>**/lib/**</exclude>
+                        <exclude>**min**</exclude>
                     </excludes>
                     <!--aggregations>
                         <aggregation>
@@ -167,10 +168,11 @@
                         </goals>
                         <configuration>
                             <transformers>
-                            <transformer implementation="org.apache.maven.plugins.shade.resource.IncludeResourceTransformer">
-                                <resource>single-min.js</resource>
-                                <file>${basedir}/target/generated-sources/single-min.js</file>
-                            </transformer>
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.IncludeResourceTransformer">
+                                    <resource>single-min.js</resource>
+                                    <file>${basedir}/target/generated-sources/single-min.js</file>
+                                </transformer>
                             </transformers>
                             <filters>
                                 <filter>
