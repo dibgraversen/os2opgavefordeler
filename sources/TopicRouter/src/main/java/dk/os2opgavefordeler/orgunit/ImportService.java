@@ -119,6 +119,8 @@ public class ImportService {
         orgUnit.setMunicipality(municipality);
         orgUnit.setIsActive(true);
         orgUnit.setName(orgUnitDTO.name);
+        orgUnit.setEsdhId(orgUnitDTO.esdhId);
+        orgUnit.setEsdhLabel(orgUnit.getEsdhLabel());
         orgUnitRepository.saveAndFlushAndRefresh(orgUnit);
         ImmutableList<Employment> employees = orgUnit.getEmployees();
         for (Employment e : employees) {

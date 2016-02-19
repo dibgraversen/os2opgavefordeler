@@ -117,7 +117,7 @@ class my_wildfly{
   contain my_os, my_postgresql
 
   class { 'wildfly':
-    version           => '9.0.2',
+    version           => '9.0.2.Final',
     install_source    => 'http://download.jboss.org/wildfly/9.0.2.Final/wildfly-9.0.2.Final.tar.gz',
     java_home         => '/usr/lib/jvm/java-1.8.0-openjdk',
     dirname           => '/opt/wildfly',
@@ -149,7 +149,7 @@ class my_wildfly{
   }->
 
   wildfly::config::module { 'org.postgresql':
-    source       => 'http://central.maven.org/maven2/org/postgresql/postgresql/9.3-1103-jdbc4/postgresql-9.3-1103-jdbc4.jar',
+    source       => 'http://central.maven.org/maven2/postgresql/postgresql/9.1-901.jdbc4/postgresql-9.1-901.jdbc4.jar',
     dependencies => ['javax.api', 'javax.transaction.api'],
     require      => Class['wildfly'],
   } ->

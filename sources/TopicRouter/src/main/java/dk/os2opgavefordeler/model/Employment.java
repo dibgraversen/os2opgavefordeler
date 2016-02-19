@@ -104,6 +104,8 @@ public class Employment implements Serializable {
 		this.esdhId = esdhId;
 	}
 
+	public void setEsdhLabel(String label){this.esdhLabel = label;}
+
 	public String getEsdhLabel() {
 		return esdhLabel;
 	}

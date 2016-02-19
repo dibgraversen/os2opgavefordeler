@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>dk.os2opgavefordeler</groupId>
@@ -18,15 +19,26 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.build.timestamp.format>yyyyMMdd'T'HHmmss</maven.build.timestamp.format>
 
-        <version.jboss.eap>6.3.0.GA</version.jboss.eap>
-        <version.org.jboss.as.plugins.maven.plugin>7.4.Final
-        </version.org.jboss.as.plugins.maven.plugin><!-- pluginManagement versions not im -->
+
         <version.slf4j>1.7.2</version.slf4j>
         <version.junit>4.11</version.junit>
         <version.jackson>2.4.4</version.jackson>
         <version.weld-for-test>1.1.23.Final</version.weld-for-test>
-        <version.deltaspike>1.5.0</version.deltaspike>
-        <hibernate.version>4.2.18.Final</hibernate.version>
+
+        <version.resteasy>3.0.10.Final</version.resteasy>
+
+        <version.hibernate>5.1.3.Final</version.hibernate>
+
+        <version.deltaspike>1.5.3</version.deltaspike>
+
+        <version.jboss.spec.javaee.7.0>1.0.3.Final</version.jboss.spec.javaee.7.0>
+
+        <!-- This should match whever is in site.pp -->
+        <version.wildfly>9.0.1.Final</version.wildfly>
+
+        <!-- This should match whatever is in site.pp -->
+        <version.postgres>9.1-901-1.jdbc4</version.postgres>
+        <!--hibernate.version>4.2.18.Final</hibernate.version-->
     </properties>
 
     <scm>
@@ -35,33 +47,25 @@
         </developerConnection>
     </scm>
 
-
-
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>org.jboss.bom.eap</groupId>
-                <artifactId>jboss-javaee-6.0-with-tools</artifactId>
-                <version>${version.jboss.eap}</version>
+                <groupId>org.jboss.spec</groupId>
+                <artifactId>jboss-javaee-7.0</artifactId>
+                <version>${version.jboss.spec.javaee.7.0}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
-                <groupId>org.jboss.bom.eap</groupId>
-                <artifactId>jboss-javaee-6.0-with-resteasy</artifactId>
-                <version>${version.jboss.eap}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.jboss.bom.eap</groupId>
-                <artifactId>jboss-javaee-6.0-with-logging</artifactId>
-                <version>${version.jboss.eap}</version>
+                <groupId>org.jboss.arquillian</groupId>
+                <artifactId>arquillian-bom</artifactId>
+                <version>1.1.11.Final</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>
+
 
     <dependencies>
         <dependency>
@@ -79,7 +83,7 @@
         <dependency>
             <groupId>postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>9.0-801.jdbc4</version>
+            <version>${version.postgres}</version>
             <scope>compile</scope>
         </dependency>
 
@@ -90,87 +94,65 @@
             <scope>compile</scope>
         </dependency>
 
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-            <version>3.0.1</version>
-            <scope>provided</scope>
-        </dependency>
 
-
-        <!-- Import the CDI API, we use provided scope as the API is included in JBoss AS 7 -->
+        <!-- Import the CDI API, we use provided scope as the API is included
+                     in JBoss WildFly -->
         <dependency>
             <groupId>javax.enterprise</groupId>
             <artifactId>cdi-api</artifactId>
             <scope>provided</scope>
         </dependency>
 
-        <!-- Import the Common Annotations API (JSR-250), we use provided scope as the API is included in JBoss AS 7 -->
+
+        <!-- Import the Common Annotations API (JSR-250), we use provided scope
+                  as the API is included in JBoss WildFly -->
         <dependency>
             <groupId>org.jboss.spec.javax.annotation</groupId>
-            <artifactId>jboss-annotations-api_1.1_spec</artifactId>
+            <artifactId>jboss-annotations-api_1.2_spec</artifactId>
             <scope>provided</scope>
         </dependency>
 
-        <!-- Import the JPA API, we use provided scope as the API is included in JBoss AS 7 -->
+        <!-- Import the JAX-RS API, we use provided scope as the API is included in WildFly -->
+        <dependency>
+            <groupId>org.jboss.spec.javax.ws.rs</groupId>
+            <artifactId>jboss-jaxrs-api_2.0_spec</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+
+        <!-- Import the Servlet API, we use provided scope as the API is included in JBoss WildFly -->
+        <dependency>
+            <groupId>org.jboss.spec.javax.servlet</groupId>
+            <artifactId>jboss-servlet-api_3.1_spec</artifactId>
+            <version>1.0.0.Final</version>
+            <scope>provided</scope>
+        </dependency>
+
+
+        <!-- Import the JPA API, we use provided scope as the API is included
+            in WildFly 8 -->
         <dependency>
             <groupId>org.hibernate.javax.persistence</groupId>
-            <artifactId>hibernate-jpa-2.0-api</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-entitymanager</artifactId>
-            <version>4.2.18.Final</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.jayway.restassured</groupId>
-            <artifactId>rest-assured</artifactId>
-            <version>2.7.0</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.jayway.restassured</groupId>
-            <artifactId>json-path</artifactId>
-            <version>2.7.0</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.jayway.restassured</groupId>
-            <artifactId>xml-path</artifactId>
-            <version>2.7.0</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-            <version>1.4.190</version>
-            <scope>compile</scope>
-        </dependency>
-
-
-        <!-- Import the EJB API, we use provided scope as the API is included in JBoss AS 7 -->
-        <dependency>
-            <groupId>org.jboss.spec.javax.ejb</groupId>
-            <artifactId>jboss-ejb-api_3.1_spec</artifactId>
+            <artifactId>hibernate-jpa-2.1-api</artifactId>
             <scope>provided</scope>
         </dependency>
 
+        <!-- Import the JPA API, we use provided scope as the API is included
+            in WildFly 8 -->
         <dependency>
-            <groupId>org.flywaydb</groupId>
-            <artifactId>flyway-core</artifactId>
-            <version>3.2.1</version>
+            <groupId>org.jboss.spec.javax.transaction</groupId>
+            <artifactId>jboss-transaction-api_1.2_spec</artifactId>
+            <scope>provided</scope>
         </dependency>
+
 
         <!-- JSR-303 (Bean Validation) Implementation -->
         <!-- Provides portable constraints such as @Email -->
-        <!-- Hibernate Validator is shipped in JBoss AS 7 -->
+        <!-- Hibernate Validator is shipped in JBoss WildFly -->
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-validator</artifactId>
-            <version>4.2.0.Final</version>
+            <version>${version.hibernate}</version>
             <scope>provided</scope>
             <exclusions>
                 <exclusion>
@@ -180,20 +162,31 @@
             </exclusions>
         </dependency>
 
-        <!-- Now we declare any tools needed -->
-
-        <!-- Annotation processor to generate the JPA 2.0 metamodel classes
-             for typesafe criteria queries -->
+        <!-- Import the JSF API, we use provided scope as the API is included in
+            JBoss WildFly -->
         <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-jpamodelgen</artifactId>
-            <version>4.3.11.Final</version>
+            <groupId>org.jboss.spec.javax.faces</groupId>
+            <artifactId>jboss-jsf-api_2.2_spec</artifactId>
             <scope>provided</scope>
         </dependency>
+
+        <!-- Now we declare any tools needed -->
+
+        <!-- Annotation processor to generate the JPA 2.0 metamodel classes for
+            typesafe criteria queries -->
+        <!--dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-jpamodelgen</artifactId>
+            <version>5.1.0.Final</version>
+        </dependency-->
+
+
+        <!-- Annotation processor that raising compilation errors whenever constraint
+            annotations are incorrectly used. -->
         <dependency>
             <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-core</artifactId>
-            <version>4.2.18.Final</version>
+            <artifactId>hibernate-validator-annotation-processor</artifactId>
+            <version>${version.hibernate}</version>
             <scope>provided</scope>
         </dependency>
 
@@ -250,26 +243,6 @@
             <scope>runtime</scope>
         </dependency>
 
-
-        <dependency>
-            <groupId>org.apache.deltaspike.cdictrl</groupId>
-            <artifactId>deltaspike-cdictrl-api</artifactId>
-            <version>${version.deltaspike}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.deltaspike.modules</groupId>
-            <artifactId>deltaspike-test-control-module-impl</artifactId>
-            <version>${version.deltaspike}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.deltaspike.cdictrl</groupId>
-            <artifactId>deltaspike-cdictrl-weld</artifactId>
-            <version>${version.deltaspike}</version>
-            <scope>test</scope>
-        </dependency>
-
         <dependency>
             <groupId>org.apache.deltaspike.modules</groupId>
             <artifactId>deltaspike-security-module-api</artifactId>
@@ -285,41 +258,24 @@
         </dependency>
 
 
-
-        <dependency>
-            <groupId>org.jboss.weld.se</groupId>
-            <artifactId>weld-se</artifactId>
-            <version>1.1.31.Final</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
+        <!--dependency>
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-jaxrs</artifactId>
             <scope>provided</scope>
-        </dependency>
+        </dependency-->
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-jaxb-provider</artifactId>
+            <version>${version.resteasy}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-multipart-provider</artifactId>
+            <version>${version.resteasy}</version>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>joda-time</groupId>
-            <artifactId>joda-time</artifactId>
-            <version>2.9</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>18.0</version>
-            <scope>compile</scope>
-        </dependency>
+
         <dependency>
             <groupId>org.jboss.jbossts</groupId>
             <artifactId>jbossjta</artifactId>
@@ -341,22 +297,135 @@
         </dependency>
 
         <dependency>
+            <groupId>com.thetransactioncompany</groupId>
+            <artifactId>cors-filter</artifactId>
+            <version>2.4</version>
+        </dependency>
+
+
+        <!-- Common sense libraries -->
+        <dependency>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
+            <version>2.9</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>18.0</version>
+            <scope>compile</scope>
+        </dependency>
+        <!-- / Common sense libraries -->
+
+
+        <!-- Testing -->
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-entitymanager</artifactId>
+            <version>4.2.18.Final</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.jayway.restassured</groupId>
+            <artifactId>rest-assured</artifactId>
+            <version>2.7.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.jayway.restassured</groupId>
+            <artifactId>json-path</artifactId>
+            <version>2.7.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.jayway.restassured</groupId>
+            <artifactId>xml-path</artifactId>
+            <version>2.7.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>1.4.190</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.deltaspike.cdictrl</groupId>
+            <artifactId>deltaspike-cdictrl-api</artifactId>
+            <version>${version.deltaspike}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.deltaspike.modules</groupId>
+            <artifactId>deltaspike-test-control-module-impl</artifactId>
+            <version>${version.deltaspike}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.deltaspike.cdictrl</groupId>
+            <artifactId>deltaspike-cdictrl-weld</artifactId>
+            <version>${version.deltaspike}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.weld.se</groupId>
+            <artifactId>weld-se</artifactId>
+            <version>1.1.31.Final</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
             <version>2.0.7-beta</version>
             <scope>test</scope>
         </dependency>
+        <!-- / Testing -->
+
+        <!-- Integration testing -->
         <dependency>
-            <groupId>com.thetransactioncompany</groupId>
-            <artifactId>cors-filter</artifactId>
-            <version>2.4</version>
+            <groupId>org.jboss.arquillian.junit</groupId>
+            <artifactId>arquillian-junit-container</artifactId>
+            <scope>test</scope>
         </dependency>
+
         <dependency>
-            <groupId>org.liquibase</groupId>
-            <artifactId>liquibase-core</artifactId>
-            <version>3.4.1</version>
+            <groupId>org.jboss.arquillian.protocol</groupId>
+            <artifactId>arquillian-protocol-servlet</artifactId>
+            <scope>test</scope>
         </dependency>
+        <!-- / Integration testing -->
+
     </dependencies>
+
+    <profiles>
+        <profile>
+            <id>arquillian-wildfly-remote</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.wildfly.arquillian</groupId>
+                    <artifactId>wildfly-arquillian-container-remote</artifactId>
+                    <version>1.0.1.Final</version>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.jboss.arquillian.protocol</groupId>
+                    <artifactId>arquillian-protocol-servlet</artifactId>
+                    <scope>test</scope>
+                </dependency>
+
+
+                <!--dependency>
+                    <groupId>org.wildfly</groupId>
+                    <artifactId>wildfly-embedded</artifactId>
+                    <version>${version.wildfly}</version>
+                    <scope>test</scope>
+                </dependency-->
+            </dependencies>
+
+        </profile>
+    </profiles>
+
     <build>
         <!-- Maven will append the version to the finalName (which is the name
              given to the generated war, and hence the context root) -->
@@ -401,170 +470,5 @@
             </plugin>
         </plugins>
 
-
     </build>
-
-    <profiles>
-        <profile>
-            <id>server-test</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-            <properties>
-                <jboss-as.id>topicrouter-test</jboss-as.id>
-                <jboss-as.host>localhost</jboss-as.host>
-                <jboss-as.port>19999</jboss-as.port>
-            </properties>
-        </profile>
-        <profile>
-            <!-- The default profile skips all tests, though you can tune it
-                to run just unit tests based on a custom pattern -->
-            <!-- Seperate profiles are provided for running all tests, including
-                Arquillian tests that execute in the specified container -->
-            <id>default</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-
-            <repositories>
-                <repository>
-                    <id>jboss-ga-repository</id>
-                    <url>http://maven.repository.redhat.com/techpreview/all</url>
-                    <releases>
-                        <enabled>true</enabled>
-                    </releases>
-                    <snapshots>
-                        <enabled>false</enabled>
-                    </snapshots>
-                </repository>
-            </repositories>
-
-            <pluginRepositories>
-                <pluginRepository>
-                    <id>jboss-ga-plugin-repository</id>
-                    <url>http://maven.repository.redhat.com/techpreview/all</url>
-                    <releases>
-                        <enabled>true</enabled>
-                    </releases>
-                    <snapshots>
-                        <enabled>false</enabled>
-                    </snapshots>
-                </pluginRepository>
-            </pluginRepositories>
-
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-surefire-plugin</artifactId>
-                        <version>2.11</version>
-                        <dependencies>
-                            <dependency>
-                                <groupId>org.apache.maven.surefire</groupId>
-                                <artifactId>surefire-junit47</artifactId>
-                                <version>2.12</version>
-                            </dependency>
-                        </dependencies>
-                        <configuration>
-                            <groups>dk.os2opgavefordeler.test.UnitTest</groups>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-
-        <profile>
-            <id>arq-jbossas-managed</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-            <!-- We add the JBoss repository as we need the JBoss AS connectors for Arquillian -->
-            <repositories>
-                <!-- The JBoss Community public repository is a composite repository of several major repositories -->
-                <!-- see http://community.jboss.org/wiki/MavenGettingStarted-Users -->
-                <repository>
-                    <id>jboss-public-repository</id>
-                    <name>JBoss Repository</name>
-                    <url>http://repository.jboss.org/nexus/content/groups/public</url>
-                    <releases>
-                    </releases>
-                    <snapshots>
-                        <enabled>false</enabled>
-                    </snapshots>
-                </repository>
-            </repositories>
-
-            <pluginRepositories>
-                <pluginRepository>
-                    <id>jboss-public-repository</id>
-                    <name>JBoss Repository</name>
-                    <url>http://repository.jboss.org/nexus/content/groups/public</url>
-                    <releases>
-                    </releases>
-                    <snapshots>
-                        <enabled>false</enabled>
-                    </snapshots>
-                </pluginRepository>
-            </pluginRepositories>
-
-            <!-- An optional Arquillian testing profile that executes tests in your JBoss AS instance -->
-            <!-- This profile will start a new JBoss AS instance, and execute the test, shutting it down when done -->
-            <!-- Run with: mvn clean test -Parq-jbossas-managed -->
-            <dependencies>
-                <dependency>
-                    <groupId>org.jboss.as</groupId>
-                    <artifactId>jboss-as-arquillian-container-managed</artifactId>
-                    <version>7.0.2.Final</version>
-                    <scope>test</scope>
-                </dependency>
-            </dependencies>
-        </profile>
-
-        <profile>
-            <id>arq-jbossas-remote</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-
-            <!-- We add the JBoss repository as we need the JBoss AS connectors for Arquillian -->
-            <repositories>
-                <!-- The JBoss Community public repository is a composite repository of several major repositories -->
-                <!-- see http://community.jboss.org/wiki/MavenGettingStarted-Users -->
-                <repository>
-                    <id>jboss-public-repository</id>
-                    <name>JBoss Repository</name>
-                    <url>http://repository.jboss.org/nexus/content/groups/public</url>
-                    <releases>
-                    </releases>
-                    <snapshots>
-                        <enabled>false</enabled>
-                    </snapshots>
-                </repository>
-            </repositories>
-
-            <pluginRepositories>
-                <pluginRepository>
-                    <id>jboss-public-repository</id>
-                    <name>JBoss Repository</name>
-                    <url>http://repository.jboss.org/nexus/content/groups/public</url>
-                    <releases>
-                    </releases>
-                    <snapshots>
-                        <enabled>false</enabled>
-                    </snapshots>
-                </pluginRepository>
-            </pluginRepositories>
-
-            <!-- An optional Arquillian testing profile that executes tests in a remote JBoss AS instance -->
-            <!-- Run with: mvn clean test -Parq-jbossas-remote -->
-            <dependencies>
-                <dependency>
-                    <groupId>org.jboss.as</groupId>
-                    <artifactId>jboss-as-arquillian-container-remote</artifactId>
-                    <version>7.0.2.Final</version>
-                    <scope>test</scope>
-                </dependency>
-            </dependencies>
-        </profile>
-    </profiles>
 </project>

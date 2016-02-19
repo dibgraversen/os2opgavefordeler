@@ -2,6 +2,7 @@ package dk.os2opgavefordeler.rest;
 
 import dk.os2opgavefordeler.assigneesearch.Assignee;
 import dk.os2opgavefordeler.assigneesearch.FindAssignedForKleService;
+import dk.os2opgavefordeler.auth.BasicAuthFilter;
 import dk.os2opgavefordeler.model.Kle;
 import dk.os2opgavefordeler.model.Municipality;
 import dk.os2opgavefordeler.model.api.DistributionRuleApiResultPO;
@@ -11,11 +12,13 @@ import dk.os2opgavefordeler.service.EmploymentService;
 import dk.os2opgavefordeler.service.KleService;
 import dk.os2opgavefordeler.service.MunicipalityService;
 import dk.os2opgavefordeler.service.OrgUnitService;
+import org.apache.commons.codec.binary.StringUtils;
 import org.jboss.resteasy.annotations.cache.NoCache;
 import org.slf4j.Logger;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.Path;
@@ -62,9 +65,15 @@ public class ApiEndpoint extends Endpoint {
 	@GET
 	@Path("/")
 	@Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
-	public Response lookup(@HeaderParam("Authorization") String token, @QueryParam("kle") String kleNumber, @Context UriInfo uriInfo) {
-		token = "ABC";
-		if (token == null) {
+	public Response lookup(@QueryParam("kle") String kleNumber, @Context UriInfo uriInfo, @Context HttpServletRequest request) {
+
+		String token = "";
+		Object t = request.getAttribute(BasicAuthFilter.ATTRIBUTE_USER_TOKEN);
+		if(t instanceof String){
+			token = (String) t;
+		}
+		//token = "ABC";
+		if (token.equals("")) {
 			return Response.status(Response.Status.UNAUTHORIZED).build();
 		}
 		Optional<Municipality> municipalityMaybe = municipalityService.getMunicipalityFromToken(token);

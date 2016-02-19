@@ -24,11 +24,12 @@
             <property name="hibernate.transaction.jta.platform"
                       value="org.hibernate.service.jta.platform.internal.JBossStandAloneJtaPlatform"/>
             <property name="hibernate.generate_statistics" value="false"/>
+            <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQL9Dialect"/>
             <!-- Properties for Hibernate -->
             <!--property name="hibernate.hbm2ddl.auto" value="create-drop" /-->
             <property name="hibernate.show_sql" value="false"/>
             <!--<property name="hibernate.hbm2ddl.auto" value="update" />-->
-            <property name="hibernate.hbm2ddl.auto" value="validate"/>
+            <property name="hibernate.hbm2ddl.auto" value="none"/>
         </properties>
     </persistence-unit>
 </persistence>

@@ -1,25 +1,28 @@
 package dk.os2opgavefordeler.auth;
 
 import org.apache.commons.codec.binary.Base64;
+import org.slf4j.Logger;
 
+import javax.inject.Inject;
 import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.StringTokenizer;
-import java.util.logging.Logger;
 
 @WebFilter
 public class BasicAuthFilter implements Filter {
     public static final String ATTRIBUTE_USER_EMAIL = "BasicAuthFilter_USER_EMAIL";
     public static final String ATTRIBUTE_USER_TOKEN = "BasicAuthFilter_USER_TOKEN";
     public static final String SESSION_ACTIVE_USER = "SESSION_AUTH_USER";
-    private static final Logger logger = Logger.getLogger(BasicAuthFilter.class.getName());
 
-    /*@Inject
-    private LoginController controller;
-*/
+    @Inject
+    private Logger logger;
+
+    @Inject
+    private AuthenticationService authenticationService;
+
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
 
@@ -27,6 +30,8 @@ public class BasicAuthFilter implements Filter {
 
     private void authenticate(HttpServletRequest request, HttpServletResponse response) throws Exception {
         String authHeader = request.getHeader("Authorization");
+
+        logger.info("Is user authenticated? {}", authenticationService.isAuthenticated());
 
         if (authHeader == null) {
             logger.info("No auth header");

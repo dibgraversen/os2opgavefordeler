@@ -20,9 +20,11 @@ def deploy_webapp(version):
     :return:
     """
 
+
 def get_war(version):
     if "local" in version.lower():
-        put("sources/TopicRouter/target/TopicRouter.war")
+        print "local"
+        run("mv -f /home/vagrant/sync/sources/TopicRouter/target/TopicRouter.war .")
     elif "snapshot" in version.lower():
         download(
         "http://nexus.miracle.local/nexus/service/local/artifact/maven/redirect?r=snapshots&g=dk.os2opgavefordeler&a=TopicRouter&v={}&e=war".format(
@@ -32,6 +34,7 @@ def get_war(version):
         "http://nexus.miracle.local/nexus/service/local/artifact/maven/redirect?r=releases&g=dk.os2opgavefordeler&a=TopicRouter&v={}&e=war".format(
                 version), "TopicRouter.war")
 
+
 def deploy_backend(version):
     """
     :param version: Version of TopicRouter to deploy
@@ -39,10 +42,14 @@ def deploy_backend(version):
     """
     get_war(version)
 
-    liquibase('clearCheckSums')
-    liquibase('update')
+    if(not "local" in version.lower()):
+        liquibase('clearCheckSums')
+        liquibase('update')
     jboss_cli("deploy TopicRouter.war --force".format(version))
 
+def dev_deploy():
+    run("sudo mv -f /home/vagrant/sync/sources/TopicRouter/target/TopicRouter.war /opt/wildfly/standalone/deployments")
+    run("sudo touch /home/vagrant/sync/sources/TopicRouter/target/TopicRouter.war.dodeploy")
 
 def deploy(version):
     deploy_backend(version)
