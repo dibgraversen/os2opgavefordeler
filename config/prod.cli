@@ -1,9 +1,0 @@
-# jboss-cli.sh --connect --file=test.cli
-
-if (outcome != failure) of /system-property=topicrouter.url.home:add()
-	/system-property=topicrouter.url.home:write-attribute(name=value, value="http://os2opgavefordeler.miracle.dk/")
-end-if
-
-if (outcome != failure) of /system-property=topicrouter.url.openid.callback:add()
-	/system-property=topicrouter.url.openid.callback:write-attribute(name=value, value="http://os2opgavefordeler.miracle.dk/rest/auth/authenticate")
-end-if

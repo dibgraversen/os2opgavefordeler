@@ -1,0 +1,8 @@
+{
+  "globals": {
+    "angular": false,
+    "_": false,
+    "console": false,
+    "require": false
+  }
+}

@@ -1,11 +1,23 @@
 node default {
+
+  case $environment {
+    'development': {
+      $host = "http://localhost:1080"
+    }
+    'test': {
+      $host = "http://topicrouter.miracle.dk"
+    }
+    default: {
+      $host = "https://os2opgavefordeler.dk"
+    }
+  }
+
   include my_os
   include my_postgresql
   include my_apache
   include my_wildfly
 }
 
-# Operating Sytem settings
 class my_os {
 
   host{ 'localhost':
@@ -19,6 +31,11 @@ class my_os {
     enable    => false,
     ensure    => false,
     hasstatus => true,
+  }
+
+
+  class { 'selinux':
+    mode => 'permissive'
   }
 
   include epel
@@ -36,16 +53,27 @@ class my_apache {
   class { 'apache':
     default_mods        => true,
     default_confd_files => true,
+    default_vhost       => false
   }
 
-  apache::mod { 'proxy_ajp': }
+  #apache::mod { 'proxy': }
 
   apache::vhost { 'localhost':
     vhost_name       => '*',
-    port             => '81',
-    docroot          => '/var/www/petshop',
+    port             => '80',
+    docroot          => "/var/www/html",
+    docroot_owner    => 'apache',
+    docroot_group    => 'apache',
     proxy_pass       => [
-      { 'path' => '/petshop', 'url' => 'ajp://localhost:8009' },
+      {
+        'path'           => '/rest',
+        'url'            => 'http://localhost:8080/TopicRouter/rest',
+        'reverse_cookies'=>[
+          { 'path' => '/TopicRouter',
+            'url'  => '/'
+          }
+        ]
+      },
     ],
   }
 }
@@ -89,8 +117,8 @@ class my_wildfly{
   contain my_os, my_postgresql
 
   class { 'wildfly':
-    version           => '8.2.0',
-    install_source    => 'http://download.jboss.org/wildfly/8.2.0.Final/wildfly-8.2.0.Final.tar.gz',
+    version           => '9.0.2.Final',
+    install_source    => 'http://download.jboss.org/wildfly/9.0.2.Final/wildfly-9.0.2.Final.tar.gz',
     java_home         => '/usr/lib/jvm/java-1.8.0-openjdk',
     dirname           => '/opt/wildfly',
     users_mgmt        => { 'wildfly' => { username => 'wildfly', password => 'wildfly' } },
@@ -121,7 +149,7 @@ class my_wildfly{
   }->
 
   wildfly::config::module { 'org.postgresql':
-    source       => 'http://central.maven.org/maven2/org/postgresql/postgresql/9.3-1103-jdbc4/postgresql-9.3-1103-jdbc4.jar',
+    source       => 'http://central.maven.org/maven2/postgresql/postgresql/9.1-901.jdbc4/postgresql-9.1-901.jdbc4.jar',
     dependencies => ['javax.api', 'javax.transaction.api'],
     require      => Class['wildfly'],
   } ->
@@ -139,24 +167,31 @@ class my_wildfly{
       'password'                         => 'SuperSaltFisk'
     }
   } ->
+
+  notify{ 'host':
+    message => "Host: $host"
+  }->
   exec{ 'home add':
-    command => '/opt/wildfly/bin/jboss-cli.sh --connect -u=mgmtuser -p=mgmtuser "/system-property=topicrouter.url.home:add()"'
+    command => '/opt/wildfly/bin/jboss-cli.sh --connect -u=mgmtuser -p=mgmtuser "/system-property=topicrouter.url.home:add()"',
+    unless  => '/opt/wildfly/bin/jboss-cli.sh --connect -u=mgmtuser -p=mgmtuser "/system-property=topicrouter.url.home:read-resource()" | grep success'
   }->
 
   exec{ 'home set':
-    command => '/opt/wildfly/bin/jboss-cli.sh --connect -u=mgmtuser -p=mgmtuser "/system-property=topicrouter.url.home:write-attribute(name=value, value="http://localhost:9001")"'
+    command => "/opt/wildfly/bin/jboss-cli.sh --connect -u=mgmtuser -p=mgmtuser \"/system-property=topicrouter.url.home:write-attribute(name=value, value=\"$host\")\""
   }->
 
   exec{ 'openid add':
-    command => '/opt/wildfly/bin/jboss-cli.sh --connect -u=mgmtuser -p=mgmtuser "/system-property=topicrouter.url.openid.callback:add()"'
+    command => '/opt/wildfly/bin/jboss-cli.sh --connect -u=mgmtuser -p=mgmtuser "/system-property=topicrouter.url.openid.callback:add()"',
+    unless  => '/opt/wildfly/bin/jboss-cli.sh --connect -u=mgmtuser -p=mgmtuser "/system-property=topicrouter.url.openid.callback:read-resource" | grep success'
   }->
 
   exec{ 'openid set':
-    command => '/opt/wildfly/bin/jboss-cli.sh --connect -u=mgmtuser -p=mgmtuser "/system-property=topicrouter.url.openid.callback:write-attribute(name=value, value="http://localhost:8080/TopicRouter/rest/auth/authenticate")"'
+    command => "/opt/wildfly/bin/jboss-cli.sh --connect -u=mgmtuser -p=mgmtuser \"/system-property=topicrouter.url.openid.callback:write-attribute(name=value, value=\"$host/rest/auth/authenticate\")\""
   }->
 
   exec{ 'godmode add':
-    command => '/opt/wildfly/bin/jboss-cli.sh --connect -u=mgmtuser -p=mgmtuser "/system-property=topicrouter.login.godmode.enabled:add()"'
+    command => '/opt/wildfly/bin/jboss-cli.sh --connect -u=mgmtuser -p=mgmtuser "/system-property=topicrouter.login.godmode.enabled:add()"',
+    unless  => '/opt/wildfly/bin/jboss-cli.sh --connect -u=mgmtuser -p=mgmtuser "/system-property=topicrouter.login.godmode.enabled:read-resource" | grep success'
   }->
 
   exec{ 'godmode set':
