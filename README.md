@@ -1,47 +1,60 @@
-README for TopicRouter frontend
-===
-This project is the frontend project for OS2 Topic Router (Opgavefordeler). 
+Læs mig
+====
 
-It is based on Angular and built with npm, Bower and Gulp.
-
-
-Dependencies and VCS
+Demo miljø
 ---
-Npm and Bower dependencies have been checked into git for availability. Compiled stylesheets, though generated source, 
-has been checked in as well so that there is no dependency to run a compile task. 
+[https://os2opgavefordeler-test.miracle.dk](https://os2opgavefordeler-test.miracle.dk)
 
-Npm
+Kræver en gyldig brugerkonto.
+
+
+Produktions miljø
 ---
-Npm defines basic Node dependencies.
- 
-Bower
+[https://os2opgavefordeler.dk](https://os2opgavefordeler.dk)
+
+Kræver en gyldig brugerkonto.
+
+Oversigt
 ---
-Bower is used for managing dev dependencies. Run `bower` install to make sure you have all the required dependencies. 
+Applikationen består af:
 
-A .bowerrc file specifying src/lib as location for bower files is required.
+ - Javascript frontend udviklet i angular.js
+ - Java backend på en JBoss
+ - Postgresql database
+ - Liquibase til database migrationer
+ - Puppet til miljø styring
 
-Gulp
+Opsætning af udviklingsmiljø
 ---
-Gulp is used to build this project.
+1. Stå i roden af dette projekt
+2. vagrant up
+3. vent
+4. mvn clean install
+5. bash ./bin/dev_deploy.sh
 
-- Run `gulp css` to compile app.less.
-- Run `gulp watch` to 'host' a version of the site and have the site refreshed when saving changes.
-- Run `gulp injectjs` to add js files from src/app/\*\* into src/index.html.
-Welcome to TaskRouter for OS2
-===
-This part of the project is the REST based backend.
+Miljøet kan tilgås på: [http://localhost:1080](http://localhost:1080) .
 
-Documentation
----
-A docs folder exists and contains a Software Guidebook as well as a domain diagram.
+Wildfly lytter på: [http://localhost:8080/](http://localhost:8080/) .
+
+ - Bruger: mgmtuser
+ - Password: mgmtuser
+
+Loggen ligger i /var/log/wildfly/console.log - du kan bruge:
+```
+ vagrant ssh -c "tail -f /var/log/wildfly/console.log"
+```
+Postgres lytter på port 5432 .
+
+ - Bruger: topicrouter
+ - Password: SuperSaltFisk
 
 
-Requirements
----
-Java 8 runtime.
-JBoss EAP 6.4 - earlier versions don't have proper Java 8 support.
-PostgreSQL 9.2.10.
+For at replikere frontenden fra din maskine til vagrant maskinen kan du køre:
+```
+vagrant rsync-auto
+```
+Så vil koden blive lagt over hver gang du gemmer.
 
-Authentication: done with OpenID Connect, using the connect2id library:
-https://bitbucket.org/connect2id/oauth-2.0-sdk-with-openid-connect-extensions
+God fornøjelse
+
 
