@@ -2,6 +2,9 @@
 
 from fabric.api import *
 
+def puppet_apply(path):
+    sudo("puppet apply --modulepath={}/modules/ {}/manifests/site.pp".format(path, path))
+
 def download(url, destination):
     run("wget '{}' -O {}".format(url, destination))
 
@@ -52,5 +55,8 @@ def dev_deploy():
     run("sudo touch /home/vagrant/sync/sources/TopicRouter/target/TopicRouter.war.dodeploy")
 
 def deploy(version):
+    run('mkdir -p V_{}'.format(version))
+    put('environment', 'V_{}'.format(version))
+    puppet_apply("V_{}/environment/puppet".format(version))
     deploy_backend(version)
     deploy_webapp(version)
