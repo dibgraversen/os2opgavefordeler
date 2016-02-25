@@ -1,6 +1,7 @@
 <beans>
     <alternatives>
         <class>dk.os2opgavefordeler.test.TestEntityManagerProducer</class>
+        <class>dk.os2opgavefordeler.auth.TestAuthenticationHolder</class>
     </alternatives>
 </beans>
 

@@ -13,15 +13,12 @@ import java.util.StringTokenizer;
 
 @WebFilter
 public class BasicAuthFilter implements Filter {
-    public static final String ATTRIBUTE_USER_EMAIL = "BasicAuthFilter_USER_EMAIL";
-    public static final String ATTRIBUTE_USER_TOKEN = "BasicAuthFilter_USER_TOKEN";
-    public static final String SESSION_ACTIVE_USER = "SESSION_AUTH_USER";
 
     @Inject
     private Logger logger;
 
     @Inject
-    private AuthenticationService authenticationService;
+    private AuthService authService;
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
@@ -31,7 +28,7 @@ public class BasicAuthFilter implements Filter {
     private void authenticate(HttpServletRequest request, HttpServletResponse response) throws Exception {
         String authHeader = request.getHeader("Authorization");
 
-        logger.info("Is user authenticated? {}", authenticationService.isAuthenticated());
+        logger.info("Is user authenticated? {}", authService.isAuthenticated());
 
         if (authHeader == null) {
             logger.info("No auth header");
@@ -61,12 +58,7 @@ public class BasicAuthFilter implements Filter {
         String email = credentials.substring(0, p).trim();
         String municipality_token = credentials.substring(p + 1).trim();
 
-        request.setAttribute(ATTRIBUTE_USER_EMAIL, email);
-        request.setAttribute(ATTRIBUTE_USER_TOKEN, municipality_token);
-
-        ActiveUser activeUser = new ActiveUser(email, true);
-
-        request.getSession().setAttribute(SESSION_ACTIVE_USER, activeUser);
+        authService.authenticateWithEmailAndToken(email, municipality_token);
     }
 
     @Override

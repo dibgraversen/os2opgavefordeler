@@ -1,6 +1,6 @@
 package dk.os2opgavefordeler.service.impl;
 
-import com.google.common.collect.Lists;
+import dk.os2opgavefordeler.auth.openid.OpenIdUserFactory;
 import dk.os2opgavefordeler.employment.EmploymentRepository;
 import dk.os2opgavefordeler.employment.UserRepository;
 import dk.os2opgavefordeler.model.Employment;
@@ -43,6 +43,9 @@ public class UserServiceImpl implements UserService {
     private UserRepository userRepository;
 
     @Inject
+    private OpenIdUserFactory openIdUserFactory;
+
+    @Inject
     private AuthorizationService auth;
 
     private static Optional<Role> hasRoleFor(User user, long employmentId) {
@@ -82,33 +85,6 @@ public class UserServiceImpl implements UserService {
         return userRepository.save(user);
     }
 
-    @Override
-    public User createUserFromOpenIdEmail(String email) {
-        // In order to create a User from an OpenID Connect login, we require the email to be present in a municipality.
-        //
-        // An email address can be used for several Employments. For instance, it's possible for a manager to also have
-        // non-manager employment - so we create a role of each of the employment.
-        //
-        Employment employment;
-        try {
-            employment = employmentRepository.findByEmail(email);
-        } catch (NoResultException e) {
-            throw new RuntimeException("No employments found for " + email);
-        }
-
-        //TODO: the following code has somewhat of a smell to it. Probably 99% of the time, there will be a single
-        //employment associated with an email address - but it feels a bit icky simply grabbing the first employment
-        //for the other cases.
-        final Role role = createRolesFromEmployments(employment);
-
-        final String name = employment.getName();
-        final User user = new User(name, email, Lists.newArrayList(role));
-
-        employment.getEmployedIn().getMunicipality().ifPresent(user::setMunicipality);
-
-        log.info("Persising {} with roles={}", user, role);
-        return createUser(user);
-    }
 
     @Override
     public List<RolePO> getRoles(long userId) {
@@ -195,7 +171,7 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new ResourceNotFoundException("Employment not found"));
 
         final User targetUser = findByEmail(targetEmployment.getEmail())
-                .orElseGet(() -> createUserFromOpenIdEmail(targetEmployment.getEmail()));
+                .orElseGet(() -> openIdUserFactory.createUserFromOpenIdEmail(targetEmployment.getEmail()));
 
         final Role sourceRole = findRoleById(roleId).orElseThrow(() -> new ResourceNotFoundException("Role not found"));
 
@@ -238,18 +214,5 @@ public class UserServiceImpl implements UserService {
                 .peek(r -> log.info("findSubstitutesFor role {} - owner {}", r, r.getOwner()))
                 .map(r -> new SubstitutePO(r.getOwner().getName(), r.getId()))
                 .collect(Collectors.toList());
-    }
-
-    private Role createRolesFromEmployments(Employment emp) {
-
-        final Optional<Employment> departmentManager = emp.getEmployedIn().getManager();
-        final Role role = new Role();
-
-        role.setManager(departmentManager.map(m -> m.equals(emp)).orElse(false));
-        role.setEmployment(emp);
-        role.setName(String.format("%s (%s)", emp.getName(), emp.getEmployedIn().getName()));
-
-        return role;
-
     }
 }

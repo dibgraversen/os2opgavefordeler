@@ -1,7 +1,6 @@
 package dk.os2opgavefordeler.orgunit;
 
-import dk.os2opgavefordeler.auth.ActiveUser;
-import dk.os2opgavefordeler.auth.BasicAuthFilter;
+import dk.os2opgavefordeler.auth.AuthService;
 import dk.os2opgavefordeler.employment.UserRepository;
 import dk.os2opgavefordeler.model.OrgUnit;
 import dk.os2opgavefordeler.model.User;
@@ -29,12 +28,11 @@ public class ImportEndpoint extends Endpoint {
     @Inject
     private UserRepository userRepository;
 
+    @Inject
+    private AuthService authService;
+
     @Context
     private HttpServletRequest request;
-
-    private ActiveUser activeUser() {
-        return (ActiveUser) request.getSession().getAttribute(BasicAuthFilter.SESSION_ACTIVE_USER);
-    }
 
     @POST
     @Consumes("application/json")
@@ -44,11 +42,11 @@ public class ImportEndpoint extends Endpoint {
         logger.info("Importing organizational unit");
         logger.info(orgUnitDTO.toString());
 
-        if (!activeUser().isLoggedIn()) {
+        if (!authService.isAuthenticated()) {
             return badRequest("No user");
         }
 
-        User u = userRepository.findByEmail(activeUser().getEmail());
+        User u = userRepository.findByEmail(authService.getAuthentication().getEmail());
 
         try {
             OrgUnit o = importService.importOrganization(u.getMunicipality().getId(), orgUnitDTO);

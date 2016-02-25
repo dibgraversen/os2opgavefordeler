@@ -1,3 +1,4 @@
+*.versionsBackup
 .DS_Store
 target
 .idea

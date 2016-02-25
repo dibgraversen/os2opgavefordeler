@@ -3,9 +3,9 @@ Vagrant.configure(2) do |config|
 
   config.vm.provision :shell, inline: 'rpm -ivh https://yum.puppetlabs.com/puppetlabs-release-el-7.noarch.rpm; yum -y install puppet'
   config.vm.provision :puppet, :options => ["--environment", "development"] do |puppet|
-    puppet.manifests_path = "environment/puppet/manifests"
+    puppet.manifests_path = "environment/src/main/puppet/manifests"
     puppet.manifest_file = "site.pp"
-    puppet.module_path = "environment/puppet/modules"
+    puppet.module_path = "environment/src/main/puppet/modules"
   end
   config.vm.provision :shell, inline: 'chmod a+x /home/vagrant'
   config.vm.provision :shell, inline: 'setenforce 0'

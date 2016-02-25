@@ -1,19 +1,15 @@
-package dk.os2opgavefordeler.service;
+package dk.os2opgavefordeler.auth.openid;
 
 import dk.os2opgavefordeler.model.IdentityProvider;
 import dk.os2opgavefordeler.model.User;
 import dk.os2opgavefordeler.model.presentation.IdentityProviderPO;
+import dk.os2opgavefordeler.service.AuthenticationException;
 
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
-public interface AuthenticationService {
-
-	Optional<IdentityProvider> findProvider(long id);
-
-	List<IdentityProvider> identityProviderList();
-	List<IdentityProviderPO> identityProviderPOList();
+public interface OpenIdAuthenticationFlow {
 
 	String generateCsrfToken();
 

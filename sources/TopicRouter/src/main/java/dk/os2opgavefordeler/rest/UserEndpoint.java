@@ -1,7 +1,6 @@
 package dk.os2opgavefordeler.rest;
 
-import dk.os2opgavefordeler.auth.ActiveUser;
-import dk.os2opgavefordeler.auth.BasicAuthFilter;
+import dk.os2opgavefordeler.auth.AuthService;
 import dk.os2opgavefordeler.employment.MunicipalityRepository;
 import dk.os2opgavefordeler.employment.UserRepository;
 import dk.os2opgavefordeler.model.Role;
@@ -41,19 +40,20 @@ public class UserEndpoint {
     @Inject
     private MunicipalityRepository municipalityRepository;
 
-    private ActiveUser activeUser(){
-        return (ActiveUser) request.getSession().getAttribute(BasicAuthFilter.SESSION_ACTIVE_USER);
-    }
+    @Inject
+    private AuthService authService;
 
     @GET
     @Path("/me")
     @Produces(MediaType.APPLICATION_JSON)
     @NoCache
     public Response getUserInfo() {
-        if (activeUser() == null || !activeUser().isLoggedIn()) {
+        log.info("Returning user info for {}", authService.getAuthentication());
+        if (!authService.isAuthenticated()) {
             return Response.ok().entity(UserInfoPO.INVALID).build();
         }
-        return Response.ok().entity(new UserInfoPO(userRepository.findByEmail(activeUser().getEmail()))).build();
+        return Response.ok().entity(new UserInfoPO(userRepository.findByEmail(authService.getAuthentication().getEmail())))
+        .build();
     }
 
     @POST

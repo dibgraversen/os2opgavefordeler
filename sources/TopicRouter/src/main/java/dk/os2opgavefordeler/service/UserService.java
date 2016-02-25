@@ -18,7 +18,6 @@ public interface UserService {
 	Optional<User> findByEmail(String email);
 
 	User createUser(User user);
-	User createUserFromOpenIdEmail(String email);
 
 	List<RolePO> getRoles(long userId);
 	Optional<Role> findRoleById(long roleId);

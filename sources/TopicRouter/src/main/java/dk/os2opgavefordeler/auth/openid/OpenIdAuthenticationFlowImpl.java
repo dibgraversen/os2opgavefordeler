@@ -1,4 +1,4 @@
-package dk.os2opgavefordeler.service.impl;
+package dk.os2opgavefordeler.auth.openid;
 
 import com.google.common.base.Strings;
 import com.nimbusds.oauth2.sdk.id.State;
@@ -17,7 +17,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @ApplicationScoped
-public class AuthenticationServiceImpl implements AuthenticationService {
+public class OpenIdAuthenticationFlowImpl implements OpenIdAuthenticationFlow {
 	@Inject
 	private Logger log;
 
@@ -30,44 +30,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	@Inject
 	private OpenIdConnect openIdConnect;
 
-	static private final Map<Long, IdentityProvider> providers = new HashMap<>();
-	static {
-		providers.put(1L, IdentityProvider.builder()
-			.id(1).name("Google account")
-			.url("https://accounts.google.com/")
-			.clientId("89170361789-mg8l3t3f11vo0cf0hce4h85epi0qqq3q.apps.googleusercontent.com")
-			.clientSecret("itCIp2JGR2NKBAu4Se9LCAjp")
-			.build()
-		);
-		providers.put(2L, IdentityProvider.builder()
-			.id(2).name("Kitos SSO")
-			.url("https://os2saml.syddjurs.dk/")
-			.clientId("suneclient")
-			.clientSecret("secret")
-			.build()
-		);
-	}
+	@Inject
+	private OpenIdUserFactory openIdUserFactory;
 
 	@Override
 	public String generateCsrfToken() {
 		return new State().toString();
-	}
-
-	@Override
-	public Optional<IdentityProvider> findProvider(long id) {
-		return Optional.ofNullable(providers.get(id));
-	}
-
-	@Override
-	public List<IdentityProvider> identityProviderList() {
-		return new ArrayList(providers.values());
-	}
-
-	@Override
-	public List<IdentityProviderPO> identityProviderPOList() {
-		return identityProviderList().stream()
-			.map(IdentityProviderPO::new)
-			.collect(Collectors.toList());
 	}
 
 	@Override
@@ -100,7 +68,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 			})
 			.orElseGet(() -> {
 				log.info("User not found, creating");
-				return userService.createUserFromOpenIdEmail(email);
+				return openIdUserFactory.createUserFromOpenIdEmail(email);
 			});
 	}
 }

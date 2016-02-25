@@ -1,5 +1,6 @@
 package dk.os2opgavefordeler.rest;
 
+import dk.os2opgavefordeler.auth.openid.OpenIdAuthenticationFlow;
 import dk.os2opgavefordeler.model.Role;
 import dk.os2opgavefordeler.model.presentation.SimpleMessage;
 import dk.os2opgavefordeler.model.presentation.SubstitutePO;
@@ -26,7 +27,7 @@ public class RoleEndpoint {
 	private EmploymentService employmentService;
 
 	@Inject
-	private AuthenticationService authenticationService;
+	private OpenIdAuthenticationFlow openIdAuthenticationFlow;
 
 
 

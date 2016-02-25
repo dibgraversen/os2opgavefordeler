@@ -2,8 +2,7 @@ package dk.os2opgavefordeler.rest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
-import dk.os2opgavefordeler.auth.ActiveUser;
-import dk.os2opgavefordeler.auth.BasicAuthFilter;
+import dk.os2opgavefordeler.auth.AuthService;
 import dk.os2opgavefordeler.employment.UserRepository;
 import dk.os2opgavefordeler.model.Employment;
 import dk.os2opgavefordeler.model.Municipality;
@@ -50,9 +49,8 @@ public class OrgUnitEndpoint {
     @Inject
     private UserRepository userRepository;
 
-    private ActiveUser activeUser() {
-        return (ActiveUser) request.getSession().getAttribute(BasicAuthFilter.SESSION_ACTIVE_USER);
-    }
+    @Inject
+    private AuthService authService;
 
     @GET
     @Path("/")
@@ -120,7 +118,7 @@ public class OrgUnitEndpoint {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response importOrg(OrgUnit input) {
-        Municipality currentMunicipality = userRepository.findByEmail(activeUser().getEmail()).getMunicipality();
+        Municipality currentMunicipality = userRepository.findByEmail(authService.getAuthentication().getEmail()).getMunicipality();
         fixupOrgUnit(input, currentMunicipality);
 
         orgUnitService.importOrganization(input);
@@ -146,8 +144,8 @@ public class OrgUnitEndpoint {
         try {
             ObjectMapper mapper = new ObjectMapper();
             OrgUnit input = mapper.readValue(completeString.toString(), OrgUnit.class);
-            log.info("user: {}", activeUser());
-            Municipality currentMunicipality = userRepository.findByEmail(activeUser().getEmail()).getMunicipality();
+            log.info("user: {}", authService.getAuthentication());
+            Municipality currentMunicipality = userRepository.findByEmail(authService.getAuthentication().getEmail()).getMunicipality();
             fixupOrgUnit(input, currentMunicipality);
             orgUnitService.importOrganization(input);
         } catch (IOException e) {

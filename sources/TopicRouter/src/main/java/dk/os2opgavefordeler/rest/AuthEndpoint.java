@@ -1,13 +1,13 @@
 package dk.os2opgavefordeler.rest;
 
 import com.google.common.base.Strings;
-import dk.os2opgavefordeler.auth.ActiveUser;
-import dk.os2opgavefordeler.auth.BasicAuthFilter;
+import dk.os2opgavefordeler.auth.AuthService;
+import dk.os2opgavefordeler.auth.provider.ProviderRepository;
 import dk.os2opgavefordeler.model.IdentityProvider;
 import dk.os2opgavefordeler.model.User;
 import dk.os2opgavefordeler.model.presentation.SimpleMessage;
 import dk.os2opgavefordeler.service.AuthenticationException;
-import dk.os2opgavefordeler.service.AuthenticationService;
+import dk.os2opgavefordeler.auth.openid.OpenIdAuthenticationFlow;
 import dk.os2opgavefordeler.service.ConfigService;
 import org.jboss.resteasy.annotations.cache.NoCache;
 import org.slf4j.Logger;
@@ -32,7 +32,7 @@ public class AuthEndpoint {
     private Logger log;
 
     @Inject
-    private AuthenticationService authenticationService;
+    private OpenIdAuthenticationFlow openIdAuthenticationFlow;
 
     @Context
     private HttpServletRequest request;
@@ -40,12 +40,19 @@ public class AuthEndpoint {
     @Inject
     private ConfigService config;
 
+    @Inject
+    private AuthService authService;
+
+    @Inject
+    private ProviderRepository providers;
+
+
     @POST
     @Path("/logout")
     @Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
     public Response logout() {
         log.info("Logging out user");
-        request.getSession().setAttribute(BasicAuthFilter.SESSION_ACTIVE_USER, null);
+        authService.logout();
         return Response.ok().entity(new SimpleMessage("logged out")).build();
     }
 
@@ -54,7 +61,7 @@ public class AuthEndpoint {
     @Produces(MediaType.APPLICATION_JSON)
     @NoCache
     public Response listIdp() {
-        return Response.ok().entity(authenticationService.identityProviderPOList()).build();
+        return Response.ok().entity(providers.identityProviderPOList()).build();
     }
 
     @GET
@@ -64,9 +71,9 @@ public class AuthEndpoint {
         try {
             final HttpSession session = request.getSession();
 
-            final IdentityProvider idp = authenticationService.findProvider(providerId).orElseThrow(RuntimeException::new);
-            final String token = authenticationService.generateCsrfToken();
-            final URI authReqURI = authenticationService.beginAuthenticationFlow(idp, token, config.getOpenIdCallbackUrl());
+            final IdentityProvider idp = providers.findProvider(providerId).orElseThrow(RuntimeException::new);
+            final String token = openIdAuthenticationFlow.generateCsrfToken();
+            final URI authReqURI = openIdAuthenticationFlow.beginAuthenticationFlow(idp, token, config.getOpenIdCallbackUrl());
 
             session.setAttribute(S_CSRF_TOKEN, token);
             session.setAttribute(S_IDP_ID, providerId);
@@ -97,12 +104,12 @@ public class AuthEndpoint {
             String token = Optional.ofNullable((String) session.getAttribute(S_CSRF_TOKEN))
                     .orElseThrow(() -> new AuthenticationException("S_CSRF_TOKEN not set"));
 
-            IdentityProvider idp = authenticationService.findProvider(idpId)
+            IdentityProvider idp = providers.findProvider(idpId)
                     .orElseThrow(() -> new AuthenticationException("Invalid IDP id"));
 
-            final User user = authenticationService.finalizeAuthenticationFlow(idp, token, config.getOpenIdCallbackUrl(), ui.getRequestUri());
+            final User user = openIdAuthenticationFlow.finalizeAuthenticationFlow(idp, token, config.getOpenIdCallbackUrl(), ui.getRequestUri());
 
-            request.getSession().setAttribute(BasicAuthFilter.SESSION_ACTIVE_USER, new ActiveUser(user.getEmail(), true));
+            authService.authenticateAs(user.getEmail());
 
             log.info("finishAuthentication: {} is now logged in, redirecting to {}", user, config.getHomeUrl());
             return Response.temporaryRedirect(URI.create(config.getHomeUrl())).build();
@@ -130,8 +137,8 @@ public class AuthEndpoint {
         }
 
         log.info("IDDQD Auth - attempting to log in [{}]", email);
-        final User user = authenticationService.findOrCreateUserFromEmail(email);
-        request.getSession().setAttribute(BasicAuthFilter.SESSION_ACTIVE_USER, new ActiveUser(user.getEmail(), true));
+        final User user = openIdAuthenticationFlow.findOrCreateUserFromEmail(email);
+        authService.authenticateAs(user.getEmail());
         return Response.temporaryRedirect(URI.create(config.getHomeUrl())).build();
     }
 }
