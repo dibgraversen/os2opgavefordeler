@@ -2,8 +2,10 @@
 
 from fabric.api import *
 
+
 def puppet_apply(path):
     sudo("puppet apply --modulepath={}/modules/ {}/manifests/site.pp".format(path, path))
+
 
 def download(url, destination):
     run("wget '{}' -O {}".format(url, destination))
@@ -14,7 +16,8 @@ def jboss_cli(cmd):
 
 
 def liquibase(cmd):
-    run("liquibase --classpath='./TopicRouter.war' --url='jdbc:postgresql://localhost/topicrouter' --username='topicrouter' --password='SuperSaltFisk' --driver='org.postgresql.Driver' --changeLogFile='/WEB-INF/classes/db/migration/changelog-master.xml' %s" % cmd)
+    run(
+        "liquibase --classpath='./TopicRouter.war' --url='jdbc:postgresql://localhost/topicrouter' --username='topicrouter' --password='SuperSaltFisk' --driver='org.postgresql.Driver' --changeLogFile='/WEB-INF/classes/db/migration/changelog-master.xml' %s" % cmd)
 
 
 def deploy_webapp(version):
@@ -24,18 +27,29 @@ def deploy_webapp(version):
     """
 
 
+def sql(command):
+    run("echo {} | psql -U topicrouter -h 127.0.0.1 topicrouter".format(command))
+
+
+def create_municipality(municipality_name, email, admin_name):
+    sql("""
+insert into employment (businesskey,email,initials,isactive,jobtitle,name,employedin_id, municipality_id) values
+('smbmed', '{}', 'smb', true, 'Director', 'Simon Møgelvang Bang', 21085, 20002);
+""")
+
+
 def get_war(version):
     if "local" in version.lower():
         print "local"
         run("mv -f /home/vagrant/sync/sources/TopicRouter/target/TopicRouter.war .")
     elif "snapshot" in version.lower():
         download(
-        "http://nexus.miracle.local/nexus/service/local/artifact/maven/redirect?r=snapshots&g=dk.os2opgavefordeler&a=TopicRouter&v={}&e=war".format(
-                version), "TopicRouter.war")
+                "http://nexus.miracle.local/nexus/service/local/artifact/maven/redirect?r=snapshots&g=dk.os2opgavefordeler&a=TopicRouter&v={}&e=war".format(
+                        version), "TopicRouter.war")
     else:
         download(
-        "http://nexus.miracle.local/nexus/service/local/artifact/maven/redirect?r=releases&g=dk.os2opgavefordeler&a=TopicRouter&v={}&e=war".format(
-                version), "TopicRouter.war")
+                "http://nexus.miracle.local/nexus/service/local/artifact/maven/redirect?r=releases&g=dk.os2opgavefordeler&a=TopicRouter&v={}&e=war".format(
+                        version), "TopicRouter.war")
 
 
 def deploy_backend(version):
@@ -45,14 +59,16 @@ def deploy_backend(version):
     """
     get_war(version)
 
-    if(not "local" in version.lower()):
+    if (not "local" in version.lower()):
         liquibase('clearCheckSums')
         liquibase('update')
     jboss_cli("deploy TopicRouter.war --force".format(version))
 
+
 def dev_deploy():
     run("sudo mv -f /home/vagrant/sync/sources/TopicRouter/target/TopicRouter.war /opt/wildfly/standalone/deployments")
     run("sudo touch /home/vagrant/sync/sources/TopicRouter/target/TopicRouter.war.dodeploy")
+
 
 def deploy(version):
     run('mkdir -p V_{}'.format(version))

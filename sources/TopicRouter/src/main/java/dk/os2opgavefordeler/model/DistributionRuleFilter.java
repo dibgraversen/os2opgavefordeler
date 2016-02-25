@@ -29,6 +29,15 @@ public abstract class DistributionRuleFilter {
 
     }
 
+    public DistributionRuleFilter(String name, DistributionRule distributionRule, OrgUnit orgUnit, Employment
+            employment) {
+
+        this.name = name;
+        this.distributionRule = distributionRule;
+        this.assignedOrg = orgUnit;
+        this.assignedEmp = employment;
+    }
+
     public long getId() {
         return id;
     }
