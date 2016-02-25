@@ -1,31 +1,98 @@
 <div class="row">
-	<div class="col-md-2"></div>
+    <div class="col-md-2"></div>
+    <div class="col-md-8">
 
-	<div ng-show="!user.loggedIn" class="col-md-8">
-		<div class="page-header">
-			<h1>Du er ikke logget ind - <small>vælg en identity provider nedenfor.</small></h1>
-		</div>
+        <div ng-show="!user.loggedIn">
+            <div class="page-header">
+                <h1>Du er ikke logget ind -
+                    <small>vælg en identity provider nedenfor.</small>
+                </h1>
+            </div>
 
-		<div class="panel panel-default">
-			<div class="panel-body">
-				<div class="form-inline">
-					<a href="{{provider.url}}" ng-repeat="provider in providers">
-						<button class="btn btn-primary btn-lg">{{provider.name}}</button>
-					</a>
-				</div>
-			</div>
-		</div>
-	</div>
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <div class="form-inline">
+                        <a href="{{provider.url}}" ng-repeat="provider in providers">
+                            <button class="btn btn-primary btn-lg">{{provider.name}}</button>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-	<div ng-show="user.loggedIn" class="col-md-8">
-		<div class="jumbotron">
-			<h1>Du er allerede logget ind.</h1>
-			<p>Du er logget ind som <i>{{user.name}}</i>.</p>
-			<p>Hvis du ønsker at skifte bruger, kan du logge ud i menuen i toppen af siden, eller ved at klikke her:</p>
+        <div ng-show="user.loggedIn">
+            <div class="jumbotron">
+                <h1>Du er allerede logget ind.</h1>
+                <p>Du er logget ind som <i>{{user.name}}</i>.</p>
+                <p>Hvis du ønsker at skifte bruger, kan du logge ud i menuen i toppen af siden, eller ved at klikke
+                    her:</p>
 
-			<button type="button" class="btn btn-primary" ng-click="logoutUser()">Log ud</button>
-		</div>
-	</div>
+                <button type="button" class="btn btn-primary" ng-click="logoutUser()">Log ud</button>
+            </div>
+        </div>
 
-	<div class="col-md-2"></div>
+        <hr/>
+
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <div style="height: 114px;">
+                            <img src="/assets/os2logo.png"/>
+                        </div>
+                        <ul>
+                            <li>OS2 Opgavefordeler kan håndtere fordeling/ansvar af kommunale opgaver (udtrykt i KLE)
+                                og en primær organisation (eks. LOS, AD eller ESDH). Derudover kan den håndtere
+                                relationer mellem den primære organisation (eks. LOS) og et antal sekundære
+                                organisationer (eks. ESDH og AD).
+                            </li>
+                            <li>OS2 Opgavefordeler er oprindeligt udviklet som en lokal prototype i Syddjurs Kommune
+                                til håndtering af automatisk postdistribution sammen med OS2KLE, men den kan også
+                                anvendes til hjemmesider, Intranet og IDM.
+                            </li>
+                            <li>OS2 Opgavefordeler handler om en kommunes forbindelse mellem KLE-numre og den
+                                entitet, der håndterer det pågældende emne, hvad enten det er en afdeling eller en
+                                medarbejder.
+                            <li>KLE-numre kommer fra KL og indlæses af sysadmin. KLE-strukturen er fælles for alle
+                                kommuner.
+                            </li>
+                            <li>Kommuner og Organisationsstruktur. Hver kommune oprettes som
+                                selvstændig enhed i applikationen. De har administratorer, som
+                                vedligeholder kommunens organisationsstruktur og har derudover
+                                brugere, der vedligeholder mapning mellem KLE-numre og
+                                afdelinger eller medarbejdere.
+                            </li>
+                            <li>REST interface Oplysninger om hvem der håndterer KLE-numre for
+                                en kommune, kan trækkes via REST/JSON til brug ved integration.
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="col-md-4">
+                        <div style="height: 114px;">
+                            <img src="/assets/MiracleBlack.jpg" width="300" style="  position: relative;
+  top: 50%;
+  transform: translateY(-50%);"/>
+                        </div>
+                        <p>OS2Opgavefordeler.dk er udviklet i regi af OS2 – <a href="http://www.os2web.dk/">www.os2web
+                            .dk</a></p>
+                        <p>Miracle A/S står for udviklingen og drift af
+                            <a href="http://os2opgavefordeler.dk/">os2opgavefordeler.dk</a>.</p>
+                        <p>Løsningen tilbydes som Software-as-a-Service til alle kommuner.</p>
+                        <p>Kontakinfo for interesserede:
+                        <address>
+                            <div>Miracle A/S</div>
+                            <div>Simon Møgelvang Bang</div>
+                            <div><a href="mailto:smb@miracle.dk">smb@miracle.dk</a></div>
+                            <div>5374 7268</div>
+                        </address>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+    <div class="col-md-2"></div>
+
 </div>
