@@ -1,4 +1,4 @@
-package dk.os2opgavefordeler.service.oidc;
+package dk.os2opgavefordeler.auth.openid;
 
 import com.google.common.base.Strings;
 import com.nimbusds.jose.JOSEException;

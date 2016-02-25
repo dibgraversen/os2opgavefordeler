@@ -1,4 +1,4 @@
-package dk.os2opgavefordeler.service.oidc;
+package dk.os2opgavefordeler.auth.openid;
 
 import dk.os2opgavefordeler.model.IdentityProvider;
 import dk.os2opgavefordeler.service.AuthenticationException;

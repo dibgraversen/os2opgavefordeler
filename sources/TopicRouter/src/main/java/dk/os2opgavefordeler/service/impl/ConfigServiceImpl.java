@@ -3,9 +3,11 @@ package dk.os2opgavefordeler.service.impl;
 import dk.os2opgavefordeler.service.ConfigService;
 import org.slf4j.Logger;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import java.util.function.Function;
 
+@ApplicationScoped
 public class ConfigServiceImpl implements ConfigService {
 	@Inject
 	Logger log;
@@ -23,6 +25,11 @@ public class ConfigServiceImpl implements ConfigService {
 	@Override
 	public boolean isGodModeLoginEnabled() {
 		return getProperty("topicrouter.login.godmode.enabled", false);
+	}
+
+	@Override
+	public boolean enableGoogleLogin() {
+		return getProperty("topicrouter.login.google.enabled", false);
 	}
 
 	private String getProperty(String property, String defaultValue) {

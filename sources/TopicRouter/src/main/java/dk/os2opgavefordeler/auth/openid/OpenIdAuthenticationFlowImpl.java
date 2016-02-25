@@ -5,16 +5,12 @@ import com.nimbusds.oauth2.sdk.id.State;
 import dk.os2opgavefordeler.employment.UserRepository;
 import dk.os2opgavefordeler.model.IdentityProvider;
 import dk.os2opgavefordeler.model.User;
-import dk.os2opgavefordeler.model.presentation.IdentityProviderPO;
 import dk.os2opgavefordeler.service.*;
-import dk.os2opgavefordeler.service.oidc.OpenIdConnect;
 import org.slf4j.Logger;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import java.net.URI;
-import java.util.*;
-import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class OpenIdAuthenticationFlowImpl implements OpenIdAuthenticationFlow {
