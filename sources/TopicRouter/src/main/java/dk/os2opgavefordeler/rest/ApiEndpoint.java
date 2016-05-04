@@ -86,12 +86,14 @@ public class ApiEndpoint extends Endpoint {
         }
 
         Optional<Kle> kleMaybe = kleService.fetchMainGroup(kleNumber, municipality.getId());
-        Kle kle = kleMaybe.get();
+
         if (!kleMaybe.isPresent()) {
             return badRequest("Did not find a Kle based on given number.");
         }
 
-        Map<String, String> parameters = new HashMap<>();
+	    Kle kle = kleMaybe.get();
+
+	    Map<String, String> parameters = new HashMap<>();
         for (Map.Entry<String, List<String>> m : uriInfo.getQueryParameters().entrySet()) {
             parameters.put(m.getKey(), m.getValue().get(0));
         }
@@ -101,7 +103,6 @@ public class ApiEndpoint extends Endpoint {
             return Response.status(Response.Status.NOT_FOUND).type(TEXT_PLAIN).entity("Noone seems to be handling the given kle for municipality.").build();
         }
 
-        //DistributionRule result = distributionService.findAssigned(kle, municipality);
         EmploymentApiResultPO manager = new EmploymentApiResultPO(orgUnitService.findResponsibleManager(assignee.getOrgUnit()).orElse(null));
         EmploymentApiResultPO employee = assignee.getEmployment().map(EmploymentApiResultPO::new).orElse(null);
         DistributionRuleApiResultPO resultPO = new DistributionRuleApiResultPO(assignee.getRule(), manager, employee);
