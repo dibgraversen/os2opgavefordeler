@@ -7,9 +7,9 @@ import javax.ws.rs.core.Response.Status;
  * @author hlo@miracle.dk
  */
 public abstract class Endpoint {
-	public static final int PAYMENT_REQUIRED = 402;
-	public static final String TEXT_PLAIN = "text/plain";
-	public static final Status BAD_REQUEST = Status.BAD_REQUEST;
+	static final int PAYMENT_REQUIRED = 402;
+	static final String TEXT_PLAIN = "text/plain";
+	private static final Status BAD_REQUEST = Status.BAD_REQUEST;
 
 	/**
 	 * Creates an error response.
@@ -17,7 +17,7 @@ public abstract class Endpoint {
 	 * @return A built Response with status 'bad request', type 'text/plain' and 'reason' as
 	 * entity.
 	 */
-	public Response badRequest(String reason){
+	protected Response badRequest(String reason){
 		return Response.status(BAD_REQUEST).type(TEXT_PLAIN).entity(reason).build();
 	}
 
