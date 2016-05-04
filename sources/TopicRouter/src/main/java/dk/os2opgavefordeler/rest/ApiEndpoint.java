@@ -67,16 +67,20 @@ public class ApiEndpoint extends Endpoint {
 
         String token = authService.getAuthentication().getToken();
 
-        if (token.equals("")) {
+        if ("".equals(token)) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
+
         Optional<Municipality> municipalityMaybe = municipalityService.getMunicipalityFromToken(token);
+
         if (!municipalityMaybe.isPresent()) {
             return Response.status(Response.Status.UNAUTHORIZED).type(TEXT_PLAIN)
                     .entity("Did not find a municipality based on given authorization.").build();
         }
+
         Municipality municipality = municipalityMaybe.get();
-        if (!municipality.isActive()) {
+
+	    if (!municipality.isActive()) {
             return Response.status(PAYMENT_REQUIRED).type(TEXT_PLAIN)
                     .entity("Your subscription is not active and therefor the api cannot be used.").build();
         }
