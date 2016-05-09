@@ -25,6 +25,8 @@
             distributionRuleId: $scope.topic.id,
             type: 'cpr'
         };
+        var orgUnitsMissing = true;
+        var currentEmployment = $scope.user.currentRole.employment;
         //$scope.orgUnits = [];
         $scope.loadAllOrgUnits = loadAllOrgUnits;
         $scope.selectedOrgUnit = {};
@@ -110,11 +112,32 @@
         function loadAllOrgUnits(){
             orgUnits = {};
             if(orgUnitsMissing){
-                topicRouterApi.getOrgUnitsForResponsibility(municipality.id, currentEmployment, false).then(function(orgUnits){
+                topicRouterApi.getOrgUnitsForResponsibility($scope.user.municipality.id, currentEmployment, false).then(function(orgUnits){
                     _.each(orgUnits, function(org){ loadParent(org); });
                     $scope.orgUnits = orgUnits;
                     orgUnitsMissing = false;
                 });
+            }
+        }
+
+        function loadParent(org){
+            if(orgUnits[org.id]){
+                // make sure it's overwritten so we only use one instance of each org.
+                org = orgUnits[org.id];
+            } else {
+                orgUnits[org.id] = org; // make sure we don't work on duplicates.
+                if(org.parentId && org.parent === undefined) {
+                    if(orgUnits[org.parentId]){
+                        org.parent = orgUnits[org.parentId];
+                    } else {
+                        topicRouterApi.getOrgUnit(org.parentId).then(function (parent) {
+                            org.parent = parent;
+                            if (parent.parentId) {
+                                loadParent(parent);
+                            }
+                        });
+                    }
+                }
             }
         }
 
