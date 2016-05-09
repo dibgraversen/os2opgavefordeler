@@ -2,7 +2,6 @@
 title SOFD Domain
 
 class User {
-  boolean admin
   Municipality municipality
 }
 
