@@ -115,9 +115,21 @@
 
 		function getRuleChildren(ruleId){
 			return httpGet('/distribution-rules/'+ruleId+'/children').then(function(rules){
+				var objectMap = {};
+
+				_.each(rules, function(rule){
+					objectMap[rule.id] = rule;
+					rule.children = [];
+				});
+
+				_.each(rules, function (rule) {
+					processRule(rule, objectMap);
+				});
+
 				_.each(rules, function(rule){
 					rule.kle.serviceTextPopover = htmlsave.truncate(rule.kle.serviceText, maxPopoverLength, { breakword:false });
 				});
+
 				return rules;
 			});
 		}
@@ -478,12 +490,12 @@
 			return $http(options).then(
 					function (response) {
 						appSpinner.hideSpinner();
-						$log.info('**response from EXECUTE', response);
+						//$log.info('**response from EXECUTE', response);
 						return response.data;
 					},
 					function(reason){
 						appSpinner.hideSpinner();
-						$log.info('**response from EXECUTE', reason);
+						//$log.info('**response from EXECUTE', reason);
 						return $q.reject(reason);
 					});
 		}
