@@ -4,6 +4,6 @@
 
 .constant("serverUrl", "http://localhost:1080/rest")
 
-.constant("version", "0.9.24")
+.constant("version", "0.9.25")
 
 ;})();
