@@ -17,8 +17,7 @@
         <maven.build.timestamp.format>yyyyMMdd'T'HHmmss</maven.build.timestamp.format>
 
         <version.jboss.eap>6.3.0.GA</version.jboss.eap>
-        <version.org.jboss.as.plugins.maven.plugin>7.4.Final
-        </version.org.jboss.as.plugins.maven.plugin><!-- pluginManagement versions not im -->
+        <version.org.jboss.as.plugins.maven.plugin>7.4.Final</version.org.jboss.as.plugins.maven.plugin>
         <version.slf4j>1.7.2</version.slf4j>
         <version.junit>4.11</version.junit>
         <version.jackson>2.4.4</version.jackson>
@@ -28,9 +27,8 @@
     </properties>
 
     <scm>
-        <connection>scm:git:git://git@github.com:miracle-as/OS2-OpgaveFordeler-Backend.git</connection>
-        <developerConnection>scm:git:git://git@github.com:miracle-as/OS2-OpgaveFordeler-Backend.git
-        </developerConnection>
+        <connection>scm:git:git://git@github.com:OS2Opgavefordeler/os2opgavefordeler.git</connection>
+        <developerConnection>scm:git:git://git@github.com:OS2Opgavefordeler/os2opgavefordeler.git</developerConnection>
     </scm>
 
     <distributionManagement>
