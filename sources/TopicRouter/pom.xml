@@ -5,7 +5,7 @@
     <parent>
         <groupId>dk.os2opgavefordeler</groupId>
         <artifactId>parent</artifactId>
-        <version>1.1.0</version>
+        <version>1.1.0-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
     <artifactId>TopicRouter</artifactId>
@@ -33,7 +33,7 @@
 
         <version.jboss.spec.javaee.7.0>1.0.3.Final</version.jboss.spec.javaee.7.0>
 
-        <!-- This should match whever is in site.pp -->
+        <!-- This should match whatever is in site.pp -->
         <version.wildfly>9.0.1.Final</version.wildfly>
 
         <!-- This should match whatever is in site.pp -->
