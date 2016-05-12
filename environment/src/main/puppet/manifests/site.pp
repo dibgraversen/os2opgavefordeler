@@ -5,7 +5,7 @@ node default {
       $host = "http://localhost:1080"
     }
     'test': {
-      $host = "http://topicrouter.miracle.dk"
+      $host = "http://os2opgavefordeler-test.miracle.dk"
     }
     default: {
       $host = "https://os2opgavefordeler.dk"
