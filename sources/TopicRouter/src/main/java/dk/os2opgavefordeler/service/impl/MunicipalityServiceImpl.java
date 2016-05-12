@@ -61,14 +61,17 @@ public class MunicipalityServiceImpl implements MunicipalityService {
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public Optional<Municipality> getMunicipalityFromToken(String token){
+	public Optional<Municipality> getMunicipalityFromToken(String token) {
 		Query query = em.createQuery("SELECT m FROM Municipality m WHERE m.token = :token");
 		query.setParameter("token", token);
-		try{
+
+		try {
 			return Optional.of((Municipality)query.getSingleResult());
-		} catch(NoResultException nre){
-			log.info("trying to find by token: {}, without luck", token);
-		} catch(NonUniqueResultException nure){
+		}
+		catch(NoResultException nre){
+			log.info("Trying to find by token: {}, without luck", token);
+		}
+		catch(NonUniqueResultException nure){
 			log.error("Multiple municipalities with same token: {}", token);
 		}
 		return Optional.empty();

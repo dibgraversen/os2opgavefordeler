@@ -15,22 +15,18 @@ public class Authentication {
         this.email = email;
     }
 
-    public String getToken() {
-        return token;
+    public Authentication(String email, String token) {
+        this.email = email;
+	    this.token = token;
     }
 
-    public void setToken(String token) {
-        this.token = token;
+    public String getToken() {
+        return token;
     }
 
     public String getEmail() {
         return email;
     }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
 
     @Override
     public boolean equals(Object o) {

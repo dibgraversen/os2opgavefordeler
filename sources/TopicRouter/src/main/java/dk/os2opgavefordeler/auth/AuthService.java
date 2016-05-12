@@ -29,7 +29,7 @@ public class AuthService {
      * @return current authentication info.
      */
     public Authentication getAuthentication() {
-        return new Authentication(authenticationHolder.getEmail());
+        return new Authentication(authenticationHolder.getEmail(), authenticationHolder.getToken());
     }
 
     /**

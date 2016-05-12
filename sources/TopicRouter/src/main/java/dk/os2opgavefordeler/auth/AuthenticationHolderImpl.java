@@ -7,9 +7,9 @@ import java.io.Serializable;
 public class AuthenticationHolderImpl implements AuthenticationHolder, Serializable {
 
     private static final long serialVersionUID = -12;
+
     private String email;
     private String token;
-
 
     public String getEmail() {
         return email;
@@ -25,7 +25,13 @@ public class AuthenticationHolderImpl implements AuthenticationHolder, Serializa
 
     public void setToken(String token) {
         this.token = token;
-
     }
 
+	@Override
+	public String toString() {
+		return "AuthenticationHolderImpl{" +
+				"email='" + email + '\'' +
+				", token='" + token + '\'' +
+				'}';
+	}
 }

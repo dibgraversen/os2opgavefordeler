@@ -67,7 +67,7 @@ public class ApiEndpoint extends Endpoint {
 
         String token = authService.getAuthentication().getToken();
 
-        if ("".equals(token)) {
+        if (token == null || token.isEmpty()) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
 
@@ -100,7 +100,7 @@ public class ApiEndpoint extends Endpoint {
 
         Assignee assignee = findAssignedForKleService.findAssignedForKle(kle, municipality, parameters);
         if (assignee == null) {
-            return Response.status(Response.Status.NOT_FOUND).type(TEXT_PLAIN).entity("Noone seems to be handling the given kle for municipality.").build();
+            return Response.status(Response.Status.NOT_FOUND).type(TEXT_PLAIN).entity("No one seems to be handling the given kle for municipality.").build();
         }
 
         EmploymentApiResultPO manager = new EmploymentApiResultPO(orgUnitService.findResponsibleManager(assignee.getOrgUnit()).orElse(null));
