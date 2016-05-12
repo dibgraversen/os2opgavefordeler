@@ -286,7 +286,7 @@
 	});
 
 	gulp.task('constants', function () {
-		var myConfig = require('./src/config.json');
+		var myConfig = require('./src/main/webapp/app/constants.js');
 		var env = argv.env || 'test'; //'dev';
 		var envConfig = myConfig[env];
 		return plugins.ngConstant({
@@ -299,4 +299,3 @@
 				.pipe(gulp.dest('./src/app'));
 	});
 })();
-

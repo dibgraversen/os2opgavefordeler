@@ -4,7 +4,7 @@
 
     <groupId>dk.os2opgavefordeler</groupId>
     <artifactId>parent</artifactId>
-    <version>1.1.0</version>
+    <version>1.1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>${project.groupId} - ${project.artifactId}</name>
@@ -17,8 +17,7 @@
         <maven.build.timestamp.format>yyyyMMdd'T'HHmmss</maven.build.timestamp.format>
 
         <version.jboss.eap>6.3.0.GA</version.jboss.eap>
-        <version.org.jboss.as.plugins.maven.plugin>7.4.Final
-        </version.org.jboss.as.plugins.maven.plugin><!-- pluginManagement versions not im -->
+        <version.org.jboss.as.plugins.maven.plugin>7.4.Final</version.org.jboss.as.plugins.maven.plugin>
         <version.slf4j>1.7.2</version.slf4j>
         <version.junit>4.11</version.junit>
         <version.jackson>2.4.4</version.jackson>
@@ -28,9 +27,8 @@
     </properties>
 
     <scm>
-        <connection>scm:git:git://git@github.com:miracle-as/OS2-OpgaveFordeler-Backend.git</connection>
-        <developerConnection>scm:git:git://git@github.com:miracle-as/OS2-OpgaveFordeler-Backend.git
-        </developerConnection>
+        <connection>scm:git:git://git@github.com:OS2Opgavefordeler/os2opgavefordeler.git</connection>
+        <developerConnection>scm:git:git://git@github.com:OS2Opgavefordeler/os2opgavefordeler.git</developerConnection>
     </scm>
 
     <distributionManagement>
@@ -52,5 +50,52 @@
         <module>sources/frontend</module>
     </modules>
 
+    <profiles>
+        <profile>
+            <id>target-dev</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <application.version>DEV-${project.version}</application.version>
+                <application.backendUrl>http://localhost:1080/rest</application.backendUrl>
+            </properties>
+        </profile>
+        <profile>
+            <id>target-test</id>
+            <properties>
+                <application.version>TEST-${project.version}</application.version>
+                <application.backendUrl>http://os2opgavefordeler-test.miracle.dk/rest</application.backendUrl>
+            </properties>
+        </profile>
+        <profile>
+            <id>target-prod</id>
+            <properties>
+                <application.version>${project.version}</application.version>
+                <application.backendUrl>https://os2opgavefordeler.dk/rest</application.backendUrl>
+            </properties>
+        </profile>
+    </profiles>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>external.atlassian.jgitflow</groupId>
+                <artifactId>jgitflow-maven-plugin</artifactId>
+                <version>1.0-m5.1</version>
+                <configuration>
+                    <flowInitContext>
+                        <masterBranchName>master</masterBranchName>
+                        <developBranchName>develop</developBranchName>
+                        <featureBranchPrefix>feature/</featureBranchPrefix>
+                        <releaseBranchPrefix>release/</releaseBranchPrefix>
+                        <hotfixBranchPrefix>hotfix/</hotfixBranchPrefix>
+                        <versionTagPrefix>V_</versionTagPrefix>
+                    </flowInitContext>
+                    <enableSshAgent>true</enableSshAgent>
+                    <scmCommentPrefix>[jgitflow]</scmCommentPrefix>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>
