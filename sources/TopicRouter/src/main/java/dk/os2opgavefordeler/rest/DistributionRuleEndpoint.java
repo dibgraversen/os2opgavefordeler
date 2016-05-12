@@ -58,8 +58,10 @@ public class DistributionRuleEndpoint extends Endpoint {
 		final Optional<OrgUnit> orgUnit = employment.map(e -> e.getEmployedIn());
 		if(orgUnit.isPresent()){
 			final List<DistributionRulePO> result = distributionService.getPoDistributions(orgUnit.get(), scope);
+
 			return ok(result);
-		} else {
+		}
+		else {
 			return badRequest("Kunne ikke finde ansættelsessted for bruger");
 		}
 	}
@@ -94,14 +96,23 @@ public class DistributionRuleEndpoint extends Endpoint {
 	@GET
 	@Path("/{distId}/children")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getChildren(@PathParam("distId") Long distId){
-		if(distId == null){
-			log.info("#getChildren with no distId");
-			return badRequest("You need to specify valid distributionId as part of the url.");
-		} else {
-			List<DistributionRulePO> result = distributionService.getChildren(distId)
-					.stream().map(DistributionRulePO::new).collect(Collectors.toList());
-			return ok(result);
+	public Response getChildren(@PathParam("distId") Long distId, @QueryParam("employment") Long employmentId, @QueryParam("scope") DistributionRuleScope scope){
+		if (distId == null || employmentId == null || scope == null) {
+			log.info("#getChildren with no distId, employmentId and scope");
+			return badRequest("You need to specify valid distributionId, employmentId and scope as part of the url.");
+		}
+		else {
+			final Optional<Employment> employment = orgUnitService.getEmployment(employmentId);
+			final Optional<OrgUnit> orgUnit = employment.map(e -> e.getEmployedIn());
+
+			if (orgUnit.isPresent()) {
+				List<DistributionRulePO> result = distributionService.getChildren(distId, orgUnit.get(), scope)
+						.stream().map(DistributionRulePO::new).collect(Collectors.toList());
+				return ok(result);
+			}
+			else {
+				return badRequest("Could not find organizational unit for user");
+			}
 		}
 	}
 

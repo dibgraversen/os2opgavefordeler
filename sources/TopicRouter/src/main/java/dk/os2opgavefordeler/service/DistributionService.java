@@ -6,6 +6,7 @@ import dk.os2opgavefordeler.model.Kle;
 import dk.os2opgavefordeler.model.Municipality;
 import dk.os2opgavefordeler.model.OrgUnit;
 import dk.os2opgavefordeler.model.presentation.DistributionRulePO;
+
 import dk.os2opgavefordeler.rest.DistributionRuleScope;
 
 import java.util.List;
@@ -26,7 +27,7 @@ public interface DistributionService {
 	DistributionRule findAssigned(Kle kle, Municipality municipality);
 	Optional<Employment> findResponsibleEmployee(DistributionRule rule);
 
-	List<DistributionRule> getChildren(Long ruleId);
+	List<DistributionRule> getChildren(Long ruleId, OrgUnit orgUnit, DistributionRuleScope scope);
 
 	DistributionRule createDistributionRule(Kle kle);
 }

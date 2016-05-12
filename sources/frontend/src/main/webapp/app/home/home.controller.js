@@ -12,7 +12,6 @@
 		$scope.filteredTopicRoutes = [];
 		$scope.substitutes = [];
 		$scope.listAlerts = [];
-		//var nodes = {};
 
 		activate();
 
@@ -51,10 +50,11 @@
 			}
 			$scope.$watch("user.currentRole", function(newValue, oldValue){
 				$log.info('Home:: user.currentRole changed', oldValue, " --> ", newValue);
-				if(newValue && newValue.employment > 0) {
+				if (newValue && newValue.employment > 0) {
 					refreshSubstitutes();
 					refreshTopicRoutes();
-				} else {
+				}
+				else {
 					$scope.topicRoutes = [];
 				}
 			});
@@ -112,31 +112,38 @@
 					function(rules){
 						$scope.topicRoutes = rules;
 						$scope.filteredTopicRoutes = rules;
-						if(rules.length > 0){
-							_.each(rules, function(rule){
-								if(rule.org){ rule.org = addToOrgCache(rule.org); }
-								if(rule.responsible){ rule.responsible = addToOrgCache(rule.responsible); }
-							});
-							_.each(rules, function(rule){
-								if(rule.parent){
-									if(!rule.parent.childrenLoaded){
-										getChildren(rule.parent, true).then(function(children){
-											rule.parent.childrenLoaded = true;
-											toggleChildren(children, true);
-										});
-									}
+
+						if (rules.length > 0) {
+							_.each(rules, function(rule) {
+								if (rule.org) {
+									rule.org = addToOrgCache(rule.org);
+								}
+
+								if (rule.responsible) {
+									rule.responsible = addToOrgCache(rule.responsible);
 								}
 							});
-						} else {
-							if($scope.settings.scope == 'ALL'){
+
+							_.each(rules, function(rule) {
+								if (rule.parent && !rule.parent.childrenLoaded) {
+									getChildren(rule.parent, true).then(function(children){
+										rule.parent.childrenLoaded = true;
+										toggleChildren(children, true);
+									});
+								}
+							});
+						}
+						else {
+							if ($scope.settings.scope === 'ALL'){
 								addAlert({ type: 'info', msg: 'Der blev ikke fundet regler.' });
-							} else {
+							}
+							else {
 								addAlert({ type: 'info', msg: 'Der blev ikke fundet regler for givne filtrering.' });
 							}
 						}
 					},
 					function(error){
-					  $log.error('fejl: '+ error.data);
+					  $log.error('Error: '+ error.data);
 					}
 			);
 		}
@@ -167,23 +174,24 @@
 		 * Returns "true" if topic or parents has responsibility taken by org.
 		 * @param topic
 		 */
-		function responsibility(topic){
+		function responsibility(topic) {
 			return topic.responsible || (topic.parent && responsibility(topic.parent));
 		}
 
-		function deleteResponsibility(topic){
+		function deleteResponsibility(topic) {
 			topic.responsible = 0;
 			topicRouterApi.updateDistributionRule(topic);
 		}
 
-		function toggleChildren(children, visible){
-			if(children && children.length > 0){
-				_.each(children, function(child){
-					if(typeof child === 'number'){
+		function toggleChildren(children, visible) {
+			if(children && children.length > 0) {
+				_.each(children, function(child) {
+					if (typeof child === 'number') {
 						child = _.find($scope.topicRoutes, { 'id': child });
 						child.visible = visible;
 						toggleChildren(child.children, child.open && visible);
-					} else if(typeof child === 'object'){
+					}
+					else if (typeof child === 'object') {
 						child.visible = visible;
 						toggleChildren(child.children, child.open && visible);
 					}
@@ -191,14 +199,14 @@
 			}
 		}
 
-		function editRule(topic){
+		function editRule(topic) {
 			$modal.open({
 				scope: $scope,
 				resolve: {
-					topic: function(){
+					topic: function() {
 						return topic;
 					},
-					municipality: function(){
+					municipality: function() {
 						return $scope.user.municipality;
 					}
 				},
@@ -231,7 +239,7 @@
 			});
 		}
 
-		function editResponsibility(topic){
+		function editResponsibility(topic) {
 			$modal.open({
 				scope: $scope,
 				resolve: {
@@ -253,12 +261,14 @@
 		 * @param {object} distributionRule
 		 * @return {string} responsible
 		 */
-		function responsible(distributionRule){
-			if(distributionRule.responsible){
+		function responsible(distributionRule) {
+			if (distributionRule.responsible) {
 				return distributionRule.responsible;
-			} else if(distributionRule.parent){
+			}
+			else if(distributionRule.parent) {
 				return responsible(distributionRule.parent);
-			} else {
+			}
+			else {
 				return '';
 			}
 		}
@@ -275,11 +285,13 @@
 		 * Returns first org name for current or parent node.
 		 */
 		function distribution(distributionRule){
-			if(distributionRule.org && distributionRule.org.name){
+			if (distributionRule.org && distributionRule.org.name){
 				return distributionRule.org.name;
-			} else if(distributionRule.parent){
+			}
+			else if (distributionRule.parent){
 				return distribution(distributionRule.parent);
-			} else {
+			}
+			else {
 				return  '';
 			}
 		}
@@ -291,11 +303,18 @@
 		 */
 		function responsibilityChangeAllowed(distributionRule){
 			// handles case where none has taken responsibility
-			if(!responsibility(distributionRule) && $scope.user.currentRole.manager){
+			if (!responsibility(distributionRule) && $scope.user.currentRole.manager) {
 				return true; // not already handled.
 			}
-			if($scope.user.currentRole.municipalityAdmin) return true;
-			if(canManage(distributionRule)) return true;
+
+			if ($scope.user.currentRole.municipalityAdmin) {
+				return true;
+			}
+
+			if (canManage(distributionRule)) {
+				return true;
+			}
+
 			return false;
 		}
 
@@ -317,22 +336,31 @@
 		}
 
 		function distributionChangeAllowed(distributionRule){
-			if($scope.user.currentRole.municipalityAdmin) return true;
-			if(canManage(distributionRule)) return true;
+			if ($scope.user.currentRole.municipalityAdmin) {
+				return true;
+			}
+
+			if (canManage(distributionRule)) {
+				return true;
+			}
+
 			return false;
 		}
 
 		function getChildren(rule, force){
 			var deferred = $q.defer();
-			if(rule.type != 'topic'){
+
+			if (rule.type != 'topic'){
 				if(force || !rule.children || rule.children.length < 1){
-					topicRouterApi.getRuleChildren(rule.id).then(function(children){
+					topicRouterApi.getRuleChildren(rule.id, $scope.user.currentRole.employment, $scope.settings.scope).then(function(children){
 						rule.children = _.collect(children, 'id');
+
 						var promises = [];
 						_.each(children, function(child){
 							promises.push(prepareRule(child));
 							child.parent = rule;
 						});
+
 						$q.all(promises).then(function(){
 							addRules(children);
 							deferred.resolve(children);
@@ -350,9 +378,15 @@
 		function responsibleEmployee(rule){
 			// rule.org makes inherit chain break by explicit responsibility
 			// i.e. resetting employee inheritance whenever an org is set on parent.
-			if(rule.employee || rule.org) return rule.employee.name;
-			else if(rule.parent) return responsibleEmployee(rule.parent);
-			else return '';
+			if (rule.employee || rule.org) {
+				return rule.employee.name;
+			}
+			else if (rule.parent) {
+				return responsibleEmployee(rule.parent);
+			}
+			else {
+				return '';
+			}
 		}
 
 		function addRules(newRules){
@@ -361,16 +395,17 @@
 		}
 
 		function prepareRule(rule){
-			//nodes[rule.id] = rule;
 			rule.open = false;
 			rule.visible = true;
-			if(typeof rule.org === "number" && rule.org > 0){
-				return topicRouterApi.getOrgUnit(rule.org).then(function(org){
+
+			if (typeof rule.org === "number" && rule.org > 0){
+				return topicRouterApi.getOrgUnit(rule.org).then(function(org) {
 					rule.org = org;
 				});
-			} else {
+			}
+			else {
 				var deferred = $q.defer();
-			  deferred.resolve();
+			    deferred.resolve();
 				return deferred.promise;
 			}
 		}
@@ -389,7 +424,7 @@
 				controller: 'KleServicetextModalInstanceCtrl',
 				size: 'lg',
 				resolve: {
-					kle: function(){
+					kle: function() {
 						return kle;
 					}
 				}

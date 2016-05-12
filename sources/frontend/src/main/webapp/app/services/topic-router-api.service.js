@@ -98,14 +98,17 @@
 				"scope": scope
 			}).then(function (data) {
 				var objectMap = {};
+
 				_.each(data, function(rule){
 					objectMap[rule.id] = rule;
 					rule.children = [];
 				});
+
 				var rulePromises = [];
 				_.each(data, function (rule) {
 					rulePromises.push(processRule(rule, objectMap));
 				});
+
 				$q.all(rulePromises).then(function(){
 					deferred.resolve(data);
 				});
@@ -113,8 +116,11 @@
 			return deferred.promise;
 		}
 
-		function getRuleChildren(ruleId){
-			return httpGet('/distribution-rules/'+ruleId+'/children').then(function(rules){
+		function getRuleChildren(ruleId, employment, scope) {
+			return httpGet('/distribution-rules/'+ruleId+'/children', {
+				"employment": employment,
+				"scope": scope
+			}).then(function(rules){
 				var objectMap = {};
 
 				_.each(rules, function(rule){
@@ -136,40 +142,57 @@
 
 		function processRule(rule, objectMap){
 			var deferred = $q.defer();
+
 			rule.visible = true;
 			rule.open = (rule.children && rule.children.length > 0);
 			rule.kle.serviceTextPopover = htmlsave.truncate(rule.kle.serviceText, maxPopoverLength, { breakword:false });
+
 			var promises = [];
-			if(rule.org > 0){
+
+			if (rule.org > 0){
 				promises.push(getOrgUnit(rule.org).then(function(orgUnit){
 					rule.org = orgUnit;
 				}));
 			}
-			if(rule.responsible > 0) {
+
+			if (rule.responsible > 0) {
 				promises.push(getOrgUnit(rule.responsible).then(function(orgUnit){
 					rule.responsible = orgUnit;
 				}));
 			}
-			if(rule.employee > 0){
+
+			if (rule.employee > 0){
 				promises.push(getEmployment(rule.employee).then(function(employee){
 					rule.employee = employee;
 				}));
 			}
+
 			if (rule.parent) {
 				var parent = objectMap[rule.parent];
-				rule.parent = parent;
-				parent.children.push(rule.id);
-				parent.open = true;
+
+				if (parent) { // hamster
+					rule.parent = parent;
+					parent.children.push(rule.id);
+					parent.open = true;
+				}
+				else {
+					$log.info("Parent not found for rule: " + rule.kle.name);
+					//$log.info("Object map: ", JSON.stringify(objectMap));
+				}
 			}
+
 			$q.all(promises).then(function(){
 				deferred.resolve();
 			});
+
 			return deferred.promise;
 		}
 
 		function getOrgUnit(orgId){
 			var deferred = $q.defer();
+
 			var promises = [];
+
 			promises.push(httpGet('/org-units/'+orgId).then(function(orgUnit){
 				if(orgUnit.managerId > 0){
 					promises.push(getEmployment(orgUnit.managerId).then(function(employment){
@@ -490,12 +513,10 @@
 			return $http(options).then(
 					function (response) {
 						appSpinner.hideSpinner();
-						//$log.info('**response from EXECUTE', response);
 						return response.data;
 					},
 					function(reason){
 						appSpinner.hideSpinner();
-						//$log.info('**response from EXECUTE', reason);
 						return $q.reject(reason);
 					});
 		}

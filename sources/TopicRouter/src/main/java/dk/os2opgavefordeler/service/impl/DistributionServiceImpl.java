@@ -7,17 +7,22 @@ import dk.os2opgavefordeler.rest.DistributionRuleScope;
 import dk.os2opgavefordeler.service.DistributionService;
 import dk.os2opgavefordeler.service.OrgUnitService;
 import dk.os2opgavefordeler.service.PersistenceService;
+
 import org.apache.deltaspike.jpa.api.transaction.Transactional;
+
 import org.slf4j.Logger;
 
 import javax.enterprise.context.ApplicationScoped;
+
 import javax.inject.Inject;
+
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.NonUniqueResultException;
 import javax.persistence.Query;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Predicate;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -32,21 +37,25 @@ import java.util.stream.Collectors;
 @ApplicationScoped
 @Transactional
 public class DistributionServiceImpl implements DistributionService {
+
     @Inject
     Logger log;
+
     @Inject
     OrgUnitService orgUnitService;
+
     @Inject
     private DistributionRuleRepository distributionRuleRepository;
+
     @Inject
     private EntityManager entityManager;
+
     @Inject
     private PersistenceService persistenceService;
 
     @Override
     public DistributionRule createDistributionRule(DistributionRule rule) {
         distributionRuleRepository.save(rule);
-        //persistenceService.persist(rule);
         return rule;
     }
 
@@ -59,10 +68,10 @@ public class DistributionServiceImpl implements DistributionService {
     @SuppressWarnings("unchecked")
     @Transactional
     public List<DistributionRule> getDistributionsAll(long municipalityId) {
-        log.info("here with muncipalityId: {}", municipalityId);
         Query query = entityManager.createQuery("SELECT r FROM DistributionRule r WHERE r.municipality.id = :municipalityId " +
                 "AND LENGTH(r.kle.number) = 2 ORDER BY r.kle.number ASC");
         query.setParameter("municipalityId", municipalityId);
+
         return query.getResultList();
     }
 
@@ -77,6 +86,7 @@ public class DistributionServiceImpl implements DistributionService {
         Query query = entityManager.createQuery("SELECT r FROM DistributionRule r WHERE r.municipality.id = :municipalityId " +
                 "AND LENGTH(r.kle.number) = 2 AND r.responsibleOrg IS NULL ORDER BY r.kle.number ASC");
         query.setParameter("municipalityId", municipalityId);
+
         return query.getResultList();
     }
 
@@ -88,48 +98,62 @@ public class DistributionServiceImpl implements DistributionService {
             // Implicit querying currently needs to include not directly owned rules, since their (possible) implicit
             // ownership will be determined by Java code.
             List<Predicate> predicates = new ArrayList<Predicate>();
+
             // filter by municipality.
             Join<DistributionRule, Municipality> ruleMunicipalityJoin = root.join(DistributionRule_.municipality);
             Join<DistributionRule, Kle> ruleKleJoin = root.join(DistributionRule_.kle);
+
             final Predicate inMunicipality = cb.equal(ruleMunicipalityJoin.get(Municipality_.id), municipalityId);
             predicates.add(inMunicipality);
+
             final Predicate main = cb.equal(root.get(DistributionRule_.responsibleOrg), orgId);
+
             if (includeImplicit) {
                 Optional<OrgUnit> org = orgUnitService.getOrgUnit(orgId);
+
                 if (org.isPresent()) {
                     Optional<Employment> manager = orgUnitService.getActualManager(orgId);
+
                     if (manager.isPresent()) {
                         List<OrgUnit> managedUnits = orgUnitService.getManagedOrgUnits(municipalityId, manager.get().getId());
                         final Predicate implicit = root.get(DistributionRule_.responsibleOrg).in(managedUnits);
                         predicates.add(implicit);
                     }
                 }
-            } else {
+            }
+            else {
                 predicates.add(main);
             }
+
             cq.where(predicates.toArray(new Predicate[predicates.size()]));
             cq.orderBy(cb.asc(ruleKleJoin.get(Kle_.number)));
         });
+
         Map<Long, DistributionRule> resultsMap = new HashMap<>();
+
         for (DistributionRule result : results) {
             resultsMap.put(result.getId(), result);
-            // TODO this is strictly presentational...
+
+            // ensure that both the immediate parent and top level parent is included to avoid breaking inherited values
             if (result.getParent().isPresent()) {
+                // include immediate parent, if present
                 if (!results.contains(result.getParent().get())) {
                     resultsMap.put(result.getParent().get().getId(), result.getParent().get());
                 }
-//				Query siblingsQuery = persistence.getEm().createQuery("SELECT rule FROM DistributionRule rule WHERE rule.parent = :parent");
-//				siblingsQuery.setParameter("parent", result.getParent().get());
-//				List<DistributionRule> siblings = siblingsQuery.getResultList();
-//				for (DistributionRule sibling : siblings) {
-//					resultsMap.put(sibling.getId(), sibling);
-//				}
+
+                // include top-level parent, if present
+                if (result.getParent().get().getParent().isPresent() && !results.contains(result.getParent().get().getParent().get())) {
+                    resultsMap.put(result.getParent().get().getParent().get().getId(), result.getParent().get().getParent().get());
+                }
             }
         }
+
         List<DistributionRule> unassigned = getUnassignedDistributionRules(municipalityId);
+
         for (DistributionRule unassignedRule : unassigned) {
             resultsMap.put(unassignedRule.getId(), unassignedRule);
         }
+
         return resultsMap.values().stream()
                 .sorted((o1, o2) -> o1.getKle().getNumber().compareTo(o2.getKle().getNumber()))
                 .collect(Collectors.toList());
@@ -138,6 +162,7 @@ public class DistributionServiceImpl implements DistributionService {
     @Override
     public List<DistributionRulePO> getPoDistributions(OrgUnit orgUnit, DistributionRuleScope scope) {
         final List<DistributionRule> distributions;
+
         switch (scope) {
             case INHERITED:
                 distributions = getDistributionsForOrg(orgUnit.getId(), orgUnit.getMunicipality().get().getId(), true);
@@ -157,8 +182,6 @@ public class DistributionServiceImpl implements DistributionService {
 
     @Override
     public void buildRulesForMunicipality(long municipalityId) {
-        log.debug("Building rules");
-
         createMissingDistributionRules(municipalityId);
         updateParentsForDistributionRules(municipalityId);
     }
@@ -168,13 +191,16 @@ public class DistributionServiceImpl implements DistributionService {
         Query responsibleQuery = entityManager.createQuery("SELECT r FROM DistributionRule r WHERE r.kle = :kle AND r.municipality = :municipality");
         responsibleQuery.setParameter("kle", kle);
         responsibleQuery.setParameter("municipality", municipality);
+
         try {
             DistributionRule rule = (DistributionRule) responsibleQuery.getSingleResult();
             return findResponsible(rule);
-        } catch (NoResultException nre) {
+        }
+        catch (NoResultException nre) {
             // TODO make one?
             log.warn("Did not find a DistributionRule for kle: {} and municipality: {}", kle, municipality);
-        } catch (NonUniqueResultException nure) {
+        }
+        catch (NonUniqueResultException nure) {
             log.error("Too many distributionrules for kle: {} and municipality: {}", kle, municipality);
         }
         return null;
@@ -183,9 +209,11 @@ public class DistributionServiceImpl implements DistributionService {
     private DistributionRule findResponsible(DistributionRule rule) {
         if (rule.getAssignedOrg().isPresent()) {
             return rule;
-        } else if (rule.getParent().isPresent()) {
+        }
+        else if (rule.getParent().isPresent()) {
             return findResponsible(rule.getParent().get());
-        } else {
+        }
+        else {
             return null;
         }
     }
@@ -199,6 +227,7 @@ public class DistributionServiceImpl implements DistributionService {
     private void createMissingDistributionRules(long municipalityId) {
         Query municipalityQuery = entityManager.createQuery("SELECT m FROM Municipality m WHERE m.id = :municipalityId");
         municipalityQuery.setParameter("municipalityId", municipalityId);
+
         try {
             // find municipality
             Municipality municipality = (Municipality) municipalityQuery.getSingleResult();
@@ -206,10 +235,11 @@ public class DistributionServiceImpl implements DistributionService {
                     "( SELECT dr.kle.id FROM DistributionRule dr WHERE municipality = :municipality) " +
                     "AND (k.municipality IS NULL OR k.municipality = :municipality)"); // municipality specific KLE handling.
             query.setParameter("municipality", municipality);
+
             // find kle's for which there is no rule...
             List<Kle> klesWithNoRule = query.getResultList();
-            if (klesWithNoRule != null && klesWithNoRule.size() > 0) {
-                // create rules.
+            if (klesWithNoRule != null && !klesWithNoRule.isEmpty()) {
+                // create rules
                 for (Kle kle : klesWithNoRule) {
                     DistributionRule rule = new DistributionRule();
                     rule.setKle(kle);
@@ -235,7 +265,8 @@ public class DistributionServiceImpl implements DistributionService {
                 "WHERE rule.municipality.id = :municipalityId AND rule.parent IS NULL AND LENGTH(rule.kle.number) > 2");
         getOrphanedRuleIdsQuery.setParameter("municipalityId", municipalityId);
         List<DistributionRule> orphanedRuleIds = getOrphanedRuleIdsQuery.getResultList();
-        if (orphanedRuleIds != null && orphanedRuleIds.size() > 0) {
+
+        if (orphanedRuleIds != null && !orphanedRuleIds.isEmpty()) {
             for (DistributionRule orphanedRule : orphanedRuleIds) {
                 Query findParentQuery = entityManager
                         .createQuery("SELECT parent FROM DistributionRule parent WHERE parent.municipality.id = :municipalityId AND parent.kle.number = :parentNumber");
@@ -243,42 +274,71 @@ public class DistributionServiceImpl implements DistributionService {
                 String parentNumber = orphanedRule.getKle().getNumber().substring(0, orphanedRule.getKle().getNumber().length() - 3);
                 findParentQuery.setParameter("parentNumber", parentNumber);
                 List<DistributionRule> parents = findParentQuery.getResultList();
+
                 if (parents.size() == 1) {
                     orphanedRule.setParent(parents.get(0));
                     entityManager.merge(orphanedRule);
-                } else {
+                }
+                else {
                     log.warn("parent size NOT 1 for: {}", orphanedRule);
+
                     for (DistributionRule parent : parents) {
                         log.warn("parent found: {} for orphan: {}", parent, orphanedRule);
                     }
-
                 }
             }
         }
     }
 
+    @Override
     public Optional<Employment> findResponsibleEmployee(DistributionRule rule) {
         if (rule.getAssignedEmp() > 0l) {
             return getEmployment(rule.getAssignedEmp());
-        } else if (rule.getParent().isPresent()) {
+        }
+        else if (rule.getParent().isPresent()) {
             return findResponsibleEmployee(rule.getParent().get());
         }
         return Optional.empty();
     }
 
     /**
-     * Fetches children to a DistributionRule.
+     * Fetches children for a given DistributionRule.
      *
      * @param ruleId The id of the parent rule.
+     * @param orgUnit The organizational unit for the user
+     * @param scope The scope for fetching children (e.g. only rules that the user is responsible for)
      * @return A list of children rules, matching the given parent.
      */
+    @Override
     @SuppressWarnings("unchecked")
-    public List<DistributionRule> getChildren(Long ruleId) {
-        if (ruleId == null) {
+    public List<DistributionRule> getChildren(Long ruleId, OrgUnit orgUnit, DistributionRuleScope scope) {
+        if (ruleId == null || orgUnit == null) {
             return new ArrayList<>();
-        } else {
-            Query query = entityManager.createQuery("SELECT rule FROM DistributionRule rule WHERE rule.parent.id = :parentId");
-            query.setParameter("parentId", ruleId);
+        }
+        else {
+            Query query;
+
+            switch (scope) {
+                case INHERITED:
+                    query = entityManager.createQuery("SELECT rule FROM DistributionRule rule WHERE rule.parent.id = :parentId");
+                    query.setParameter("parentId", ruleId);
+
+                    break;
+                case RESPONSIBLE:
+                    /*query = entityManager.createQuery("SELECT rule FROM DistributionRule rule WHERE rule.parent.id = :parentId");
+                    query.setParameter("parentId", ruleId);*/
+
+                    query = entityManager.createQuery("SELECT rule FROM DistributionRule rule WHERE rule.parent.id = :parentId and rule.responsibleOrg.id = :orgId");
+                    query.setParameter("parentId", ruleId);
+                    query.setParameter("orgId", orgUnit.getId());
+
+                    break;
+                case ALL:
+                default:/* intentional fallthrough */
+                    query = entityManager.createQuery("SELECT rule FROM DistributionRule rule WHERE rule.parent.id = :parentId");
+                    query.setParameter("parentId", ruleId);
+            }
+
             return query.getResultList();
         }
     }
@@ -288,12 +348,15 @@ public class DistributionServiceImpl implements DistributionService {
         DistributionRule.Builder builder = DistributionRule.builder();
         builder.municipality(kle.getMunicipality()).kle(kle);
         DistributionRule rule = builder.build();
+
         Query parentQuery = entityManager.createQuery("SELECT r from DistributionRule r WHERE r.kle = :parentKle AND r.municipality = :municipality");
         parentQuery.setParameter("parentKle", kle.getParent());
         parentQuery.setParameter("municipality", kle.getMunicipality());
+
         DistributionRule parentRule = (DistributionRule) parentQuery.getSingleResult();
         rule.setParent(parentRule);
         entityManager.persist(rule);
+
         return rule;
     }
 
@@ -311,7 +374,8 @@ public class DistributionServiceImpl implements DistributionService {
         try {
             Employment employment = entityManager.find(Employment.class, id);
             return Optional.of(employment);
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             return Optional.empty();
         }
     }
