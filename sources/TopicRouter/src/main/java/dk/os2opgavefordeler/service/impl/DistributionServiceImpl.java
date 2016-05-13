@@ -325,12 +325,9 @@ public class DistributionServiceImpl implements DistributionService {
 
                     break;
                 case RESPONSIBLE:
-                    query = entityManager.createQuery("SELECT rule FROM DistributionRule rule WHERE rule.parent.id = :parentId");
+                    query = entityManager.createQuery("SELECT rule FROM DistributionRule rule WHERE rule.parent.id = :parentId AND (rule.responsibleOrg.id = :orgId OR (rule.responsibleOrg.id = null AND rule.parent.responsibleOrg.id = :orgId))");
                     query.setParameter("parentId", ruleId);
-
-                    /*query = entityManager.createQuery("SELECT rule FROM DistributionRule rule WHERE rule.parent.id = :parentId and rule.responsibleOrg.id = :orgId");
-                    query.setParameter("parentId", ruleId);
-                    query.setParameter("orgId", orgUnit.getId());*/
+	                query.setParameter("orgId", orgUnit.getId());
 
                     break;
                 case ALL:
