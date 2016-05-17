@@ -170,14 +170,10 @@
 			if (rule.parent) {
 				var parent = objectMap[rule.parent];
 
-				if (parent) { // hamster
+				if (parent) {
 					rule.parent = parent;
 					parent.children.push(rule.id);
 					parent.open = true;
-				}
-				else {
-					$log.info("Parent not found for rule: " + rule.kle.name);
-					//$log.info("Object map: ", JSON.stringify(objectMap));
 				}
 			}
 
