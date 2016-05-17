@@ -205,4 +205,33 @@ public class DistributionRule implements Serializable {
             return this;
         }
     }
+
+    public boolean isResponsible(long orgId) {
+		if (getResponsibleOrg().isPresent()) { // might be directly responsible
+			if (getResponsibleOrg().get().getId() == orgId) {
+				return true;
+			}
+		}
+	    else { // not directly responsible
+			if (getParent().isPresent()) {
+				if (getParent().get().getResponsibleOrg().isPresent()) {
+					if (parent.getResponsibleOrg().get().getId() == orgId) { // inherited responsibility from direct parent
+						return true;
+					}
+				}
+				else { // direct parent has inherited responsibility - we need to check top-level ancestor, if possible
+					if (getParent().get().getParent().isPresent()) {
+						if (getParent().get().getParent().get().getResponsibleOrg().isPresent()) { // top-level ancestor has specific responsibility
+							if (getParent().get().getParent().get().getResponsibleOrg().get().getId() == orgId) {
+								return true;
+							}
+						}
+					}
+				}
+			}
+		}
+
+	    return false;
+    }
+
 }
