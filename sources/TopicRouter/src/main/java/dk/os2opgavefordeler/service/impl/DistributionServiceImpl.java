@@ -116,7 +116,7 @@ public class DistributionServiceImpl implements DistributionService {
 
                     if (manager.isPresent()) {
                         List<OrgUnit> managedUnits = orgUnitService.getManagedOrgUnits(municipalityId, manager.get().getId());
-                        final Predicate implicit = root.get(DistributionRule_.responsibleOrg).in(managedUnits);
+	                    final Predicate implicit = root.get(DistributionRule_.responsibleOrg).in(managedUnits);
                         predicates.add(implicit);
                     }
                 }
@@ -320,12 +320,13 @@ public class DistributionServiceImpl implements DistributionService {
 
             switch (scope) {
                 case INHERITED:
-                    query = entityManager.createQuery("SELECT rule FROM DistributionRule rule WHERE rule.parent.id = :parentId");
+	                query = entityManager.createQuery("SELECT rule FROM DistributionRule rule WHERE rule.parent.id = :parentId AND (rule.responsibleOrg.id = :orgId OR (rule.responsibleOrg.id = null AND rule.parent.responsibleOrg.id = :orgId))");
                     query.setParameter("parentId", ruleId);
+	                query.setParameter("orgId", orgUnit.getId());
 
                     break;
                 case RESPONSIBLE:
-                    query = entityManager.createQuery("SELECT rule FROM DistributionRule rule WHERE rule.parent.id = :parentId AND (rule.responsibleOrg.id = :orgId OR (rule.responsibleOrg.id = null AND rule.parent.responsibleOrg.id = :orgId))");
+	                query = entityManager.createQuery("SELECT rule FROM DistributionRule rule WHERE rule.parent.id = :parentId AND (rule.responsibleOrg.id = :orgId OR (rule.responsibleOrg.id = null AND rule.parent.responsibleOrg.id = :orgId))");
                     query.setParameter("parentId", ruleId);
 	                query.setParameter("orgId", orgUnit.getId());
 
