@@ -320,13 +320,13 @@ public class DistributionServiceImpl implements DistributionService {
 
             switch (scope) {
                 case INHERITED:
-	                query = entityManager.createQuery("SELECT rule FROM DistributionRule rule WHERE rule.parent.id = :parentId AND (rule.responsibleOrg.id = :orgId OR (rule.responsibleOrg.id = null AND rule.parent.responsibleOrg.id = :orgId))");
+	                query = entityManager.createQuery("SELECT rule FROM DistributionRule rule WHERE rule.parent.id = :parentId AND (rule.responsibleOrg.id = :orgId OR (rule.responsibleOrg.id = null AND rule.parent.responsibleOrg.id = :orgId) OR (SELECT count(*) FROM DistributionRule subRule WHERE subRule.parent.id = rule.id AND subRule.responsibleOrg.id = :orgId) > 0)");
                     query.setParameter("parentId", ruleId);
 	                query.setParameter("orgId", orgUnit.getId());
 
                     break;
                 case RESPONSIBLE:
-	                query = entityManager.createQuery("SELECT rule FROM DistributionRule rule WHERE rule.parent.id = :parentId AND (rule.responsibleOrg.id = :orgId OR (rule.responsibleOrg.id = null AND rule.parent.responsibleOrg.id = :orgId))");
+	                query = entityManager.createQuery("SELECT rule FROM DistributionRule rule WHERE rule.parent.id = :parentId AND (rule.responsibleOrg.id = :orgId OR (rule.responsibleOrg.id = null AND rule.parent.responsibleOrg.id = :orgId) OR (SELECT count(*) FROM DistributionRule subRule WHERE subRule.parent.id = rule.id AND subRule.responsibleOrg.id = :orgId) > 0)");
                     query.setParameter("parentId", ruleId);
 	                query.setParameter("orgId", orgUnit.getId());
 
