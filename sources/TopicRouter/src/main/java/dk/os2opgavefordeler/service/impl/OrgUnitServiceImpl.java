@@ -30,21 +30,32 @@ public class OrgUnitServiceImpl implements OrgUnitService {
 
 	@Override
 	public OrgUnit saveOrgUnit(OrgUnit orgUnit) {
-		logger.info("orgUnit: {}", orgUnit);
+		logger.info("[saveOrgUnit] JSON based orgUnit: {}", orgUnit);
+
 		EntityManager em = persistence.getEm();
+
 		Municipality currentMunicipality = orgUnit.getMunicipality().get();
+
+		logger.info("[saveOrgUnit] Municipality: {}", currentMunicipality);
+
 		List<Employment> newEmployments = new ArrayList<>();
 
 		// check for existence.
 		Optional<OrgUnit> orgLookup = getOrgUnitFromBusinessKey(orgUnit.getBusinessKey(), orgUnit.getMunicipality().get().getId());
 		boolean updating = orgLookup.isPresent();
+
 		OrgUnit result = null;
+
 		if (updating) {
 			result = orgLookup.get();
-		} else {
-			result = orgUnit;
+			logger.info("[saveOrgUnit] Updating: {}", result);
 		}
-		if(updating){
+		else {
+			result = orgUnit;
+			logger.info("[saveOrgUnit] Creating: {}", result);
+		}
+
+		if (updating) {
 			result.setName(orgUnit.getName());
 			result.setEmail(orgUnit.getEmail());
 			result.setEsdhId(orgUnit.getEsdhId());
@@ -54,62 +65,89 @@ public class OrgUnitServiceImpl implements OrgUnitService {
 
 		// fix parent reference.
 		Optional<OrgUnit> givenParent = orgUnit.getParent();
-		if (givenParent.isPresent()){
+
+		if (givenParent.isPresent()) {
+			logger.info("[saveOrgUnit] Found parent");
+
 			Optional<OrgUnit> parent = getOrgUnitFromBusinessKey(givenParent.get().getBusinessKey(), currentMunicipality.getId());
-			if (parent.isPresent()){
+
+			if (parent.isPresent()) {
+				logger.info("[saveOrgUnit] Fixing parent");
 				orgUnit.setParent(parent.get());
-			} else {
-				logger.error("no parent found");
-				// TODO create one???
 			}
+			else {
+				logger.error("[saveOrgUnit] No parent found"); // TODO: Create one???
+			}
+		}
+		else {
+			logger.info("[saveOrgUnit] No parent found");
 		}
 
 		// fix up manager.
 		// TODO check if collection is deprecated.
 		List<Employment> newEmployeesCollection = new ArrayList<>();
+
 		Optional<Employment> givenManager = orgUnit.getManager();
-		if(givenManager.isPresent()){
+
+		if (givenManager.isPresent()) {
+			logger.info("[saveOrgUnit] Manager found for given orgUnit - looking up manager using business key");
+
 			Optional<Employment> manager = getEmploymentFromBusinessKey(givenManager.get().getBusinessKey(), currentMunicipality.getId());
-			if(manager.isPresent()){
+
+			if (manager.isPresent()) {
+				logger.info("[saveOrgUnit] Manager found using business key: {}", givenManager.get().getBusinessKey());
+
 				Employment managerEntity = manager.get();
 				updateEmployment(givenManager.get(), managerEntity);
 				result.setManager(managerEntity);
-				if(updating){
+
+				if (updating) {
 					managerEntity.setEmployedIn(result);
-				} else {
+				}
+				else {
 					managerEntity.setEmployedIn(null);
 					newEmployments.add(managerEntity);
 				}
+
 				em.merge(managerEntity);
-			} else {
+			}
+			else {
 				Employment newManager = givenManager.get();
+
 				newManager.setEmployedIn(null);
-				if(newManager.getMunicipality() == null) {
+
+				if (newManager.getMunicipality() == null) {
 					newManager.setMunicipality(currentMunicipality);
 				}
-				logger.info("manager: {}", newManager);
+
+				logger.info("[saveOrgUnit] Manager: {}", newManager);
+
 				em.persist(newManager);
 				newEmployments.add(newManager);
 			}
-		} else if (updating){
+		}
+		else if (updating) {
+			logger.info("[saveOrgUnit] No manager found for orgUnit");
 			result.setManager(null);
 		}
 
 		// employees
-		if(result.getEmployees() != null && !result.getEmployees().isEmpty()) {
+		if (result.getEmployees() != null && !result.getEmployees().isEmpty()) {
 			// remove by setting employed in = blank if no longer part of employees.
 			if(orgUnit.getEmployees() != null && !orgUnit.getEmployees().isEmpty()){
 				for (Employment employment : result.getEmployees()) {
 					boolean found = false;
+
 					for (Employment newEmployment : orgUnit.getEmployees()) {
-						if(result.getManager().isPresent()){
-							if(employment.getBusinessKey().equals(newEmployment.getBusinessKey()) ||
+						if (result.getManager().isPresent()){
+							if (employment.getBusinessKey().equals(newEmployment.getBusinessKey()) ||
 									employment.getBusinessKey().equals(result.getManager().get().getBusinessKey())){
 								found = true;
 							}
 						}
 					}
-					if(!found){
+
+					if (!found){
 						Query query = em.createQuery("UPDATE Employment e SET e.employedIn = NULL WHERE e.id = :employmentId");
 						query.setParameter("employmentId", employment.getId());
 						query.executeUpdate();
@@ -117,19 +155,25 @@ public class OrgUnitServiceImpl implements OrgUnitService {
 				}
 			}
 		}
-		if(orgUnit.getEmployees() != null && !orgUnit.getEmployees().isEmpty()){
+
+		if (orgUnit.getEmployees() != null && !orgUnit.getEmployees().isEmpty()){
 			for (Employment employment : orgUnit.getEmployees()) {
 				Optional<Employment> employmentLookup = getEmploymentFromBusinessKey(employment.getBusinessKey(), currentMunicipality.getId());
-				if(employmentLookup.isPresent()){
+
+				if (employmentLookup.isPresent()){
 					logger.info("employment found.");
+
 					Employment existingEmployment = employmentLookup.get();
 					updateEmployment(employment, existingEmployment);
-					if(updating){
+
+					if (updating){
 						existingEmployment.setEmployedIn(result);
-					} else {
+					}
+					else {
 						existingEmployment.setEmployedIn(null);
 						newEmployments.add(existingEmployment);
 					}
+
 					em.merge(existingEmployment);
 					newEmployeesCollection.add(existingEmployment);
 				} else {
@@ -147,16 +191,23 @@ public class OrgUnitServiceImpl implements OrgUnitService {
 					newEmployments.add(employment);
 				}
 			}
-			if(updating){
+
+			if (updating){
 				result.setEmployees(newEmployeesCollection);
 			}
 		}
 
-		if(updating){
+		if (updating) {
+			logger.info("[saveOrgUnit] Saving updated orgUnit: " + result);
+
 			em.merge(result);
-		} else {
+		}
+		else {
+			logger.info("[saveOrgUnit] Saving new orgUnit: " + result);
+
 			em.persist(result);
-			// now that we've saved this, set employed in on employments.
+
+				// now that we've saved this, set employed in on employments.
 			for (Employment newEmployment : newEmployments) {
 				newEmployment.setEmployedIn(result);
 				em.merge(newEmployment);
@@ -271,11 +322,14 @@ public class OrgUnitServiceImpl implements OrgUnitService {
 
 	@Override
 	public void importOrganization(OrgUnit orgUnit) {
-		// TODO MUY IMPORTANTE! The given orgUnit must bee top level orgUnit.
+		// TODO MUY IMPORTANTE! The given orgUnit must be top level orgUnit.
 		fixRelations(orgUnit);
+
 		Municipality currentMunicipality = orgUnit.getMunicipality().get();
+
 		Optional<OrgUnit> existing = getOrgUnitFromBusinessKey(orgUnit.getBusinessKey(), currentMunicipality.getId());
-		if(existing.isPresent()){
+
+		if (existing.isPresent()){
 			// do update
 			List<String> businessKeys = getChildBusinessKeys(orgUnit);
 			if(businessKeys != null && !businessKeys.isEmpty()){

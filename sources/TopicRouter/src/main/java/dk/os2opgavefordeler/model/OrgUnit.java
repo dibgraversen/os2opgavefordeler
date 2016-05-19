@@ -201,6 +201,25 @@ public class OrgUnit implements Serializable, IHasChildren<OrgUnit> {
 
 	@Override
 	public String toString() {
+		return "OrgUnit{" +
+				"id=" + id +
+				", isActive=" + isActive +
+				", businessKey='" + businessKey + '\'' +
+				", name='" + name + '\'' +
+				", email='" + email + '\'' +
+				", esdhId='" + esdhId + '\'' +
+				", esdhLabel='" + esdhLabel + '\'' +
+				", phone='" + phone + '\'' +
+				", parent=" + parent +
+				", children=" + children +
+				", manager=" + manager +
+				", employees=" + employees +
+				", municipality=" + municipality +
+				'}';
+	}
+
+	/*@Override
+	public String toString() {
 		return MoreObjects.toStringHelper(this)
 				.add("id", id)
 				.add("name", name)
@@ -208,7 +227,9 @@ public class OrgUnit implements Serializable, IHasChildren<OrgUnit> {
 				.add("phone", phone)
 				.add("businessKey", businessKey)
 				.toString();
-	}
+	}*/
+
+
 
 	//--------------------------------------------------------------------------
 	// Builder
