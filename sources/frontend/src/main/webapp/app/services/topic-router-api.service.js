@@ -33,6 +33,8 @@
 			getKlesForMunicipality: getKlesForMunicipality,
 			saveMunicipalityKle: saveMunicipalityKle,
 			deleteMunicipalityKle: deleteMunicipalityKle,
+			getApiKey: getApiKey,
+			saveApiKey: saveApiKey,
 
 			//
 			getFiltersForRule: getFiltersForRule,
@@ -326,6 +328,18 @@
 
 		function deleteMunicipalityKle(kle){
 			return httpDelete('/municipalities/'+kle.municipalityId+'/kle/'+kle.id);
+		}
+
+		function getApiKey(municipality){
+			if (municipality) {
+				return httpGet('/municipalities/' + municipality.id + '/apikey');
+			}
+		}
+
+		function saveApiKey(municipality, apiKey) {
+			$log.info('Saving API key: ' + apiKey + ' for municipality: ' + municipality);
+
+			return httpPost('/municipalities/' + municipality + '/apikey/' + apiKey);
 		}
 
 		// DTO classes.

@@ -71,6 +71,26 @@
 					</div>
 				</div>
 			</tab>
+			<tab heading="API key">
+				<div class="panel panel-default margin-top">
+					<div class="panel-heading">
+						Vedligehold API key
+					</div>
+					<div class="panel-body">
+						<p>
+							Her kan du vedligeholde den API key som er påkrævet for at kalde /api-endpointet.
+						</p>
+						<p>
+							API key: {{ apiKey }}
+						</p>
+						<div class="actions">
+							<div class="text-right">
+								<button class="btn btn-default" ng-click="editApiKey()">Rediger API key</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</tab>
 		</tabset>
 	</div>
 

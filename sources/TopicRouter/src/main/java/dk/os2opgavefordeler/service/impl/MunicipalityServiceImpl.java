@@ -211,4 +211,40 @@ public class MunicipalityServiceImpl implements MunicipalityService {
 		}
 		return parentMaybe.get();
 	}
+
+	@Override
+	public String getApiKey(long municipalityId) {
+		String apiKey = null;
+
+		Query query = getEm().createQuery("SELECT m FROM Municipality m WHERE m.id = :municipalityId");
+		query.setParameter("municipalityId", municipalityId);
+
+		Municipality municipality;
+
+		try {
+			municipality = (Municipality)query.getSingleResult();
+			apiKey = municipality.getToken();
+		}
+		catch (NoResultException nre){
+			log.info("Trying to find municipality by ID: {}, without luck", municipalityId);
+		}
+
+		return apiKey;
+	}
+
+	@Override
+	public void setApiKey(long municipalityId, String apiKey) {
+		Query query = getEm().createQuery("SELECT m FROM Municipality m WHERE m.id = :municipalityId");
+		query.setParameter("municipalityId", municipalityId);
+
+		Municipality municipality;
+
+		try {
+			municipality = (Municipality)query.getSingleResult();
+			municipality.setToken(apiKey);
+		}
+		catch (NoResultException nre){
+			log.info("Trying to find municipality by ID: {}, without luck", municipalityId);
+		}
+	}
 }

@@ -1,0 +1,27 @@
+<div>
+	<div class="modal-header">
+		<button type="button" class="close" ng-click="cancel()"><span aria-hidden="true">&times;</span></button>
+		<h4 class="modal-title">{{ titleText }}</h4>
+	</div>
+	<div class="modal-body">
+		<alert ng-repeat="alert in messages" type="{{alert.type}}"
+		       close="closeMessage($index)" class="animate-fade"
+		       style="width: 100%">{{alert.msg}}
+		</alert>
+
+		<form>
+			<div class="form-group">
+				<label for="apiKey">API key:</label>
+				<input type="text" class="form-control" id="apiKey" placeholder="API key" ng-model="apiKey.apiKey" />
+			</div>
+		</form>
+
+		API key is: {{ apiKey }}
+	</div>
+	<div class="modal-footer">
+		<div class="actions text-right">
+			<button class="btn btn-primary" ng-click="ok()">{{ saveText }}</button>
+			<button class="btn btn-default" ng-click="cancel()">Annullér</button>
+		</div>
+	</div>
+</div>

@@ -24,4 +24,6 @@ public interface MunicipalityService {
 	KlePO saveMunicipalityKle(KlePO kle) throws ValidationException;
 	void deleteMunicipalityKle(long municipalityId, long kleId) throws ValidationException;
 	List<KlePO> getMunicipalityKle(long municipalityId);
+	String getApiKey(long municipalityId);
+	void setApiKey(long municipalityId, String apiKey);
 }

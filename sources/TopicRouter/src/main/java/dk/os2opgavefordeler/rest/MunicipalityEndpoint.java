@@ -1,11 +1,17 @@
 package dk.os2opgavefordeler.rest;
 
+import dk.os2opgavefordeler.auth.AuthService;
 import dk.os2opgavefordeler.employment.MunicipalityRepository;
 import dk.os2opgavefordeler.employment.OrgUnitRepository;
+import dk.os2opgavefordeler.employment.UserRepository;
 import dk.os2opgavefordeler.model.Municipality;
+import dk.os2opgavefordeler.model.User;
 import dk.os2opgavefordeler.model.ValidationException;
+import dk.os2opgavefordeler.model.presentation.ApiKeyPO;
 import dk.os2opgavefordeler.model.presentation.KlePO;
 import dk.os2opgavefordeler.service.MunicipalityService;
+import dk.os2opgavefordeler.service.UserService;
+import org.jboss.resteasy.annotations.cache.NoCache;
 import org.slf4j.Logger;
 
 import javax.inject.Inject;
@@ -38,6 +44,15 @@ public class MunicipalityEndpoint extends Endpoint {
 
     @Inject
     private EntityManager entityManager;
+
+	@Inject
+	private AuthService authService;
+
+	@Inject
+	private UserRepository userRepository;
+
+	@Inject
+	private UserService userService;
 
     @GET
     @Path("/")
@@ -128,4 +143,53 @@ public class MunicipalityEndpoint extends Endpoint {
             return badRequest(e.getMessage());
         }
     }
+
+    @GET
+    @Path("/{municipalityId}/apikey")
+    @Produces(MediaType.APPLICATION_JSON)
+    @NoCache
+    public Response getApiKey(@PathParam("municipalityId") long municipalityId) {
+	    if (!authService.isAuthenticated()) {
+            return Response.status(Response.Status.UNAUTHORIZED).build();
+        }
+
+	    if (permissionsOk(municipalityId)) {
+		    String apiKey = municipalityService.getApiKey(municipalityId);
+		    return ok(new ApiKeyPO(apiKey));
+	    }
+
+	    return Response.status(Response.Status.UNAUTHORIZED).build();
+    }
+
+	@POST
+	@Path("/{municipalityId}/apikey/{apiKey}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response setApiKey(@PathParam("municipalityId") long municipalityId, @PathParam("apiKey") String apiKey) {
+		if (!authService.isAuthenticated()) {
+			return Response.status(Response.Status.UNAUTHORIZED).build();
+		}
+
+		if (permissionsOk(municipalityId)) {
+			municipalityService.setApiKey(municipalityId, apiKey);
+			return ok(new ApiKeyPO(apiKey));
+		}
+
+		return Response.status(Response.Status.UNAUTHORIZED).build();
+	}
+
+	private boolean permissionsOk(long municipalityId) {
+		// determine municipality from user
+		User user = userRepository.findByEmail(authService.getAuthentication().getEmail());
+
+		// make sure the user is authorized to see/update the API key
+		if (userService.isMunicipalityAdmin(user.getId())) {
+			Municipality currentMunicipality = user.getMunicipality();
+
+			if (currentMunicipality.getId() == municipalityId) {
+				return true;
+			}
+		}
+
+		return false;
+	}
 }

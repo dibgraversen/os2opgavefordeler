@@ -33,12 +33,14 @@
 		$scope.uploadFile = null;
 		$scope.mAdminAlerts = [];
 		$scope.kles = [];
+		$scope.apiKey = {};
 
 		$scope.upload = upload;
 		$scope.closeAlert = closeAlert;
 		$scope.addKle = addKle;
 		$scope.editKle = editKle;
 		$scope.deleteKle = deleteKle;
+		$scope.editApiKey = editApiKey;
 
 		activate();
 
@@ -51,6 +53,10 @@
 			}
 			topicRouterApi.getKlesForMunicipality($scope.user.municipality).then(function(kles){
 				$scope.kles = kles;
+			});
+
+			topicRouterApi.getApiKey($scope.user.municipality).then(function(apiKey){
+				$scope.apiKey = apiKey;
 			});
 		}
 
@@ -145,6 +151,25 @@
 						kle.name = updatedKle.name;
 						kle.number = updatedKle.number;
 						kle.serviceText = updatedKle.serviceText;
+					});
+		}
+
+		function editApiKey() {
+			clearMessages();
+			$modal.open({
+				resolve: {
+					municipality: function(){
+						return $scope.user.municipality;
+					},
+					apiKey: function(){
+						return $scope.apiKey;
+					}
+				},
+				templateUrl: 'app/municipality-admin/edit-api-key-modal.html',
+				controller: 'EditApiKeyModalInstanceCtrl'
+			}).result.then(
+					function(apiKey){
+						$scope.apiKey = apiKey;
 					});
 		}
 

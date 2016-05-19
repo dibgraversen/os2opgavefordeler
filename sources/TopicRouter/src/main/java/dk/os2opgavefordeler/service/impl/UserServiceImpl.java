@@ -1,8 +1,10 @@
 package dk.os2opgavefordeler.service.impl;
 
 import dk.os2opgavefordeler.auth.openid.OpenIdUserFactory;
+
 import dk.os2opgavefordeler.employment.EmploymentRepository;
 import dk.os2opgavefordeler.employment.UserRepository;
+
 import dk.os2opgavefordeler.model.Employment;
 import dk.os2opgavefordeler.model.Role;
 import dk.os2opgavefordeler.model.User;
@@ -10,17 +12,24 @@ import dk.os2opgavefordeler.model.UserSettings;
 import dk.os2opgavefordeler.model.presentation.RolePO;
 import dk.os2opgavefordeler.model.presentation.SubstitutePO;
 import dk.os2opgavefordeler.model.presentation.UserSettingsPO;
+
 import dk.os2opgavefordeler.service.*;
+
 import org.apache.deltaspike.jpa.api.transaction.Transactional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.ApplicationScoped;
+
 import javax.inject.Inject;
+
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
+
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -215,4 +224,19 @@ public class UserServiceImpl implements UserService {
                 .map(r -> new SubstitutePO(r.getOwner().getName(), r.getId()))
                 .collect(Collectors.toList());
     }
+
+	@Override
+	public boolean isMunicipalityAdmin(long userId) {
+		List<RolePO> roles = getRoles(userId);
+
+		Iterator<RolePO> roleIterator = roles.iterator();
+
+		boolean isMunicipalityAdmin = false;
+
+		while (roleIterator.hasNext() && !isMunicipalityAdmin) {
+			isMunicipalityAdmin = roleIterator.next().isMunicipalityAdmin();
+		}
+
+		return isMunicipalityAdmin;
+	}
 }

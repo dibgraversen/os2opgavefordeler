@@ -34,4 +34,5 @@ public interface UserService {
 
 	Role createSubstituteRole(long targetEmploymentId, long roleId) throws ResourceNotFoundException, AuthorizationException;
 	List<SubstitutePO> findSubstitutesFor(long roleId) throws ResourceNotFoundException, AuthorizationException;
+	boolean isMunicipalityAdmin(long userId);
 }
