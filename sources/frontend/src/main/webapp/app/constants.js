@@ -2,7 +2,7 @@
 	'use strict';
 	angular.module("app.config", [])
 
-			.constant("serverUrl", "/rest")
-			.constant("version", "DEV-1.1.0")
+			.constant("serverUrl", "${application.backendUrl}")
+			.constant("version", "${application.version}")
 	;
 })();
