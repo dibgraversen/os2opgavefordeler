@@ -168,8 +168,8 @@
 				templateUrl: 'app/municipality-admin/edit-api-key-modal.html',
 				controller: 'EditApiKeyModalInstanceCtrl'
 			}).result.then(
-					function(apiKey){
-						$scope.apiKey = apiKey;
+					function(updatedApiKey){
+						$scope.apiKey = updatedApiKey;
 					});
 		}
 

@@ -337,8 +337,6 @@
 		}
 
 		function saveApiKey(municipality, apiKey) {
-			$log.info('Saving API key: ' + apiKey + ' for municipality: ' + municipality);
-
 			return httpPost('/municipalities/' + municipality + '/apikey/' + apiKey);
 		}
 

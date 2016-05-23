@@ -7,8 +7,6 @@
 
 	function EditApiKeyModalInstanceCtrl($scope, $modalInstance, $log, topicRouterApi, apiKey, municipality){
 		$scope.messages = [];
-		$scope.titleText = 'Redigér API key';
-		$scope.saveText = 'Opret';
 
 		$scope.ok = ok;
 		$scope.cancel = cancel;
@@ -23,7 +21,7 @@
 				$scope.saveText = 'Gem';
 
 				// populate locals
-				//$scope.apiKey = apiKey;
+				$scope.apiKey = apiKey;
 			}
 		}
 
@@ -31,17 +29,17 @@
 			// reset messages.
 			$scope.messages.splice(0, $scope.messages.length);
 
-			$log.info('API key: ' + JSON.stringify(apiKey));
+			// validate API key string
+			var apiKeyStr = $scope.apiKey.apiKey;
 
-			// validate
-			var apiKeyValid = validateApiKey(apiKey.apiKey);
+			var apiKeyValid = validateApiKey(apiKeyStr);
 
-			if(apiKeyValid){
-				topicRouterApi.saveApiKey(municipality.id, apiKey.apiKey).then(
-						function(savedApiKey){
+			if (apiKeyValid){
+				topicRouterApi.saveApiKey(municipality.id, apiKeyStr).then(
+						function(savedApiKey) {
 							$modalInstance.close(savedApiKey);
 						},
-						function(error){
+						function(error) {
 							addMessage({type: 'danger', msg: error.data});
 						});
 			}
@@ -50,9 +48,9 @@
 		function validateApiKey(apiKey){
 			var valid = true;
 
-			if(apiKey.length < 1){
+			if(apiKey.length < 8) {
 				valid = false;
-				addMessage({ type: 'warning', msg: 'Du skal angive en API key.'});
+				addMessage({ type: 'warning', msg: 'Du skal angive en API key på minimum otte tegn.'});
 			}
 
 			return valid;
