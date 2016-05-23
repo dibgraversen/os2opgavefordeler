@@ -13,6 +13,7 @@
 		$scope.openCreateMunicipality = openCreateMunicipality;
 		$scope.openEditMunicipality = openEditMunicipality;
 		$scope.toggleActive = toggleActive;
+		$scope.buildRules = buildRules;
 		$scope.closeAlert = closeAlert;
 
 		activate();
@@ -77,6 +78,20 @@
 							msg: "opdatering af kommune fejlede, prøv igen senere."
 						});
 					});
+		}
+
+		function buildRules(municipality) {
+			topicRouterApi.buildRules(municipality).then(function(response) {
+				addMessage({
+					type: 'success',
+					msg: 'Regler er ved at blive oprettet. Dette kan tage et par minutter.'
+				});
+			}, function(){
+				addMessage({
+					type: "danger",
+					msg: "Oprettelse af regler fejlede."
+				});
+			});
 		}
 
 		function addMessage(message){

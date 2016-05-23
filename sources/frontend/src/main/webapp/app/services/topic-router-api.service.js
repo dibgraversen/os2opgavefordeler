@@ -30,6 +30,7 @@
 			getMunicipalities: getMunicipalities,
 			createMunicipality: createMunicipality,
 			updateMunicipality: updateMunicipality,
+			buildRules: buildRules,
 			getKlesForMunicipality: getKlesForMunicipality,
 			saveMunicipalityKle: saveMunicipalityKle,
 			deleteMunicipalityKle: deleteMunicipalityKle,
@@ -313,6 +314,12 @@
 
 		function updateMunicipality(municipality){
 			return httpPost('/municipalities/'+municipality.id, municipality);
+		}
+
+		function buildRules(municipality) {
+			return httpGet('/distribution-rules/buildRules', {
+				"municipalityId": municipality.id
+			})
 		}
 
 		function getKlesForMunicipality(municipality){

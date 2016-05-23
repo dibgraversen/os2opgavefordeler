@@ -182,6 +182,8 @@ public class DistributionServiceImpl implements DistributionService {
 
     @Override
     public void buildRulesForMunicipality(long municipalityId) {
+        log.info("Building rules for municipality with ID: {}", municipalityId);
+
         createMissingDistributionRules(municipalityId);
         updateParentsForDistributionRules(municipalityId);
     }

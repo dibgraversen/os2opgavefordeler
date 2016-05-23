@@ -10,8 +10,9 @@
 			<th>
 				Navn
 			</th>
-			<th style="width: 70px">id</th>
-			<th style="width: 50px">aktiv</th>
+			<th style="width: 70px">Id</th>
+			<th style="width: 50px">Aktiv</th>
+			<th style="width: 50px">Regler</th>
 			<th style="width: 25px"></th>
 		</tr>
 		</thead>
@@ -21,6 +22,9 @@
 			<td>{{ municipality.id }}</td>
 			<td>
 				<a ng-click="toggleActive(municipality)">{{ municipality.active ? 'Ja' : 'Nej' }}</a>
+			</td>
+			<td>
+				<a ng-click="buildRules(municipality)">Opret</a>
 			</td>
 			<td><span class="glyphicon glyphicon-edit" tooltip="rediger"
 								ng-click="openEditMunicipality(municipality)"></span></td>
