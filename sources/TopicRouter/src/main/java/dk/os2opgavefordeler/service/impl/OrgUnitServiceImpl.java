@@ -30,8 +30,6 @@ public class OrgUnitServiceImpl implements OrgUnitService {
 
 	@Override
 	public OrgUnit saveOrgUnit(OrgUnit orgUnit) {
-		logger.info("[saveOrgUnit] JSON based orgUnit: {}", orgUnit);
-
 		EntityManager em = persistence.getEm();
 
 		Municipality currentMunicipality = orgUnit.getMunicipality().get();
@@ -48,11 +46,9 @@ public class OrgUnitServiceImpl implements OrgUnitService {
 
 		if (updating) {
 			result = orgLookup.get();
-			logger.info("[saveOrgUnit] Updating: {}", result);
 		}
 		else {
 			result = orgUnit;
-			logger.info("[saveOrgUnit] Creating: {}", result);
 		}
 
 		if (updating) {
@@ -72,11 +68,11 @@ public class OrgUnitServiceImpl implements OrgUnitService {
 			Optional<OrgUnit> parent = getOrgUnitFromBusinessKey(givenParent.get().getBusinessKey(), currentMunicipality.getId());
 
 			if (parent.isPresent()) {
-				logger.info("[saveOrgUnit] Fixing parent");
+				logger.info("[saveOrgUnit] Fixing parent for OrgUnit " + orgUnit.getName() + " - settting to " + parent.get().getName());
 				orgUnit.setParent(parent.get());
 			}
 			else {
-				logger.error("[saveOrgUnit] No parent found"); // TODO: Create one???
+				logger.error("[saveOrgUnit] Given parent set - but no parent found using business key"); // TODO: Create one???
 			}
 		}
 		else {
@@ -90,13 +86,9 @@ public class OrgUnitServiceImpl implements OrgUnitService {
 		Optional<Employment> givenManager = orgUnit.getManager();
 
 		if (givenManager.isPresent()) {
-			logger.info("[saveOrgUnit] Manager found for given orgUnit - looking up manager using business key");
-
 			Optional<Employment> manager = getEmploymentFromBusinessKey(givenManager.get().getBusinessKey(), currentMunicipality.getId());
 
 			if (manager.isPresent()) {
-				logger.info("[saveOrgUnit] Manager found using business key: {}", givenManager.get().getBusinessKey());
-
 				Employment managerEntity = manager.get();
 				updateEmployment(givenManager.get(), managerEntity);
 				result.setManager(managerEntity);
@@ -120,14 +112,11 @@ public class OrgUnitServiceImpl implements OrgUnitService {
 					newManager.setMunicipality(currentMunicipality);
 				}
 
-				logger.info("[saveOrgUnit] Manager: {}", newManager);
-
 				em.persist(newManager);
 				newEmployments.add(newManager);
 			}
 		}
 		else if (updating) {
-			logger.info("[saveOrgUnit] No manager found for orgUnit");
 			result.setManager(null);
 		}
 
@@ -166,7 +155,7 @@ public class OrgUnitServiceImpl implements OrgUnitService {
 					Employment existingEmployment = employmentLookup.get();
 					updateEmployment(employment, existingEmployment);
 
-					if (updating){
+					if (updating) {
 						existingEmployment.setEmployedIn(result);
 					}
 					else {
@@ -176,15 +165,19 @@ public class OrgUnitServiceImpl implements OrgUnitService {
 
 					em.merge(existingEmployment);
 					newEmployeesCollection.add(existingEmployment);
-				} else {
+				}
+				else {
 					logger.info("creating new");
-					if(updating) {
+
+					if (updating) {
 						employment.setEmployedIn(result);
-					} else {
+					}
+					else {
 						employment.setEmployedIn(null);
 						newEmployments.add(employment);
 					}
 					employment.setMunicipality(currentMunicipality);
+
 					logger.info("employment: {}", employment);
 					em.persist(employment);
 					newEmployeesCollection.add(employment);
@@ -198,21 +191,18 @@ public class OrgUnitServiceImpl implements OrgUnitService {
 		}
 
 		if (updating) {
-			logger.info("[saveOrgUnit] Saving updated orgUnit: " + result);
-
 			em.merge(result);
 		}
 		else {
-			logger.info("[saveOrgUnit] Saving new orgUnit: " + result);
-
 			em.persist(result);
 
-				// now that we've saved this, set employed in on employments.
+			// now that we've saved this, set employed in on employments.
 			for (Employment newEmployment : newEmployments) {
 				newEmployment.setEmployedIn(result);
 				em.merge(newEmployment);
 			}
 		}
+
 		return result;
 	}
 
