@@ -50,12 +50,16 @@ public class ImportEndpoint extends Endpoint {
 
         try {
             OrgUnit o = importService.importOrganization(u.getMunicipality().getId(), orgUnitDTO);
+
             return Response
                     .ok()
                     .entity(o.getId())
                     .build();
-        } catch (ImportService.InvalidMunicipalityException e) {
-            return badRequest("ERROR");
+        }
+        catch (ImportService.InvalidMunicipalityException e) {
+            logger.error("Invalid municipality for import: {}", e);
+
+	        return badRequest("ERROR");
         }
     }
 
