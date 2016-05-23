@@ -1,15 +1,12 @@
 {
   "businessKey": "K1",
-  "name": "Miraclekøbing Kommune",
+  "name": "Miraclekøbing",
   "email": null,
   "phone": null,
-  "esdhId": "miko",
-  "esdhLabel": "Miracles Kommune",
+  "esdhId": null,
+  "esdhLabel": null,
   "manager": null,
   "employees": [],
-  "municipality": {
-    "name": "Miraclekøbing Kommune"
-  },
   "children": [
     {
       "businessKey": "K2",
@@ -52,17 +49,6 @@
         },
         {
           "businessKey": "K5",
-          "name": "KMD Lønservice",
-          "email": null,
-          "phone": null,
-          "esdhId": "",
-          "esdhLabel": "",
-          "manager": null,
-          "employees": [],
-          "children": []
-        },
-        {
-          "businessKey": "K6",
           "name": "Direktion STAB",
           "email": null,
           "phone": null,
@@ -88,6 +74,15 @@
                 "esdhId": "2"
               },
               "employees": [
+                {
+                  "businessKey": "K8",
+                  "name": "Sune Marcher",
+                  "email": "sum@miracle.dk",
+                  "initials": "sum",
+                  "jobTitle": "Sekretariatschef",
+                  "phone": "53747270",
+                  "esdhId": "2"
+                },
                 {
                   "businessKey": "K9",
                   "name": "Hans Ehlert Thomsen",
@@ -150,10 +145,27 @@
                   "phone": null,
                   "esdhId": "",
                   "esdhLabel": "",
-                  "manager": null,
+                  "manager": {
+                    "businessKey": "K15",
+                    "name": "Rune Nielsen",
+                    "email": "rni@miracle.dk",
+                    "initials": "rni",
+                    "jobTitle": "Byrådskalif",
+                    "phone": "53747176",
+                    "esdhId": "14"
+                  },
                   "employees": [
                     {
                       "businessKey": "K15",
+                      "name": "Rune Nielsen",
+                      "email": "rni@miracle.dk",
+                      "initials": "rni",
+                      "jobTitle": "Byrådskalif",
+                      "phone": "53747176",
+                      "esdhId": "14"
+                    },
+                    {
+                      "businessKey": "K16",
                       "name": "Henrik Løvborg",
                       "email": "hlo@miracle.dk",
                       "initials": "hlo",
@@ -162,7 +174,7 @@
                       "esdhId": "5"
                     },
                     {
-                      "businessKey": "K16",
+                      "businessKey": "K17",
                       "name": "Dennis Bohnstedt Hansen",
                       "email": "dbh@miracle.dk",
                       "initials": "dbh",
@@ -171,7 +183,7 @@
                       "esdhId": "6"
                     },
                     {
-                      "businessKey": "K17",
+                      "businessKey": "K18",
                       "name": "Hans Guldager",
                       "email": "hgk@miracle.dk",
                       "initials": "hgk",
@@ -180,7 +192,7 @@
                       "esdhId": ""
                     },
                     {
-                      "businessKey": "K18",
+                      "businessKey": "K19",
                       "name": "Anders Haaning Andersen",
                       "email": "aha@miracle.dk",
                       "initials": "aha",
@@ -192,7 +204,7 @@
                   "children": []
                 },
                 {
-                  "businessKey": "K19",
+                  "businessKey": "K20",
                   "name": "Råd og nævn",
                   "email": null,
                   "phone": null,
@@ -202,7 +214,7 @@
                   "employees": [],
                   "children": [
                     {
-                      "businessKey": "K20",
+                      "businessKey": "K21",
                       "name": "Folkeoplysning",
                       "email": null,
                       "phone": null,
@@ -213,25 +225,33 @@
                       "children": []
                     },
                     {
-                      "businessKey": "K21",
+                      "businessKey": "K22",
                       "name": "Huslejenævn",
                       "email": null,
                       "phone": null,
                       "esdhId": "",
                       "esdhLabel": "",
-                      "manager": null,
+                      "manager": {
+                        "businessKey": "K23",
+                        "name": "Brian Bek Jensen",
+                        "email": "bbj@miracle.dk",
+                        "initials": "bbj",
+                        "jobTitle": "Formand",
+                        "phone": "",
+                        "esdhId": "8"
+                      },
                       "employees": [
                         {
-                          "businessKey": "K22",
+                          "businessKey": "K23",
                           "name": "Brian Bek Jensen",
                           "email": "bbj@miracle.dk",
                           "initials": "bbj",
-                          "jobTitle": "Lejerrepræsentant",
+                          "jobTitle": "Formand",
                           "phone": "",
                           "esdhId": "8"
                         },
                         {
-                          "businessKey": "K23",
+                          "businessKey": "K24",
                           "name": "Martin Hvidberg Nielsen",
                           "email": "mhn@miracle.dk",
                           "initials": "mhn",
@@ -243,7 +263,7 @@
                       "children": []
                     },
                     {
-                      "businessKey": "K24",
+                      "businessKey": "K25",
                       "name": "Beboerklagenævn",
                       "email": null,
                       "phone": null,
@@ -252,7 +272,7 @@
                       "manager": null,
                       "employees": [
                         {
-                          "businessKey": "K25",
+                          "businessKey": "K26",
                           "name": "Anders Staugaard",
                           "email": "ast@miracle.dk",
                           "initials": "ast",
@@ -264,16 +284,24 @@
                       "children": []
                     },
                     {
-                      "businessKey": "K26",
+                      "businessKey": "K27",
                       "name": "Ældrerådet",
                       "email": null,
                       "phone": null,
                       "esdhId": "",
                       "esdhLabel": "",
-                      "manager": null,
+                      "manager": {
+                        "businessKey": "K28",
+                        "name": "Kristian V. Sørensen",
+                        "email": "kvs@miracle.dk",
+                        "initials": "kvs",
+                        "jobTitle": "Ældrerådsformand",
+                        "phone": "42461699",
+                        "esdhId": "11"
+                      },
                       "employees": [
                         {
-                          "businessKey": "K27",
+                          "businessKey": "K28",
                           "name": "Kristian V. Sørensen",
                           "email": "kvs@miracle.dk",
                           "initials": "kvs",
@@ -285,16 +313,24 @@
                       "children": []
                     },
                     {
-                      "businessKey": "K28",
+                      "businessKey": "K29",
                       "name": "Hegnsyn",
                       "email": null,
                       "phone": null,
                       "esdhId": "",
                       "esdhLabel": "",
-                      "manager": null,
+                      "manager": {
+                        "businessKey": "K30",
+                        "name": "Kristoffer Bundgaard",
+                        "email": "",
+                        "initials": "kbu",
+                        "jobTitle": "Hegnsynsmand",
+                        "phone": "53747260",
+                        "esdhId": "12"
+                      },
                       "employees": [
                         {
-                          "businessKey": "K29",
+                          "businessKey": "K30",
                           "name": "Kristoffer Bundgaard",
                           "email": "",
                           "initials": "kbu",
@@ -306,7 +342,7 @@
                       "children": []
                     },
                     {
-                      "businessKey": "K30",
+                      "businessKey": "K31",
                       "name": "Beredskabskommission",
                       "email": null,
                       "phone": null,
@@ -317,16 +353,24 @@
                       "children": []
                     },
                     {
-                      "businessKey": "K31",
+                      "businessKey": "K32",
                       "name": "Fredningsnævn",
                       "email": null,
                       "phone": null,
                       "esdhId": "",
                       "esdhLabel": "",
-                      "manager": null,
+                      "manager": {
+                        "businessKey": "K33",
+                        "name": "Rasmus Rosendal",
+                        "email": "rro@miracle.dk",
+                        "initials": "rro",
+                        "jobTitle": "Medlem af Fredningsnævnet",
+                        "phone": "",
+                        "esdhId": "13"
+                      },
                       "employees": [
                         {
-                          "businessKey": "K32",
+                          "businessKey": "K33",
                           "name": "Rasmus Rosendal",
                           "email": "rro@miracle.dk",
                           "initials": "rro",
