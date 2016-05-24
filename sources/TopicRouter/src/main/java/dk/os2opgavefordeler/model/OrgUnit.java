@@ -207,6 +207,7 @@ public class OrgUnit implements Serializable, IHasChildren<OrgUnit> {
 				.add("email", email)
 				.add("phone", phone)
 				.add("businessKey", businessKey)
+				.add("municipality", municipality)
 				.toString();
 	}
 

@@ -7,8 +7,11 @@ import dk.os2opgavefordeler.employment.UserRepository;
 import dk.os2opgavefordeler.model.Employment;
 import dk.os2opgavefordeler.model.Municipality;
 import dk.os2opgavefordeler.model.OrgUnit;
+import dk.os2opgavefordeler.model.User;
 import dk.os2opgavefordeler.model.presentation.OrgUnitPO;
 import dk.os2opgavefordeler.model.presentation.SimpleMessage;
+import dk.os2opgavefordeler.orgunit.ImportService;
+import dk.os2opgavefordeler.orgunit.OrgUnitDTO;
 import dk.os2opgavefordeler.service.BadRequestArgumentException;
 import dk.os2opgavefordeler.service.OrgUnitService;
 import dk.os2opgavefordeler.service.UserService;
@@ -32,13 +35,16 @@ import java.util.Optional;
 
 @Path("/org-units")
 @RequestScoped
-public class OrgUnitEndpoint {
+public class OrgUnitEndpoint extends Endpoint {
     public static final String FILE = "file";
     @Inject
     Logger log;
 
     @Inject
     OrgUnitService orgUnitService;
+
+	@Inject
+	private ImportService importService;
 
     @Inject
     UserService userService;
@@ -133,25 +139,43 @@ public class OrgUnitEndpoint {
     public Response fileImport(MultipartFormDataInput multipartInput) {
         Map<String, List<InputPart>> uploadForm = multipartInput.getFormDataMap();
         List<InputPart> inputParts = uploadForm.get(FILE);
+
         StringBuilder completeString = new StringBuilder();
+
         for (InputPart inputPart : inputParts) {
             try {
                 completeString.append(inputPart.getBodyAsString());
-            } catch (IOException e) {
-                e.printStackTrace();
+            }
+            catch (IOException e) {
+                log.error("Error while reading import file: ", e);
             }
         }
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-            OrgUnit input = mapper.readValue(completeString.toString(), OrgUnit.class);
-            log.info("user: {}", authService.getAuthentication());
-            Municipality currentMunicipality = userRepository.findByEmail(authService.getAuthentication().getEmail()).getMunicipality();
-            fixupOrgUnit(input, currentMunicipality);
-            orgUnitService.importOrganization(input);
-        } catch (IOException e) {
-            return Response.status(Response.Status.BAD_REQUEST).build();
-        }
-        return Response.ok().build();
+
+	    User u = userRepository.findByEmail(authService.getAuthentication().getEmail());
+
+	    try {
+		    ObjectMapper mapper = new ObjectMapper();
+		    OrgUnitDTO orgUnitDTO = mapper.readValue(completeString.toString(), OrgUnitDTO.class);
+
+		    OrgUnit o = importService.importOrganization(u.getMunicipality().getId(), orgUnitDTO);
+
+		    log.info("Imported the following OrgUnit: {}", o.toString());
+
+		    return Response
+				    .ok()
+				    .entity(o.getId())
+				    .build();
+	    }
+	    catch (ImportService.InvalidMunicipalityException e) {
+		    log.error("Invalid municipality for import: {}", e);
+
+		    return badRequest("ERROR");
+	    }
+	    catch (IOException e) {
+		    log.error("Error while mapping JSON: ", e);
+	    }
+
+	    return Response.ok().build();
     }
 
     private void fixupOrgUnit(OrgUnit input, Municipality municipality) {

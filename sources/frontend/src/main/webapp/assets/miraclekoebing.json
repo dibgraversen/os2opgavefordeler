@@ -1,0 +1,393 @@
+{
+  "businessKey": "K1",
+  "name": "Miraclekøbing",
+  "email": null,
+  "phone": null,
+  "esdhId": null,
+  "esdhLabel": null,
+  "manager": null,
+  "employees": [],
+  "children": [
+    {
+      "businessKey": "K2",
+      "name": "Direktion",
+      "email": null,
+      "phone": null,
+      "esdhId": "di",
+      "esdhLabel": "Direktion",
+      "manager": {
+        "businessKey": "K3",
+        "name": "Simon Møgelvang Bang",
+        "email": "smb@miracle.dk",
+        "initials": "smb",
+        "jobTitle": "Kommunaldirektør",
+        "phone": "53747268",
+        "esdhId": "1"
+      },
+      "employees": [
+        {
+          "businessKey": "K3",
+          "name": "Simon Møgelvang Bang",
+          "email": "smb@miracle.dk",
+          "initials": "smb",
+          "jobTitle": "Kommunaldirektør",
+          "phone": "53747268",
+          "esdhId": "1"
+        }
+      ],
+      "children": [
+        {
+          "businessKey": "K4",
+          "name": "Forsyning",
+          "email": null,
+          "phone": null,
+          "esdhId": "",
+          "esdhLabel": "",
+          "manager": null,
+          "employees": [],
+          "children": []
+        },
+        {
+          "businessKey": "K5",
+          "name": "Direktion STAB",
+          "email": null,
+          "phone": null,
+          "esdhId": "",
+          "esdhLabel": "",
+          "manager": null,
+          "employees": [],
+          "children": [
+            {
+              "businessKey": "K7",
+              "name": "Ledelsessekretariat",
+              "email": null,
+              "phone": null,
+              "esdhId": "",
+              "esdhLabel": "",
+              "manager": {
+                "businessKey": "K8",
+                "name": "Sune Marcher",
+                "email": "sum@miracle.dk",
+                "initials": "sum",
+                "jobTitle": "Sekretariatschef",
+                "phone": "53747270",
+                "esdhId": "2"
+              },
+              "employees": [
+                {
+                  "businessKey": "K8",
+                  "name": "Sune Marcher",
+                  "email": "sum@miracle.dk",
+                  "initials": "sum",
+                  "jobTitle": "Sekretariatschef",
+                  "phone": "53747270",
+                  "esdhId": "2"
+                },
+                {
+                  "businessKey": "K9",
+                  "name": "Hans Ehlert Thomsen",
+                  "email": "het@miracle.dk",
+                  "initials": "het",
+                  "jobTitle": "HR konsulent",
+                  "phone": "53747286",
+                  "esdhId": "3"
+                },
+                {
+                  "businessKey": "K10",
+                  "name": "Søren Dines Jensen",
+                  "email": "sdj@miracle.dk",
+                  "initials": "sdj",
+                  "jobTitle": "HR konsulent",
+                  "phone": "53747265",
+                  "esdhId": "4"
+                }
+              ],
+              "children": [
+                {
+                  "businessKey": "K11",
+                  "name": "Borgerservice og Direktionssekretariat",
+                  "email": null,
+                  "phone": null,
+                  "esdhId": "",
+                  "esdhLabel": "",
+                  "manager": null,
+                  "employees": [],
+                  "children": [
+                    {
+                      "businessKey": "K12",
+                      "name": "Direktionssekretariatet",
+                      "email": null,
+                      "phone": null,
+                      "esdhId": "",
+                      "esdhLabel": "",
+                      "manager": null,
+                      "employees": [],
+                      "children": [
+                        {
+                          "businessKey": "K13",
+                          "name": "Forsikringsafdelingen",
+                          "email": null,
+                          "phone": null,
+                          "esdhId": "",
+                          "esdhLabel": "",
+                          "manager": null,
+                          "employees": [],
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "businessKey": "K14",
+                  "name": "Byrådet",
+                  "email": null,
+                  "phone": null,
+                  "esdhId": "",
+                  "esdhLabel": "",
+                  "manager": {
+                    "businessKey": "K15",
+                    "name": "Rune Nielsen",
+                    "email": "rni@miracle.dk",
+                    "initials": "rni",
+                    "jobTitle": "Byrådskalif",
+                    "phone": "53747176",
+                    "esdhId": "14"
+                  },
+                  "employees": [
+                    {
+                      "businessKey": "K15",
+                      "name": "Rune Nielsen",
+                      "email": "rni@miracle.dk",
+                      "initials": "rni",
+                      "jobTitle": "Byrådskalif",
+                      "phone": "53747176",
+                      "esdhId": "14"
+                    },
+                    {
+                      "businessKey": "K16",
+                      "name": "Henrik Løvborg",
+                      "email": "hlo@miracle.dk",
+                      "initials": "hlo",
+                      "jobTitle": "Byrådsmedlem",
+                      "phone": "53747258",
+                      "esdhId": "5"
+                    },
+                    {
+                      "businessKey": "K17",
+                      "name": "Dennis Bohnstedt Hansen",
+                      "email": "dbh@miracle.dk",
+                      "initials": "dbh",
+                      "jobTitle": "Byrådsmedlem",
+                      "phone": "53747254",
+                      "esdhId": "6"
+                    },
+                    {
+                      "businessKey": "K18",
+                      "name": "Hans Guldager",
+                      "email": "hgk@miracle.dk",
+                      "initials": "hgk",
+                      "jobTitle": "1. viceborgmester",
+                      "phone": "53747257",
+                      "esdhId": ""
+                    },
+                    {
+                      "businessKey": "K19",
+                      "name": "Anders Haaning Andersen",
+                      "email": "aha@miracle.dk",
+                      "initials": "aha",
+                      "jobTitle": "Borgmester",
+                      "phone": "53747169",
+                      "esdhId": "7"
+                    }
+                  ],
+                  "children": []
+                },
+                {
+                  "businessKey": "K20",
+                  "name": "Råd og nævn",
+                  "email": null,
+                  "phone": null,
+                  "esdhId": "",
+                  "esdhLabel": "",
+                  "manager": null,
+                  "employees": [],
+                  "children": [
+                    {
+                      "businessKey": "K21",
+                      "name": "Folkeoplysning",
+                      "email": null,
+                      "phone": null,
+                      "esdhId": "",
+                      "esdhLabel": "",
+                      "manager": null,
+                      "employees": [],
+                      "children": []
+                    },
+                    {
+                      "businessKey": "K22",
+                      "name": "Huslejenævn",
+                      "email": null,
+                      "phone": null,
+                      "esdhId": "",
+                      "esdhLabel": "",
+                      "manager": {
+                        "businessKey": "K23",
+                        "name": "Brian Bek Jensen",
+                        "email": "bbj@miracle.dk",
+                        "initials": "bbj",
+                        "jobTitle": "Formand",
+                        "phone": "",
+                        "esdhId": "8"
+                      },
+                      "employees": [
+                        {
+                          "businessKey": "K23",
+                          "name": "Brian Bek Jensen",
+                          "email": "bbj@miracle.dk",
+                          "initials": "bbj",
+                          "jobTitle": "Formand",
+                          "phone": "",
+                          "esdhId": "8"
+                        },
+                        {
+                          "businessKey": "K24",
+                          "name": "Martin Hvidberg Nielsen",
+                          "email": "mhn@miracle.dk",
+                          "initials": "mhn",
+                          "jobTitle": "Suppleant for udlejerrepræsentant",
+                          "phone": "53747287",
+                          "esdhId": "9"
+                        }
+                      ],
+                      "children": []
+                    },
+                    {
+                      "businessKey": "K25",
+                      "name": "Beboerklagenævn",
+                      "email": null,
+                      "phone": null,
+                      "esdhId": "",
+                      "esdhLabel": "",
+                      "manager": null,
+                      "employees": [
+                        {
+                          "businessKey": "K26",
+                          "name": "Anders Staugaard",
+                          "email": "ast@miracle.dk",
+                          "initials": "ast",
+                          "jobTitle": "Boligorganisationerne",
+                          "phone": "53747252",
+                          "esdhId": "10"
+                        }
+                      ],
+                      "children": []
+                    },
+                    {
+                      "businessKey": "K27",
+                      "name": "Ældrerådet",
+                      "email": null,
+                      "phone": null,
+                      "esdhId": "",
+                      "esdhLabel": "",
+                      "manager": {
+                        "businessKey": "K28",
+                        "name": "Kristian V. Sørensen",
+                        "email": "kvs@miracle.dk",
+                        "initials": "kvs",
+                        "jobTitle": "Ældrerådsformand",
+                        "phone": "42461699",
+                        "esdhId": "11"
+                      },
+                      "employees": [
+                        {
+                          "businessKey": "K28",
+                          "name": "Kristian V. Sørensen",
+                          "email": "kvs@miracle.dk",
+                          "initials": "kvs",
+                          "jobTitle": "Ældrerådsformand",
+                          "phone": "42461699",
+                          "esdhId": "11"
+                        }
+                      ],
+                      "children": []
+                    },
+                    {
+                      "businessKey": "K29",
+                      "name": "Hegnsyn",
+                      "email": null,
+                      "phone": null,
+                      "esdhId": "",
+                      "esdhLabel": "",
+                      "manager": {
+                        "businessKey": "K30",
+                        "name": "Kristoffer Bundgaard",
+                        "email": "",
+                        "initials": "kbu",
+                        "jobTitle": "Hegnsynsmand",
+                        "phone": "53747260",
+                        "esdhId": "12"
+                      },
+                      "employees": [
+                        {
+                          "businessKey": "K30",
+                          "name": "Kristoffer Bundgaard",
+                          "email": "",
+                          "initials": "kbu",
+                          "jobTitle": "Hegnsynsmand",
+                          "phone": "53747260",
+                          "esdhId": "12"
+                        }
+                      ],
+                      "children": []
+                    },
+                    {
+                      "businessKey": "K31",
+                      "name": "Beredskabskommission",
+                      "email": null,
+                      "phone": null,
+                      "esdhId": "",
+                      "esdhLabel": "",
+                      "manager": null,
+                      "employees": [],
+                      "children": []
+                    },
+                    {
+                      "businessKey": "K32",
+                      "name": "Fredningsnævn",
+                      "email": null,
+                      "phone": null,
+                      "esdhId": "",
+                      "esdhLabel": "",
+                      "manager": {
+                        "businessKey": "K33",
+                        "name": "Rasmus Rosendal",
+                        "email": "rro@miracle.dk",
+                        "initials": "rro",
+                        "jobTitle": "Medlem af Fredningsnævnet",
+                        "phone": "",
+                        "esdhId": "13"
+                      },
+                      "employees": [
+                        {
+                          "businessKey": "K33",
+                          "name": "Rasmus Rosendal",
+                          "email": "rro@miracle.dk",
+                          "initials": "rro",
+                          "jobTitle": "Medlem af Fredningsnævnet",
+                          "phone": "",
+                          "esdhId": "13"
+                        }
+                      ],
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
