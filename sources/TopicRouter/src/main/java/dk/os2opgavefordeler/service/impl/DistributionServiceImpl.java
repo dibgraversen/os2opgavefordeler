@@ -148,12 +148,6 @@ public class DistributionServiceImpl implements DistributionService {
             }
         }
 
-        List<DistributionRule> unassigned = getUnassignedDistributionRules(municipalityId);
-
-        for (DistributionRule unassignedRule : unassigned) {
-            resultsMap.put(unassignedRule.getId(), unassignedRule);
-        }
-
         return resultsMap.values().stream()
                 .sorted((o1, o2) -> o1.getKle().getNumber().compareTo(o2.getKle().getNumber()))
                 .collect(Collectors.toList());
