@@ -120,7 +120,7 @@ public class ImportService {
         orgUnit.setIsActive(true);
         orgUnit.setName(orgUnitDTO.name);
         orgUnit.setEsdhId(orgUnitDTO.esdhId);
-        orgUnit.setEsdhLabel(orgUnit.getEsdhLabel());
+        orgUnit.setEsdhLabel(orgUnitDTO.esdhLabel);
         orgUnitRepository.saveAndFlushAndRefresh(orgUnit);
         ImmutableList<Employment> employees = orgUnit.getEmployees();
         for (Employment e : employees) {
