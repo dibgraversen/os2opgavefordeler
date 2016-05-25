@@ -29,6 +29,13 @@ public class DistributionRuleController {
     @Inject
     private DistributionRuleFilterFactory filterFactory;
 
+	/**
+	 * Creates a new distribution rule filter
+	 *
+	 * @param dto DTO object for the distribution rule filter
+	 * @throws OrgUnitNotFoundException
+	 * @throws RuleNotFoundException
+	 */
     public void createFilter(DistributionRuleFilterDTO dto) throws
             OrgUnitNotFoundException,
             RuleNotFoundException {
@@ -40,6 +47,7 @@ public class DistributionRuleController {
         }
 
         OrgUnit orgUnit = orgUnitRepository.findBy(dto.assignedOrgId);
+
         if (orgUnit == null) {
             throw new OrgUnitNotFoundException("Organizational unit not found");
         }
@@ -50,6 +58,15 @@ public class DistributionRuleController {
 
     }
 
+	/**
+	 * Updates the distribution rule filter with the specified filter ID
+	 *
+	 * @param ruleId ID for the distribution rule
+	 * @param filterId ID for the distribution rule filter
+	 * @param dto DTO object to use when updating the distribution rule filter
+	 * @throws OrgUnitNotFoundException
+	 * @throws RuleNotFoundException
+	 */
     public void updateFilter(long ruleId, long filterId, DistributionRuleFilterDTO dto) throws
             OrgUnitNotFoundException,
             RuleNotFoundException {
@@ -60,26 +77,32 @@ public class DistributionRuleController {
         }
 
         OrgUnit orgUnit = orgUnitRepository.findBy(dto.assignedOrgId);
+
         if (orgUnit == null) {
             throw new OrgUnitNotFoundException("Organizational unit not found");
         }
 
         DistributionRuleFilter filterById = rule.getFilterById(filterId);
         filterById.setName(dto.name);
+
         Employment e = employmentRepository.findBy(dto.assignedEmployeeId);
-        if (e != null) {
+
+	    if (e != null) {
             filterById.setAssignedEmployee(e);
         }
+
         OrgUnit o = orgUnitRepository.findBy(dto.assignedOrgId);
-        if (o != null) {
+
+	    if (o != null) {
             filterById.setAssignedOrg(o);
         }
 
-        if(filterById instanceof CprDistributionRuleFilter) {
+        if (filterById instanceof CprDistributionRuleFilter) {
             CprDistributionRuleFilter f = (CprDistributionRuleFilter) filterById;
             f.setDays(dto.days);
             f.setMonths(dto.months);
-        } else if(filterById instanceof TextDistributionRuleFilter){
+        }
+        else if (filterById instanceof TextDistributionRuleFilter) {
             TextDistributionRuleFilter f = (TextDistributionRuleFilter) filterById;
             f.setText(dto.text);
         }
@@ -88,16 +111,21 @@ public class DistributionRuleController {
 
     }
 
+	/**
+	 * Deletes the distribution rule filter with the specified distribution rule ID and filter ID
+	 *
+	 * @param distributionRuleId ID for the distribution rule
+	 * @param filterId ID for the distribution rule filter
+	 */
     public void deleteFilter(long distributionRuleId, long filterId) {
         DistributionRule rule = ruleRepository.findBy(distributionRuleId);
-
 
         DistributionRuleFilter filterById = rule.getFilterById(filterId);
         filterById.setDistributionRule(null);
         rule.removeFilter(filterById);
+
         entityManager.remove(filterById);
         ruleRepository.save(rule);
-
     }
 
     public class RuleNotFoundException extends Exception {

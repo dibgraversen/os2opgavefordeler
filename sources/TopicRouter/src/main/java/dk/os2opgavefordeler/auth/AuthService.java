@@ -1,12 +1,17 @@
 package dk.os2opgavefordeler.auth;
 
-import dk.os2opgavefordeler.employment.UserRepository;
-import dk.os2opgavefordeler.model.User;
-import org.apache.commons.lang3.StringUtils;
-
 import javax.enterprise.context.ApplicationScoped;
+
 import javax.inject.Inject;
 
+import org.apache.commons.lang3.StringUtils;
+
+import dk.os2opgavefordeler.employment.UserRepository;
+import dk.os2opgavefordeler.model.User;
+
+/**
+ * Authentication service
+ */
 @ApplicationScoped
 public class AuthService {
 
@@ -17,14 +22,16 @@ public class AuthService {
     private UserRepository userRepository;
 
     /**
+     * Checks whether the uses has been authenticated
      *
-     * @return true if the user is authenticated.
+     * @return true if the user has been authenticated.
      */
     public boolean isAuthenticated() {
         return StringUtils.isNotEmpty(authenticationHolder.getEmail());
     }
 
     /**
+     * Returns authentication information
      *
      * @return current authentication info.
      */
@@ -34,6 +41,7 @@ public class AuthService {
 
     /**
      * Authenticates using email and token. Used as authentication with api access.
+     *
      * @param email of the user.
      * @param token of the municipality.
      */
