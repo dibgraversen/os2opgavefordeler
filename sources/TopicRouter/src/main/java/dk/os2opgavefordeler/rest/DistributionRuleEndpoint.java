@@ -41,9 +41,11 @@ public class DistributionRuleEndpoint extends Endpoint {
 	UserService userService;
 
 	/**
-	 * @param employmentId The employment for whom to look up TopicRoutes
-	 * @param roleId      The role for which to get the TopicRoutes.
-	 * @return a list of TopicRoutePO's matching the role and scope.
+	 * Returns a list of distribution rules for the specified role and scope.
+	 *
+	 * @param roleId The role for which to get the distribution rules
+	 * @param scope The scope for looking up distribution rules
+	 * @return list of DistributionRulePO's matching the role and scope
 	 */
 	@GET
 	@Path("/")
