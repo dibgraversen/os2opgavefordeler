@@ -153,7 +153,7 @@
 		}
 
 		function getTopicRoutes(){
-			return topicRouterApi.getTopicRoutes($scope.user.currentRole.employment, $scope.settings.scope);
+			return topicRouterApi.getTopicRoutes($scope.user.currentRole.id, $scope.settings.scope);
 		}
 
 		function save(){

@@ -3,10 +3,12 @@ package dk.os2opgavefordeler.rest;
 import dk.os2opgavefordeler.model.DistributionRule;
 import dk.os2opgavefordeler.model.Employment;
 import dk.os2opgavefordeler.model.OrgUnit;
+import dk.os2opgavefordeler.model.Role;
 import dk.os2opgavefordeler.model.presentation.DistributionRulePO;
 import dk.os2opgavefordeler.service.DistributionService;
 import dk.os2opgavefordeler.service.OrgUnitService;
 import dk.os2opgavefordeler.service.PersistenceService;
+import dk.os2opgavefordeler.service.UserService;
 import org.slf4j.Logger;
 
 import javax.enterprise.context.RequestScoped;
@@ -14,6 +16,7 @@ import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -34,6 +37,9 @@ public class DistributionRuleEndpoint extends Endpoint {
 	@Inject
 	OrgUnitService orgUnitService;
 
+	@Inject
+	UserService userService;
+
 	/**
 	 * @param employmentId The employment for whom to look up TopicRoutes
 	 * @param scope      The scope for which to get the TopicRoutes.
@@ -42,27 +48,42 @@ public class DistributionRuleEndpoint extends Endpoint {
 	@GET
 	@Path("/")
 	@Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
-	public Response routesForEmployment(@QueryParam("employment") Long employmentId, @QueryParam("scope") DistributionRuleScope scope) {
+	public Response routesForEmployment(@QueryParam("role") Long roleId, @QueryParam("scope") DistributionRuleScope scope) {
 		//TODO: define scopes properly, define Enum.
-		//TODO: change employment parameter to role
 
-		log.info("routesForEmployment[{},{}]", employmentId, scope);
+		log.info("routesForEmployment[{},{}]", roleId, scope);
 
-		if (employmentId == null || scope == null) {
-			return badRequest("need employmentId and scope");
+		if (roleId == null || scope == null) {
+			return badRequest("need role and scope");
 		}
 
-		//TODO: what if current user/role isn't the manager of the given orgunit? Should we still return results filtered
-		//by the orgunit, or should we return an empty result unless scope is 'ALL'?
-		final Optional<Employment> employment = orgUnitService.getEmployment(employmentId);
-		final Optional<OrgUnit> orgUnit = employment.map(e -> e.getEmployedIn());
-		if(orgUnit.isPresent()){
-			final List<DistributionRulePO> result = distributionService.getPoDistributions(orgUnit.get(), scope);
+		final Optional<Role> role = userService.findRoleById(roleId);
 
-			return ok(result);
+		if (role.isPresent()) {
+			final Optional<Employment> employment = role.get().getEmployment();
+
+			if (employment.isPresent()) {
+				final Optional<OrgUnit> orgUnit = employment.map(Employment::getEmployedIn);
+
+				if (orgUnit.isPresent()) {
+					// only display results if the user is the manager of the given organisation unit or the scope is ALL
+					if (role.get().isManager() || scope == DistributionRuleScope.ALL) {
+						return ok(distributionService.getPoDistributions(orgUnit.get(), scope));
+					}
+					else {
+						return ok(new ArrayList<DistributionRulePO>());
+					}
+				}
+				else {
+					return badRequest("Kunne ikke finde ansættelsessted for bruger");
+				}
+			}
+			else {
+				return badRequest("Kunne ikke finde ansættelse for bruger");
+			}
 		}
 		else {
-			return badRequest("Kunne ikke finde ansættelsessted for bruger");
+			return badRequest("Kunne ikke finde rolle for bruger");
 		}
 	}
 
@@ -103,7 +124,7 @@ public class DistributionRuleEndpoint extends Endpoint {
 		}
 		else {
 			final Optional<Employment> employment = orgUnitService.getEmployment(employmentId);
-			final Optional<OrgUnit> orgUnit = employment.map(e -> e.getEmployedIn());
+			final Optional<OrgUnit> orgUnit = employment.map(Employment::getEmployedIn);
 
 			if (orgUnit.isPresent()) {
 				List<DistributionRulePO> result = distributionService.getChildren(distId, orgUnit.get(), scope)
@@ -179,11 +200,7 @@ public class DistributionRuleEndpoint extends Endpoint {
 			existing.setAssignedOrg(newOrg);
 		});
 
-		updateIfChanged(existing.getAssignedEmp(), updated.getEmployee(), newEmpId -> {
-			//TODO: validate once we add EmploymentService
-			//Employment emp = employmentService.getEmployment(newEmpId).orElseThrow(IllegalArgumentException::new);
-			existing.setAssignedEmp(newEmpId);
-		});
+		updateIfChanged(existing.getAssignedEmp(), updated.getEmployee(), existing::setAssignedEmp);
 
 		distributionService.createDistributionRule(existing); // if we move logic to DistributionService, 'existing' is managed and this shouldn't be necessary.
 	}

@@ -93,11 +93,11 @@
 			return httpPost('/users/' + userId + '/settings', settings);
 		}
 
-		function getTopicRoutes(employment, scope) {
+		function getTopicRoutes(role, scope) {
 			var deferred = $q.defer();
 
 			httpGet('/distribution-rules', {
-				"employment": employment,
+				"role": role,
 				"scope": scope
 			}).then(function (data) {
 				var objectMap = {};
