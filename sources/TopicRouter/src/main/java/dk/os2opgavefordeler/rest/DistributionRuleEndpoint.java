@@ -42,15 +42,13 @@ public class DistributionRuleEndpoint extends Endpoint {
 
 	/**
 	 * @param employmentId The employment for whom to look up TopicRoutes
-	 * @param scope      The scope for which to get the TopicRoutes.
-	 * @return a list of TopicRoutePO's matching the employment and scope.
+	 * @param roleId      The role for which to get the TopicRoutes.
+	 * @return a list of TopicRoutePO's matching the role and scope.
 	 */
 	@GET
 	@Path("/")
 	@Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
 	public Response routesForEmployment(@QueryParam("role") Long roleId, @QueryParam("scope") DistributionRuleScope scope) {
-		//TODO: define scopes properly, define Enum.
-
 		log.info("routesForEmployment[{},{}]", roleId, scope);
 
 		if (roleId == null || scope == null) {
