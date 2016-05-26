@@ -1,24 +1,31 @@
 package dk.os2opgavefordeler.distribution;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.ws.rs.*;
+import javax.ws.rs.core.Response;
+
+import org.apache.deltaspike.jpa.api.transaction.Transactional;
+
+import javax.inject.Inject;
+
+import javax.persistence.EntityManager;
+
 import dk.os2opgavefordeler.distribution.dto.CprDistributionRuleFilterDTO;
 import dk.os2opgavefordeler.distribution.dto.DistributionRuleFilterDTO;
 import dk.os2opgavefordeler.distribution.dto.TextDistributionRuleFilterDTO;
+
 import dk.os2opgavefordeler.model.CprDistributionRuleFilter;
 import dk.os2opgavefordeler.model.DistributionRule;
 import dk.os2opgavefordeler.model.DistributionRuleFilter;
 import dk.os2opgavefordeler.model.TextDistributionRuleFilter;
 import dk.os2opgavefordeler.model.presentation.DistributionRulePO;
+
 import dk.os2opgavefordeler.rest.Endpoint;
+
 import dk.os2opgavefordeler.service.BootstrappingDataProviderSingleton;
 import dk.os2opgavefordeler.service.OrgUnitService;
-import org.apache.deltaspike.jpa.api.transaction.Transactional;
-
-import javax.inject.Inject;
-import javax.persistence.EntityManager;
-import javax.ws.rs.*;
-import javax.ws.rs.core.Response;
-import java.util.ArrayList;
-import java.util.List;
 
 @Path("/distributionrulefilter")
 @Transactional

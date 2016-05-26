@@ -1,14 +1,19 @@
 package dk.os2opgavefordeler.distribution;
 
-import dk.os2opgavefordeler.distribution.dto.DistributionRuleFilterDTO;
-import dk.os2opgavefordeler.employment.EmploymentRepository;
-import dk.os2opgavefordeler.employment.OrgUnitRepository;
-import dk.os2opgavefordeler.model.*;
 import org.apache.deltaspike.jpa.api.transaction.Transactional;
 
 import javax.enterprise.context.ApplicationScoped;
+
 import javax.inject.Inject;
+
 import javax.persistence.EntityManager;
+
+import dk.os2opgavefordeler.distribution.dto.DistributionRuleFilterDTO;
+
+import dk.os2opgavefordeler.employment.EmploymentRepository;
+import dk.os2opgavefordeler.employment.OrgUnitRepository;
+
+import dk.os2opgavefordeler.model.*;
 
 @ApplicationScoped
 @Transactional
