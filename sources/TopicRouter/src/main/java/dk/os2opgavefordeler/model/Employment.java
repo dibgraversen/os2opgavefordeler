@@ -80,6 +80,10 @@ public class Employment implements Serializable {
 		return businessKey;
 	}
 
+	public void setBusinessKey(String businessKey) {
+		this.businessKey = businessKey;
+	}
+
 	public String getName() {
 		return name;
 	}
