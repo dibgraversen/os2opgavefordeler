@@ -20,45 +20,47 @@ public class BasicAuthFilter implements Filter {
     @Inject
     private AuthService authService;
 
+	private static final String AUTH_BASIC = "Basic";
+
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
-
+        // not currently implemented
     }
 
-    private void authenticate(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    private void authenticate(HttpServletRequest request) throws Exception {
         String authHeader = request.getHeader("Authorization");
 
-        logger.info("Is user authenticated? {}", authService.isAuthenticated());
-
         if (authHeader == null) {
-            logger.info("No auth header");
             return;
         }
 
         StringTokenizer st = new StringTokenizer(authHeader);
+
         if (!st.hasMoreTokens()) {
             logger.info("Malformed auth header, no tokens.");
             return;
         }
-        String basic = st.nextToken();
-        if (!basic.equalsIgnoreCase("Basic")) {
-            logger.info("Auth is not basic.");
-            return;
-        }
+
+        String authType = st.nextToken();
+
+	    if (!AUTH_BASIC.equalsIgnoreCase(authType)) {
+		    logger.info("Auth is not basic.");
+		    return;
+	    }
 
         String credentials = new String(Base64.decodeBase64(st.nextToken()), "UTF-8");
-        logger.info("Credentials: " + credentials);
-        int p = credentials.indexOf(":");
+
+        int p = credentials.indexOf(':');
 
         if (p == -1) {
-            logger.info("Auth is malformed, no : given.");
+            logger.info("Auth is malformed, no ':' given.");
             return;
         }
 
         String email = credentials.substring(0, p).trim();
-        String municipality_token = credentials.substring(p + 1).trim();
+        String municipalityToken = credentials.substring(p + 1).trim();
 
-        authService.authenticateWithEmailAndToken(email, municipality_token);
+        authService.authenticateWithEmailAndToken(email, municipalityToken);
     }
 
     @Override
@@ -66,16 +68,19 @@ public class BasicAuthFilter implements Filter {
             throws IOException, ServletException {
 
         HttpServletRequest request = (HttpServletRequest) servletRequest;
-        HttpServletResponse response = (HttpServletResponse) servletResponse;
+
         try {
-            authenticate(request, response);
-        } catch (Exception e) {
-            e.printStackTrace();
+            authenticate(request);
         }
+        catch (Exception e) {
+	        logger.error("Error while authenticating: ", e);
+        }
+
         filterChain.doFilter(servletRequest, servletResponse);
     }
 
     @Override
     public void destroy() {
+	    // not currently implemented
     }
 }

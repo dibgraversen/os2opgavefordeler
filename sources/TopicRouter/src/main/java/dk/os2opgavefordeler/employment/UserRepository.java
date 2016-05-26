@@ -1,8 +1,9 @@
 package dk.os2opgavefordeler.employment;
 
-import dk.os2opgavefordeler.model.User;
 import org.apache.deltaspike.data.api.AbstractEntityRepository;
 import org.apache.deltaspike.data.api.Repository;
+
+import dk.os2opgavefordeler.model.User;
 
 import javax.enterprise.context.ApplicationScoped;
 

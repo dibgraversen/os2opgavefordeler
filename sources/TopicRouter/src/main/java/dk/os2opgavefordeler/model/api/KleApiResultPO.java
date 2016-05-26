@@ -1,6 +1,8 @@
 package dk.os2opgavefordeler.model.api;
 
 /**
+ * Convenience class for a KLE result from an API call
+ *
  * @author hlo@miracle.dk
  */
 public class KleApiResultPO {

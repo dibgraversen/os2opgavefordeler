@@ -2,6 +2,9 @@ package dk.os2opgavefordeler.model.api;
 
 import dk.os2opgavefordeler.model.OrgUnit;
 
+/**
+ * Convenience class for an organisational unit result from an API call
+ */
 public class OrgUnitApiResultPO {
 	private EmploymentApiResultPO manager;
 

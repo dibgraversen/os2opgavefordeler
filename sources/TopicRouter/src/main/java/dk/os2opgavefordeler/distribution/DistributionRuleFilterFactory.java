@@ -1,18 +1,22 @@
 package dk.os2opgavefordeler.distribution;
 
+import javax.persistence.EntityManager;
+
+import javax.enterprise.context.ApplicationScoped;
+
+import javax.inject.Inject;
+
 import dk.os2opgavefordeler.distribution.dto.CprDistributionRuleFilterDTO;
 import dk.os2opgavefordeler.distribution.dto.DistributionRuleFilterDTO;
 import dk.os2opgavefordeler.distribution.dto.TextDistributionRuleFilterDTO;
+
 import dk.os2opgavefordeler.employment.EmploymentRepository;
 import dk.os2opgavefordeler.employment.OrgUnitRepository;
+
 import dk.os2opgavefordeler.model.CprDistributionRuleFilter;
 import dk.os2opgavefordeler.model.DistributionRule;
 import dk.os2opgavefordeler.model.DistributionRuleFilter;
 import dk.os2opgavefordeler.model.TextDistributionRuleFilter;
-
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-import javax.persistence.EntityManager;
 
 @ApplicationScoped
 public class DistributionRuleFilterFactory {
@@ -29,6 +33,12 @@ public class DistributionRuleFilterFactory {
     @Inject
     private DistributionRuleRepository repository;
 
+	/**
+	 * Creates a DistributionRuleFilter from the specified DTO object
+	 *
+	 * @param dto DTO object
+	 * @return the resulting DistributionRuleFilter
+	 */
     public DistributionRuleFilter fromDto(DistributionRuleFilterDTO dto) {
         // Try to create from existing
         DistributionRule rule = repository.findBy(dto.distributionRuleId);
@@ -50,7 +60,8 @@ public class DistributionRuleFilterFactory {
             filter.setDistributionRule(rule);
 
             return filter;
-        } else if (TextDistributionRuleFilterDTO.TYPE.equals(dto.type)) {
+        }
+        else if (TextDistributionRuleFilterDTO.TYPE.equals(dto.type)) {
 
             TextDistributionRuleFilter filter = new TextDistributionRuleFilter();
 
@@ -68,6 +79,7 @@ public class DistributionRuleFilterFactory {
 
 
         }
+
         throw new RuntimeException("Bad data");
     }
 

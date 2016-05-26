@@ -1,13 +1,13 @@
 package dk.os2opgavefordeler.employment;
 
-import dk.os2opgavefordeler.model.Municipality;
-import dk.os2opgavefordeler.model.OrgUnit;
 import org.apache.deltaspike.data.api.AbstractEntityRepository;
 import org.apache.deltaspike.data.api.Query;
 import org.apache.deltaspike.data.api.Repository;
 import org.apache.deltaspike.data.api.SingleResultType;
 
 import java.util.List;
+
+import dk.os2opgavefordeler.model.OrgUnit;
 
 @Repository(forEntity = OrgUnit.class)
 public abstract class OrgUnitRepository extends AbstractEntityRepository<OrgUnit, Long> {
