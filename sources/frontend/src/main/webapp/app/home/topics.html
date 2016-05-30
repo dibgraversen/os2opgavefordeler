@@ -56,11 +56,13 @@
 								ng-click="editRule(topic)">
 							Fordeling
 						</button>
+
 						<button ng-if="topic.org" type="button" class="btn btn-primary dropdown-toggle" dropdown-toggle>
 							<span class="caret"></span>
 						</button>
+
 						<ul ng-if="topic.org" class="dropdown-menu">
-							<li><a href="#" ng-click="listFilters(topic)">Udvidet fordeling</a></li>
+							<li><a href="#" ng-if="settings.extendedResponsibilityEnabled" ng-click="listFilters(topic)">Udvidet fordeling</a></li>
 							<li><a href="#" class="danger" ng-click="deleteRule(topic)">Fjern fordeling</a></li>
 						</ul>
 					</div>

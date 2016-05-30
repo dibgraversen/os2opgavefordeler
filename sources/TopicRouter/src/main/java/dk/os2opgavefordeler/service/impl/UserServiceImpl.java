@@ -57,6 +57,9 @@ public class UserServiceImpl implements UserService {
     @Inject
     private AuthorizationService auth;
 
+	@Inject
+	private ConfigService configService;
+
     private static Optional<Role> hasRoleFor(User user, long employmentId) {
         return user.getRoles().stream()
                 .filter(role -> role.getEmployment().map(
@@ -139,7 +142,8 @@ public class UserServiceImpl implements UserService {
         try {
             UserSettings settings = query.getSingleResult();
             return Optional.of(settings);
-        } catch (NoResultException ex) {
+        }
+        catch (NoResultException ex) {
             return Optional.empty();
         }
     }
@@ -147,14 +151,37 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserSettingsPO getSettingsPO(long userId) {
         //TODO: should create-if-not-existing responsibility be here or in the controller?
-        final UserSettings settings = getSettings(userId).orElseGet(
+	    final UserSettings settings = getSettings(userId).orElseGet(
                 () -> {
                     log.info("getSettingsPO: no existing settings, creating new");
                     return createUserSettings(new UserSettings(userId));
                 }
         );
 
-        return new UserSettingsPO(settings);
+	    UserSettingsPO userSettingsPO = new UserSettingsPO(settings);
+
+	    // TODO: Once the extended responsibility functionality is fixed, remove this setting
+	    final User user = userRepository.findBy(userId);
+
+	    boolean extendedResponsibility = false;
+
+	    if (user != null) {
+		    if (user.getMunicipality() != null && user.getMunicipality().getId() == 20001) { // only Syddjurs municipality are using this for now
+			    extendedResponsibility = true;
+			    log.info("Extended responsibility always enabled for Syddjurs");
+		    }
+		    else {
+			    extendedResponsibility = configService.isExtendedResponsibilityEnabled();
+			    log.info("Extended responsibility enabled for {}: {}", user.getMunicipality().getName(), extendedResponsibility);
+		    }
+	    }
+	    else {
+		    log.error("No user with ID '{}' found when getting settings", userId);
+	    }
+
+	    userSettingsPO.setExtendedResponsibilityEnabled(extendedResponsibility);
+
+        return userSettingsPO;
     }
 
     @Override
@@ -164,11 +191,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void updateSettings(UserSettingsPO updatedsettings) {
-        UserSettings settings = em.find(UserSettings.class, updatedsettings.getId());
-        settings.setScope(updatedsettings.getScope());
-        settings.setShowResponsible(updatedsettings.isShowResponsible());
-        settings.setShowExpandedOrg(updatedsettings.isShowExpandedOrg());
+    public void updateSettings(UserSettingsPO updatedSettings) {
+        UserSettings settings = em.find(UserSettings.class, updatedSettings.getId());
+        settings.setScope(updatedSettings.getScope());
+        settings.setShowResponsible(updatedSettings.isShowResponsible());
+        settings.setShowExpandedOrg(updatedSettings.isShowExpandedOrg());
         em.merge(settings);
     }
 

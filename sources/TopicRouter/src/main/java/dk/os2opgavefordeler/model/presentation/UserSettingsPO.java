@@ -1,19 +1,24 @@
 package dk.os2opgavefordeler.model.presentation;
 
-import dk.os2opgavefordeler.model.UserSettings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import dk.os2opgavefordeler.model.UserSettings;
 
 /**
  * @author hlo@miracle.dk
  */
 public class UserSettingsPO {
+
 	private final Logger log = LoggerFactory.getLogger(getClass());
+
 	private long id;
 	private long userId;
 	private FilterScope scope;
+
 	private boolean showResponsible;
 	private boolean showExpandedOrg;
+	private boolean extendedResponsibilityEnabled;
 
 	public UserSettingsPO() {
 	}
@@ -28,11 +33,13 @@ public class UserSettingsPO {
 
 	public UserSettings asUserSettings(){
 		UserSettings result = new UserSettings();
+
 		result.setId(id);
 		result.setUserId(userId);
 		result.setScope(scope);
 		result.setShowResponsible(showResponsible);
 		result.setShowExpandedOrg(showExpandedOrg);
+
 		return result;
 	}
 
@@ -74,6 +81,14 @@ public class UserSettingsPO {
 
 	public void setShowExpandedOrg(boolean showExpandedOrg) {
 		this.showExpandedOrg = showExpandedOrg;
+	}
+
+	public boolean isExtendedResponsibilityEnabled() {
+		return extendedResponsibilityEnabled;
+	}
+
+	public void setExtendedResponsibilityEnabled(boolean extendedResponsibilityEnabled) {
+		this.extendedResponsibilityEnabled = extendedResponsibilityEnabled;
 	}
 
 	@Override
