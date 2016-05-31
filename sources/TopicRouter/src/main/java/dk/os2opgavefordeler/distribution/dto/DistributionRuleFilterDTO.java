@@ -1,6 +1,6 @@
 package dk.os2opgavefordeler.distribution.dto;
 
-public  class DistributionRuleFilterDTO {
+public class DistributionRuleFilterDTO {
 
     public String type;
     public long filterId;

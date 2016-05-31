@@ -21,55 +21,54 @@
                     <td>{{ filter.name }}</td>
                     <td>{{ filter.assignedOrgName }}</td>
                     <td>{{ filter.assignedEmployeeName }}</td>
-                    <td align="right"><a href="" class="btn" ng-click="show(filter.filterId)">Vis</a> <a href="" class="btn btn-danger"
-                                                                        ng-click="removeFilter(filter.filterId)">Slet</a>
+                    <td align="right">
+	                    <a href="" class="btn btn-primary" ng-click="show(filter.filterId, filter.type)">Vis</a>
+	                    <a href="" class="btn btn-danger" ng-click="removeFilter(filter.filterId)">Slet</a>
                     </td>
                 </tr>
                 </tbody>
             </table>
         </div>
+
         <div ng-show="currentTab=='add' || currentTab=='show'">
             <form method="post">
                 <tabset justified="true">
-                    <tab ng-click="model.type='cpr'" heading="Dato">
+	                <!-- Date based filter -->
+                    <tab ng-click="model.type='cpr'" heading="Dato" active="active.cpr">
                         <p>
                             <label for="filter_name">Navn:
-                                <input type="text" class="form-control" ng-model="model.name" name="filter_name"
-                                       id="filter_name">
+                                <input type="text" class="form-control" ng-model="model.name" name="filter_name" id="filter_name">
                             </label>
                         </p>
 
                         <p>
                             <label for="filter_days">Dage: <span>(1,3-5 betyder dagene 1,3,4,5)</span>
-                                <input type="text" class="form-control" ng-model="model.days" name="filter_days"
-                                       id="filter_days">
+                                <input type="text" class="form-control" ng-model="model.days" name="filter_days" id="filter_days">
                             </label>
                         </p>
 
                         <p>
                             <label for="filter_months">Måneder: <span>(1,4-7 betyder månederne 1,4,5,6,7)</span>
-                                <input type="text" class="form-control" ng-model="model.months" name="filter_months"
-                                       id="filter_months">
+                                <input type="text" class="form-control" ng-model="model.months" name="filter_months" id="filter_months">
                             </label>
                         </p>
                     </tab>
-                    <tab heading="Tekst" ng-click="model.type='text'">
+
+	                <!-- Text based filter -->
+                    <tab heading="Tekst" ng-click="model.type='text'" active="active.text">
                         <p>
                             <label for="filter_name2">Navn:
-                                <input type="text" class="form-control" ng-model="model.name" name="filter_name"
-                                       id="filter_name2">
+                                <input type="text" class="form-control" ng-model="model.name" name="filter_name" id="filter_name2">
                             </label>
                         </p>
 
                         <p>
                             <label for="filter_text">Text: <span>(Brug * til wildcard søgning. * kan placeres først og sidst i teksten.)</span>
-                                <input type="text" class="form-control" ng-model="model.text" name="filter_text"
-                                       id="filter_text">
+                                <input type="text" class="form-control" ng-model="model.text" name="filter_text" id="filter_text">
                             </label>
                         </p>
                     </tab>
                 </tabset>
-
 
                 <div>
                     <tabset justified="true">
@@ -81,8 +80,7 @@
                                 <div class="padded-top col-md-4">
                                     <div class="checkbox">
                                         <label>
-                                            <input type="checkbox" ng-model="scopeFilter.showAll"
-                                                   ng-click="loadAllOrgUnits()"> Vis alle
+                                            <input type="checkbox" ng-model="scopeFilter.showAll" ng-click="loadAllOrgUnits()"> Vis alle
                                         </label>
                                     </div>
                                 </div>
@@ -160,8 +158,8 @@
                             <div class="row"
                                  ng-show="searchResult.totalMatches > employments.length && searchResult.totalMatches > 0">
                                 <div class="col-md-8 col-md-offset-2">
-                                    <button class="btn btn-primary btn-block" ng-click="loadMoreEmployments()">Hent
-                                        flere
+                                    <button class="btn btn-primary btn-block" ng-click="loadMoreEmployments()">
+	                                    Hent flere
                                     </button>
                                 </div>
                             </div>

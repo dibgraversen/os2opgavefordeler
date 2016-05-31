@@ -57,20 +57,21 @@ public class DistributionRuleFilterEndpoint extends Endpoint {
     @Path("/{ruleId}/filters")
     @Produces("application/json")
     public Response list(@PathParam("ruleId") long ruleId) {
-
         DistributionRule rule = ruleRepository.findBy(ruleId);
-        if(rule == null){
+
+        if (rule == null){
             return ok();
         }
 
         Iterable<DistributionRuleFilter> filters = rule.getFilters();
+
         List<DistributionRuleFilterDTO> result = new ArrayList<>();
 
-        for (DistributionRuleFilter f : filters) {
-
-            if(f instanceof CprDistributionRuleFilter) {
+        for (DistributionRuleFilter f: filters) {
+            if (f instanceof CprDistributionRuleFilter) {
                 result.add(new CprDistributionRuleFilterDTO((CprDistributionRuleFilter) f));
-            } else if(f instanceof TextDistributionRuleFilter){
+            }
+            else if (f instanceof TextDistributionRuleFilter){
                 result.add(new TextDistributionRuleFilterDTO((TextDistributionRuleFilter) f));
             }
         }

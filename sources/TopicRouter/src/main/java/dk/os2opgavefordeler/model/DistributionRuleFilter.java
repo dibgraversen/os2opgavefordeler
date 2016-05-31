@@ -1,9 +1,10 @@
 package dk.os2opgavefordeler.model;
 
-import org.hibernate.validator.constraints.NotBlank;
+import java.util.Map;
 
 import javax.persistence.*;
-import java.util.Map;
+
+import org.hibernate.validator.constraints.NotBlank;
 
 @Entity
 public abstract class DistributionRuleFilter {
@@ -29,9 +30,7 @@ public abstract class DistributionRuleFilter {
 
     }
 
-    public DistributionRuleFilter(String name, DistributionRule distributionRule, OrgUnit orgUnit, Employment
-            employment) {
-
+    public DistributionRuleFilter(String name, DistributionRule distributionRule, OrgUnit orgUnit, Employment employment) {
         this.name = name;
         this.distributionRule = distributionRule;
         this.assignedOrg = orgUnit;

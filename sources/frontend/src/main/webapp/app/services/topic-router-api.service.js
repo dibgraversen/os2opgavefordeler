@@ -44,6 +44,7 @@
 		};
 
 		var baseUrl = serverUrl;
+
 		var requestConfig = {
 			headers: {
 				'Content-Type': 'application/json',
@@ -57,7 +58,7 @@
 
 		return service;
 
-		function getFiltersForRule(ruleId){
+		function getFiltersForRule(ruleId) {
 			return httpGet("/distributionrulefilter/"+ruleId+"/filters");
 		}
 

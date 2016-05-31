@@ -5,38 +5,41 @@
     ExtendedResponsibilityController.$inject = ['$log', '$scope', 'topicRouterApi'];
 
     function ExtendedResponsibilityController($log, $scope, topicRouterApi) {
-        //$scope.employeeFilter = "";
-
         $scope.close = close;
-        $scope.type = "cpr";
+        $scope.type = 'cpr';
         $scope.removeFilter = removeFilter;
         $scope.add = add;
         $scope.currentTab = 'list';
 
         function cleanModel() {
+	        $log.info('ExtendedResponsibilityController::cleanModel (type: ' + $scope.type + ')');
+
             $scope.selectedOrgUnit = {};
+
             return {
-            distributionRuleId: $scope.topic.id,
-            type: 'cpr'
+                distributionRuleId: $scope.topic.id,
+                type: $scope.type
             };
         }
 
         $scope.model = {
             distributionRuleId: $scope.topic.id,
-            type: 'cpr'
+            type: $scope.type
         };
+
         var orgUnitsMissing = true;
         var currentEmployment = $scope.user.currentRole.employment;
-        //$scope.orgUnits = [];
-        $scope.loadAllOrgUnits = loadAllOrgUnits;
+
+	    $scope.loadAllOrgUnits = loadAllOrgUnits;
         $scope.selectedOrgUnit = {};
         $scope.setSelectedOrgUnit = setSelectedOrgUnit;
         $scope.employmentSearch = employmentSearch;
-        $scope.updateFilterd = updateFilterd;
+        $scope.updateFilter = updateFilter;
         $scope.createFilter = createFilter;
         $scope.loadMoreEmployments = loadMoreEmployments;
         $scope.setSelectedEmp = setSelectedEmp;
         $scope.show = show;
+
         $scope.search = {
             municipalityId: $scope.user.municipality.id,
             offset: 0,
@@ -44,31 +47,52 @@
             nameTerm: '',
             initialsTerm: ''
         };
-        var orgUnits = {};
-        activate();
 
-        function show(filterId){
-            $log.info("ExtendedResponsibilityController::show " + filterId);
+	    // activates the specified tab
+	    function activateTab(tab) {
+		    $scope.active = {}; //reset
+		    $scope.active[tab] = true;
+	    };
+
+	    // set default active tab to CPR
+	    $scope.active = {
+		    cpr: true
+	    };
+
+	    var orgUnits = {};
+
+	    activate();
+
+        function show(filterId, filterType){
+            $log.info("ExtendedResponsibilityController::show filter " + filterId + " (type: " + filterType + ")");
+
             $scope.model = cleanModel();
-            $scope.currentTab='show';
+            $scope.currentTab = 'show';
             $scope.model.filterId = filterId;
-            topicRouterApi.getFiltersForRule($scope.topic.id).then(function(res){
-                for(var i in res){
-                    if(res[i].filterId == filterId){
+	        $scope.model.type = filterType;
+	        $scope.type = filterType;
+
+	        activateTab(filterType); // select the correct tab based on filter type
+
+	        topicRouterApi.getFiltersForRule($scope.topic.id).then(function(res){
+                for (var i in res) {
+                    if (res[i].filterId == filterId) {
                         $scope.model = res[i];
                     }
                 }
-                for(var i in $scope.orgUnits){
-                    if($scope.orgUnits[i].id == $scope.model.assignedOrgId){
+
+                for (var i in $scope.orgUnits) {
+                    if ($scope.orgUnits[i].id == $scope.model.assignedOrgId) {
                         setSelectedOrgUnit($scope.orgUnits[i]);
                     }
                 }
             });
         }
 
-        function updateFilterd(){
+        function updateFilter(){
             $log.info("ExtendedResponsibilityController::updateFilter");
-            topicRouterApi.updateFilter($scope.model).then(function(){
+
+            topicRouterApi.updateFilter($scope.model).then(function() {
                 _refresh();
                 $scope.currentTab = 'list'
             });
@@ -82,6 +106,7 @@
         }
 
         function setSelectedEmp(emp){
+	        $scope.selectedEmp = emp;
             $scope.model.assignedEmployeeId = emp.id;
             $scope.model.assignedEmployeeName = emp.name;
         }
@@ -121,17 +146,21 @@
         }
 
         function loadParent(org){
-            if(orgUnits[org.id]){
+            if (orgUnits[org.id]){
                 // make sure it's overwritten so we only use one instance of each org.
                 org = orgUnits[org.id];
-            } else {
+            }
+            else {
                 orgUnits[org.id] = org; // make sure we don't work on duplicates.
-                if(org.parentId && org.parent === undefined) {
-                    if(orgUnits[org.parentId]){
+
+                if (org.parentId && org.parent === undefined) {
+                    if (orgUnits[org.parentId]) {
                         org.parent = orgUnits[org.parentId];
-                    } else {
+                    }
+                    else {
                         topicRouterApi.getOrgUnit(org.parentId).then(function (parent) {
                             org.parent = parent;
+
                             if (parent.parentId) {
                                 loadParent(parent);
                             }
@@ -143,12 +172,14 @@
 
         function activate() {
             $log.info("ExtendedResponsibilityController::activate");
+
             _refresh();
         }
 
         function _refresh() {
-            $log.info("ExtendedResponsibilityController::_refresh");
-            topicRouterApi.getFiltersForRule(1).then(function (filters) {
+            $log.info("ExtendedResponsibilityController::_refresh (rule: " + $scope.topic.id + ")");
+
+	        topicRouterApi.getFiltersForRule($scope.topic.id).then(function (filters) {
                 $scope.filters = filters;
             });
         }
@@ -159,9 +190,9 @@
         }
 
         function removeFilter(filterId) {
-            $log.info("ExtendedResponsibilityController::removing " + filterId);
+            $log.info("ExtendedResponsibilityController::removing filter " + filterId + ' for rule ' + $scope.topic.id);
 
-            topicRouterApi.removeFilter(1, filterId).then(function () {
+            topicRouterApi.removeFilter($scope.topic.id, filterId).then(function () {
                 _refresh();
             });
 
