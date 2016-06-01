@@ -2,9 +2,9 @@
     'use strict';
     angular.module('topicRouter').controller('ExtendedResponsibilityController', ExtendedResponsibilityController);
 
-    ExtendedResponsibilityController.$inject = ['$log', '$scope', 'topicRouterApi'];
+    ExtendedResponsibilityController.$inject = ['$log', '$scope', '$modalStack', 'topicRouterApi'];
 
-    function ExtendedResponsibilityController($log, $scope, topicRouterApi) {
+    function ExtendedResponsibilityController($log, $scope, $modalStack, topicRouterApi) {
 	    var defaultFilterType = 'cpr';
 
         $scope.close = close;
@@ -212,7 +212,7 @@
 
         function close() {
             $log.info("ExtendedResponsibilityController::close");
-            //$modalInstance.dismiss('cancel');
+	        $modalStack.dismissAll('cancel');
         }
 
     }
