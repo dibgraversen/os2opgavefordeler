@@ -1,31 +1,35 @@
 <div ng-controller="ExtendedResponsibilityController">
     <div class="modal-header">
-        <button type="button" class="close" ng-click="close()"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title">Tilføj udvidet fordelingsregel for '{{ topic.kle.number }} {{ topic.kle.name }}'</h4>
+        <button type="button" class="close" ng-click="close()">
+	        <span aria-hidden="true">&times;</span>
+        </button>
+
+	    <h4 class="modal-title">Tilføj udvidet fordelingsregel for '{{ topic.kle.number }} {{ topic.kle.name }}'</h4>
     </div>
 
     <div class="modal-body">
         <div ng-show="currentTab=='list'">
             <h1>Eksisterende regler</h1>
+
             <table class="table table-hover">
                 <thead>
-                <tr>
-                    <th>Regel</th>
-                    <th>Organisationsenhed</th>
-                    <th>Medarbejder</th>
-                    <th>&nbsp;</th>
-                </tr>
+	                <tr>
+	                    <th>Regel</th>
+	                    <th>Organisationsenhed</th>
+	                    <th>Medarbejder</th>
+	                    <th>&nbsp;</th>
+	                </tr>
                 </thead>
                 <tbody ng-repeat="filter in filters">
-                <tr>
-                    <td>{{ filter.name }}</td>
-                    <td>{{ filter.assignedOrgName }}</td>
-                    <td>{{ filter.assignedEmployeeName }}</td>
-                    <td align="right">
-	                    <a href="" class="btn btn-primary" ng-click="show(filter.filterId, filter.type)">Vis</a>
-	                    <a href="" class="btn btn-danger" ng-click="removeFilter(filter.filterId)">Slet</a>
-                    </td>
-                </tr>
+	                <tr>
+	                    <td>{{ filter.name }}</td>
+	                    <td>{{ filter.assignedOrgName }}</td>
+	                    <td>{{ filter.assignedEmployeeName }}</td>
+	                    <td align="right">
+		                    <a href="" class="btn btn-primary" ng-click="show(filter.filterId, filter.type)">Vis</a>
+		                    <a href="" class="btn btn-danger" ng-click="removeFilter(filter.filterId)">Slet</a>
+	                    </td>
+	                </tr>
                 </tbody>
             </table>
         </div>

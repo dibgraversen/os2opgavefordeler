@@ -5,8 +5,10 @@
     ExtendedResponsibilityController.$inject = ['$log', '$scope', 'topicRouterApi'];
 
     function ExtendedResponsibilityController($log, $scope, topicRouterApi) {
+	    var defaultFilterType = 'cpr';
+
         $scope.close = close;
-        $scope.type = 'cpr';
+        $scope.type = defaultFilterType;
         $scope.removeFilter = removeFilter;
         $scope.add = add;
         $scope.currentTab = 'list';
@@ -15,6 +17,14 @@
 	        $log.info('ExtendedResponsibilityController::cleanModel (type: ' + $scope.type + ')');
 
             $scope.selectedOrgUnit = {};
+	        $scope.selectedEmp = {};
+
+	        $scope.searchResult = {};
+	        $scope.employments = {};
+
+	        $scope.type = defaultFilterType;
+
+	        activateTab($scope.type); // select the correct tab based on filter type
 
             return {
                 distributionRuleId: $scope.topic.id,
@@ -111,9 +121,10 @@
             $scope.model.assignedEmployeeName = emp.name;
         }
 
-        function employmentSearch(){
+        function employmentSearch() {
             $scope.searchNotification = false;
             $scope.search.offset = 0;
+
             topicRouterApi.employmentSearch($scope.search).then(function(result){
                 $scope.searchResult = result;
                 $scope.employments = result.results;
