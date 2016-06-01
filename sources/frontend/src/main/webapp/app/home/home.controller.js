@@ -107,6 +107,8 @@
 		}
 
 		function refreshTopicRoutes(){
+			$log.info('HomeCtrl::refreshTopicRoutes');
+
 			$scope.listAlerts = [];
 			getTopicRoutes().then(
 					function(rules){

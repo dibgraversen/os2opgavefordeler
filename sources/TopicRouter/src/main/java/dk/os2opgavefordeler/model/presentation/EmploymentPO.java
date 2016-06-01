@@ -5,9 +5,9 @@ import dk.os2opgavefordeler.model.Employment;
 public class EmploymentPO {
 	private long id;
 
-//	private boolean isActive;
 	private String name;
 	private String email;
+	private String phone;
 	private String esdhId;
 	private String esdhName;
 	private String initials;
@@ -17,9 +17,9 @@ public class EmploymentPO {
 
 	public EmploymentPO(Employment source) {
 		this.id = source.getId();
-//		this.isActive = source.a
 		this.name = source.getName();
 		this.email = source.getEmail();
+		this.phone = source.getPhone();
 		this.esdhId = source.getEsdhId();
 		this.esdhName = source.getEsdhLabel();
 		this.initials = source.getInitials();
@@ -37,6 +37,10 @@ public class EmploymentPO {
 
 	public String getEmail() {
 		return email;
+	}
+
+	public String getPhone() {
+		return phone;
 	}
 
 	public String getEsdhId() {

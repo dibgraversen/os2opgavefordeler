@@ -45,8 +45,8 @@
 					</span>
 				</td>
 				<td ng-class="topic.org ? '' : 'inherited'">{{ topic.org.name || distribution(topic) }}</td>
-				<td ng-show="settings.showExpandedOrg">{{ topic.org.email }}</td>
-				<td ng-show="settings.showExpandedOrg">{{ topic.org.phone }}</td>
+				<td ng-show="settings.showExpandedOrg">{{ topic.employee.email }}</td>
+				<td ng-show="settings.showExpandedOrg">{{ topic.employee.phone }}</td>
 				<td ng-class="topic.employee ? '' : 'inherited'">{{ responsibleEmployee(topic) }}</td>
 				<td class="button">
 					<div class="btn-group" ng-show="distributionChangeAllowed(topic)" dropdown style="width:120px">
