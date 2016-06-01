@@ -7,7 +7,7 @@ import dk.os2opgavefordeler.model.CprDistributionRuleFilter;
  */
 public class CprDistributionRuleFilterDTO extends DistributionRuleFilterDTO{
 
-    private static final String FILTER_TYPE = "cpr";
+    public static final String FILTER_TYPE = "cpr";
 
     public CprDistributionRuleFilterDTO() {
         type = FILTER_TYPE;

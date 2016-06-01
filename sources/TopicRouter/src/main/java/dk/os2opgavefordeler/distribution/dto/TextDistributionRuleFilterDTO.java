@@ -4,7 +4,7 @@ import dk.os2opgavefordeler.model.TextDistributionRuleFilter;
 
 public class TextDistributionRuleFilterDTO extends DistributionRuleFilterDTO{
 
-    private static final String FILTER_TYPE = "text";
+    public static final String FILTER_TYPE = "text";
 
     public TextDistributionRuleFilterDTO() {
         type = FILTER_TYPE;

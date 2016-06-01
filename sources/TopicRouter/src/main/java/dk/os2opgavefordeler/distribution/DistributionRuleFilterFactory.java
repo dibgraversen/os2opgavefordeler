@@ -43,7 +43,7 @@ public class DistributionRuleFilterFactory {
         // Try to create from existing
         DistributionRule rule = repository.findBy(dto.distributionRuleId);
 
-        if (CprDistributionRuleFilterDTO.TYPE.equals(dto.type)) {
+        if (CprDistributionRuleFilterDTO.FILTER_TYPE.equals(dto.type)) {
 
             CprDistributionRuleFilter filter = new CprDistributionRuleFilter();
 
@@ -61,7 +61,7 @@ public class DistributionRuleFilterFactory {
 
             return filter;
         }
-        else if (TextDistributionRuleFilterDTO.TYPE.equals(dto.type)) {
+        else if (TextDistributionRuleFilterDTO.FILTER_TYPE.equals(dto.type)) {
 
             TextDistributionRuleFilter filter = new TextDistributionRuleFilter();
 
