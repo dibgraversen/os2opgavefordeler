@@ -1,7 +1,7 @@
 <div>
 	<div class="modal-header">
 		<button type="button" class="close" ng-click="cancel()"><span aria-hidden="true">&times;</span></button>
-		<h4 class="modal-title">{{ titleText }}</h4>
+		<h4 class="modal-title ng-cloak">{{ titleText }}</h4>
 	</div>
 	<div class="modal-body">
 		<alert ng-repeat="alert in createMunicipalityAlerts" type="{{alert.type}}"
@@ -17,7 +17,7 @@
 
 	</div>
 	<div class="modal-footer">
-		<button class="btn btn-primary" ng-click="ok()">{{ okText }}</button>
+		<button class="btn btn-primary ng-cloak" ng-click="ok()">{{ okText }}</button>
 		<button class="btn btn-default" ng-click="cancel()">Annuller</button>
 	</div>
 </div>

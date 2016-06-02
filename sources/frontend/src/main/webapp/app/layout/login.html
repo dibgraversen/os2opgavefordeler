@@ -9,11 +9,11 @@
                 </h1>
             </div>
 
-            <div class="panel panel-default">
+            <div class="panel panel-default ng-cloak">
                 <div class="panel-body">
                     <div class="form-inline">
                         <a href="{{provider.url}}" ng-repeat="provider in providers">
-                            <button class="btn btn-primary btn-lg">{{provider.name}}</button>
+                            <button class="btn btn-primary btn-lg ng-cloak">{{provider.name}}</button>
                         </a>
                     </div>
                 </div>
@@ -21,7 +21,7 @@
         </div>
 
         <div ng-show="user.loggedIn">
-            <div class="jumbotron">
+            <div class="jumbotron ng-cloak">
                 <h1>Du er allerede logget ind.</h1>
                 <p>Du er logget ind som <i>{{user.name}}</i>.</p>
                 <p>Hvis du ønsker at skifte bruger, kan du logge ud i menuen i toppen af siden, eller ved at klikke

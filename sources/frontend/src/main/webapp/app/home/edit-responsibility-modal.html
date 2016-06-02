@@ -4,11 +4,15 @@
 		<h4 class="modal-title">Vedligehold ansvar</h4>
 	</div>
 	<div class="modal-body">
-		<div>Vedligehold af ansvar for: '{{ topic.kle.number }} {{ topic.kle.name }}'</div>
-		<dl class="dl-horizontal">
+		<div class="ng-cloak">
+			Vedligehold af ansvar for: '{{ topic.kle.number }} {{ topic.kle.name }}'
+		</div>
+
+		<dl class="dl-horizontal ng-cloak">
 			<dt>Ansvarlig enhed:</dt>
 			<dd>{{ topic.responsible.name }}</dd>
 		</dl>
+
 		<div>
 			<form class="form-horizontal">
 				<div class="form-group">
