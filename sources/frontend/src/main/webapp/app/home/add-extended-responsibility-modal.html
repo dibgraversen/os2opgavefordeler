@@ -20,8 +20,8 @@
 	                    <th>&nbsp;</th>
 	                </tr>
                 </thead>
-                <tbody ng-repeat="filter in filters">
-	                <tr>
+                <tbody>
+	                <tr ng-repeat="filter in filters">
 	                    <td>{{ filter.name }}</td>
 	                    <td>{{ filter.assignedOrgName }}</td>
 	                    <td>{{ filter.assignedEmployeeName }}</td>
@@ -67,7 +67,7 @@
                         </p>
 
                         <p>
-                            <label for="filter_text">Text: <span>(Brug * til wildcard søgning. * kan placeres først og sidst i teksten.)</span>
+                            <label for="filter_text">Tekst: <span>(Brug * til wildcard søgning. * kan placeres først og sidst i teksten.)</span>
                                 <input type="text" class="form-control" ng-model="model.text" name="filter_text" id="filter_text">
                             </label>
                         </p>
@@ -176,12 +176,22 @@
     <div class="modal-footer" ng-show="currentTab=='list'">
         <a href="" class="btn btn-primary" ng-click="add()">Tilføj</a>
     </div>
-    <div class="modal-footer" ng-show="currentTab=='add'">
-        <a href="" class="btn btn-primary" ng-click="currentTab='list'">Annuller</a>
+    <div class="modal-footer ng-cloak" ng-show="currentTab=='add'">
+	    <alert ng-repeat="alert in ruleAlerts" type="{{alert.type}}"
+	           close="closeAlert($index)" class="animate-fade"
+	           style="width: 100%">{{alert.msg}}
+	    </alert>
+
+	    <a href="" class="btn btn-primary" ng-click="currentTab='list'">Annuller</a>
         <a href="" class="btn btn-primary" ng-click="createFilter()">Opret</a>
     </div>
-    <div class="modal-footer" ng-show="currentTab=='show'">
-        <a href="" class="btn btn-primary" ng-click="currentTab='list'">Annuller</a>
+    <div class="modal-footer ng-cloak" ng-show="currentTab=='show'">
+	    <alert ng-repeat="alert in ruleAlerts" type="{{alert.type}}"
+	           close="closeAlert($index)" class="animate-fade"
+	           style="width: 100%">{{alert.msg}}
+	    </alert>
+
+	    <a href="" class="btn btn-primary" ng-click="currentTab='list'">Annuller</a>
         <a href="" class="btn btn-primary" ng-click="createFilter()">Opdater</a>
     </div>
 </div>
