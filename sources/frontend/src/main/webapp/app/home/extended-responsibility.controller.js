@@ -1,5 +1,6 @@
 (function () {
     'use strict';
+
     angular.module('topicRouter').controller('ExtendedResponsibilityController', ExtendedResponsibilityController);
 
     ExtendedResponsibilityController.$inject = ['$log', '$scope', '$modalStack', 'topicRouterApi'];
@@ -14,6 +15,7 @@
         $scope.currentTab = 'list';
 	    $scope.ruleAlerts = [];
 	    $scope.initialType = '';
+	    $scope.municipalityId = $scope.user.municipality.id;
 
         function cleanModel() {
 	        $log.info('ExtendedResponsibilityController::cleanModel (type: ' + $scope.type + ')');
@@ -96,6 +98,8 @@
 
 	        activateTab(filterType); // select the correct tab based on filter type
 
+	        loadInitialData();
+
 	        topicRouterApi.getFiltersForRule($scope.topic.id).then(function(res){
                 for (var i in res) {
                     if (res[i].filterId == filterId) {
@@ -108,6 +112,12 @@
                         setSelectedOrgUnit($scope.orgUnits[i]);
                     }
                 }
+
+		        for (var i in $scope.employments) {
+			        if ($scope.employments[i].id == $scope.model.assignedEmployeeId) {
+				        setSelectedEmp($scope.employments[i]);
+			        }
+		        }
             });
         }
 
@@ -241,9 +251,13 @@
 
         function loadAllOrgUnits(){
             orgUnits = {};
-            if(orgUnitsMissing){
+
+            if (orgUnitsMissing){
                 topicRouterApi.getOrgUnitsForResponsibility($scope.user.municipality.id, currentEmployment, false).then(function(orgUnits){
-                    _.each(orgUnits, function(org){ loadParent(org); });
+                    _.each(orgUnits, function(org){
+	                    loadParent(org);
+                    });
+
                     $scope.orgUnits = orgUnits;
                     orgUnitsMissing = false;
                 });
@@ -281,6 +295,12 @@
             _refresh();
         }
 
+	    function loadInitialData() {
+		    topicRouterApi.getEmployments($scope.municipalityId, currentEmployment, true).then(function(employments){
+			    $scope.employments = employments;
+		    });
+	    }
+
         function _refresh() {
             $log.info("ExtendedResponsibilityController::_refresh (rule: " + $scope.topic.id + ")");
 
@@ -290,6 +310,10 @@
         }
 
         function add() {
+	        $log.info('ExtendedResponsibilityController::add');
+
+	        loadInitialData();
+
             $scope.model = cleanModel();
 
 	        $scope.initialType = '';

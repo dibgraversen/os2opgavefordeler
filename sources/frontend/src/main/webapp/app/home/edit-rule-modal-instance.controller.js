@@ -46,14 +46,16 @@
 
 		activate();
 
-		function activate(){
+		function activate() {
 			// load some org. stuff.
 			topicRouterApi.getOrgUnitsForResponsibility(municipality.id, currentEmployment, true).then(function(orgUnits){
 				_.each(orgUnits, function(org){
 					loadParent(org);
 				});
+
 				$scope.orgUnits = orgUnits;
 			});
+
 			topicRouterApi.getEmployments(municipality.id, currentEmployment, true).then(function(employments){
 				$scope.employments = employments;
 			});
@@ -61,9 +63,13 @@
 
 		function loadAllOrgUnits(){
 			orgUnits = {};
-			if(orgUnitsMissing){
+
+			if (orgUnitsMissing){
 				topicRouterApi.getOrgUnitsForResponsibility(municipality.id, currentEmployment, false).then(function(orgUnits){
-					_.each(orgUnits, function(org){ loadParent(org); });
+					_.each(orgUnits, function(org){
+						loadParent(org);
+					});
+
 					$scope.orgUnits = orgUnits;
 					orgUnitsMissing = false;
 				});
