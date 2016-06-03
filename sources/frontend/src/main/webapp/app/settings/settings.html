@@ -14,20 +14,17 @@
 			<th style="width: 50px">Aktiv</th>
 			<th style="width: 50px">Regler</th>
 			<th style="width: 25px"></th>
+			<th style="width: 25px"></th>
 		</tr>
 		</thead>
 		<tbody>
 		<tr ng-repeat="municipality in municipalities">
 			<td>{{ municipality.name }}</td>
 			<td>{{ municipality.id }}</td>
-			<td>
-				<a ng-click="toggleActive(municipality)">{{ municipality.active ? 'Ja' : 'Nej' }}</a>
-			</td>
-			<td>
-				<a ng-click="buildRules(municipality)">Opret</a>
-			</td>
-			<td><span class="glyphicon glyphicon-edit" tooltip="rediger"
-								ng-click="openEditMunicipality(municipality)"></span></td>
+			<td><a ng-click="toggleActive(municipality)">{{ municipality.active ? 'Ja' : 'Nej' }}</a></td>
+			<td><a ng-click="buildRules(municipality)">Opret</a></td>
+			<td><span class="glyphicon glyphicon-edit" tooltip="Redigér" ng-click="openEditMunicipality(municipality)"></span></td>
+			<td><span class="glyphicon glyphicon-remove" tooltip="Slet" ng-click="openDeleteMunicipality(municipality)"></span></td>
 		</tr>
 		</tbody>
 	</table>

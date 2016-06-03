@@ -1,0 +1,18 @@
+<div>
+	<div class="modal-header">
+		<button type="button" class="close" ng-click="cancel()"><span aria-hidden="true">&times;</span></button>
+		<h4 class="modal-title ng-cloak">{{ titleText }}</h4>
+	</div>
+	<div class="modal-body">
+		<alert ng-repeat="alert in deleteMunicipalityAlerts" type="{{alert.type}}"
+		       close="closeAlert($index)" class="animate-fade"
+		       style="width: 100%">{{alert.msg}}
+		</alert>
+
+		<p>Slet {{ municipalityName }}?</p>
+	</div>
+	<div class="modal-footer">
+		<button class="btn btn-danger ng-cloak" ng-click="ok()">{{ okText }}</button>
+		<button class="btn btn-default" ng-click="cancel()">Annuller</button>
+	</div>
+</div>

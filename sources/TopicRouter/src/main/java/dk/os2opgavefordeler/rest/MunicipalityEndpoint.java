@@ -66,20 +66,50 @@ public class MunicipalityEndpoint extends Endpoint {
     @Path("/{municipalityId}")
     @Produces("application/json")
     public Response deleteMunicipality(@PathParam("municipalityId") long municipalityId) {
-        log.info("Deleting municipality: " + municipalityId);
+	    log.info("Deleting structure for municipality with ID: {}", municipalityId);
 
-        log.info("Deleting orgunits belonging to municipality: {}", municipalityId);
-
+	    // start transaction
         EntityTransaction transaction = entityManager.getTransaction();
         transaction.begin();
-        Query q = entityManager.createNativeQuery("DELETE FROM orgunit WHERE municipality_id = ?");
+
+	    // prepare query
+	    Query query = entityManager.createNativeQuery("DELETE FROM municipality WHERE id = " + municipalityId);
+
+	    // execute the delete statements in the query and commit the transaction
+	    query.executeUpdate();
+        transaction.commit();
+
+	    /*
+		Query q = entityManager.createNativeQuery("DELETE FROM orgunit WHERE municipality_id = ?");
         q.setParameter(1, municipalityId);
         q.executeUpdate();
 
-        q = entityManager.createNativeQuery("DELETE FROM municipality WHERE id = ?");
-        q.setParameter(1, municipalityId);
-        q.executeUpdate();
-        transaction.commit();
+				" DELETE FROM distributionrule WHERE assignedemp IN (SELECT id FROM employment WHERE isactive = FALSE);" +
+						" DELETE FROM distributionrule_distributionrulefilter WHERE filters_id IN (SELECT id FROM distributionrule WHERE assignedemp IN (SELECT id FROM employment WHERE isactive = FALSE));" +
+						" DELETE FROM distributionrulefilter drf WHERE drf.distributionrule_id IN (SELECT id FROM distributionrule WHERE assignedemp IN (SELECT id FROM employment WHERE isactive = FALSE));" +
+
+						" DELETE FROM distributionrule_distributionrulefilter WHERE filters_id IN (SELECT id FROM distributionrulefilter drf WHERE drf.assignedemp IN (SELECT id FROM employment WHERE isactive = FALSE));" +
+						" DELETE FROM distributionrulefilter drf WHERE drf.assignedemp IN (SELECT id FROM employment WHERE isactive = FALSE);" +
+
+						" DELETE FROM role WHERE employment_id IN (SELECT id FROM employment WHERE isactive = FALSE); " +
+						" UPDATE orgunit SET manager_id = NULL WHERE manager_id IN (SELECT id FROM employment WHERE isactive = FALSE);" +
+
+						" UPDATE orgunit SET manager_id = NULL WHERE manager_id IN (SELECT id FROM employment WHERE employedin_id IN (SELECT id FROM orgunit WHERE isactive = FALSE));" +
+
+						" DELETE FROM role WHERE employment_id IN (SELECT id FROM employment WHERE employedin_id IN (SELECT id FROM orgunit WHERE isactive = FALSE));" +
+
+						" DELETE FROM distributionrule_distributionrulefilter WHERE distributionrule_id IN (SELECT id FROM distributionrule WHERE assignedemp IN (SELECT id FROM employment WHERE employedin_id IN (SELECT id FROM orgunit WHERE isactive = FALSE)));" +
+						" DELETE FROM distributionrule_distributionrulefilter WHERE distributionrule_id IN (SELECT id FROM distributionrule WHERE parent_id IN (SELECT id FROM distributionrule WHERE assignedemp IN (SELECT id FROM employment WHERE employedin_id IN (SELECT id FROM orgunit WHERE isactive = FALSE))));" +
+						" DELETE FROM distributionrule WHERE parent_id IN (SELECT id FROM distributionrule WHERE assignedemp IN (SELECT id FROM employment WHERE employedin_id IN (SELECT id FROM orgunit WHERE isactive = FALSE)));" +
+						" DELETE FROM distributionrule WHERE assignedemp IN (SELECT id FROM employment WHERE employedin_id IN (SELECT id FROM orgunit WHERE isactive = FALSE));" +
+
+						" DELETE FROM distributionrule_distributionrulefilter WHERE filters_id IN (SELECT id FROM distributionrulefilter WHERE assignedemp IN (SELECT id FROM employment WHERE employedin_id IN (SELECT id FROM orgunit WHERE isactive = FALSE)));" +
+						" DELETE FROM distributionrulefilter WHERE assignedemp IN (SELECT id FROM employment WHERE employedin_id IN (SELECT id FROM orgunit WHERE isactive = FALSE));" +
+
+						" DELETE FROM employment WHERE employedin_id IN (SELECT id FROM orgunit WHERE isactive = FALSE);" +
+						" DELETE FROM employment WHERE isactive = FALSE;"
+	    */
+
         return ok();
     }
 

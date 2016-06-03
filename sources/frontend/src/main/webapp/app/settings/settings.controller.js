@@ -12,6 +12,7 @@
 
 		$scope.openCreateMunicipality = openCreateMunicipality;
 		$scope.openEditMunicipality = openEditMunicipality;
+		$scope.openDeleteMunicipality = openDeleteMunicipality;
 		$scope.toggleActive = toggleActive;
 		$scope.buildRules = buildRules;
 		$scope.closeAlert = closeAlert;
@@ -60,6 +61,26 @@
 
 			modalInstance.result.then(function(updatedMunicipality){
 				municipality = updatedMunicipality;
+			});
+		}
+		
+		function openDeleteMunicipality(municipality) {
+			var modalInstance = $modal.open({
+				templateUrl: 'app/settings/delete-municipality-modal.html',
+				controller: 'DeleteMunicipalityModalInstanceCtrl',
+				size: 'md',
+				resolve: {
+					municipality: function(){
+						return municipality;
+					}
+				}
+			});
+
+			modalInstance.result.then(function(municipality) {
+				// remove the municipality from the list
+				$scope.municipalities = $scope.municipalities.filter(function (currMunicipality) {
+					return currMunicipality.id !== municipality.id;
+				});
 			});
 		}
 
