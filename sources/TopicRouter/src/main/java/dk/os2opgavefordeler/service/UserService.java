@@ -20,6 +20,7 @@ public interface UserService {
 	User createUser(User user);
 
 	List<RolePO> getRoles(long userId);
+	List<RolePO> getAllRoles();
 	Optional<Role> findRoleById(long roleId);
 
 	void createRole(Role role);

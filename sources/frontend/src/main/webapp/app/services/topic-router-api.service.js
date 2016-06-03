@@ -17,6 +17,7 @@
 			updateDistributionRule: updateDistributionRule,
 			getRuleChildren: getRuleChildren,
 			getRoles: getRoles,
+			getAllRoles: getAllRoles,
 			getSettings: getSettings,
 			updateSettings: updateSettings,
 			getOrgUnitsForResponsibility: getOrgUnitsForResponsibility,
@@ -214,6 +215,10 @@
 
 		function getRoles(userId) {
 			return httpGet('/users/' + userId + '/roles');
+		}
+		
+		function getAllRoles() {
+			return httpGet('/roles');
 		}
 
 		/**

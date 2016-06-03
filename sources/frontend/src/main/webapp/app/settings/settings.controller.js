@@ -8,6 +8,7 @@
 		/* jshint validthis: true */
 		var vm = this;
 		$scope.municipalities = [];
+		$scope.roles = [];
 		$scope.settingsMessages = [];
 
 		$scope.openCreateMunicipality = openCreateMunicipality;
@@ -25,9 +26,16 @@
 				$log.info("not privileged, redirecting to home");
 				$state.go("home");
 			}
+
 			topicRouterApi.getMunicipalities().then(function(municipalities){
 				$scope.municipalities = municipalities;
 			});
+
+			topicRouterApi.getAllRoles().then(function(roles){
+				$scope.roles = roles;
+			});
+
+
 		}
 
 		// API

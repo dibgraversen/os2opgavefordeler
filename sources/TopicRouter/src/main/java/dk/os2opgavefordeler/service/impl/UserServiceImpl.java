@@ -26,6 +26,7 @@ import javax.inject.Inject;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
+import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
 import java.util.Collections;
@@ -109,6 +110,18 @@ public class UserServiceImpl implements UserService {
                 .collect(Collectors.toList());
         return result;
     }
+
+	@Override
+	public List<RolePO> getAllRoles() {
+		final TypedQuery<Role> query = em.createQuery("SELECT r FROM Role r", Role.class);
+
+		final List<Role> roles = query.getResultList();
+
+		final List<RolePO> result = roles.stream()
+				.map(RolePO::new)
+				.collect(Collectors.toList());
+		return result;
+	}
 
     @Override
     public Optional<Role> findRoleById(long roleId) {

@@ -28,7 +28,6 @@ import java.util.List;
  */
 @Path("/municipalities")
 public class MunicipalityEndpoint extends Endpoint {
-    public static final String TEXT_PLAIN = "text/plain";
 
     @Inject
     Logger log;
@@ -135,7 +134,9 @@ public class MunicipalityEndpoint extends Endpoint {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response createMunicipality(Municipality municipality) {
         log.info("Creating municipality: {}", municipality);
+
         Municipality result = municipalityService.createMunicipality(municipality);
+
         log.info("Municipality created: {}", municipality);
         return ok(result);
     }
@@ -182,10 +183,12 @@ public class MunicipalityEndpoint extends Endpoint {
         if (municipalityId == null || kleId == null) {
             return badRequest("You need to provide valid municipalityId and kleId");
         }
+
         try {
             municipalityService.deleteMunicipalityKle(municipalityId, kleId);
             return ok(kleId);
-        } catch (ValidationException e) {
+        }
+        catch (ValidationException e) {
             return badRequest(e.getMessage());
         }
     }

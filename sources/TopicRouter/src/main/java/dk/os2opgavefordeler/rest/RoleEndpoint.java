@@ -2,6 +2,7 @@ package dk.os2opgavefordeler.rest;
 
 import dk.os2opgavefordeler.auth.openid.OpenIdAuthenticationFlow;
 import dk.os2opgavefordeler.model.Role;
+import dk.os2opgavefordeler.model.presentation.RolePO;
 import dk.os2opgavefordeler.model.presentation.SimpleMessage;
 import dk.os2opgavefordeler.model.presentation.SubstitutePO;
 import dk.os2opgavefordeler.service.*;
@@ -13,6 +14,7 @@ import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.ArrayList;
 import java.util.List;
 
 @Path("/roles")
@@ -29,15 +31,29 @@ public class RoleEndpoint {
 	@Inject
 	private OpenIdAuthenticationFlow openIdAuthenticationFlow;
 
+	private static final String INVALID_ROLE_ID = "Invalid roleId";
+	private static final String INVALID_EMPLOYMENT_ID = "Invalid employmentId";
 
+	@GET
+	@Path("/")
+	@Produces(MediaType.APPLICATION_JSON)
+	@NoCache
+	public Response getRoles() {
+		List<RolePO> roles = new ArrayList<>();
+
+		roles = userService.getAllRoles();
+
+		return Response.status(Response.Status.OK).entity(roles).build();
+	}
 
 	@DELETE
 	@Path("/{roleId}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response deleteRole(@PathParam("roleId") Long roleId) {
 		log.info("deleteRole({})", roleId);
+
 		try {
-			Validate.nonZero(roleId, "Invalid roleId");
+			Validate.nonZero(roleId, INVALID_ROLE_ID);
 			userService.removeRole(roleId);
 
 			return Response.noContent().build();
@@ -60,8 +76,9 @@ public class RoleEndpoint {
 	@NoCache
 	public Response getSubstitutes(@PathParam("id") Long roleId) {
 		log.info("getSubstitutes({})", roleId);
+
 		try {
-			Validate.nonZero(roleId, "Invalid roleId");
+			Validate.nonZero(roleId, INVALID_ROLE_ID);
 
 			final List<SubstitutePO> substitutes = userService.findSubstitutesFor(roleId);
 			return Response.status(Response.Status.OK).entity(substitutes).build();
@@ -84,9 +101,10 @@ public class RoleEndpoint {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response createSubstitute(@PathParam("roleId") Long roleId, @QueryParam("employmentId") Long employmentId) {
 		log.info("createSubstitute({}, {})", roleId, employmentId);
+
 		try {
-			Validate.nonZero(roleId, "Invalid roleId");
-			Validate.nonZero(employmentId, "Invalid employmentId");
+			Validate.nonZero(roleId, INVALID_ROLE_ID);
+			Validate.nonZero(employmentId, INVALID_EMPLOYMENT_ID);
 
 			final Role role = userService.createSubstituteRole(employmentId, roleId);
 
