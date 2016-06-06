@@ -5,6 +5,7 @@ import dk.os2opgavefordeler.model.User;
 import dk.os2opgavefordeler.model.UserSettings;
 import dk.os2opgavefordeler.model.presentation.RolePO;
 import dk.os2opgavefordeler.model.presentation.SubstitutePO;
+import dk.os2opgavefordeler.model.presentation.UserRolePO;
 import dk.os2opgavefordeler.model.presentation.UserSettingsPO;
 
 import java.util.List;
@@ -16,6 +17,8 @@ import java.util.Optional;
 public interface UserService {
 	Optional<User> findById(long userId);
 	Optional<User> findByEmail(String email);
+
+	List<UserRolePO> getAllUsers();
 
 	User createUser(User user);
 
@@ -35,5 +38,6 @@ public interface UserService {
 
 	Role createSubstituteRole(long targetEmploymentId, long roleId) throws ResourceNotFoundException, AuthorizationException;
 	List<SubstitutePO> findSubstitutesFor(long roleId) throws ResourceNotFoundException, AuthorizationException;
+	boolean isAdmin(long userId);
 	boolean isMunicipalityAdmin(long userId);
 }

@@ -11,6 +11,7 @@ import dk.os2opgavefordeler.model.User;
 import dk.os2opgavefordeler.model.UserSettings;
 import dk.os2opgavefordeler.model.presentation.RolePO;
 import dk.os2opgavefordeler.model.presentation.SubstitutePO;
+import dk.os2opgavefordeler.model.presentation.UserRolePO;
 import dk.os2opgavefordeler.model.presentation.UserSettingsPO;
 
 import dk.os2opgavefordeler.service.*;
@@ -29,10 +30,7 @@ import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @ApplicationScoped
@@ -92,6 +90,33 @@ public class UserServiceImpl implements UserService {
             return Optional.empty();
         }
     }
+
+	@Override
+	public List<UserRolePO> getAllUsers() {
+		List<UserRolePO> results = new ArrayList<>();
+
+		TypedQuery<User> query = em.createQuery("SELECT u FROM User u", User.class);
+
+		for (User currUser: query.getResultList()) {
+			// get non-substitute role
+			Role assignedRole = null;
+
+			for (Role currRole: currUser.getRoles()) {
+				if (!currRole.isSubstitute()) {
+					assignedRole = currRole;
+				}
+			}
+
+			if (assignedRole != null) {
+				results.add(new UserRolePO(currUser, assignedRole));
+			}
+			else {
+				results.add(new UserRolePO(currUser, null));
+			}
+		}
+
+		return results;
+	}
 
     @Override
     public User createUser(User user) {
@@ -264,6 +289,21 @@ public class UserServiceImpl implements UserService {
                 .map(r -> new SubstitutePO(r.getOwner().getName(), r.getId()))
                 .collect(Collectors.toList());
     }
+
+	@Override
+	public boolean isAdmin(long userId) {
+		List<RolePO> roles = getRoles(userId);
+
+		Iterator<RolePO> roleIterator = roles.iterator();
+
+		boolean isAdmin = false;
+
+		while (roleIterator.hasNext() && !isAdmin) {
+			isAdmin = roleIterator.next().isAdmin();
+		}
+
+		return isAdmin;
+	}
 
 	@Override
 	public boolean isMunicipalityAdmin(long userId) {

@@ -8,7 +8,7 @@
 		/* jshint validthis: true */
 		var vm = this;
 		$scope.municipalities = [];
-		$scope.roles = [];
+		$scope.users = [];
 		$scope.settingsMessages = [];
 
 		$scope.openCreateMunicipality = openCreateMunicipality;
@@ -31,15 +31,14 @@
 				$scope.municipalities = municipalities;
 			});
 
-			topicRouterApi.getAllRoles().then(function(roles){
-				$scope.roles = roles;
+			topicRouterApi.getAllUsers().then(function(users){
+				$scope.users = users;
 			});
 
 
 		}
 
 		// API
-
 		function openCreateMunicipality(){
 			var modalInstance = $modal.open({
 				templateUrl: 'app/settings/add-municipality-modal.html',

@@ -37,24 +37,39 @@
 
 	<h2 class="page-title">Brugere</h2>
 
+	<label for="municipalitySelector">Kommune:</label>
+	<select id="municipalitySelector" ng-model="search.municipality">
+		<option ng-repeat="municipality in municipalities" value="{{ municipality.name }}">{{ municipality.name }}</option>
+	</select>
+
 	<table class="table table-striped table-hover">
 		<thead>
 		<tr>
-			<th style="width: 55%">Navn</th>
-			<th style="width: 10%">Admin</th>
+			<th style="width: 20%">Kommune</th>
+			<th style="width: 35%">Navn</th>
+			<th style="width: 10%">Sysadmin</th>
 			<th style="width: 10%">Kommuneadmin</th>
 			<th style="width: 10%">Leder</th>
-			<th style="width: 10%">Stedfortræder</th>
 			<th style="width: 5%"></th>
 		</tr>
 		</thead>
 		<tbody>
-			<tr ng-repeat="role in roles">
-				<td>{{ role.name }}</td>
-				<td>{{ role.admin ? 'Ja' : 'Nej' }}</td>
-				<td>{{ role.municipalityAdmin ? 'Ja' : 'Nej' }}</td>
-				<td>{{ role.manager ? 'Ja' : 'Nej' }}</td>
-				<td>{{ role.substitute ? 'Ja' : 'Nej' }}</td>
+			<tr ng-repeat="user in users | filter:search.municipality">
+				<td>
+					{{ user.municipality.name }}
+				</td>
+				<td>
+					{{ user.name }} ({{ user.email }})
+
+					<span ng-hide="user.roleSet"
+				      class="glyphicon glyphicon-exclamation-sign"
+				      style="color:red"
+				      popover-trigger="mouseenter" popover-append-to-body="true"
+				      popover="Denne bruger har ikke fået tildelt en rolle"></span>
+				</td>
+				<td>{{ user.admin ? 'Ja' : 'Nej' }}</td>
+				<td>{{ user.municipalityAdmin ? 'Ja' : 'Nej' }}</td>
+				<td>{{ user.manager ? 'Ja' : 'Nej' }}</td>
 				<td><span class="glyphicon glyphicon-edit" tooltip="Redigér" ng-click=""></span></td>
 			</tr>
 		</tbody>
