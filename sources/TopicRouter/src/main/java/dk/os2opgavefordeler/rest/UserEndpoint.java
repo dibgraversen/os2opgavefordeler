@@ -75,8 +75,6 @@ public class UserEndpoint {
 		}
 	}
 
-
-
     @GET
     @Path("/me")
     @Produces(MediaType.APPLICATION_JSON)
@@ -94,11 +92,15 @@ public class UserEndpoint {
     @Path("/")
     @Consumes("application/json")
     @Produces("application/json")
-    public User create(User user) {
+    public Response create(User user) {
+	    log.info("Creating user: {}", user.toString());
+
         Municipality municipality = municipalityRepository.findBy(user.getMunicipality().getId());
         user.setMunicipality(municipality);
 
-        return userRepository.save(user);
+        userService.createOrUpdateUser(user);
+
+	    return Response.ok().build();
     }
 
     @DELETE

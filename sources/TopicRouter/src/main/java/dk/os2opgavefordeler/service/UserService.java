@@ -21,6 +21,7 @@ public interface UserService {
 	List<UserRolePO> getAllUsers();
 
 	User createUser(User user);
+	User createOrUpdateUser(User user);
 
 	List<RolePO> getRoles(long userId);
 	List<RolePO> getAllRoles();

@@ -16,6 +16,7 @@
 			getTopicRoutes: getTopicRoutes,
 			updateDistributionRule: updateDistributionRule,
 			getRuleChildren: getRuleChildren,
+			updateUser: updateUser,
 			getRoles: getRoles,
 			getAllRoles: getAllRoles,
 			getAllUsers: getAllUsers,
@@ -79,6 +80,10 @@
 
 		function getIdentityProviders() {
 			return httpGet("/auth/providers");
+		}
+
+		function updateUser(model){
+			return httpPost("/users/", model);
 		}
 
 		function getUserInfo() {

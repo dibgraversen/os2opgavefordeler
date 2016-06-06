@@ -123,6 +123,10 @@ public class UserServiceImpl implements UserService {
         return userRepository.save(user);
     }
 
+	@Override
+	public User createOrUpdateUser(User user) {
+		return userRepository.saveAndFlushAndRefresh(user);
+	}
 
     @Override
     public List<RolePO> getRoles(long userId) {

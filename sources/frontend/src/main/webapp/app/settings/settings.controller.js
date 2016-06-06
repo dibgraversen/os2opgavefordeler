@@ -14,6 +14,7 @@
 		$scope.openCreateMunicipality = openCreateMunicipality;
 		$scope.openEditMunicipality = openEditMunicipality;
 		$scope.openDeleteMunicipality = openDeleteMunicipality;
+		$scope.openEditUser = openEditUser;
 		$scope.toggleActive = toggleActive;
 		$scope.buildRules = buildRules;
 		$scope.closeAlert = closeAlert;
@@ -34,8 +35,6 @@
 			topicRouterApi.getAllUsers().then(function(users){
 				$scope.users = users;
 			});
-
-
 		}
 
 		// API
@@ -119,6 +118,27 @@
 					type: "danger",
 					msg: "Oprettelse af regler fejlede."
 				});
+			});
+		}
+
+		// User handling
+		function openEditUser(user){
+			var modalInstance = $modal.open({
+				templateUrl: 'app/settings/edit-user-modal.html',
+				controller: 'EditUserModalInstanceCtrl',
+				size: 'md',
+				resolve: {
+					municipality: function(){
+						return user.municipality;
+					},
+					user: function() {
+						return user;
+					}
+				}
+			});
+
+			modalInstance.result.then(function(updatedUser){
+				user.name = updatedUser.name;
 			});
 		}
 
