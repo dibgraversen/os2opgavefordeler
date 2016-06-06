@@ -21,7 +21,7 @@
 		<tr ng-repeat="municipality in municipalities">
 			<td>{{ municipality.name }}</td>
 			<td>{{ municipality.id }}</td>
-			<td><a ng-click="toggleActive(municipality)">{{ municipality.active ? 'Ja' : 'Nej' }}</a></td>
+			<td><input type="checkbox" name="municipalityActive" ng-checked="{{ municipality.active }}" ng-click="toggleActive(municipality)"></td>
 			<td><a ng-click="buildRules(municipality)">Opret</a></td>
 			<td><span class="glyphicon glyphicon-edit" tooltip="Redigér" ng-click="openEditMunicipality(municipality)"></span></td>
 			<td><span class="glyphicon glyphicon-remove" tooltip="Slet" ng-click="openDeleteMunicipality(municipality)"></span></td>
@@ -67,9 +67,9 @@
 				      popover-trigger="mouseenter" popover-append-to-body="true"
 				      popover="Denne bruger har ikke fået tildelt en rolle"></span>
 				</td>
-				<td><a ng-click="toggleAdmin(user)">{{ user.admin ? 'Ja' : 'Nej' }}</a></td>
-				<td><a ng-click="toggleMunicipalityAdmin(user)">{{ user.municipalityAdmin ? 'Ja' : 'Nej' }}</a></td>
-				<td>{{ user.manager ? 'Ja' : 'Nej' }}</td>
+				<td><input type="checkbox" name="userAdmin" ng-checked="{{ user.admin }}" ng-click="toggleAdmin(user)"></td>
+				<td><input type="checkbox" name="userMunicipalityAdmin" ng-checked="{{ user.municipalityAdmin }}" ng-click="toggleMunicipalityAdmin(user)"></td>
+				<td><input type="checkbox" name="userAdmin" ng-checked="{{ user.manager }}" disabled></td>
 				<td><span class="glyphicon glyphicon-edit" tooltip="Redigér" ng-click="openEditUser(user)"></span></td>
 			</tr>
 		</tbody>
