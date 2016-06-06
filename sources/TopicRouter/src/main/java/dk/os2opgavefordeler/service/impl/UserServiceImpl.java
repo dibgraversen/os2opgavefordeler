@@ -169,6 +169,11 @@ public class UserServiceImpl implements UserService {
         em.persist(role);
     }
 
+	@Override
+	public void updateRole(Role role) {
+		em.merge(role);
+	}
+
     @Override
     public void removeRole(long roleId) throws ResourceNotFoundException, AuthorizationException {
         final Role role = findRoleById(roleId).orElseThrow(() -> new ResourceNotFoundException("Role not found"));
@@ -293,6 +298,17 @@ public class UserServiceImpl implements UserService {
                 .map(r -> new SubstitutePO(r.getOwner().getName(), r.getId()))
                 .collect(Collectors.toList());
     }
+
+	@Override
+	public boolean isAdmin(String email) {
+		Optional<User> user = findByEmail(email);
+
+		if (user.isPresent()) {
+			return isAdmin(user.get().getId());
+		}
+
+		return false;
+	}
 
 	@Override
 	public boolean isAdmin(long userId) {

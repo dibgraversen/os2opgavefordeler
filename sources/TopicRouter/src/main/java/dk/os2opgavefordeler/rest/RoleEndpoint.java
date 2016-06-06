@@ -1,7 +1,9 @@
 package dk.os2opgavefordeler.rest;
 
+import dk.os2opgavefordeler.auth.AuthService;
 import dk.os2opgavefordeler.auth.openid.OpenIdAuthenticationFlow;
 import dk.os2opgavefordeler.model.Role;
+import dk.os2opgavefordeler.model.User;
 import dk.os2opgavefordeler.model.presentation.RolePO;
 import dk.os2opgavefordeler.model.presentation.SimpleMessage;
 import dk.os2opgavefordeler.model.presentation.SubstitutePO;
@@ -16,6 +18,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Path("/roles")
 public class RoleEndpoint {
@@ -29,6 +32,9 @@ public class RoleEndpoint {
 	private EmploymentService employmentService;
 
 	@Inject
+	private AuthService authService;
+
+	@Inject
 	private OpenIdAuthenticationFlow openIdAuthenticationFlow;
 
 	private static final String INVALID_ROLE_ID = "Invalid roleId";
@@ -39,11 +45,17 @@ public class RoleEndpoint {
 	@Produces(MediaType.APPLICATION_JSON)
 	@NoCache
 	public Response getRoles() {
-		List<RolePO> roles = new ArrayList<>();
+		if (!authService.isAuthenticated()) {
+			return Response.status(Response.Status.UNAUTHORIZED).entity("Not logged in").build();
+		}
 
-		roles = userService.getAllRoles();
+		if (userService.isAdmin(authService.getAuthentication().getEmail())) {
+			return Response.ok().entity(userService.getAllRoles()).build();
+		}
+		else {
+			return Response.status(Response.Status.UNAUTHORIZED).entity("Not authorized").build();
+		}
 
-		return Response.status(Response.Status.OK).entity(roles).build();
 	}
 
 	@DELETE
@@ -118,6 +130,76 @@ public class RoleEndpoint {
 		}
 		catch(BadRequestArgumentException e) {
 			return Response.status(Response.Status.BAD_REQUEST).entity(new SimpleMessage(e.getMessage())).build();
+		}
+	}
+
+	@POST
+	@Path("/{roleId}/municipalityadmin/{valueId}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response setMunicipalityAdmin(@PathParam("roleId") Long roleId, @PathParam("valueId") Long valueId) {
+		if (!authService.isAuthenticated()) {
+			return Response.status(Response.Status.UNAUTHORIZED).entity("Not logged in").build();
+		}
+
+		if (userService.isAdmin(authService.getAuthentication().getEmail())) {
+			try {
+				Validate.nonZero(roleId, INVALID_ROLE_ID);
+
+				Optional<Role> role = userService.findRoleById(roleId);
+
+				if (role.isPresent()) {
+					Role updatedRole = role.get();
+					updatedRole.setMunicipalityAdmin(valueId == 1);
+					userService.updateRole(updatedRole);
+
+					return Response.status(Response.Status.OK).entity(new SimpleMessage("OK")).build();
+				}
+				else {
+					log.warn("Role #{} not found", roleId);
+					return Response.status(Response.Status.NOT_FOUND).entity(new SimpleMessage("Role not found")).build();
+				}
+			}
+			catch(BadRequestArgumentException e) {
+				return Response.status(Response.Status.BAD_REQUEST).entity(new SimpleMessage(e.getMessage())).build();
+			}
+		}
+		else {
+			return Response.status(Response.Status.UNAUTHORIZED).entity(new SimpleMessage("Unauthorized")).build();
+		}
+	}
+
+	@POST
+	@Path("/{roleId}/admin/{valueId}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response setAdmin(@PathParam("roleId") Long roleId, @PathParam("valueId") Long valueId) {
+		if (!authService.isAuthenticated()) {
+			return Response.status(Response.Status.UNAUTHORIZED).entity("Not logged in").build();
+		}
+
+		if (userService.isAdmin(authService.getAuthentication().getEmail())) {
+			try {
+				Validate.nonZero(roleId, INVALID_ROLE_ID);
+
+				Optional<Role> role = userService.findRoleById(roleId);
+
+				if (role.isPresent()) {
+					Role updatedRole = role.get();
+					updatedRole.setAdmin(valueId == 1);
+					userService.updateRole(updatedRole);
+
+					return Response.status(Response.Status.OK).entity(new SimpleMessage("OK")).build();
+				}
+				else {
+					log.warn("Role #{} not found", roleId);
+					return Response.status(Response.Status.NOT_FOUND).entity(new SimpleMessage("Role not found")).build();
+				}
+			}
+			catch(BadRequestArgumentException e) {
+				return Response.status(Response.Status.BAD_REQUEST).entity(new SimpleMessage(e.getMessage())).build();
+			}
+		}
+		else {
+			return Response.status(Response.Status.UNAUTHORIZED).entity(new SimpleMessage("Unauthorized")).build();
 		}
 	}
 }

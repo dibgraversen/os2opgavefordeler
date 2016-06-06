@@ -67,8 +67,8 @@
 				      popover-trigger="mouseenter" popover-append-to-body="true"
 				      popover="Denne bruger har ikke fået tildelt en rolle"></span>
 				</td>
-				<td>{{ user.admin ? 'Ja' : 'Nej' }}</td>
-				<td>{{ user.municipalityAdmin ? 'Ja' : 'Nej' }}</td>
+				<td><a ng-click="toggleAdmin(user)">{{ user.admin ? 'Ja' : 'Nej' }}</a></td>
+				<td><a ng-click="toggleMunicipalityAdmin(user)">{{ user.municipalityAdmin ? 'Ja' : 'Nej' }}</a></td>
 				<td>{{ user.manager ? 'Ja' : 'Nej' }}</td>
 				<td><span class="glyphicon glyphicon-edit" tooltip="Redigér" ng-click="openEditUser(user)"></span></td>
 			</tr>

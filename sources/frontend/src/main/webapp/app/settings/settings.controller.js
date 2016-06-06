@@ -16,6 +16,8 @@
 		$scope.openDeleteMunicipality = openDeleteMunicipality;
 		$scope.openEditUser = openEditUser;
 		$scope.toggleActive = toggleActive;
+		$scope.toggleMunicipalityAdmin = toggleMunicipalityAdmin;
+		$scope.toggleAdmin = toggleAdmin;
 		$scope.buildRules = buildRules;
 		$scope.closeAlert = closeAlert;
 
@@ -140,6 +142,44 @@
 			modalInstance.result.then(function(updatedUser){
 				user.name = updatedUser.name;
 			});
+		}
+
+		function toggleMunicipalityAdmin(user) {
+			user.municipalityAdmin = !user.municipalityAdmin;
+
+			topicRouterApi.setMunicipalityAdmin(user.roleId, user.municipalityAdmin)
+					.then(function(response) {
+						addMessage({
+							type: 'success',
+							msg: 'Brugeren blev opdateret.'
+						});
+					}, function(){
+						user.municipalityAdmin = !user.municipalityAdmin;
+
+						addMessage({
+							type: "danger",
+							msg: "Opdatering af bruger fejlede, prøv igen senere."
+						});
+					});
+		}
+
+		function toggleAdmin(user) {
+			user.admin = !user.admin;
+
+			topicRouterApi.setAdmin(user.roleId, user.admin)
+					.then(function(response) {
+						addMessage({
+							type: 'success',
+							msg: 'Brugeren blev opdateret.'
+						});
+					}, function(){
+						user.admin = !user.admin;
+
+						addMessage({
+							type: "danger",
+							msg: "Opdatering af bruger fejlede, prøv igen senere."
+						});
+					});
 		}
 
 		function addMessage(message){

@@ -28,6 +28,7 @@ public interface UserService {
 	Optional<Role> findRoleById(long roleId);
 
 	void createRole(Role role);
+	void updateRole(Role role);
 	void removeRole(long roleId) throws ResourceNotFoundException, AuthorizationException;
 
 	Optional<UserSettings> getSettings(long userId);
@@ -39,6 +40,7 @@ public interface UserService {
 
 	Role createSubstituteRole(long targetEmploymentId, long roleId) throws ResourceNotFoundException, AuthorizationException;
 	List<SubstitutePO> findSubstitutesFor(long roleId) throws ResourceNotFoundException, AuthorizationException;
+	boolean isAdmin(String email);
 	boolean isAdmin(long userId);
 	boolean isMunicipalityAdmin(long userId);
 }

@@ -18,10 +18,11 @@
 			getRuleChildren: getRuleChildren,
 			updateUser: updateUser,
 			getRoles: getRoles,
-			getAllRoles: getAllRoles,
 			getAllUsers: getAllUsers,
 			getSettings: getSettings,
 			updateSettings: updateSettings,
+			setMunicipalityAdmin: setMunicipalityAdmin,
+			setAdmin: setAdmin,
 			getOrgUnitsForResponsibility: getOrgUnitsForResponsibility,
 			getOrgUnit: getOrgUnit,
 			getEmployments: getEmployments,
@@ -100,6 +101,14 @@
 
 		function updateSettings(userId, settings) {
 			return httpPost('/users/' + userId + '/settings', settings);
+		}
+
+		function setMunicipalityAdmin(roleId, municipalityAdmin) {
+			return httpPost('/roles/' + roleId + '/municipalityadmin/' + (municipalityAdmin?'1':'0'));
+		}
+
+		function setAdmin(roleId, admin) {
+			return httpPost('/roles/' + roleId + '/admin/' + (admin?'1':'0'));
 		}
 
 		function getTopicRoutes(role, scope) {
@@ -221,10 +230,6 @@
 
 		function getRoles(userId) {
 			return httpGet('/users/' + userId + '/roles');
-		}
-		
-		function getAllRoles() {
-			return httpGet('/roles');
 		}
 		
 		function getAllUsers() {
