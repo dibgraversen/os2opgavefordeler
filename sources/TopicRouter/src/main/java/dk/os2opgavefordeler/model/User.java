@@ -24,7 +24,7 @@ public class User implements Serializable {
 	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private UserSettings settings;
 
-	@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
 	private Municipality municipality;
 
 	public User() {
