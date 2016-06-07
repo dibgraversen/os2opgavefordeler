@@ -1,15 +1,18 @@
 package dk.os2opgavefordeler.model.presentation;
 
-import com.google.common.base.MoreObjects;
 import dk.os2opgavefordeler.model.Kle;
 
+import com.google.common.base.MoreObjects;
+
 /**
- * @author hlo@miracle.dk
+ * Presentation object for a KLE
  */
 public class KlePO {
-	public static final String MAIN = "MAIN";
-	public static final String GROUP = "GROUP";
-	public static final String TOPIC = "TOPIC";
+
+	private static final String MAIN_KLE_TYPE = "main";
+	private static final String GROUP_KLE_TYPE = "group";
+	private static final String TOPIC_KLE_TYPE = "topic";
+	private static final String UNKNOWN_KLE_TYPE = "<unknown>";
 
 	/**
 	 * Id for reference.
@@ -41,31 +44,58 @@ public class KlePO {
 	public KlePO() {
 	}
 
+	/**
+	 * Constructs a new KlePO presentation object with values set from the specified source KLE
+	 *
+	 * @param source source KLE object
+	 */
 	public KlePO(Kle source){
 		id = source.getId();
 		number = source.getNumber();
 		name = source.getTitle();
 		type = getTypeFromNumber(source.getNumber());
 		serviceText = source.getDescription();
-		municipalityId = source.getMunicipality().getId();
+
+		if (source.getMunicipality() != null) { // municipalities are *only* set on a few specific KLEs
+			municipalityId = source.getMunicipality().getId();
+		}
 	}
 
 	private String getTypeFromNumber(String number){
-		if(number != null){
+		if (number != null) {
 			String[] parts = number.split("\\.");
-			if(parts.length == 1){ return MAIN; }
-			if(parts.length == 2){ return GROUP; }
-			if(parts.length == 3){ return TOPIC; }
+
+			if (parts.length == 1) {
+				return MAIN_KLE_TYPE;
+			}
+
+			if (parts.length == 2)  {
+				return GROUP_KLE_TYPE;
+			}
+
+			if (parts.length == 3) {
+				return TOPIC_KLE_TYPE;
+			}
+
+			return UNKNOWN_KLE_TYPE; // unable to determine type
 		}
+
 		return "";
 	}
 
+	/**
+	 * Returns this KlePO presentation object as a Kle object instead
+	 *
+	 * @return kle object with values set from the presentation object
+	 */
 	public Kle asKle(){
 		Kle result = new Kle();
+
 		result.setId(id);
 		result.setNumber(number);
 		result.setTitle(name);
 		result.setDescription(serviceText);
+
 		return result;
 	}
 

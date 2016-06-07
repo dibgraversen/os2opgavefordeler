@@ -1,7 +1,6 @@
 package dk.os2opgavefordeler.model.presentation;
 
 import dk.os2opgavefordeler.model.DistributionRule;
-import dk.os2opgavefordeler.model.Kle;
 import dk.os2opgavefordeler.model.OrgUnit;
 
 /**
@@ -50,15 +49,17 @@ public class DistributionRulePO {
 	public DistributionRulePO(DistributionRule source) {
 		this.parent = source.getParent().map(rule -> rule.getId()).orElse(0L);
 		this.id = source.getId();
-
-		this.kle = kleFrom(source.getKle());
+		this.kle = new KlePO(source.getKle());
 		this.responsible = source.getResponsibleOrg().map(OrgUnit::getId).orElse(0L);
-		if(source.getResponsibleOrg().isPresent()) {
+
+		if (source.getResponsibleOrg().isPresent()) {
 			this.responsibleOrgName = source.getResponsibleOrg().get().getName();
-			if(source.getResponsibleOrg().get().getManager().isPresent()) {
+
+			if (source.getResponsibleOrg().get().getManager().isPresent()) {
 				this.responsibleManagerName = source.getResponsibleOrg().get().getManager().get().getName();
 			}
 		}
+
 		this.employee = source.getAssignedEmp();
 		this.org = source.getAssignedOrg().map(OrgUnit::getId).orElse(0L);
 	}
@@ -119,28 +120,4 @@ public class DistributionRulePO {
 		this.responsible = responsible;
 	}
 
-
-
-	private static KlePO kleFrom(Kle in) {
-		KlePO kle = new KlePO();
-
-		kle.setId(in.getId());
-		kle.setNumber(in.getNumber());
-		kle.setName(in.getTitle());
-		kle.setServiceText(in.getDescription());
-
-		//TODO: need to track type in a cleaner way than this.
-		String num = kle.getNumber();
-		if(num.length() == 2) {
-			kle.setType("main");
-		} else if(num.length() == 5) {
-			kle.setType("group");
-		} else if(num.length() == 8) {
-			kle.setType("topic");
-		} else {
-			kle.setType("<unknown>");
-		}
-
-		return kle;
-	}
 }
