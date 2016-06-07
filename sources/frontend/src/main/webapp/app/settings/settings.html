@@ -38,9 +38,7 @@
 	<h2 class="page-title">Brugere</h2>
 
 	<label for="municipalitySelector">Kommune:</label>
-	<select id="municipalitySelector" ng-model="search.municipality">
-		<option ng-repeat="municipality in municipalities" value="{{ municipality.name }}">{{ municipality.name }}</option>
-	</select>
+	<select id="municipalitySelector" ng-model="search.municipality" ng-options="municipality.name for municipality in municipalities track by municipality.name"></select>
 
 	<table class="table table-striped table-hover">
 		<thead>
@@ -49,28 +47,36 @@
 			<th style="width: 35%">Navn</th>
 			<th style="width: 10%">Sysadmin</th>
 			<th style="width: 10%">Kommuneadmin</th>
-			<th style="width: 10%">Leder</th>
+			<th style="width: 10%">
+				Leder
+
+				<span ng-hide="user.roleSet"
+			      class="glyphicon glyphicon-exclamation-sign"
+			      style="color:lightskyblue"
+			      popover-trigger="mouseenter" popover-append-to-body="true"
+			      popover="Hvorvidt brugeren er leder kan ikke sættes manuelt"></span>
+			</th>
 			<th style="width: 5%"></th>
 		</tr>
 		</thead>
 		<tbody>
-			<tr ng-repeat="user in users | filter:search.municipality">
+			<tr ng-repeat="currUser in users | filter:search.municipality.name | orderBy:'name' ">
 				<td>
-					{{ user.municipality.name }}
+					{{ currUser.municipality.name }}
 				</td>
 				<td>
-					{{ user.name }} ({{ user.email }})
+					{{ currUser.name }} ({{ currUser.email }})
 
-					<span ng-hide="user.roleSet"
+					<span ng-hide="currUser.roleSet"
 				      class="glyphicon glyphicon-exclamation-sign"
 				      style="color:red"
 				      popover-trigger="mouseenter" popover-append-to-body="true"
 				      popover="Denne bruger har ikke fået tildelt en rolle"></span>
 				</td>
-				<td><input type="checkbox" name="userAdmin" ng-checked="{{ user.admin }}" ng-click="toggleAdmin(user)"></td>
-				<td><input type="checkbox" name="userMunicipalityAdmin" ng-checked="{{ user.municipalityAdmin }}" ng-click="toggleMunicipalityAdmin(user)"></td>
-				<td><input type="checkbox" name="userAdmin" ng-checked="{{ user.manager }}" disabled></td>
-				<td><span class="glyphicon glyphicon-edit" tooltip="Redigér" ng-click="openEditUser(user)"></span></td>
+				<td><input type="checkbox" name="userAdmin" ng-checked="{{ currUser.admin }}" ng-click="toggleAdmin(currUser)"></td>
+				<td><input type="checkbox" name="userMunicipalityAdmin" ng-checked="{{ currUser.municipalityAdmin }}" ng-click="toggleMunicipalityAdmin(currUser)"></td>
+				<td><input type="checkbox" name="userAdmin" ng-checked="{{ currUser.manager }}" disabled></td>
+				<td><span class="glyphicon glyphicon-edit" tooltip="Redigér" ng-click="openEditUser(currUser)"></span></td>
 			</tr>
 		</tbody>
 	</table>

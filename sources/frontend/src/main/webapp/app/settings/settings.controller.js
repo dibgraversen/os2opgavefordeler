@@ -21,6 +21,9 @@
 		$scope.buildRules = buildRules;
 		$scope.closeAlert = closeAlert;
 
+		$scope.search = {};
+		$scope.search.municipality = $scope.user.municipality;
+
 		activate();
 
 		function activate() {
