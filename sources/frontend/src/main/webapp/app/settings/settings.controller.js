@@ -15,6 +15,7 @@
 		$scope.openEditMunicipality = openEditMunicipality;
 		$scope.openDeleteMunicipality = openDeleteMunicipality;
 		$scope.openEditUser = openEditUser;
+		$scope.openDeleteUser = openDeleteUser;
 		$scope.toggleActive = toggleActive;
 		$scope.toggleMunicipalityAdmin = toggleMunicipalityAdmin;
 		$scope.toggleAdmin = toggleAdmin;
@@ -37,9 +38,7 @@
 				$scope.municipalities = municipalities;
 			});
 
-			topicRouterApi.getAllUsers().then(function(users){
-				$scope.users = users;
-			});
+			refreshUserList();
 		}
 
 		// API
@@ -53,7 +52,7 @@
 				}
 			});
 
-			modalInstance.result.then(function(municipality){
+			modalInstance.result.then(function(municipality) {
 				$scope.municipalities.push(municipality);
 			});
 		}
@@ -147,6 +146,26 @@
 			});
 		}
 
+		function openDeleteUser(user) {
+			var modalInstance = $modal.open({
+				templateUrl: 'app/settings/delete-user-modal.html',
+				controller: 'DeleteUserModalInstanceCtrl',
+				size: 'md',
+				resolve: {
+					user: function() {
+						return user;
+					}
+				}
+			});
+
+			modalInstance.result.then(function(deletedUser){
+				// reload user list
+				topicRouterApi.getAllUsers().then(function(users) {
+					$scope.users = users;
+				});
+			});
+		}
+
 		function toggleMunicipalityAdmin(user) {
 			user.municipalityAdmin = !user.municipalityAdmin;
 
@@ -183,6 +202,12 @@
 							msg: "Opdatering af bruger fejlede, prøv igen senere."
 						});
 					});
+		}
+
+		function refreshUserList() {
+			topicRouterApi.getAllUsers().then(function(users) {
+				$scope.users = users;
+			});
 		}
 
 		function addMessage(message){

@@ -141,6 +141,36 @@ public class UserServiceImpl implements UserService {
     }
 
 	@Override
+	public List<Role> getSubstituteRoles(long userId) {
+		List<Role> substituteRoles = new ArrayList<>();
+
+		try {
+			// get the actual non-substitute role
+			final TypedQuery<Role> mainRoleQuery = em.createQuery("SELECT r FROM Role r WHERE r.owner.id = :userId and r.substitute = false", Role.class);
+			mainRoleQuery.setParameter("userId", userId);
+
+			final Role mainRole = mainRoleQuery.getSingleResult();
+
+			Optional<Employment> employment = mainRole.getEmployment();
+
+			if (employment.isPresent()) {
+				long employmentId = employment.get().getId();
+
+				final TypedQuery<Role> substituteRolesQuery = em.createQuery("SELECT r FROM Role r WHERE r.employment.id = :employmentId and r.substitute = true", Role.class);
+				substituteRolesQuery.setParameter("employmentId", employmentId);
+
+				substituteRoles = substituteRolesQuery.getResultList();
+			}
+
+		}
+		catch (NoResultException e) {
+			log.info("No substitute roles found for user with ID: {}", userId);
+		}
+
+		return substituteRoles;
+	}
+
+	@Override
 	public List<RolePO> getAllRoles() {
 		final TypedQuery<Role> query = em.createQuery("SELECT r FROM Role r", Role.class);
 
@@ -180,6 +210,23 @@ public class UserServiceImpl implements UserService {
         auth.verifyCanActAs(role);
         em.remove(role);
     }
+
+	@Override
+	public void removeUser(User user) throws ResourceNotFoundException, AuthorizationException {
+		// remove substitute roles first
+		for (Role currSubstituteRole: getSubstituteRoles(user.getId())) {
+			removeRole(currSubstituteRole.getId());
+		}
+
+		// then remove main roles
+		for (Role currRole: user.getRoles()) {
+			removeRole(currRole.getId());
+			user.removeRole(currRole);
+		}
+
+		// lastly, remove the user itself
+		userRepository.removeAndFlush(user);
+	}
 
     @Override
     public Optional<UserSettings> getSettings(long userId) {

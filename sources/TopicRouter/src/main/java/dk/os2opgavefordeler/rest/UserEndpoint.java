@@ -6,10 +6,10 @@ import dk.os2opgavefordeler.employment.UserRepository;
 import dk.os2opgavefordeler.model.Municipality;
 import dk.os2opgavefordeler.model.Role;
 import dk.os2opgavefordeler.model.User;
-import dk.os2opgavefordeler.model.presentation.RolePO;
-import dk.os2opgavefordeler.model.presentation.UserInfoPO;
-import dk.os2opgavefordeler.model.presentation.UserRolePO;
-import dk.os2opgavefordeler.model.presentation.UserSettingsPO;
+import dk.os2opgavefordeler.model.presentation.*;
+import dk.os2opgavefordeler.service.AuthenticationException;
+import dk.os2opgavefordeler.service.AuthorizationException;
+import dk.os2opgavefordeler.service.ResourceNotFoundException;
 import dk.os2opgavefordeler.service.UserService;
 import org.jboss.resteasy.annotations.cache.NoCache;
 import org.slf4j.Logger;
@@ -60,13 +60,9 @@ public class UserEndpoint {
 
 		if (user.isPresent()) {
 			if (userService.isAdmin(user.get().getId())) {
-				log.info("Returning user list");
-
 				return Response.ok().entity(userService.getAllUsers()).build();
 			}
 			else {
-				log.warn("Unauthorized attempt to get user list");
-
 				return Response.status(Response.Status.UNAUTHORIZED).entity("Not authorized").build();
 			}
 		}
@@ -107,12 +103,35 @@ public class UserEndpoint {
     @Path("/{userId}")
     @Produces("application/json")
     public Response delete(@PathParam("userId") long userId) {
-        User user = userRepository.findBy(userId);
-        for (Role r : user.getRoles()) {
-            user.removeRole(r);
-        }
-        userRepository.removeAndFlush(user);
-        return Response.ok().build();
+	    if (!authService.isAuthenticated()) {
+		    return Response.status(Response.Status.UNAUTHORIZED).entity("Not logged in").build();
+	    }
+
+	    Optional<User> user = userService.findByEmail(authService.getAuthentication().getEmail());
+
+	    if (user.isPresent()) {
+		    if (userService.isAdmin(user.get().getId())) {
+			    User userToDelete = userRepository.findBy(userId);
+
+			    try {
+				    userService.removeUser(userToDelete);
+			    }
+				catch (ResourceNotFoundException e) {
+					return Response.status(Response.Status.UNAUTHORIZED).entity(e.getMessage()).build();
+				}
+			    catch (AuthorizationException e) {
+				    return Response.status(Response.Status.UNAUTHORIZED).entity("Not authorized").build();
+			    }
+
+			    return Response.ok().build();
+		    }
+		    else {
+			    return Response.status(Response.Status.UNAUTHORIZED).entity("Not authorized").build();
+		    }
+	    }
+	    else {
+		    return Response.status(Response.Status.NOT_FOUND).entity("User not found").build();
+	    }
     }
 
     @GET

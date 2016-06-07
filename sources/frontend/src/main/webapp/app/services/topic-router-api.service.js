@@ -17,6 +17,7 @@
 			updateDistributionRule: updateDistributionRule,
 			getRuleChildren: getRuleChildren,
 			updateUser: updateUser,
+			deleteUser: deleteUser,
 			getRoles: getRoles,
 			getAllUsers: getAllUsers,
 			getSettings: getSettings,
@@ -85,6 +86,10 @@
 
 		function updateUser(model){
 			return httpPost("/users/", model);
+		}
+
+		function deleteUser(userId) {
+			return httpDelete('/users/' + userId);
 		}
 
 		function getUserInfo() {

@@ -21,9 +21,11 @@ public interface UserService {
 	List<UserRolePO> getAllUsers();
 
 	User createUser(User user);
+	void removeUser(User user) throws ResourceNotFoundException, AuthorizationException;
 	User createOrUpdateUser(User user);
 
 	List<RolePO> getRoles(long userId);
+	List<Role> getSubstituteRoles(long userId);
 	List<RolePO> getAllRoles();
 	Optional<Role> findRoleById(long roleId);
 
