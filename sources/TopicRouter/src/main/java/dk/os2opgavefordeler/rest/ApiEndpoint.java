@@ -68,7 +68,7 @@ public class ApiEndpoint extends Endpoint {
     @GET
     @Path("/")
     @Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
-    public Response lookup(@QueryParam("kle") String kleNumber, @Context UriInfo uriInfo, @Context HttpServletRequest request) {
+    public Response lookup(@QueryParam("kle") String kleNumber, @QueryParam("cpr") String cprNumber, @Context UriInfo uriInfo, @Context HttpServletRequest request) {
 
         String token = authService.getAuthentication().getToken();
 
@@ -129,7 +129,8 @@ public class ApiEndpoint extends Endpoint {
 
         if (everythingIsOk) {
             return ok("We get signal.");
-        } else {
+        }
+        else {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Somebody set up us the bomb.").build();
         }
     }

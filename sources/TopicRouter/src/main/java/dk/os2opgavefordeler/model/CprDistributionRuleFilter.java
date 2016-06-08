@@ -1,11 +1,14 @@
 package dk.os2opgavefordeler.model;
 
-import javax.persistence.Entity;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
+import dk.os2opgavefordeler.util.FilterHelper;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import javax.persistence.Entity;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
@@ -33,48 +36,26 @@ public class CprDistributionRuleFilter extends DistributionRuleFilter {
 
     }
 
-    private List<Integer> stringAsIntRangeList(String s) {
-        List<Integer> res = new ArrayList<>();
-        String[] daysArray = s.split(",");
-        for (String d : daysArray) {
-            // range
-            if (d.contains("-")) {
-                int begin = Integer.parseInt(d.split("-")[0]);
-                int end = Integer.parseInt(d.split("-")[1]);
-                if (end < begin) {
-                    int tmp = begin;
-                    begin = end;
-                    end = tmp;
-                }
-                for (int i = begin; i <= end; i++) {
-                    res.add(i);
-                }
-            } else {
-                res.add(Integer.parseInt(d));
-            }
-        }
-        return res;
-    }
-
     @Override
     public boolean matches(Map<String, String> parameters) {
-
-        if (!parameters.containsKey(getName())) {
+	    if (!parameters.containsKey(getName())) {
             return false;
         }
+
         String param = parameters.get(getName());
-        if (param.length() < 5) {
+
+	    if (param.length() < 5) {
             return false;
         }
 
         int day = Integer.parseInt(param.substring(0, 2));
         int month = Integer.parseInt(param.substring(2, 4));
 
-        if (!stringAsIntRangeList(days).contains(day)) {
+        if (!FilterHelper.stringAsIntRangeList(days).contains(day)) {
             return false;
         }
 
-        return stringAsIntRangeList(months).contains(month);
+        return FilterHelper.stringAsIntRangeList(months).contains(month);
     }
 
     public String getDays() {
