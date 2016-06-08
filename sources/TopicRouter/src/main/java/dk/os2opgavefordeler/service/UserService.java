@@ -44,5 +44,6 @@ public interface UserService {
 	List<SubstitutePO> findSubstitutesFor(long roleId) throws ResourceNotFoundException, AuthorizationException;
 	boolean isAdmin(String email);
 	boolean isAdmin(long userId);
+	boolean isManager(long userId);
 	boolean isMunicipalityAdmin(long userId);
 }

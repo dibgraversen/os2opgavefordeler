@@ -117,11 +117,6 @@
 					type: 'success',
 					msg: 'Regler er ved at blive oprettet. Dette kan tage et par minutter.'
 				});
-			}, function(){
-				addMessage({
-					type: "danger",
-					msg: "Oprettelse af regler fejlede."
-				});
 			});
 		}
 

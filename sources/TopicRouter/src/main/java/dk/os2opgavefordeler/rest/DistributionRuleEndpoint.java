@@ -1,9 +1,7 @@
 package dk.os2opgavefordeler.rest;
 
-import dk.os2opgavefordeler.model.DistributionRule;
-import dk.os2opgavefordeler.model.Employment;
-import dk.os2opgavefordeler.model.OrgUnit;
-import dk.os2opgavefordeler.model.Role;
+import dk.os2opgavefordeler.auth.AuthService;
+import dk.os2opgavefordeler.model.*;
 import dk.os2opgavefordeler.model.presentation.DistributionRulePO;
 import dk.os2opgavefordeler.service.DistributionService;
 import dk.os2opgavefordeler.service.OrgUnitService;
@@ -39,6 +37,9 @@ public class DistributionRuleEndpoint extends Endpoint {
 
 	@Inject
 	UserService userService;
+
+	@Inject
+	private AuthService authService;
 
 	/**
 	 * Returns a list of distribution rules for the specified role and scope.
@@ -91,27 +92,42 @@ public class DistributionRuleEndpoint extends Endpoint {
 	@Path("/{distId}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
-	public Response updateResponsibleOrganization(@PathParam("distId") Long distId, DistributionRulePO distribution)
-	{
-		if(distId == null || distribution == null) {
+	public Response updateResponsibleOrganization(@PathParam("distId") Long distId, DistributionRulePO distribution) {
+		if (distId == null || distribution == null) {
 			log.info("updateResponsibleOrganization - bad request[{},{}]", distId, distribution);
 			return badRequest("need distId and distribution object");
 		}
 
-		//TODO: user/role access-check. Only Manager and Admin can modify.
+		if (!authService.isAuthenticated()) {
+			return Response.status(Response.Status.UNAUTHORIZED).entity("Not logged in").build();
+		}
 
-		//TODO: multi-tenancy considerations. Do we pass municipality to service methods, or do we inject that in the
-		//services? At any rate, make sure we can't get mess with other municipalities' data.
-		return distributionService.getDistribution(distId)
-			.map(existing -> {
-				log.info("updateResponsibleOrganization - updating resource");
-				return doUpdateResponsibleOrganization(existing, distribution);
-			})
-			.orElseGet(() -> {
-						log.info("updateResponsibleOrganization - nonexisting distributionRule[{}]", distId);
-						return Response.status(Response.Status.NOT_FOUND).build();
-					}
-			);
+		Optional<User> user = userService.findByEmail(authService.getAuthentication().getEmail());
+
+		if (user.isPresent()) {
+			long userId = user.get().getId();
+
+			if (userService.isAdmin(userId) || userService.isManager(userId)) { // only managers and admins can update responsibility
+				//TODO: multi-tenancy considerations. Do we pass municipality to service methods, or do we inject that in the
+				//services? At any rate, make sure we can't get mess with other municipalities' data.
+				return distributionService.getDistribution(distId)
+						.map(existing -> {
+							log.info("updateResponsibleOrganization - updating resource");
+							return doUpdateResponsibleOrganization(existing, distribution);
+						})
+						.orElseGet(() -> {
+									log.info("updateResponsibleOrganization - nonexisting distributionRule[{}]", distId);
+									return Response.status(Response.Status.NOT_FOUND).build();
+								}
+						);
+			}
+			else {
+				return Response.status(Response.Status.UNAUTHORIZED).entity("Not authorized").build();
+			}
+		}
+		else {
+			return Response.status(Response.Status.NOT_FOUND).entity("User not found").build();
+		}
 	}
 
 	@GET

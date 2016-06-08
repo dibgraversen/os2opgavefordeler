@@ -373,6 +373,21 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
+	public boolean isManager(long userId) {
+		List<RolePO> roles = getRoles(userId);
+
+		Iterator<RolePO> roleIterator = roles.iterator();
+
+		boolean isManager = false;
+
+		while (roleIterator.hasNext() && !isManager) {
+			isManager = roleIterator.next().isManager();
+		}
+
+		return isManager;
+	}
+
+	@Override
 	public boolean isMunicipalityAdmin(long userId) {
 		List<RolePO> roles = getRoles(userId);
 

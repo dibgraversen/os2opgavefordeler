@@ -180,6 +180,8 @@ public class DistributionServiceImpl implements DistributionService {
 
         createMissingDistributionRules(municipalityId);
         updateParentsForDistributionRules(municipalityId);
+
+        log.info("Rules created for municipality with ID: {}", municipalityId);
     }
 
     @Override
