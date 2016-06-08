@@ -11,20 +11,26 @@ public class FilterHelper {
 	// this helper class should not be instantiated
 	private FilterHelper() {}
 
-	public static List<Integer> stringAsIntRangeList(String s) {
+	public static List<Integer> stringAsIntRangeList(String rangeString) {
 		List<Integer> res = new ArrayList<>();
 
-		String[] daysArray = s.split(",");
+		if (rangeString.isEmpty()) {
+			return res;
+		}
 
-		for (String d: daysArray) {
+		String[] splitArray = rangeString.split(",");
+
+		for (String d: splitArray) {
 			if (d.contains("-")) { // range
 				int begin = Integer.parseInt(d.split("-")[0]);
 				int end = Integer.parseInt(d.split("-")[1]);
+
 				if (end < begin) {
 					int tmp = begin;
 					begin = end;
 					end = tmp;
 				}
+
 				for (int i = begin; i <= end; i++) {
 					res.add(i);
 				}

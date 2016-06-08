@@ -10,6 +10,7 @@ import javax.enterprise.context.ApplicationScoped;
 
 import javax.inject.Inject;
 
+import dk.os2opgavefordeler.util.FilterHelper;
 import org.slf4j.Logger;
 
 import dk.os2opgavefordeler.distribution.DistributionRuleRepository;
@@ -75,21 +76,11 @@ public class FindAssignedForKleService {
     }
 
     private Assignee matchByFilter(DistributionRule distributionRule, Map<String, String> filterParameters) {
-        logger.info("Matching assignee by filter - parameters are:");
-
-	    for (String key: filterParameters.keySet()) {
-		    logger.info("Name: {}, Value: {}", key, filterParameters.get(key));
-	    }
-
 	    Iterable<DistributionRuleFilter> filters = distributionRule.getFilters();
 
 	    for (DistributionRuleFilter filter: filters) {
-		    logger.info("Checking filter: " + filter.getName());
-
-            if (filter.matches(filterParameters)) {
-	            logger.info("Filter matches! Employee is: {}", filter.getAssignedEmployee());
-
-                return createAssignee(distributionRule, filter.getAssignedOrg(), Optional.ofNullable(filter.getAssignedEmployee()));
+		    if (filter.matches(filterParameters)) {
+			    return createAssignee(distributionRule, filter.getAssignedOrg(), Optional.ofNullable(filter.getAssignedEmployee()));
             }
         }
 

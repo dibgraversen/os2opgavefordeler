@@ -14,16 +14,22 @@ import javax.persistence.InheritanceType;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public class CprDistributionRuleFilter extends DistributionRuleFilter {
 
+	private static final String URL_PARAMETER_NAME = "cpr";
+
     /**
-     * String is in format of 3-5,10-15 which means from 3 to 5 and from 10 to 15. In long form:
-     * 3,4,5,10,11,12,13,14,15
+     * String is in format of 3-5,10-15 which means from 3 to 5 and from 10 to 15.
+     *
+     * In long form: 3,4,5,10,11,12,13,14,15
+     *
      * This signifies which days of the month to filter for
      */
     private String days;
 
     /**
-     * String is in format of 3-5,10-12 which means from 3 to 5 and from 10 to 12. In long form:
-     * 3,4,5,10,11,12
+     * String is in format of 3-5,10-12 which means from 3 to 5 and from 10 to 12.
+     *
+     * In long form: 3,4,5,10,11,12
+     *
      * This signifies which months in the year to filter for
      */
     private String months;
@@ -38,11 +44,11 @@ public class CprDistributionRuleFilter extends DistributionRuleFilter {
 
     @Override
     public boolean matches(Map<String, String> parameters) {
-	    if (!parameters.containsKey(getName())) {
+	    if (!parameters.containsKey(URL_PARAMETER_NAME)) {
             return false;
         }
 
-        String param = parameters.get(getName());
+        String param = parameters.get(URL_PARAMETER_NAME);
 
 	    if (param.length() < 5) {
             return false;
@@ -51,11 +57,11 @@ public class CprDistributionRuleFilter extends DistributionRuleFilter {
         int day = Integer.parseInt(param.substring(0, 2));
         int month = Integer.parseInt(param.substring(2, 4));
 
-        if (!FilterHelper.stringAsIntRangeList(days).contains(day)) {
-            return false;
-        }
+	    if (days == null || !FilterHelper.stringAsIntRangeList(days).contains(day)) {
+		    return false;
+	    }
 
-        return FilterHelper.stringAsIntRangeList(months).contains(month);
+	    return months != null && FilterHelper.stringAsIntRangeList(months).contains(month);
     }
 
     public String getDays() {

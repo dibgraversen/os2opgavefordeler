@@ -60,7 +60,6 @@ public class DistributionRuleController {
         rule.addFilter(filterFactory.fromDto(dto));
 
         ruleRepository.save(rule);
-
     }
 
 	/**
