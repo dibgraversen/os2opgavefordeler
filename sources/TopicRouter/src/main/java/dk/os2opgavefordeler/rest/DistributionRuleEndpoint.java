@@ -170,7 +170,7 @@ public class DistributionRuleEndpoint extends Endpoint {
 	@Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
 	public Response getFilterNamesText(@QueryParam("municipalityId") long municipalityId) {
 		if (municipalityId < 0) {
-			log.info("#getFilterNames with no distId, employmentId and scope");
+			log.info("#getFilterNames with no municipalityId");
 			return badRequest("You need to specify a valid municipality ID.");
 		}
 		else {
@@ -183,11 +183,26 @@ public class DistributionRuleEndpoint extends Endpoint {
 	@Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
 	public Response getDefaultFilterNameText(@QueryParam("municipalityId") long municipalityId) {
 		if (municipalityId < 0) {
-			log.info("#getFilterNames with no distId, employmentId and scope");
+			log.info("#getFilterNames with no municipalityId");
 			return badRequest("You need to specify a valid municipality ID.");
 		}
 		else {
 			return ok(distributionService.getDefaultTextFilterName(municipalityId));
+		}
+	}
+
+	@POST
+	@Path("/text/names/default/{filterNameId}")
+	@Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
+	public Response setDefaultFilterNameText(@PathParam("filterNameId") Long filterNameId, @QueryParam("municipalityId") long municipalityId) {
+		if (municipalityId < 0) {
+			log.info("#setDefaultFilterNameText with no municipalityId");
+			return badRequest("You need to specify a valid municipality ID.");
+		}
+		else {
+			distributionService.setDefaultTextFilterName(municipalityId, filterNameId);
+
+			return ok();
 		}
 	}
 
@@ -196,7 +211,7 @@ public class DistributionRuleEndpoint extends Endpoint {
 	@Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
 	public Response getFilterNamesDate(@QueryParam("municipalityId") long municipalityId) {
 		if (municipalityId < 0) {
-			log.info("#getFilterNames with no distId, employmentId and scope");
+			log.info("#getFilterNames with no municipalityId");
 			return badRequest("You need to specify a valid municipality ID.");
 		}
 		else {
@@ -209,11 +224,26 @@ public class DistributionRuleEndpoint extends Endpoint {
 	@Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
 	public Response getDefaultFilterNameDate(@QueryParam("municipalityId") long municipalityId) {
 		if (municipalityId < 0) {
-			log.info("#getFilterNames with no distId, employmentId and scope");
+			log.info("#getFilterNames with no municipalityId");
 			return badRequest("You need to specify a valid municipality ID.");
 		}
 		else {
 			return ok(distributionService.getDefaultDateFilterName(municipalityId));
+		}
+	}
+
+	@POST
+	@Path("/date/names/default/{filterNameId}")
+	@Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
+	public Response setDefaultFilterNameDate(@PathParam("filterNameId") Long filterNameId, @QueryParam("municipalityId") long municipalityId) {
+		if (municipalityId < 0) {
+			log.info("#setDefaultFilterNameText with no municipalityId");
+			return badRequest("You need to specify a valid municipality ID.");
+		}
+		else {
+			distributionService.setDefaultDateFilterName(municipalityId, filterNameId);
+
+			return ok();
 		}
 	}
 

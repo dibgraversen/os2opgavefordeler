@@ -91,6 +91,78 @@
 					</div>
 				</div>
 			</tab>
+			<tab heading="Parametre">
+				<div class="panel panel-default margin-top">
+					<div class="panel-heading">
+						Vedligehold API-parametre
+					</div>
+					<div class="panel-body">
+						<p>
+							Her kan du vedligeholde navnene på de parametre, som sendes med i API-kald og som benyttes til hhv. dato- og tekstfordeling.
+						</p>
+
+						<b>Dato</b>
+
+						<table class="table table-hover" style="table-layout: fixed">
+							<thead>
+							<tr>
+								<th style="width: 200px">Navn</th>
+								<th style="width: 30px"></th>
+								<th style="width: 30px"></th>
+							</tr>
+							</thead>
+							<tbody ng-repeat="dateApiParam in dateApiParameters">
+							<tr>
+								<td>
+									{{ dateApiParam.name }}
+
+									<span ng-show="{{ dateApiParam.defaultName }}"
+								        class="glyphicon glyphicon-exclamation-sign"
+								        style="color:lightskyblue"
+								        popover-trigger="mouseenter" popover-append-to-body="true"
+								        popover="Denne parameter er default"></span>
+								</td>
+								<td><a href="" class="btn btn-primary" ng-click="setDefaultDateParameter(dateApiParam)">Vælg som default</a></td>
+								<td><a href="" class="btn btn-danger" ng-click="deleteParameter(dateApiParam)">Slet</a></td>
+							</tr>
+							</tbody>
+						</table>
+
+						<b>Tekst</b>
+
+						<table class="table table-hover" style="table-layout: fixed">
+							<thead>
+							<tr>
+								<th style="width: 200px">Navn</th>
+								<th style="width: 30px"></th>
+								<th style="width: 30px"></th>
+							</tr>
+							</thead>
+							<tbody ng-repeat="textApiParam in dateApiParameters">
+							<tr>
+								<td>
+									{{ textApiParam.name }}
+
+									<span ng-show="{{ textApiParam.defaultName }}"
+									      class="glyphicon glyphicon-exclamation-sign"
+									      style="color:lightskyblue"
+									      popover-trigger="mouseenter" popover-append-to-body="true"
+									      popover="Denne parameter er default"></span>
+								</td>
+								<td><a href="" class="btn btn-primary" ng-click="setDefaultTextParameter(textApiParam)">Vælg som default</a></td>
+								<td><a href="" class="btn btn-danger" ng-click="deleteParameter(textApiParam)">Slet</a></td>
+							</tr>
+							</tbody>
+						</table>
+
+						<div class="actions">
+							<div class="text-right">
+								<button class="btn btn-default" ng-click="editParameters()">Rediger parametre</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</tab>
 		</tabset>
 	</div>
 

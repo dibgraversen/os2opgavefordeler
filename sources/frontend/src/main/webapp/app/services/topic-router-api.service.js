@@ -42,6 +42,10 @@
 			deleteMunicipalityKle: deleteMunicipalityKle,
 			getApiKey: getApiKey,
 			saveApiKey: saveApiKey,
+			getTextParamsForMunicipality: getTextParamsForMunicipality,
+			getDateParamsForMunicipality: getDateParamsForMunicipality,
+			setDefaultTextParamForMunicipality: setDefaultTextParamForMunicipality,
+			setDefaultDateParamForMunicipality: setDefaultDateParamForMunicipality,
 
 			//
 			getFiltersForRule: getFiltersForRule,
@@ -376,6 +380,22 @@
 
 		function saveApiKey(municipality, apiKey) {
 			return httpPost('/municipalities/' + municipality + '/apikey/' + apiKey);
+		}
+
+		function getTextParamsForMunicipality(municipality) {
+			return httpGet('/distribution-rules/text/names', {"municipalityId": municipality.id});
+		}
+
+		function getDateParamsForMunicipality(municipality) {
+			return httpGet('/distribution-rules/date/names', {"municipalityId": municipality.id});
+		}
+
+		function setDefaultTextParamForMunicipality(municipality, textParam) {
+			return httpPost('/distribution-rules/text/names/default/' + textParam.id + '?municipalityId=' + municipality.id);
+		}
+
+		function setDefaultDateParamForMunicipality(municipality, dateParam) {
+			return httpPost('/distribution-rules/date/names/default/' + dateParam.id + '?municipalityId=' + municipality.id);
 		}
 
 		// DTO classes.

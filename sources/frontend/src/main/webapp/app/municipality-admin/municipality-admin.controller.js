@@ -33,14 +33,17 @@
 		$scope.uploadFile = null;
 		$scope.mAdminAlerts = [];
 		$scope.kles = [];
+		$scope.dateApiParameters = [];
+		$scope.textApiParameters = [];
 		$scope.apiKey = {};
-
 		$scope.upload = upload;
 		$scope.closeAlert = closeAlert;
 		$scope.addKle = addKle;
 		$scope.editKle = editKle;
 		$scope.deleteKle = deleteKle;
 		$scope.editApiKey = editApiKey;
+		$scope.setDefaultTextParameter = setDefaultTextParameter;
+		$scope.setDefaultDateParameter = setDefaultDateParameter;
 
 		activate();
 
@@ -51,12 +54,21 @@
 				$log.info("not privileged, redirecting to home");
 				$state.go("home");
 			}
+
 			topicRouterApi.getKlesForMunicipality($scope.user.municipality).then(function(kles){
 				$scope.kles = kles;
 			});
 
 			topicRouterApi.getApiKey($scope.user.municipality).then(function(apiKey){
 				$scope.apiKey = apiKey;
+			});
+
+			topicRouterApi.getTextParamsForMunicipality($scope.user.municipality).then(function(textParams){
+				$scope.textApiParameters = textParams;
+			});
+
+			topicRouterApi.getDateParamsForMunicipality($scope.user.municipality).then(function(dateParams){
+				$scope.dateApiParameters = dateParams;
 			});
 		}
 
@@ -173,8 +185,31 @@
 					});
 		}
 
+		function setDefaultTextParameter(textApiParam) {
+			textApiParam.defaultName = !textApiParam.defaultName;
+
+			topicRouterApi.setDefaultTextParamForMunicipality($scope.user.municipality, textApiParam).then(function() {
+				// no need to update anything if call was successful
+			},
+			function() { // call failed
+				textApiParam.defaultName = !textApiParam.defaultName;
+			});
+		}
+
+		function setDefaultDateParameter(dateApiParam) {
+			dateApiParam.defaultName = !dateApiParam.defaultName;
+
+			topicRouterApi.setDefaultDateParamForMunicipality($scope.user.municipality, dateApiParam).then(function() {
+				// no need to update anything if call was successful
+			},
+			function() { // call failed
+				dateApiParam.defaultName = !dateApiParam.defaultName;
+			});
+		}
+
 		function addKle(){
 			clearMessages();
+
 			$modal.open({
 				resolve: {
 					municipality: function(){
