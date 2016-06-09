@@ -134,7 +134,7 @@
 				if ($scope.selectedOrgUnit.id) { // the user must select an organisational unit
 					if ($scope.initialType === '' || $scope.initialType === $scope.model.type) {
 						if ($scope.model.type === 'cpr') { // make sure the user has provided days and/or months, if needed
-							if ($scope.model.days || $scope.model.months) {
+							if ($scope.model.months) {
 								// check that the numbers specified for days and/or months are valid
 								var validDays = true;
 								var validMonths = true;
@@ -169,7 +169,7 @@
 							else {
 								addAlert({
 									type: 'warning',
-									msg: 'Du skal angive dage og/eller måneder.'
+									msg: 'Du skal som minimum angive en eller flere måneder.'
 								});
 							}
 						}

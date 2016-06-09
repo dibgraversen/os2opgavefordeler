@@ -75,6 +75,46 @@ public class DistributionServiceImpl implements DistributionService {
         return query.getResultList();
     }
 
+	@Override
+	public List<DistributionRuleFilterName> getFilterNamesAll(long municipalityId) {
+		Query query = entityManager.createQuery("SELECT filterName FROM DistributionRuleFilterName filterName WHERE filterName.municipality.id = :municipalityId");
+		query.setParameter("municipalityId", municipalityId);
+
+		return query.getResultList();
+	}
+
+	@Override
+	public List<DistributionRuleFilterName> getFilterNamesDate(long municipalityId) {
+		Query query = entityManager.createQuery("SELECT filterName FROM DistributionRuleFilterName filterName WHERE filterName.municipality.id = :municipalityId AND filterName.type = 'CprDistributionRuleFilter'");
+		query.setParameter("municipalityId", municipalityId);
+
+		return query.getResultList();
+	}
+
+	@Override
+	public List<DistributionRuleFilterName> getFilterNamesText(long municipalityId) {
+		Query query = entityManager.createQuery("SELECT filterName FROM DistributionRuleFilterName filterName WHERE filterName.municipality.id = :municipalityId AND filterName.type = 'TextDistributionRuleFilter'");
+		query.setParameter("municipalityId", municipalityId);
+
+		return query.getResultList();
+	}
+
+	@Override
+	public DistributionRuleFilterName getDefaultDateFilterName(long municipalityId) {
+		Query query = entityManager.createQuery("SELECT filterName FROM DistributionRuleFilterName filterName WHERE filterName.municipality.id = :municipalityId AND filterName.type = 'DateDistributionRuleFilter' AND filterName.defaultName = true");
+		query.setParameter("municipalityId", municipalityId);
+
+		return (DistributionRuleFilterName)query.getSingleResult();
+	}
+
+	@Override
+	public DistributionRuleFilterName getDefaultTextFilterName(long municipalityId) {
+		Query query = entityManager.createQuery("SELECT filterName FROM DistributionRuleFilterName filterName WHERE filterName.municipality.id = :municipalityId AND filterName.type = 'TextDistributionRuleFilter' AND filterName.defaultName = true");
+		query.setParameter("municipalityId", municipalityId);
+
+		return (DistributionRuleFilterName)query.getSingleResult();
+	}
+
     /**
      * Finds DistributionRules for that are top level and unassigned.
      *

@@ -1,10 +1,6 @@
 package dk.os2opgavefordeler.service;
 
-import dk.os2opgavefordeler.model.DistributionRule;
-import dk.os2opgavefordeler.model.Employment;
-import dk.os2opgavefordeler.model.Kle;
-import dk.os2opgavefordeler.model.Municipality;
-import dk.os2opgavefordeler.model.OrgUnit;
+import dk.os2opgavefordeler.model.*;
 import dk.os2opgavefordeler.model.presentation.DistributionRulePO;
 
 import dk.os2opgavefordeler.rest.DistributionRuleScope;
@@ -17,6 +13,12 @@ public interface DistributionService {
 
 	Optional<DistributionRule> getDistribution(long id);
 	List<DistributionRule> getDistributionsAll(long municipalityId);
+
+	List<DistributionRuleFilterName> getFilterNamesAll(long municipalityId);
+	List<DistributionRuleFilterName> getFilterNamesDate(long municipalityId);
+	List<DistributionRuleFilterName> getFilterNamesText(long municipalityId);
+	DistributionRuleFilterName getDefaultTextFilterName(long municipalityId);
+	DistributionRuleFilterName getDefaultDateFilterName(long municipalityId);
 
 	List<DistributionRule> getDistributionsForOrg(long orgId, long municipalityId, boolean includeImplicit);
 

@@ -155,13 +155,66 @@ public class DistributionRuleEndpoint extends Endpoint {
 
 	@GET
 	@Path("/buildRules")
-	public Response buildRulesForMunicipality(@QueryParam("municipalityId") long municipalityId){
-		if(municipalityId < 0) {
+	public Response buildRulesForMunicipality(@QueryParam("municipalityId") long municipalityId) {
+		if (municipalityId < 0) {
 			log.info("buildRules - bad request[{}]", municipalityId);
 			return badRequest("municipalityId needed");
 		}
+
 		distributionService.buildRulesForMunicipality(municipalityId);
 		return ok();
+	}
+
+	@GET
+	@Path("/text/names")
+	@Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
+	public Response getFilterNamesText(@QueryParam("municipalityId") long municipalityId) {
+		if (municipalityId < 0) {
+			log.info("#getFilterNames with no distId, employmentId and scope");
+			return badRequest("You need to specify a valid municipality ID.");
+		}
+		else {
+			return ok(distributionService.getFilterNamesText(municipalityId));
+		}
+	}
+
+	@GET
+	@Path("/text/names/default")
+	@Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
+	public Response getDefaultFilterNameText(@QueryParam("municipalityId") long municipalityId) {
+		if (municipalityId < 0) {
+			log.info("#getFilterNames with no distId, employmentId and scope");
+			return badRequest("You need to specify a valid municipality ID.");
+		}
+		else {
+			return ok(distributionService.getDefaultTextFilterName(municipalityId));
+		}
+	}
+
+	@GET
+	@Path("/date/names")
+	@Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
+	public Response getFilterNamesDate(@QueryParam("municipalityId") long municipalityId) {
+		if (municipalityId < 0) {
+			log.info("#getFilterNames with no distId, employmentId and scope");
+			return badRequest("You need to specify a valid municipality ID.");
+		}
+		else {
+			return ok(distributionService.getFilterNamesDate(municipalityId));
+		}
+	}
+
+	@GET
+	@Path("/date/names/default")
+	@Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
+	public Response getDefaultFilterNameDate(@QueryParam("municipalityId") long municipalityId) {
+		if (municipalityId < 0) {
+			log.info("#getFilterNames with no distId, employmentId and scope");
+			return badRequest("You need to specify a valid municipality ID.");
+		}
+		else {
+			return ok(distributionService.getDefaultDateFilterName(municipalityId));
+		}
 	}
 
 	//TODO: code below this point should probably be refactored to service methods.

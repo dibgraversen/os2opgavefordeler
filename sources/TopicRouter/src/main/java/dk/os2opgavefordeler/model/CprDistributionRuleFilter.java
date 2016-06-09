@@ -2,8 +2,6 @@ package dk.os2opgavefordeler.model;
 
 import dk.os2opgavefordeler.util.FilterHelper;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import javax.persistence.Entity;
@@ -13,8 +11,6 @@ import javax.persistence.InheritanceType;
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public class CprDistributionRuleFilter extends DistributionRuleFilter {
-
-	private static final String URL_PARAMETER_NAME = "cpr";
 
     /**
      * String is in format of 3-5,10-15 which means from 3 to 5 and from 10 to 15.
@@ -44,11 +40,11 @@ public class CprDistributionRuleFilter extends DistributionRuleFilter {
 
     @Override
     public boolean matches(Map<String, String> parameters) {
-	    if (!parameters.containsKey(URL_PARAMETER_NAME)) {
+	    if (!parameters.containsKey(getName())) {
             return false;
         }
 
-        String param = parameters.get(URL_PARAMETER_NAME);
+        String param = parameters.get(getName());
 
 	    if (param.length() < 5) {
             return false;
@@ -57,11 +53,16 @@ public class CprDistributionRuleFilter extends DistributionRuleFilter {
         int day = Integer.parseInt(param.substring(0, 2));
         int month = Integer.parseInt(param.substring(2, 4));
 
-	    if (days == null || !FilterHelper.stringAsIntRangeList(days).contains(day)) {
-		    return false;
+	    if (days == null || days.isEmpty()) { // only check for month
+		    return FilterHelper.stringAsIntRangeList(months).contains(month);
 	    }
 
-	    return months != null && FilterHelper.stringAsIntRangeList(months).contains(month);
+	    if (months != null && !months.isEmpty()) { // check for both month and day
+		    return FilterHelper.stringAsIntRangeList(months).contains(month) && FilterHelper.stringAsIntRangeList(days).contains(day);
+	    }
+	    else { // no months or days defined in filter
+		    return false;
+	    }
     }
 
     public String getDays() {
