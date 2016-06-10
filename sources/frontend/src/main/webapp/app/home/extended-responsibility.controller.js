@@ -17,11 +17,14 @@
 	    $scope.initialType = '';
 	    $scope.municipalityId = $scope.user.municipality.id;
 
-	    $scope.dateApiParameters = [];
-	    $scope.textApiParameters = [];
+	    $scope.dateParameters = [];
+	    $scope.textParameters = [];
 
-	    $scope.selectedDateApiParam = {};
-	    $scope.selectedTextApiParam = {};
+	    $scope.defaultDateParam = {};
+	    $scope.defaultTextParam = {};
+
+	    $scope.selectedDateParam = {};
+	    $scope.selectedTextParam = {};
 
         function cleanModel() {
 	        $log.info('ExtendedResponsibilityController::cleanModel (type: ' + $scope.type + ')');
@@ -89,6 +92,25 @@
 		    cpr: true
 	    };
 
+	    // set default values for dropdowns
+	    function setDefaultDropdownValues() {
+		    $log.info('ExtendedResponsibilityController::setDefaultDropdownValues');
+
+		    topicRouterApi.getDefaultDateParamForMunicipality($scope.user.municipality).then(function(param) {
+			    $log.info('Setting default date value: ' + JSON.stringify(param));
+
+			    $scope.defaultDateParam = param;
+			    $scope.selectedDateParam = param;
+		    });
+
+		    topicRouterApi.getDefaultTextParamForMunicipality($scope.user.municipality).then(function(param) {
+			    $log.info('Setting default text value: ' + JSON.stringify(param));
+
+			    $scope.defaultTextParam = param;
+			    $scope.selectedTextParam = param;
+		    });
+	    }
+
 	    var orgUnits = {};
 
 	    activate();
@@ -131,11 +153,15 @@
         }
 
 	    function setSelectedDateParam(selectedParam) {
-		    $scope.selectedDateApiParam = selectedParam;
+		    $log.info('ExtendedResponsibilityController::setSelectedDateParam (value: ' + selectedParam + ')');
+
+		    $scope.selectedDateParam = selectedParam;
 	    }
 
 	    function setSelectedTextParam(selectedParam) {
-		    $scope.selectedTextApiParam = selectedParam;
+		    $log.info('ExtendedResponsibilityController::setSelectedTextParam (value: ' + selectedParam + ')');
+
+		    $scope.selectedTextParam = selectedParam;
 	    }
 
         function updateFilter(){
@@ -149,13 +175,11 @@
 
 	        // set correct name for model based on type
 	        if ($scope.model.type === 'cpr') {
-		        $scope.model.name = $scope.selectedDateApiParam.name;
+		        $scope.model.name = $scope.selectedDateParam.name;
 	        }
 	        else {
-		        $scope.model.name = $scope.selectedTextApiParam.name;
+		        $scope.model.name = $scope.selectedTextParam.name;
 	        }
-
-	        $log.info('Name is: ' + $scope.model.name);
 
 			if ($scope.model.name) { // the name must be supplied
 				if ($scope.selectedOrgUnit.id) { // the user must select an organisational unit
@@ -323,24 +347,18 @@
         }
 
 	    function loadInitialData() {
+		    $log.info("ExtendedResponsibilityController::loadInitialData");
+
 		    topicRouterApi.getEmployments($scope.municipalityId, currentEmployment, true).then(function(employments){
 			    $scope.employments = employments;
 		    });
 
 		    topicRouterApi.getTextParamsForMunicipality($scope.user.municipality).then(function(textParams){
-			    $scope.textApiParameters = textParams;
+			    $scope.textParameters = textParams;
 		    });
 
 		    topicRouterApi.getDateParamsForMunicipality($scope.user.municipality).then(function(dateParams){
-			    $scope.dateApiParameters = dateParams;
-		    });
-
-		    topicRouterApi.getDefaultDateParamForMunicipality($scope.user.municipality).then(function(defaultDateParam){
-			    $scope.selectedDateApiParam = defaultDateParam;
-		    });
-
-		    topicRouterApi.getDefaultTextParamForMunicipality($scope.user.municipality).then(function(defaultTextParam){
-			    $scope.selectedTextApiParam = defaultTextParam;
+			    $scope.dateParameters = dateParams;
 		    });
 	    }
 
@@ -362,6 +380,8 @@
 	        $scope.initialType = '';
 
             $scope.currentTab = "add";
+
+	        setDefaultDropdownValues();
         }
 
         function removeFilter(filterId) {
