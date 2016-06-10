@@ -33,8 +33,8 @@
 		$scope.uploadFile = null;
 		$scope.mAdminAlerts = [];
 		$scope.kles = [];
-		$scope.dateApiParameters = [];
-		$scope.textApiParameters = [];
+		$scope.dateParameters = [];
+		$scope.textParameters = [];
 		$scope.apiKey = {};
 		$scope.upload = upload;
 		$scope.closeAlert = closeAlert;
@@ -64,11 +64,11 @@
 			});
 
 			topicRouterApi.getTextParamsForMunicipality($scope.user.municipality).then(function(textParams){
-				$scope.textApiParameters = textParams;
+				$scope.textParameters = textParams;
 			});
 
 			topicRouterApi.getDateParamsForMunicipality($scope.user.municipality).then(function(dateParams){
-				$scope.dateApiParameters = dateParams;
+				$scope.dateParameters = dateParams;
 			});
 		}
 
@@ -185,25 +185,31 @@
 					});
 		}
 
-		function setDefaultTextParameter(textApiParam) {
-			textApiParam.defaultName = !textApiParam.defaultName;
+		function setDefaultTextParameter(textParam) {
+			textParam.defaultName = !textParam.defaultName;
 
-			topicRouterApi.setDefaultTextParamForMunicipality($scope.user.municipality, textApiParam).then(function() {
-				// no need to update anything if call was successful
+			topicRouterApi.setDefaultTextParamForMunicipality($scope.user.municipality, textParam).then(function() {
+				for (var i = 0; i < $scope.textParameters.length; i++) {
+					$scope.textParameters[i].defaultName = false;
+				}
+
+				textParam.defaultName = true;
 			},
 			function() { // call failed
-				textApiParam.defaultName = !textApiParam.defaultName;
+				textParam.defaultName = false;
 			});
 		}
 
-		function setDefaultDateParameter(dateApiParam) {
-			dateApiParam.defaultName = !dateApiParam.defaultName;
+		function setDefaultDateParameter(dateParam) {
+			topicRouterApi.setDefaultDateParamForMunicipality($scope.user.municipality, dateParam).then(function() {
+				for (var i = 0; i < $scope.dateParameters.length; i++) {
+					$scope.dateParameters[i].defaultName = false;
+				}
 
-			topicRouterApi.setDefaultDateParamForMunicipality($scope.user.municipality, dateApiParam).then(function() {
-				// no need to update anything if call was successful
+				dateParam.defaultName = true;
 			},
 			function() { // call failed
-				dateApiParam.defaultName = !dateApiParam.defaultName;
+				dateParam.defaultName = false;
 			});
 		}
 
