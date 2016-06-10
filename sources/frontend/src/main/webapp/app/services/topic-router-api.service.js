@@ -45,7 +45,9 @@
 			getTextParamsForMunicipality: getTextParamsForMunicipality,
 			getDateParamsForMunicipality: getDateParamsForMunicipality,
 			setDefaultTextParamForMunicipality: setDefaultTextParamForMunicipality,
+			getDefaultTextParamForMunicipality: getDefaultTextParamForMunicipality,
 			setDefaultDateParamForMunicipality: setDefaultDateParamForMunicipality,
+			getDefaultDateParamForMunicipality: getDefaultDateParamForMunicipality,
 
 			//
 			getFiltersForRule: getFiltersForRule,
@@ -394,8 +396,16 @@
 			return httpPost('/distribution-rules/text/names/default/' + textParam.id + '?municipalityId=' + municipality.id);
 		}
 
+		function getDefaultTextParamForMunicipality(municipality) {
+			return httpGet('/distribution-rules/text/names/default'+ '?municipalityId=' + municipality.id);
+		}
+
 		function setDefaultDateParamForMunicipality(municipality, dateParam) {
 			return httpPost('/distribution-rules/date/names/default/' + dateParam.id + '?municipalityId=' + municipality.id);
+		}
+
+		function getDefaultDateParamForMunicipality(municipality) {
+			return httpGet('/distribution-rules/date/names/default'+ '?municipalityId=' + municipality.id);
 		}
 
 		// DTO classes.

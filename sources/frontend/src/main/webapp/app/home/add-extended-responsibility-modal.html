@@ -40,9 +40,8 @@
 	                <!-- Date based filter -->
                     <tab ng-click="model.type='cpr'" heading="Dato" active="active.cpr">
                         <p>
-                            <label for="filter_name">Navn:
-                                <input type="text" class="form-control" ng-model="model.name" name="filter_name" id="filter_name">
-                            </label>
+                            <label for="filter_name_date">Navn:</label>
+                            <select name="filter_name_date" id="filter_name_date" ng-change="setSelectedDateParam(selectedDateApiParam)" ng-model="selectedDateApiParam" ng-options="filter.name for filter in dateApiParameters track by filter.name"></select>
                         </p>
 
                         <p>
@@ -60,13 +59,12 @@
 
 	                <!-- Text based filter -->
                     <tab heading="Tekst" ng-click="model.type='text'" active="active.text">
-                        <p>
-                            <label for="filter_name2">Navn:
-                                <input type="text" class="form-control" ng-model="model.name" name="filter_name" id="filter_name2">
-                            </label>
-                        </p>
+	                    <p>
+		                    <label for="filter_name_text">Navn:</label>
+		                    <select name="filter_name_text" id="filter_name_text" ng-change="setSelectedTextParam(selectedTextApiParam)" ng-model="selectedTextApiParam" ng-options="filter.name for filter in textApiParameters track by filter.name"></select>
+	                    </p>
 
-                        <p>
+	                    <p>
                             <label for="filter_text">Tekst: <span>(Brug * til wildcard søgning. * kan placeres først og sidst i teksten.)</span>
                                 <input type="text" class="form-control" ng-model="model.text" name="filter_text" id="filter_text">
                             </label>

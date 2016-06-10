@@ -17,6 +17,12 @@
 	    $scope.initialType = '';
 	    $scope.municipalityId = $scope.user.municipality.id;
 
+	    $scope.dateApiParameters = [];
+	    $scope.textApiParameters = [];
+
+	    $scope.selectedDateApiParam = {};
+	    $scope.selectedTextApiParam = {};
+
         function cleanModel() {
 	        $log.info('ExtendedResponsibilityController::cleanModel (type: ' + $scope.type + ')');
 
@@ -60,6 +66,9 @@
         $scope.setSelectedEmp = setSelectedEmp;
         $scope.show = show;
 	    $scope.closeAlert = closeAlert;
+
+	    $scope.setSelectedDateParam = setSelectedDateParam;
+	    $scope.setSelectedTextParam = setSelectedTextParam;
 
         $scope.search = {
             municipalityId: $scope.user.municipality.id,
@@ -121,6 +130,14 @@
             });
         }
 
+	    function setSelectedDateParam(selectedParam) {
+		    $scope.selectedDateApiParam = selectedParam;
+	    }
+
+	    function setSelectedTextParam(selectedParam) {
+		    $scope.selectedTextApiParam = selectedParam;
+	    }
+
         function updateFilter(){
             $log.info("ExtendedResponsibilityController::updateFilter");
 
@@ -129,6 +146,16 @@
 
         function createFilter(){
 	        $log.info("ExtendedResponsibilityController::createFilter (initial type was '" + $scope.initialType + "', new type is: '" + $scope.model.type + "')");
+
+	        // set correct name for model based on type
+	        if ($scope.model.type === 'cpr') {
+		        $scope.model.name = $scope.selectedDateApiParam.name;
+	        }
+	        else {
+		        $scope.model.name = $scope.selectedTextApiParam.name;
+	        }
+
+	        $log.info('Name is: ' + $scope.model.name);
 
 			if ($scope.model.name) { // the name must be supplied
 				if ($scope.selectedOrgUnit.id) { // the user must select an organisational unit
@@ -211,7 +238,7 @@
         }
 
 	    function setFilterFromModel() {
-		    $log.info('ExtendedResponsibilityController::setFilterFromModel (type: ' + $scope.model.type + ')');
+		    $log.info('ExtendedResponsibilityController::setFilterFromModel (type: ' + $scope.model.type + ', name: ' + $scope.model.name + ')');
 
 		    topicRouterApi.createFilter($scope.model).then(function() {
 			    _refresh();
@@ -298,6 +325,22 @@
 	    function loadInitialData() {
 		    topicRouterApi.getEmployments($scope.municipalityId, currentEmployment, true).then(function(employments){
 			    $scope.employments = employments;
+		    });
+
+		    topicRouterApi.getTextParamsForMunicipality($scope.user.municipality).then(function(textParams){
+			    $scope.textApiParameters = textParams;
+		    });
+
+		    topicRouterApi.getDateParamsForMunicipality($scope.user.municipality).then(function(dateParams){
+			    $scope.dateApiParameters = dateParams;
+		    });
+
+		    topicRouterApi.getDefaultDateParamForMunicipality($scope.user.municipality).then(function(defaultDateParam){
+			    $scope.selectedDateApiParam = defaultDateParam;
+		    });
+
+		    topicRouterApi.getDefaultTextParamForMunicipality($scope.user.municipality).then(function(defaultTextParam){
+			    $scope.selectedTextApiParam = defaultTextParam;
 		    });
 	    }
 
