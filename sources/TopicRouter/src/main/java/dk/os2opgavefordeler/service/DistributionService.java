@@ -1,12 +1,12 @@
 package dk.os2opgavefordeler.service;
 
+import java.util.List;
+import java.util.Optional;
+
 import dk.os2opgavefordeler.model.*;
 import dk.os2opgavefordeler.model.presentation.DistributionRulePO;
 
 import dk.os2opgavefordeler.rest.DistributionRuleScope;
-
-import java.util.List;
-import java.util.Optional;
 
 public interface DistributionService {
 	DistributionRule createDistributionRule(DistributionRule rule);

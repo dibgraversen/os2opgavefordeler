@@ -41,6 +41,14 @@ public class DistributionRuleEndpoint extends Endpoint {
 	@Inject
 	private AuthService authService;
 
+	private static final String NOT_LOGGED_IN = "Not logged in";
+	private static final String NOT_AUTHORIZED = "Not authorized";
+	private static final String USER_NOT_FOUND = "User not found";
+	private static final String INVALID_MUNICIPALITY_ID = "You need to specify a valid municipality ID.";
+	private static final String NO_ORGUNIT_FOUND_FOR_USER = "Couldn't find organizational unit for user";
+	private static final String NO_EMPLOYMENT_FOUND_FOR_USER = "Couldn't find employment for user";
+	private static final String NO_ROLE_FOUND_FOR_USER = "Couldn't find role for user";
+
 	/**
 	 * Returns a list of distribution rules for the specified role and scope.
 	 *
@@ -55,7 +63,7 @@ public class DistributionRuleEndpoint extends Endpoint {
 		log.info("routesForEmployment[{},{}]", roleId, scope);
 
 		if (roleId == null || scope == null) {
-			return badRequest("need role and scope");
+			return badRequest("Invalid role and/or scope");
 		}
 
 		final Optional<Role> role = userService.findRoleById(roleId);
@@ -76,15 +84,15 @@ public class DistributionRuleEndpoint extends Endpoint {
 					}
 				}
 				else {
-					return badRequest("Kunne ikke finde ansættelsessted for bruger");
+					return badRequest(NO_ORGUNIT_FOUND_FOR_USER);
 				}
 			}
 			else {
-				return badRequest("Kunne ikke finde ansættelse for bruger");
+				return badRequest(NO_EMPLOYMENT_FOUND_FOR_USER);
 			}
 		}
 		else {
-			return badRequest("Kunne ikke finde rolle for bruger");
+			return badRequest(NO_ROLE_FOUND_FOR_USER);
 		}
 	}
 
@@ -99,7 +107,7 @@ public class DistributionRuleEndpoint extends Endpoint {
 		}
 
 		if (!authService.isAuthenticated()) {
-			return Response.status(Response.Status.UNAUTHORIZED).entity("Not logged in").build();
+			return Response.status(Response.Status.UNAUTHORIZED).entity(NOT_LOGGED_IN).build();
 		}
 
 		Optional<User> user = userService.findByEmail(authService.getAuthentication().getEmail());
@@ -122,11 +130,11 @@ public class DistributionRuleEndpoint extends Endpoint {
 						);
 			}
 			else {
-				return Response.status(Response.Status.UNAUTHORIZED).entity("Not authorized").build();
+				return Response.status(Response.Status.UNAUTHORIZED).entity(NOT_AUTHORIZED).build();
 			}
 		}
 		else {
-			return Response.status(Response.Status.NOT_FOUND).entity("User not found").build();
+			return Response.status(Response.Status.NOT_FOUND).entity(USER_NOT_FOUND).build();
 		}
 	}
 
@@ -148,7 +156,7 @@ public class DistributionRuleEndpoint extends Endpoint {
 				return ok(result);
 			}
 			else {
-				return badRequest("Could not find organizational unit for user");
+				return badRequest(NO_ORGUNIT_FOUND_FOR_USER);
 			}
 		}
 	}
@@ -158,10 +166,11 @@ public class DistributionRuleEndpoint extends Endpoint {
 	public Response buildRulesForMunicipality(@QueryParam("municipalityId") long municipalityId) {
 		if (municipalityId < 0) {
 			log.info("buildRules - bad request[{}]", municipalityId);
-			return badRequest("municipalityId needed");
+			return badRequest(INVALID_MUNICIPALITY_ID);
 		}
 
 		distributionService.buildRulesForMunicipality(municipalityId);
+
 		return ok();
 	}
 
@@ -171,7 +180,7 @@ public class DistributionRuleEndpoint extends Endpoint {
 	public Response getFilterNamesText(@QueryParam("municipalityId") long municipalityId) {
 		if (municipalityId < 0) {
 			log.info("#getFilterNames with no municipalityId");
-			return badRequest("You need to specify a valid municipality ID.");
+			return badRequest(INVALID_MUNICIPALITY_ID);
 		}
 		else {
 			return ok(distributionService.getFilterNamesText(municipalityId));
@@ -184,7 +193,7 @@ public class DistributionRuleEndpoint extends Endpoint {
 	public Response getDefaultFilterNameText(@QueryParam("municipalityId") long municipalityId) {
 		if (municipalityId < 0) {
 			log.info("#getFilterNames with no municipalityId");
-			return badRequest("You need to specify a valid municipality ID.");
+			return badRequest(INVALID_MUNICIPALITY_ID);
 		}
 		else {
 			return ok(distributionService.getDefaultTextFilterName(municipalityId));
@@ -197,7 +206,7 @@ public class DistributionRuleEndpoint extends Endpoint {
 	public Response setDefaultFilterNameText(@PathParam("filterNameId") Long filterNameId, @QueryParam("municipalityId") long municipalityId) {
 		if (municipalityId < 0) {
 			log.info("#setDefaultFilterNameText with no municipalityId");
-			return badRequest("You need to specify a valid municipality ID.");
+			return badRequest(INVALID_MUNICIPALITY_ID);
 		}
 		else {
 			distributionService.setDefaultTextFilterName(municipalityId, filterNameId);
@@ -212,7 +221,7 @@ public class DistributionRuleEndpoint extends Endpoint {
 	public Response getFilterNamesDate(@QueryParam("municipalityId") long municipalityId) {
 		if (municipalityId < 0) {
 			log.info("#getFilterNames with no municipalityId");
-			return badRequest("You need to specify a valid municipality ID.");
+			return badRequest(INVALID_MUNICIPALITY_ID);
 		}
 		else {
 			return ok(distributionService.getFilterNamesDate(municipalityId));
@@ -225,7 +234,7 @@ public class DistributionRuleEndpoint extends Endpoint {
 	public Response getDefaultFilterNameDate(@QueryParam("municipalityId") long municipalityId) {
 		if (municipalityId < 0) {
 			log.info("#getFilterNames with no municipalityId");
-			return badRequest("You need to specify a valid municipality ID.");
+			return badRequest(INVALID_MUNICIPALITY_ID);
 		}
 		else {
 			return ok(distributionService.getDefaultDateFilterName(municipalityId));
@@ -238,7 +247,7 @@ public class DistributionRuleEndpoint extends Endpoint {
 	public Response setDefaultFilterNameDate(@PathParam("filterNameId") Long filterNameId, @QueryParam("municipalityId") long municipalityId) {
 		if (municipalityId < 0) {
 			log.info("#setDefaultFilterNameText with no municipalityId");
-			return badRequest("You need to specify a valid municipality ID.");
+			return badRequest(INVALID_MUNICIPALITY_ID);
 		}
 		else {
 			distributionService.setDefaultDateFilterName(municipalityId, filterNameId);
@@ -251,7 +260,8 @@ public class DistributionRuleEndpoint extends Endpoint {
 	private Response doUpdateResponsibleOrganization(DistributionRule existing, DistributionRulePO updated) {
 		if(!allowedToUpdate(existing)) {
 			log.warn("User {} doesn't have permissions to update {}", "<WeDontHaveUsersYet>", existing);
-			return Response.status(Response.Status.FORBIDDEN).build();
+
+			return forbidden();
 		}
 		try {
 			updateDistributionRule(existing, updated);
@@ -262,7 +272,7 @@ public class DistributionRuleEndpoint extends Endpoint {
 			return Response.serverError().build();
 		}
 
-		return Response.ok().build();
+		return ok();
 	}
 
 	private boolean allowedToUpdate(DistributionRule existing) {

@@ -45,4 +45,12 @@ public abstract class Endpoint {
 		return Response.ok().entity(result).build();
 	}
 
+	/**
+	 * Creates a forbidden response.
+	 *
+	 * @return a built Response with status forbidden and no entity set.
+	 */
+	public Response forbidden() {
+		return Response.status(Response.Status.FORBIDDEN).build();
+	}
 }
