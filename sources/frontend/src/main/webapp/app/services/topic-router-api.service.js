@@ -48,6 +48,8 @@
 			getDefaultTextParamForMunicipality: getDefaultTextParamForMunicipality,
 			setDefaultDateParamForMunicipality: setDefaultDateParamForMunicipality,
 			getDefaultDateParamForMunicipality: getDefaultDateParamForMunicipality,
+			deleteTextParameter: deleteTextParameter,
+			deleteDateParameter: deleteDateParameter,
 
 			//
 			getFiltersForRule: getFiltersForRule,
@@ -405,7 +407,15 @@
 		}
 
 		function getDefaultDateParamForMunicipality(municipality) {
-			return httpGet('/distribution-rules/date/names/default'+ '?municipalityId=' + municipality.id);
+			return httpGet('/distribution-rules/date/names/default' + '?municipalityId=' + municipality.id);
+		}
+
+		function deleteDateParameter(municipality, parameter) {
+			return httpDelete('/distribution-rules/date/names/' + parameter.id + '?municipalityId=' + municipality.id);
+		}
+
+		function deleteTextParameter(municipality, parameter) {
+			return httpDelete('/distribution-rules/text/names/' + parameter.id + '?municipalityId=' + municipality.id);
 		}
 
 		// DTO classes.

@@ -187,6 +187,36 @@ public class DistributionRuleEndpoint extends Endpoint {
 		}
 	}
 
+	@DELETE
+	@Path("/text/names/{filterNameId}")
+	@Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
+	public Response deleteTextFilterName(@PathParam("filterNameId") Long filterNameId, @QueryParam("municipalityId") long municipalityId) {
+		if (municipalityId < 0) {
+			log.info("#deleteFilterName with no municipalityId");
+			return badRequest(INVALID_MUNICIPALITY_ID);
+		}
+		else {
+			distributionService.deleteFilterName(municipalityId, filterNameId);
+
+			return ok();
+		}
+	}
+
+	@DELETE
+	@Path("/date/names/{filterNameId}")
+	@Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
+	public Response deleteDateFilterName(@PathParam("filterNameId") Long filterNameId, @QueryParam("municipalityId") long municipalityId) {
+		if (municipalityId < 0) {
+			log.info("#deleteFilterName with no municipalityId");
+			return badRequest(INVALID_MUNICIPALITY_ID);
+		}
+		else {
+			distributionService.deleteFilterName(municipalityId, filterNameId);
+
+			return ok();
+		}
+	}
+
 	@GET
 	@Path("/text/names/default")
 	@Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")

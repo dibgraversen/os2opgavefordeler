@@ -121,7 +121,7 @@
 										      popover="Denne parameter er default"></span>
 									</td>
 									<td><a ng-hide="dateParam.defaultName" href="" class="btn btn-primary" ng-click="setDefaultDateParameter(dateParam)">Vælg som default</a></td>
-									<td><a href="" class="btn btn-danger" ng-click="deleteParameter(dateParam)">Slet</a></td>
+									<td><a href="" class="btn btn-danger" ng-click="deleteDateParameter(dateParam)">Slet</a></td>
 								</tr>
 							</tbody>
 						</table>
@@ -130,11 +130,11 @@
 
 						<table class="table table-hover" style="table-layout: fixed">
 							<thead>
-							<tr>
-								<th style="width: 200px">Navn</th>
-								<th style="width: 30px"></th>
-								<th style="width: 30px"></th>
-							</tr>
+								<tr>
+									<th style="width: 200px">Navn</th>
+									<th style="width: 30px"></th>
+									<th style="width: 30px"></th>
+								</tr>
 							</thead>
 							<tbody ng-repeat="textParam in textParameters">
 								<tr>
@@ -146,7 +146,7 @@
 				                               popover="Denne parameter er default"></span>
 									</td>
 									<td><a ng-hide="textParam.defaultName" href="" class="btn btn-primary" ng-click="setDefaultTextParameter(textParam)">Vælg som default</a></td>
-									<td><a href="" class="btn btn-danger" ng-click="deleteParameter(textParam)">Slet</a></td>
+									<td><a href="" class="btn btn-danger" ng-click="deleteTextParameter(textParam)">Slet</a></td>
 								</tr>
 							</tbody>
 						</table>

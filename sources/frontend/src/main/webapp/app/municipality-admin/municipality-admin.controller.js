@@ -44,6 +44,8 @@
 		$scope.editApiKey = editApiKey;
 		$scope.setDefaultTextParameter = setDefaultTextParameter;
 		$scope.setDefaultDateParameter = setDefaultDateParameter;
+		$scope.deleteTextParameter = deleteTextParameter;
+		$scope.deleteDateParameter = deleteDateParameter;
 
 		activate();
 
@@ -210,6 +212,36 @@
 			},
 			function() { // call failed
 				dateParam.defaultName = false;
+			});
+		}
+
+		function deleteDateParameter(parameter) {
+			topicRouterApi.deleteDateParameter($scope.user.municipality, parameter).then(function() {
+				// remove object from array
+				$scope.dateParameters = $scope.dateParameters.filter(function (el) {
+					return el.id !== parameter.id;
+				});
+			},
+			function() { // call failed
+				$scope.mAdminAlerts = [{
+					type: 'warning',
+					msg: 'Kunne ikke slette parameteren.'
+				}];
+			});
+		}
+
+		function deleteTextParameter(parameter) {
+			topicRouterApi.deleteTextParameter($scope.user.municipality, parameter).then(function() {
+				// remove object from array
+				$scope.textParameters = $scope.textParameters.filter(function (el) {
+					return el.id !== parameter.id;
+				});
+			},
+			function() { // call failed
+				$scope.mAdminAlerts = [{
+					type: 'warning',
+					msg: 'Kunne ikke slette parameteren.'
+				}];
 			});
 		}
 

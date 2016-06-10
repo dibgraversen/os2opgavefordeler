@@ -119,6 +119,14 @@ public class DistributionServiceImpl implements DistributionService {
 	}
 
 	@Override
+	public void deleteFilterName(long municipalityId, long filterId) {
+		Query query = entityManager.createQuery("DELETE FROM DistributionRuleFilterName filterName WHERE filterName.municipality.id = :municipalityId AND filterName.id = :filterId");
+		query.setParameter("municipalityId", municipalityId);
+		query.setParameter("filterId", filterId);
+		query.executeUpdate();
+	}
+
+	@Override
 	public DistributionRuleFilterName getDefaultTextFilterName(long municipalityId) {
 		Query query = entityManager.createQuery("SELECT filterName FROM DistributionRuleFilterName filterName WHERE filterName.municipality.id = :municipalityId AND filterName.type = 'TextDistributionRuleFilter' AND filterName.defaultName = true");
 		query.setParameter("municipalityId", municipalityId);
