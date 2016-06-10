@@ -63,7 +63,8 @@ public class CprDistributionRuleFilter extends DistributionRuleFilter {
             return false;
         }
         String param = parameters.get(getName());
-        if (param.length() < 5) {
+
+        if (param.length() < 4) {
             return false;
         }
 
