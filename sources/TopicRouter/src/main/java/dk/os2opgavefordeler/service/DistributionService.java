@@ -6,6 +6,7 @@ import java.util.Optional;
 import dk.os2opgavefordeler.model.*;
 import dk.os2opgavefordeler.model.presentation.DistributionRulePO;
 
+import dk.os2opgavefordeler.model.presentation.FilterNamePO;
 import dk.os2opgavefordeler.rest.DistributionRuleScope;
 
 public interface DistributionService {
@@ -14,12 +15,12 @@ public interface DistributionService {
 	Optional<DistributionRule> getDistribution(long id);
 	List<DistributionRule> getDistributionsAll(long municipalityId);
 
-	List<DistributionRuleFilterName> getFilterNamesAll(long municipalityId);
-	List<DistributionRuleFilterName> getFilterNamesDate(long municipalityId);
-	List<DistributionRuleFilterName> getFilterNamesText(long municipalityId);
-	DistributionRuleFilterName getDefaultTextFilterName(long municipalityId);
+	List<FilterNamePO> getFilterNamesAll(long municipalityId);
+	List<FilterNamePO> getFilterNamesDate(long municipalityId);
+	List<FilterNamePO> getFilterNamesText(long municipalityId);
+	FilterNamePO getDefaultTextFilterName(long municipalityId);
 	void setDefaultTextFilterName(long municipalityId, long filterId);
-	DistributionRuleFilterName getDefaultDateFilterName(long municipalityId);
+	FilterNamePO getDefaultDateFilterName(long municipalityId);
 	void setDefaultDateFilterName(long municipalityId, long filterId);
 	void deleteFilterName(long municipalityId, long filterId);
 

@@ -12,6 +12,9 @@ import javax.persistence.InheritanceType;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public class CprDistributionRuleFilter extends DistributionRuleFilter {
 
+	public static final String DEFAULT_FILTER_NAME = "dato";
+	public static final String TYPE = "CprDistributionRuleFilter";
+
     /**
      * String is in format of 3-5,10-15 which means from 3 to 5 and from 10 to 15.
      *

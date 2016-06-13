@@ -11,7 +11,8 @@ import java.util.Map;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public class TextDistributionRuleFilter extends DistributionRuleFilter {
 
-    private static final String URL_PARAMETER_NAME = "text";
+    public static final String DEFAULT_FILTER_NAME = "tekst";
+	public static final String TYPE = "TextDistributionRuleFilter";
 
     /**
      * Uses * as wildcard. Wildcards can be placed at beginning and end, not in the middle.
@@ -33,11 +34,11 @@ public class TextDistributionRuleFilter extends DistributionRuleFilter {
 
     @Override
     public boolean matches(Map<String, String> parameters) {
-	    if (!parameters.containsKey(URL_PARAMETER_NAME)) {
+	    if (!parameters.containsKey(getName())) {
 		    return false;
 	    }
 
-        String parameter = parameters.get(URL_PARAMETER_NAME);
+        String parameter = parameters.get(getName());
 
         if (parameter == null || parameter.isEmpty()) {
             return false;

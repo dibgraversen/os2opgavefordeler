@@ -101,6 +101,10 @@
 							Her kan du vedligeholde navnene på de parametre, som sendes med i API-kald og benyttes til datofordeling.
 						</p>
 
+						<p>
+							<b>NB:</b> Hvis ingen navne er angivet, så vil parameternavnet "dato" være tilgængelig ved oprettelse af udvidede fordelingsregler.
+						</p>
+
 						<table class="table table-hover" style="table-layout: fixed">
 							<thead>
 							<tr>
@@ -110,7 +114,7 @@
 							</tr>
 							</thead>
 							<tbody>
-								<tr ng-repeat="dateParam in dateParameters">
+								<tr ng-repeat="dateParam in dateParameters | filter: idFilter">
 									<td>{{ dateParam.name }}
 										<span ng-show="dateParam.defaultName"
 										      class="glyphicon glyphicon-exclamation-sign"
@@ -142,6 +146,10 @@
 							Her kan du vedligeholde navnene på de parametre, som sendes med i API-kald og benyttes til tekstfordeling.
 						</p>
 
+						<p>
+							<b>NB:</b> Hvis ingen navne er angivet, så vil parameternavnet "tekst" være tilgængelig ved oprettelse af udvidede fordelingsregler.
+						</p>
+
 						<table class="table table-hover" style="table-layout: fixed">
 							<thead>
 							<tr>
@@ -150,8 +158,8 @@
 								<th style="width: 30px"></th>
 							</tr>
 							</thead>
-							<tbody ng-repeat="textParam in textParameters">
-							<tr>
+							<tbody>
+							<tr ng-repeat="textParam in textParameters | filter: idFilter">
 								<td>{{ textParam.name }}
 										<span ng-show="textParam.defaultName"
 										      class="glyphicon glyphicon-exclamation-sign"

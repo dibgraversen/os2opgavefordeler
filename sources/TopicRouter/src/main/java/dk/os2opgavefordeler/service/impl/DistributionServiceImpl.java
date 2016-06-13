@@ -2,8 +2,10 @@ package dk.os2opgavefordeler.service.impl;
 
 import dk.os2opgavefordeler.distribution.DistributionRuleFilterNameRepository;
 import dk.os2opgavefordeler.distribution.DistributionRuleRepository;
+import dk.os2opgavefordeler.employment.MunicipalityRepository;
 import dk.os2opgavefordeler.model.*;
 import dk.os2opgavefordeler.model.presentation.DistributionRulePO;
+import dk.os2opgavefordeler.model.presentation.FilterNamePO;
 import dk.os2opgavefordeler.rest.DistributionRuleScope;
 import dk.os2opgavefordeler.service.DistributionService;
 import dk.os2opgavefordeler.service.OrgUnitService;
@@ -51,6 +53,9 @@ public class DistributionServiceImpl implements DistributionService {
 	@Inject
 	private DistributionRuleFilterNameRepository distributionRuleFilterNameRepository;
 
+	@Inject
+	private MunicipalityRepository municipalityRepository;
+
     @Inject
     private EntityManager entityManager;
 
@@ -80,35 +85,69 @@ public class DistributionServiceImpl implements DistributionService {
     }
 
 	@Override
-	public List<DistributionRuleFilterName> getFilterNamesAll(long municipalityId) {
+	public List<FilterNamePO> getFilterNamesAll(long municipalityId) {
 		Query query = entityManager.createQuery("SELECT filterName FROM DistributionRuleFilterName filterName WHERE filterName.municipality.id = :municipalityId");
 		query.setParameter("municipalityId", municipalityId);
 
-		return query.getResultList();
+		List<DistributionRuleFilterName> results = (List<DistributionRuleFilterName>)query.getResultList();
+
+		return results.stream().map(FilterNamePO::new).collect(Collectors.toList());
 	}
 
 	@Override
-	public List<DistributionRuleFilterName> getFilterNamesDate(long municipalityId) {
+	public List<FilterNamePO> getFilterNamesDate(long municipalityId) {
 		Query query = entityManager.createQuery("SELECT filterName FROM DistributionRuleFilterName filterName WHERE filterName.municipality.id = :municipalityId AND filterName.type = 'CprDistributionRuleFilter'");
 		query.setParameter("municipalityId", municipalityId);
 
-		return query.getResultList();
+		List<DistributionRuleFilterName> results = (List<DistributionRuleFilterName>)query.getResultList();
+
+		if (results != null && !results.isEmpty()) {
+			return results.stream().map(FilterNamePO::new).collect(Collectors.toList());
+		}
+		else { // return default name
+			List<FilterNamePO> filterNames = new ArrayList<>();
+			filterNames.add(new FilterNamePO(-1L, CprDistributionRuleFilter.DEFAULT_FILTER_NAME, true));
+			return filterNames;
+		}
 	}
 
 	@Override
-	public List<DistributionRuleFilterName> getFilterNamesText(long municipalityId) {
+	public List<FilterNamePO> getFilterNamesText(long municipalityId) {
 		Query query = entityManager.createQuery("SELECT filterName FROM DistributionRuleFilterName filterName WHERE filterName.municipality.id = :municipalityId AND filterName.type = 'TextDistributionRuleFilter'");
 		query.setParameter("municipalityId", municipalityId);
 
-		return query.getResultList();
+		List<DistributionRuleFilterName> results = (List<DistributionRuleFilterName>)query.getResultList();
+
+		if (results != null && !results.isEmpty()) {
+			return results.stream().map(FilterNamePO::new).collect(Collectors.toList());
+		}
+		else { // return default name
+			List<FilterNamePO> filterNames = new ArrayList<>();
+			filterNames.add(new FilterNamePO(-1L, TextDistributionRuleFilter.DEFAULT_FILTER_NAME, true));
+			return filterNames;
+		}
 	}
 
 	@Override
-	public DistributionRuleFilterName getDefaultDateFilterName(long municipalityId) {
+	public FilterNamePO getDefaultDateFilterName(long municipalityId) {
 		Query query = entityManager.createQuery("SELECT filterName FROM DistributionRuleFilterName filterName WHERE filterName.municipality.id = :municipalityId AND filterName.type = 'CprDistributionRuleFilter' AND filterName.defaultName = true");
 		query.setParameter("municipalityId", municipalityId);
 
-		return (DistributionRuleFilterName)query.getSingleResult();
+		List results = query.getResultList();
+
+		if (results != null && !results.isEmpty()) {
+			if (results.size() == 1) {
+				return new FilterNamePO((DistributionRuleFilterName)query.getSingleResult());
+			}
+			else {
+				log.error("More than one default date filter name found!");
+				return null;
+			}
+		}
+		else { // return default filter name
+			return new FilterNamePO(-1L, CprDistributionRuleFilter.DEFAULT_FILTER_NAME, true);
+		}
+
 	}
 
 	@Override
@@ -127,11 +166,24 @@ public class DistributionServiceImpl implements DistributionService {
 	}
 
 	@Override
-	public DistributionRuleFilterName getDefaultTextFilterName(long municipalityId) {
+	public FilterNamePO getDefaultTextFilterName(long municipalityId) {
 		Query query = entityManager.createQuery("SELECT filterName FROM DistributionRuleFilterName filterName WHERE filterName.municipality.id = :municipalityId AND filterName.type = 'TextDistributionRuleFilter' AND filterName.defaultName = true");
 		query.setParameter("municipalityId", municipalityId);
 
-		return (DistributionRuleFilterName)query.getSingleResult();
+		List results = query.getResultList();
+
+		if (results != null && !results.isEmpty()) {
+			if (results.size() == 1) {
+				return new FilterNamePO((DistributionRuleFilterName)query.getSingleResult());
+			}
+			else {
+				log.error("More than one default text filter name found!");
+				return null;
+			}
+		}
+		else { // return default filter name
+			return new FilterNamePO(-1L, TextDistributionRuleFilter.DEFAULT_FILTER_NAME, true);
+		}
 	}
 
 	@Override

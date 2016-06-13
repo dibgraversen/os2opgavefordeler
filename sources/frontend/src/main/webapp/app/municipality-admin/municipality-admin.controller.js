@@ -46,6 +46,7 @@
 		$scope.setDefaultDateParameter = setDefaultDateParameter;
 		$scope.deleteTextParameter = deleteTextParameter;
 		$scope.deleteDateParameter = deleteDateParameter;
+		$scope.idFilter = idFilter;
 
 		activate();
 
@@ -199,6 +200,11 @@
 			},
 			function() { // call failed
 				textParam.defaultName = false;
+
+				$scope.mAdminAlerts = [{
+					type: 'warning',
+					msg: 'Kunne ikke sætte parameteren som default.'
+				}];
 			});
 		}
 
@@ -212,6 +218,11 @@
 			},
 			function() { // call failed
 				dateParam.defaultName = false;
+
+				$scope.mAdminAlerts = [{
+					type: 'warning',
+					msg: 'Kunne ikke sætte parameteren som default.'
+				}];
 			});
 		}
 
@@ -296,6 +307,10 @@
 									});
 						}
 					});
+		}
+
+		function idFilter(element) {
+			return element.id != -1;
 		}
 	}
 })();
