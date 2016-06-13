@@ -105,12 +105,11 @@
 							<b>NB:</b> Hvis ingen navne er angivet, så vil parameternavnet "dato" være tilgængelig ved oprettelse af udvidede fordelingsregler.
 						</p>
 
-						<table class="table table-hover" style="table-layout: fixed">
+						<table class="table table-hover" style="table-layout: auto">
 							<thead>
 							<tr>
-								<th style="width: 200px">Navn</th>
-								<th style="width: 35px"></th>
-								<th style="width: 30px"></th>
+								<th style="width: 400px">Navn</th>
+								<th style="width: 200px"></th>
 							</tr>
 							</thead>
 							<tbody>
@@ -122,8 +121,11 @@
 										      popover-trigger="mouseenter" popover-append-to-body="true"
 										      popover="Denne parameter er default"></span>
 									</td>
-									<td><a ng-hide="dateParam.defaultName" href="" class="btn btn-primary" ng-click="setDefaultDateParameter(dateParam)">Vælg som default</a></td>
-									<td><a href="" class="btn btn-danger" ng-click="deleteDateParameter(dateParam)">Slet</a></td>
+									<td align="right">
+										<a ng-hide="dateParam.defaultName" href="" class="btn btn-primary" ng-click="setDefaultDateParameter(dateParam)">Vælg som default</a>
+										<a href="" class="btn btn-primary" ng-click="editParameter(dateParam)">Rediger</a>
+										<a href="" class="btn btn-danger" ng-click="deleteDateParameter(dateParam)">Slet</a>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -153,23 +155,25 @@
 						<table class="table table-hover" style="table-layout: fixed">
 							<thead>
 							<tr>
-								<th style="width: 200px">Navn</th>
-								<th style="width: 35px"></th>
-								<th style="width: 30px"></th>
+								<th style="width: 400px">Navn</th>
+								<th style="width: 200px"></th>
 							</tr>
 							</thead>
 							<tbody>
-							<tr ng-repeat="textParam in textParameters | filter: idFilter">
-								<td>{{ textParam.name }}
-										<span ng-show="textParam.defaultName"
-										      class="glyphicon glyphicon-exclamation-sign"
-										      style="color:lightskyblue"
-										      popover-trigger="mouseenter" popover-append-to-body="true"
-										      popover="Denne parameter er default"></span>
-								</td>
-								<td><a ng-hide="textParam.defaultName" href="" class="btn btn-primary" ng-click="setDefaultTextParameter(textParam)">Vælg som default</a></td>
-								<td><a href="" class="btn btn-danger" ng-click="deleteTextParameter(textParam)">Slet</a></td>
-							</tr>
+								<tr ng-repeat="textParam in textParameters | filter: idFilter">
+									<td>{{ textParam.name }}
+											<span ng-show="textParam.defaultName"
+											      class="glyphicon glyphicon-exclamation-sign"
+											      style="color:lightskyblue"
+											      popover-trigger="mouseenter" popover-append-to-body="true"
+											      popover="Denne parameter er default"></span>
+									</td>
+									<td align="right">
+										<a ng-hide="textParam.defaultName" href="" class="btn btn-primary" ng-click="setDefaultTextParameter(textParam)">Vælg som default</a>
+										<a href="" class="btn btn-primary" ng-click="editParameter(textParam)">Rediger</a>
+										<a href="" class="btn btn-danger" ng-click="deleteTextParameter(textParam)">Slet</a>
+									</td>
+								</tr>
 							</tbody>
 						</table>
 

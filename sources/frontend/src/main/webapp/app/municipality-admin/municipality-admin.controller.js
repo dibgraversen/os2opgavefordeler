@@ -44,6 +44,9 @@
 		$scope.editApiKey = editApiKey;
 		$scope.setDefaultTextParameter = setDefaultTextParameter;
 		$scope.setDefaultDateParameter = setDefaultDateParameter;
+		$scope.addDateParameter = addDateParameter;
+		$scope.addTextParameter = addTextParameter;
+		$scope.editParameter = editParameter;
 		$scope.deleteTextParameter = deleteTextParameter;
 		$scope.deleteDateParameter = deleteDateParameter;
 		$scope.idFilter = idFilter;
@@ -114,6 +117,89 @@
 					msg: 'Du har ikke valgt en fil.'
 				}];
 			}
+		}
+
+		// API
+		function addDateParameter() {
+			var modalInstance = $modal.open({
+				templateUrl: 'app/municipality-admin/add-parameter-name-modal.html',
+				controller: 'AddParameterNameModalInstanceCtrl',
+				size: 'md',
+				resolve: {
+					parameter: function() {
+						return false;
+					},
+					type: function() {
+						return 'CprDistributionRuleFilter';
+					},
+					municipality: function() {
+						return $scope.user.municipality;
+					}
+				}
+			});
+
+			modalInstance.result.then(function(parameter) {
+				$scope.dateParameters.push(parameter);
+			});
+		}
+
+		function editParameter(parameter) {
+			var modalInstance = $modal.open({
+				templateUrl: 'app/municipality-admin/add-parameter-name-modal.html',
+				controller: 'AddParameterNameModalInstanceCtrl',
+				size: 'md',
+				resolve: {
+					parameter: function () {
+						return parameter;
+					},
+					type: function () {
+						return parameter.type;
+					},
+					municipality: function () {
+						return $scope.user.municipality;
+					}
+				}
+			});
+
+			modalInstance.result.then(function (updatedParameter) {
+				if (updatedParameter.type == 'TextDistributionRuleFilter') {
+					updateParameterName($scope.textParameters, updatedParameter);
+				}
+				else {
+					updateParameterName($scope.dateParameters, updatedParameter);
+				}
+			});
+		}
+
+		function updateParameterName(paramArray, updatedParameter) {
+			for (var i = 0; i < paramArray.length; i++) {
+				if (paramArray[i].id == updatedParameter.id) {
+					paramArray[i].name = updatedParameter.name;
+				}
+			}
+		}
+
+		function addTextParameter(){
+			var modalInstance = $modal.open({
+				templateUrl: 'app/municipality-admin/add-parameter-name-modal.html',
+				controller: 'AddParameterNameModalInstanceCtrl',
+				size: 'md',
+				resolve: {
+					parameter: function() {
+						return false;
+					},
+					type: function() {
+						return 'TextDistributionRuleFilter';
+					},
+					municipality: function() {
+						return $scope.user.municipality;
+					}
+				}
+			});
+
+			modalInstance.result.then(function(parameter) {
+				$scope.textParameters.push(parameter);
+			});
 		}
 
 		function closeAlert(index) {

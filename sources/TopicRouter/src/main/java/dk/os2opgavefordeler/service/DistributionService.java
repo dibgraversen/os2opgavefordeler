@@ -22,6 +22,7 @@ public interface DistributionService {
 	void setDefaultTextFilterName(long municipalityId, long filterId);
 	FilterNamePO getDefaultDateFilterName(long municipalityId);
 	void setDefaultDateFilterName(long municipalityId, long filterId);
+	FilterNamePO updateFilterName(long municipalityId, FilterNamePO filterNamePO);
 	void deleteFilterName(long municipalityId, long filterId);
 
 	List<DistributionRule> getDistributionsForOrg(long orgId, long municipalityId, boolean includeImplicit);

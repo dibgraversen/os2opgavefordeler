@@ -106,7 +106,7 @@ public class DistributionServiceImpl implements DistributionService {
 		}
 		else { // return default name
 			List<FilterNamePO> filterNames = new ArrayList<>();
-			filterNames.add(new FilterNamePO(-1L, CprDistributionRuleFilter.DEFAULT_FILTER_NAME, true));
+			filterNames.add(new FilterNamePO(-1L, CprDistributionRuleFilter.DEFAULT_FILTER_NAME, CprDistributionRuleFilter.TYPE, true));
 			return filterNames;
 		}
 	}
@@ -123,7 +123,7 @@ public class DistributionServiceImpl implements DistributionService {
 		}
 		else { // return default name
 			List<FilterNamePO> filterNames = new ArrayList<>();
-			filterNames.add(new FilterNamePO(-1L, TextDistributionRuleFilter.DEFAULT_FILTER_NAME, true));
+			filterNames.add(new FilterNamePO(-1L, TextDistributionRuleFilter.DEFAULT_FILTER_NAME, TextDistributionRuleFilter.TYPE, true));
 			return filterNames;
 		}
 	}
@@ -145,7 +145,7 @@ public class DistributionServiceImpl implements DistributionService {
 			}
 		}
 		else { // return default filter name
-			return new FilterNamePO(-1L, CprDistributionRuleFilter.DEFAULT_FILTER_NAME, true);
+			return new FilterNamePO(-1L, CprDistributionRuleFilter.DEFAULT_FILTER_NAME, CprDistributionRuleFilter.TYPE, true);
 		}
 
 	}
@@ -155,6 +155,37 @@ public class DistributionServiceImpl implements DistributionService {
 		Query query = entityManager.createQuery("SELECT filterName FROM DistributionRuleFilterName filterName WHERE filterName.municipality.id = :municipalityId AND filterName.type = 'CprDistributionRuleFilter'");
 		query.setParameter("municipalityId", municipalityId);
 		setDefaultFilterName(query.getResultList(), filterId);
+	}
+
+	@Override
+	public FilterNamePO updateFilterName(long municipalityId, FilterNamePO filterNamePO) {
+		FilterNamePO result = null;
+
+		Municipality municipality = municipalityRepository.findBy(municipalityId);
+
+		if (municipality != null) {
+			DistributionRuleFilterName distributionRuleFilterName;
+
+			if (filterNamePO.getId() > 0) { // update existing filter name
+				distributionRuleFilterName = distributionRuleFilterNameRepository.findBy(filterNamePO.getId());
+			}
+			else { // create new filter name
+				distributionRuleFilterName = new DistributionRuleFilterName();
+				distributionRuleFilterName.setType(filterNamePO.getType()); // type is only needed for new filter names (changing types is not allowed)
+			}
+
+			if (distributionRuleFilterName != null) {
+				distributionRuleFilterName.setName(filterNamePO.getName());
+				distributionRuleFilterName.setDefaultName(filterNamePO.isDefaultName());
+				distributionRuleFilterName.setMunicipality(municipality);
+
+				distributionRuleFilterNameRepository.save(distributionRuleFilterName);
+
+				result = new FilterNamePO(distributionRuleFilterName);
+			}
+		}
+
+		return result;
 	}
 
 	@Override
@@ -182,7 +213,7 @@ public class DistributionServiceImpl implements DistributionService {
 			}
 		}
 		else { // return default filter name
-			return new FilterNamePO(-1L, TextDistributionRuleFilter.DEFAULT_FILTER_NAME, true);
+			return new FilterNamePO(-1L, TextDistributionRuleFilter.DEFAULT_FILTER_NAME, TextDistributionRuleFilter.TYPE, true);
 		}
 	}
 

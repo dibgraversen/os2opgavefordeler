@@ -60,7 +60,7 @@
 	                <!-- Text based filter -->
                     <tab heading="Tekst" ng-click="model.type='text'" active="active.text">
 	                    <p>
-		                    <label for="filter_name_text">Navn:</label>
+		                    <label for="filter_name_text">Navn: (selected: {{ selectedTextParam }})</label>
 		                    <select class="form-control" style="width:300px;" name="filter_name_text" id="filter_name_text" ng-change="setSelectedTextParam(selectedTextParam)" ng-model="selectedTextParam" ng-options="filter.name for filter in textParameters track by filter.name"></select>
 	                    </p>
 

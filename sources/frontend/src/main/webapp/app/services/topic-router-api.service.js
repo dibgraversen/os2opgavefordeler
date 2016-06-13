@@ -50,6 +50,8 @@
 			getDefaultDateParamForMunicipality: getDefaultDateParamForMunicipality,
 			deleteTextParameter: deleteTextParameter,
 			deleteDateParameter: deleteDateParameter,
+			updateDateParameterName: updateDateParameterName,
+			updateTextParameterName: updateTextParameterName,
 
 			//
 			getFiltersForRule: getFiltersForRule,
@@ -418,6 +420,18 @@
 			return httpDelete('/distribution-rules/text/names/' + parameter.id + '?municipalityId=' + municipality.id);
 		}
 
+		function updateDateParameterName(municipality, parameter) {
+			$log.info('Updating date parameter: ' + JSON.stringify(parameter));
+
+			return httpPost('/distribution-rules/date/names' + '?municipalityId=' + municipality.id, parameter);
+		}
+
+		function updateTextParameterName(municipality, parameter) {
+			$log.info('Updating text parameter: ' + JSON.stringify(parameter));
+
+			return httpPost('/distribution-rules/text/names' + '?municipalityId=' + municipality.id, parameter);
+		}
+		
 		// DTO classes.
 
 		/**

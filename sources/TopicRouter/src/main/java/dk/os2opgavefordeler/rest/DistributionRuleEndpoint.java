@@ -3,6 +3,7 @@ package dk.os2opgavefordeler.rest;
 import dk.os2opgavefordeler.auth.AuthService;
 import dk.os2opgavefordeler.model.*;
 import dk.os2opgavefordeler.model.presentation.DistributionRulePO;
+import dk.os2opgavefordeler.model.presentation.FilterNamePO;
 import dk.os2opgavefordeler.service.DistributionService;
 import dk.os2opgavefordeler.service.OrgUnitService;
 import dk.os2opgavefordeler.service.PersistenceService;
@@ -187,6 +188,19 @@ public class DistributionRuleEndpoint extends Endpoint {
 		}
 	}
 
+	@POST
+	@Path("/text/names")
+	@Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
+	public Response updateTextFilterName(@QueryParam("municipalityId") long municipalityId, FilterNamePO filterNamePO) {
+		if (municipalityId < 0) {
+			log.info("#getFilterNames with no municipalityId");
+			return badRequest(INVALID_MUNICIPALITY_ID);
+		}
+		else {
+			return ok(distributionService.updateFilterName(municipalityId, filterNamePO));
+		}
+	}
+
 	@DELETE
 	@Path("/text/names/{filterNameId}")
 	@Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
@@ -255,6 +269,19 @@ public class DistributionRuleEndpoint extends Endpoint {
 		}
 		else {
 			return ok(distributionService.getFilterNamesDate(municipalityId));
+		}
+	}
+
+	@POST
+	@Path("/date/names")
+	@Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
+	public Response updateDateFilterName(@QueryParam("municipalityId") long municipalityId, FilterNamePO filterNamePO) {
+		if (municipalityId < 0) {
+			log.info("#getFilterNames with no municipalityId");
+			return badRequest(INVALID_MUNICIPALITY_ID);
+		}
+		else {
+			return ok(distributionService.updateFilterName(municipalityId, filterNamePO));
 		}
 	}
 
