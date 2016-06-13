@@ -66,11 +66,11 @@
 		}
 
 		function addAlert(alert) {
-			$scope.createMunicipalityAlerts.push(alert);
+			$scope.createParameterNameAlerts.push(alert);
 		}
 
 		function closeAlert(index) {
-			$scope.createMunicipalityAlerts.splice(index, 1);
+			$scope.createParameterNameAlerts.splice(index, 1);
 		}
 	}
 })();

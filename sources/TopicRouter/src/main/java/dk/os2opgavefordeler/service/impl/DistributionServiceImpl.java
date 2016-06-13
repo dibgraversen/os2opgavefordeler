@@ -168,21 +168,30 @@ public class DistributionServiceImpl implements DistributionService {
 
 			if (filterNamePO.getId() > 0) { // update existing filter name
 				distributionRuleFilterName = distributionRuleFilterNameRepository.findBy(filterNamePO.getId());
+				distributionRuleFilterName.setDefaultName(filterNamePO.isDefaultName());
 			}
 			else { // create new filter name
+				// determine if this is the first filter name being created
+				Query query = entityManager.createQuery("SELECT filterName FROM DistributionRuleFilterName filterName WHERE filterName.municipality.id = :municipalityId AND filterName.type = '" + filterNamePO.getType() + "'");
+				query.setParameter("municipalityId", municipalityId);
+
+				boolean firstFilterName = query.getResultList() == null || query.getResultList().isEmpty();
+
 				distributionRuleFilterName = new DistributionRuleFilterName();
 				distributionRuleFilterName.setType(filterNamePO.getType()); // type is only needed for new filter names (changing types is not allowed)
+
+				if (firstFilterName) { // since this is the first filter name of its kind, it should be marked as default
+					distributionRuleFilterName.setDefaultName(true);
+				}
 			}
 
-			if (distributionRuleFilterName != null) {
-				distributionRuleFilterName.setName(filterNamePO.getName());
-				distributionRuleFilterName.setDefaultName(filterNamePO.isDefaultName());
-				distributionRuleFilterName.setMunicipality(municipality);
+			// set general values
+			distributionRuleFilterName.setName(filterNamePO.getName());
+			distributionRuleFilterName.setMunicipality(municipality);
 
-				distributionRuleFilterNameRepository.save(distributionRuleFilterName);
+			distributionRuleFilterNameRepository.save(distributionRuleFilterName);
 
-				result = new FilterNamePO(distributionRuleFilterName);
-			}
+			result = new FilterNamePO(distributionRuleFilterName);
 		}
 
 		return result;

@@ -318,6 +318,17 @@
 				$scope.dateParameters = $scope.dateParameters.filter(function (el) {
 					return el.id !== parameter.id;
 				});
+				
+				// if the parameter was the default parameter, select a new default
+				if (parameter.defaultName) {
+					var storedParams = $scope.dateParameters.filter(function (el) {
+						return el.id !== -1;
+					});
+
+					if (storedParams && storedParams.length > 0) {
+						setDefaultDateParameter(storedParams[0]);
+					}
+				}
 			},
 			function() { // call failed
 				$scope.mAdminAlerts = [{
@@ -333,6 +344,17 @@
 				$scope.textParameters = $scope.textParameters.filter(function (el) {
 					return el.id !== parameter.id;
 				});
+
+				// if the parameter was the default parameter, select a new default
+				if (parameter.defaultName) {
+					var storedParams = $scope.textParameters.filter(function (el) {
+						return el.id !== -1;
+					});
+
+					if (storedParams && storedParams.length > 0) {
+						setDefaultTextParameter(storedParams[0]);
+					}
+				}
 			},
 			function() { // call failed
 				$scope.mAdminAlerts = [{
