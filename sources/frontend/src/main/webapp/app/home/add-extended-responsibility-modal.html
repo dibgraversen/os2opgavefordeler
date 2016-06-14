@@ -40,8 +40,8 @@
 	                <!-- Date based filter -->
                     <tab ng-click="model.type='cpr'" heading="Dato" active="active.cpr">
                         <p>
-                            <label for="filter_name_date">Navn: (selected: {{ selectedDateParam }})</label>
-                            <select class="form-control" style="width:300px;" name="filter_name_date" id="filter_name_date" ng-change="setSelectedDateParam(selectedDateParam)" ng-model="selectedDateParam" ng-options="filter.name for filter in dateParameters track by filter.name"></select>
+                            <label for="filter_name_date">Navn: </label>
+                            <select class="form-control" style="width:300px;" name="filter_name_date" id="filter_name_date" ng-change="setSelectedDateParam(selectedDateParam)" ng-model="selectedParams.cpr" ng-options="filter.name for filter in dateParameters track by filter.name"></select>
                         </p>
 
                         <p>
@@ -60,8 +60,8 @@
 	                <!-- Text based filter -->
                     <tab heading="Tekst" ng-click="model.type='text'" active="active.text">
 	                    <p>
-		                    <label for="filter_name_text">Navn: (selected: {{ selectedTextParam }})</label>
-		                    <select class="form-control" style="width:300px;" name="filter_name_text" id="filter_name_text" ng-change="setSelectedTextParam(selectedTextParam)" ng-model="selectedTextParam" ng-options="filter.name for filter in textParameters track by filter.name"></select>
+		                    <label for="filter_name_text">Navn: </label>
+		                    <select class="form-control" style="width:300px;" name="filter_name_text" id="filter_name_text" ng-change="setSelectedTextParam(selectedTextParam)" ng-model="selectedParams.text" ng-options="filter.name for filter in textParameters track by filter.name"></select>
 	                    </p>
 
 	                    <p>

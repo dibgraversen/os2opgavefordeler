@@ -24,13 +24,13 @@
 	    $scope.defaultDateParam = {};
 	    $scope.defaultTextParam = {};
 
-	    $scope.selectedDateParam = {};
-	    $scope.selectedTextParam = {};
+	    $scope.selectedParams = {
+		    cpr: false,
+		    text: false
+	    };
 
         function cleanModel() {
-	        $log.info('ExtendedResponsibilityController::cleanModel (type: ' + $scope.type + ')');
-
-            $scope.selectedOrgUnit = {};
+	        $scope.selectedOrgUnit = {};
 	        $scope.selectedEmp = {};
 
 	        $scope.searchResult = {};
@@ -96,19 +96,15 @@
 
 	    function setDefaultDateParameterName() {
 		    topicRouterApi.getDefaultDateParamForMunicipality($scope.user.municipality).then(function(param) {
-			    $log.info('ExtendedResponsibilityController::setDefaultDateParameterName (value: ' + param.name + ')');
-
 			    $scope.defaultDateParam = param;
-			    $scope.selectedDateParam = param;
+			    $scope.selectedParams.cpr = param;
 		    });
 	    }
 
 	    function setDefaultTextParameterName() {
 		    topicRouterApi.getDefaultTextParamForMunicipality($scope.user.municipality).then(function (param) {
-			    $log.info('ExtendedResponsibilityController::setDefaultTextParameterName (value: ' + param.name + ')');
-
 			    $scope.defaultTextParam = param;
-			    $scope.selectedTextParam = param;
+			    $scope.selectedParams.text = param;
 		    });
 	    }
 
@@ -117,10 +113,6 @@
 	    activate();
 
         function show(filter){
-            $log.info("ExtendedResponsibilityController::show filter " + filter.filterId + " (type: " + filter.type + ")");
-
-	        $log.info('Selected date param is: ' + $scope.selectedDateParam.name);
-
 	        $scope.ruleAlerts = [];
 
 	        $scope.model = cleanModel();
@@ -138,11 +130,7 @@
 	        topicRouterApi.getFiltersForRule($scope.topic.id).then(function(res){
                 for (var i in res) {
                     if (res[i].filterId == filter.filterId) {
-	                    $log.info('Setting model to: ' + JSON.stringify(res[i]));
-
-                        $scope.model = res[i];
-
-
+	                    $scope.model = res[i];
                     }
                 }
 
@@ -161,32 +149,28 @@
         }
 
 	    function setSelectedDateParam(selectedParam) {
-		    $log.info('ExtendedResponsibilityController::setSelectedDateParam (value: ' + selectedParam.name + ')');
-
-		    $scope.selectedDateParam = selectedParam;
+		    if (selectedParam) {
+			    $scope.selectedParams.cpr = selectedParam;
+		    }
 	    }
 
 	    function setSelectedTextParam(selectedParam) {
-		    $log.info('ExtendedResponsibilityController::setSelectedTextParam (value: ' + selectedParam.name + ')');
-
-		    $scope.selectedTextParam = selectedParam;
+		    if (selectedParam) {
+			    $scope.selectedParams.text = selectedParam;
+		    }
 	    }
 
         function updateFilter(){
-            $log.info("ExtendedResponsibilityController::updateFilter");
-
 	        setFilterFromModel();
         }
 
         function createFilter(){
-	        $log.info("ExtendedResponsibilityController::createFilter (initial type was '" + $scope.initialType + "', new type is: '" + $scope.model.type + "')");
-
 	        // set correct name for model based on type
 	        if ($scope.model.type === 'cpr') {
-		        $scope.model.name = $scope.selectedDateParam.name;
+		        $scope.model.name = $scope.selectedParams.cpr.name;
 	        }
 	        else {
-		        $scope.model.name = $scope.selectedTextParam.name;
+		        $scope.model.name = $scope.selectedParams.text.name;
 	        }
 
 			if ($scope.model.name) { // the name must be supplied
@@ -270,8 +254,6 @@
         }
 
 	    function setFilterFromModel() {
-		    $log.info('ExtendedResponsibilityController::setFilterFromModel (type: ' + $scope.model.type + ', name: ' + $scope.model.name + ')');
-
 		    topicRouterApi.createFilter($scope.model).then(function() {
 			    _refresh();
 			    $scope.currentTab = 'list'
@@ -349,14 +331,10 @@
         }
 
         function activate() {
-            $log.info("ExtendedResponsibilityController::activate");
-
             _refresh();
         }
 
 	    function loadInitialData() {
-		    $log.info("ExtendedResponsibilityController::loadInitialData");
-
 		    topicRouterApi.getEmployments($scope.municipalityId, currentEmployment, true).then(function(employments){
 			    $scope.employments = employments;
 		    });
@@ -395,24 +373,17 @@
 	    }
 
         function _refresh() {
-            $log.info("ExtendedResponsibilityController::_refresh (rule: " + $scope.topic.id + ")");
-
 	        topicRouterApi.getFiltersForRule($scope.topic.id).then(function (filters) {
                 $scope.filters = filters;
             });
         }
 
         function add() {
-	        $log.info('ExtendedResponsibilityController::add');
-
 	        loadInitialData();
 
             $scope.model = cleanModel();
-
 	        $scope.initialType = '';
-
 	        $scope.initialName = '';
-
             $scope.currentTab = "add";
 
 	        setDefaultDateParameterName();
@@ -420,8 +391,6 @@
         }
 
         function removeFilter(filter) {
-            $log.info("ExtendedResponsibilityController::removing filter " + filter.filterId + ' for rule ' + $scope.topic.id);
-
             topicRouterApi.removeFilter($scope.topic.id, filter.filterId).then(function () {
                 _refresh();
             });
@@ -430,20 +399,14 @@
         }
 
         function close() {
-            $log.info("ExtendedResponsibilityController::close");
-
 	        $modalStack.dismissAll('cancel');
         }
 
 	    function cancelEdit() {
-		    $log.info('Cancelling edit');
-
-		    $scope.selectedDateParam = {};
-		    $scope.selectedTextParam = {};
+		    $scope.selectedParams.cpr = false;
+		    $scope.selectedParams.text = false;
 		    $scope.initialType = '';
 		    $scope.initialName = '';
-		    $scope.dateParameters = [];
-		    $scope.textParameters = [];
 
 		    $scope.currentTab = 'list';
 	    }
