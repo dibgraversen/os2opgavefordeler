@@ -70,6 +70,7 @@
         $scope.setSelectedEmp = setSelectedEmp;
         $scope.show = show;
 	    $scope.closeAlert = closeAlert;
+	    $scope.cancelEdit = cancelEdit;
 
 	    $scope.setSelectedDateParam = setSelectedDateParam;
 	    $scope.setSelectedTextParam = setSelectedTextParam;
@@ -118,6 +119,8 @@
         function show(filter){
             $log.info("ExtendedResponsibilityController::show filter " + filter.filterId + " (type: " + filter.type + ")");
 
+	        $log.info('Selected date param is: ' + $scope.selectedDateParam.name);
+
 	        $scope.ruleAlerts = [];
 
 	        $scope.model = cleanModel();
@@ -135,7 +138,11 @@
 	        topicRouterApi.getFiltersForRule($scope.topic.id).then(function(res){
                 for (var i in res) {
                     if (res[i].filterId == filter.filterId) {
+	                    $log.info('Setting model to: ' + JSON.stringify(res[i]));
+
                         $scope.model = res[i];
+
+
                     }
                 }
 
@@ -357,13 +364,8 @@
 		    topicRouterApi.getTextParamsForMunicipality($scope.user.municipality).then(function(textParams){
 			    $scope.textParameters = textParams;
 
-			    $log.info('Initial name: ' + $scope.initialName);
-			    $log.info('Initial type: ' + $scope.initialType);
-
 			    if ($scope.initialName > '' && $scope.initialType == 'text') {
 				    for (var i = 0; i < $scope.textParameters.length; i++) {
-					    $log.info('Checking: ' + $scope.textParameters[i].id + ' <--> ' + $scope.initialName);
-
 					    if ($scope.textParameters[i].name === $scope.initialName) {
 						    // select this parameter
 						    setSelectedTextParam($scope.textParameters[i]);
@@ -380,8 +382,6 @@
 
 			    if ($scope.initialName > '' && $scope.initialType == 'cpr') {
 				    for (var i = 0; i < $scope.dateParameters.length; i++) {
-					    $log.info('Checking: ' + $scope.dateParameters[i].name + ' <--> ' + $scope.initialName);
-
 					    if ($scope.dateParameters[i].name === $scope.initialName) {
 						    // select this parameter
 						    setSelectedDateParam($scope.dateParameters[i]);
@@ -434,6 +434,19 @@
 
 	        $modalStack.dismissAll('cancel');
         }
+
+	    function cancelEdit() {
+		    $log.info('Cancelling edit');
+
+		    $scope.selectedDateParam = {};
+		    $scope.selectedTextParam = {};
+		    $scope.initialType = '';
+		    $scope.initialName = '';
+		    $scope.dateParameters = [];
+		    $scope.textParameters = [];
+
+		    $scope.currentTab = 'list';
+	    }
 
 	    function addAlert(alert) {
 		    $scope.ruleAlerts.push(alert);
