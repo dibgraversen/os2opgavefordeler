@@ -15,6 +15,7 @@
         $scope.currentTab = 'list';
 	    $scope.ruleAlerts = [];
 	    $scope.initialType = '';
+	    $scope.initialName = '';
 	    $scope.municipalityId = $scope.user.municipality.id;
 
 	    $scope.dateParameters = [];
@@ -92,19 +93,18 @@
 		    cpr: true
 	    };
 
-	    // set default values for dropdowns
-	    function setDefaultDropdownValues() {
-		    $log.info('ExtendedResponsibilityController::setDefaultDropdownValues');
-
+	    function setDefaultDateParameterName() {
 		    topicRouterApi.getDefaultDateParamForMunicipality($scope.user.municipality).then(function(param) {
-			    $log.info('Setting default date value: ' + JSON.stringify(param));
+			    $log.info('ExtendedResponsibilityController::setDefaultDateParameterName (value: ' + param.name + ')');
 
 			    $scope.defaultDateParam = param;
 			    $scope.selectedDateParam = param;
 		    });
+	    }
 
-		    topicRouterApi.getDefaultTextParamForMunicipality($scope.user.municipality).then(function(param) {
-			    $log.info('Setting default text value: ' + JSON.stringify(param));
+	    function setDefaultTextParameterName() {
+		    topicRouterApi.getDefaultTextParamForMunicipality($scope.user.municipality).then(function (param) {
+			    $log.info('ExtendedResponsibilityController::setDefaultTextParameterName (value: ' + param.name + ')');
 
 			    $scope.defaultTextParam = param;
 			    $scope.selectedTextParam = param;
@@ -115,25 +115,26 @@
 
 	    activate();
 
-        function show(filterId, filterType){
-            $log.info("ExtendedResponsibilityController::show filter " + filterId + " (type: " + filterType + ")");
+        function show(filter){
+            $log.info("ExtendedResponsibilityController::show filter " + filter.filterId + " (type: " + filter.type + ")");
 
 	        $scope.ruleAlerts = [];
 
 	        $scope.model = cleanModel();
             $scope.currentTab = 'show';
-            $scope.model.filterId = filterId;
-	        $scope.model.type = filterType;
-	        $scope.type = filterType;
-	        $scope.initialType = filterType;
+            $scope.model.filterId = filter.filterId;
+	        $scope.model.type = filter.type;
+	        $scope.type = filter.type;
+	        $scope.initialType = filter.type;
+	        $scope.initialName = filter.name;
 
-	        activateTab(filterType); // select the correct tab based on filter type
+	        activateTab(filter.type); // select the correct tab based on filter type
 
 	        loadInitialData();
 
 	        topicRouterApi.getFiltersForRule($scope.topic.id).then(function(res){
                 for (var i in res) {
-                    if (res[i].filterId == filterId) {
+                    if (res[i].filterId == filter.filterId) {
                         $scope.model = res[i];
                     }
                 }
@@ -153,13 +154,13 @@
         }
 
 	    function setSelectedDateParam(selectedParam) {
-		    $log.info('ExtendedResponsibilityController::setSelectedDateParam (value: ' + selectedParam + ')');
+		    $log.info('ExtendedResponsibilityController::setSelectedDateParam (value: ' + selectedParam.name + ')');
 
 		    $scope.selectedDateParam = selectedParam;
 	    }
 
 	    function setSelectedTextParam(selectedParam) {
-		    $log.info('ExtendedResponsibilityController::setSelectedTextParam (value: ' + selectedParam + ')');
+		    $log.info('ExtendedResponsibilityController::setSelectedTextParam (value: ' + selectedParam.name + ')');
 
 		    $scope.selectedTextParam = selectedParam;
 	    }
@@ -355,10 +356,41 @@
 
 		    topicRouterApi.getTextParamsForMunicipality($scope.user.municipality).then(function(textParams){
 			    $scope.textParameters = textParams;
+
+			    $log.info('Initial name: ' + $scope.initialName);
+			    $log.info('Initial type: ' + $scope.initialType);
+
+			    if ($scope.initialName > '' && $scope.initialType == 'text') {
+				    for (var i = 0; i < $scope.textParameters.length; i++) {
+					    $log.info('Checking: ' + $scope.textParameters[i].id + ' <--> ' + $scope.initialName);
+
+					    if ($scope.textParameters[i].name === $scope.initialName) {
+						    // select this parameter
+						    setSelectedTextParam($scope.textParameters[i]);
+						    break;
+					    }
+				    }
+
+				    setDefaultDateParameterName();
+			    }
 		    });
 
 		    topicRouterApi.getDateParamsForMunicipality($scope.user.municipality).then(function(dateParams){
 			    $scope.dateParameters = dateParams;
+
+			    if ($scope.initialName > '' && $scope.initialType == 'cpr') {
+				    for (var i = 0; i < $scope.dateParameters.length; i++) {
+					    $log.info('Checking: ' + $scope.dateParameters[i].name + ' <--> ' + $scope.initialName);
+
+					    if ($scope.dateParameters[i].name === $scope.initialName) {
+						    // select this parameter
+						    setSelectedDateParam($scope.dateParameters[i]);
+						    break;
+					    }
+				    }
+
+				    setDefaultTextParameterName();
+			    }
 		    });
 	    }
 
@@ -379,15 +411,18 @@
 
 	        $scope.initialType = '';
 
+	        $scope.initialName = '';
+
             $scope.currentTab = "add";
 
-	        setDefaultDropdownValues();
+	        setDefaultDateParameterName();
+	        setDefaultTextParameterName();
         }
 
-        function removeFilter(filterId) {
-            $log.info("ExtendedResponsibilityController::removing filter " + filterId + ' for rule ' + $scope.topic.id);
+        function removeFilter(filter) {
+            $log.info("ExtendedResponsibilityController::removing filter " + filter.filterId + ' for rule ' + $scope.topic.id);
 
-            topicRouterApi.removeFilter($scope.topic.id, filterId).then(function () {
+            topicRouterApi.removeFilter($scope.topic.id, filter.filterId).then(function () {
                 _refresh();
             });
 
