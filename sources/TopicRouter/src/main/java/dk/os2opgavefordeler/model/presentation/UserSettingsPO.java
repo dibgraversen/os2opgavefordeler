@@ -18,7 +18,6 @@ public class UserSettingsPO {
 
 	private boolean showResponsible;
 	private boolean showExpandedOrg;
-	private boolean extendedResponsibilityEnabled;
 
 	public UserSettingsPO() {
 	}
@@ -81,14 +80,6 @@ public class UserSettingsPO {
 
 	public void setShowExpandedOrg(boolean showExpandedOrg) {
 		this.showExpandedOrg = showExpandedOrg;
-	}
-
-	public boolean isExtendedResponsibilityEnabled() {
-		return extendedResponsibilityEnabled;
-	}
-
-	public void setExtendedResponsibilityEnabled(boolean extendedResponsibilityEnabled) {
-		this.extendedResponsibilityEnabled = extendedResponsibilityEnabled;
 	}
 
 	@Override

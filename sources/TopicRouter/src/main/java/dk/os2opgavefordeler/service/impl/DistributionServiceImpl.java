@@ -1,8 +1,11 @@
 package dk.os2opgavefordeler.service.impl;
 
+import dk.os2opgavefordeler.distribution.DistributionRuleFilterNameRepository;
 import dk.os2opgavefordeler.distribution.DistributionRuleRepository;
+import dk.os2opgavefordeler.employment.MunicipalityRepository;
 import dk.os2opgavefordeler.model.*;
 import dk.os2opgavefordeler.model.presentation.DistributionRulePO;
+import dk.os2opgavefordeler.model.presentation.FilterNamePO;
 import dk.os2opgavefordeler.rest.DistributionRuleScope;
 import dk.os2opgavefordeler.service.DistributionService;
 import dk.os2opgavefordeler.service.OrgUnitService;
@@ -47,6 +50,12 @@ public class DistributionServiceImpl implements DistributionService {
     @Inject
     private DistributionRuleRepository distributionRuleRepository;
 
+	@Inject
+	private DistributionRuleFilterNameRepository distributionRuleFilterNameRepository;
+
+	@Inject
+	private MunicipalityRepository municipalityRepository;
+
     @Inject
     private EntityManager entityManager;
 
@@ -74,6 +83,155 @@ public class DistributionServiceImpl implements DistributionService {
 
         return query.getResultList();
     }
+
+	@Override
+	public List<FilterNamePO> getFilterNamesAll(long municipalityId) {
+		Query query = entityManager.createQuery("SELECT filterName FROM DistributionRuleFilterName filterName WHERE filterName.municipality.id = :municipalityId");
+		query.setParameter("municipalityId", municipalityId);
+
+		List<DistributionRuleFilterName> results = (List<DistributionRuleFilterName>)query.getResultList();
+
+		return results.stream().map(FilterNamePO::new).collect(Collectors.toList());
+	}
+
+	@Override
+	public List<FilterNamePO> getFilterNamesDate(long municipalityId) {
+		Query query = entityManager.createQuery("SELECT filterName FROM DistributionRuleFilterName filterName WHERE filterName.municipality.id = :municipalityId AND filterName.type = 'CprDistributionRuleFilter'");
+		query.setParameter("municipalityId", municipalityId);
+
+		List<DistributionRuleFilterName> results = (List<DistributionRuleFilterName>)query.getResultList();
+
+		if (results != null && !results.isEmpty()) {
+			return results.stream().map(FilterNamePO::new).collect(Collectors.toList());
+		}
+		else { // return default name
+			List<FilterNamePO> filterNames = new ArrayList<>();
+			filterNames.add(new FilterNamePO(-1L, CprDistributionRuleFilter.DEFAULT_FILTER_NAME, CprDistributionRuleFilter.TYPE, true));
+			return filterNames;
+		}
+	}
+
+	@Override
+	public List<FilterNamePO> getFilterNamesText(long municipalityId) {
+		Query query = entityManager.createQuery("SELECT filterName FROM DistributionRuleFilterName filterName WHERE filterName.municipality.id = :municipalityId AND filterName.type = 'TextDistributionRuleFilter'");
+		query.setParameter("municipalityId", municipalityId);
+
+		List<DistributionRuleFilterName> results = (List<DistributionRuleFilterName>)query.getResultList();
+
+		if (results != null && !results.isEmpty()) {
+			return results.stream().map(FilterNamePO::new).collect(Collectors.toList());
+		}
+		else { // return default name
+			List<FilterNamePO> filterNames = new ArrayList<>();
+			filterNames.add(new FilterNamePO(-1L, TextDistributionRuleFilter.DEFAULT_FILTER_NAME, TextDistributionRuleFilter.TYPE, true));
+			return filterNames;
+		}
+	}
+
+	@Override
+	public FilterNamePO getDefaultDateFilterName(long municipalityId) {
+		Query query = entityManager.createQuery("SELECT filterName FROM DistributionRuleFilterName filterName WHERE filterName.municipality.id = :municipalityId AND filterName.type = 'CprDistributionRuleFilter' AND filterName.defaultName = true");
+		query.setParameter("municipalityId", municipalityId);
+
+		List results = query.getResultList();
+
+		if (results != null && !results.isEmpty()) {
+			if (results.size() == 1) {
+				return new FilterNamePO((DistributionRuleFilterName)query.getSingleResult());
+			}
+			else {
+				log.error("More than one default date filter name found!");
+				return null;
+			}
+		}
+		else { // return default filter name
+			return new FilterNamePO(-1L, CprDistributionRuleFilter.DEFAULT_FILTER_NAME, CprDistributionRuleFilter.TYPE, true);
+		}
+
+	}
+
+	@Override
+	public void setDefaultDateFilterName(long municipalityId, long filterId) {
+		Query query = entityManager.createQuery("SELECT filterName FROM DistributionRuleFilterName filterName WHERE filterName.municipality.id = :municipalityId AND filterName.type = 'CprDistributionRuleFilter'");
+		query.setParameter("municipalityId", municipalityId);
+		setDefaultFilterName(query.getResultList(), filterId);
+	}
+
+	@Override
+	public FilterNamePO updateFilterName(long municipalityId, FilterNamePO filterNamePO) {
+		FilterNamePO result = null;
+
+		Municipality municipality = municipalityRepository.findBy(municipalityId);
+
+		if (municipality != null) {
+			DistributionRuleFilterName distributionRuleFilterName;
+
+			if (filterNamePO.getId() > 0) { // update existing filter name
+				distributionRuleFilterName = distributionRuleFilterNameRepository.findBy(filterNamePO.getId());
+				distributionRuleFilterName.setDefaultName(filterNamePO.isDefaultName());
+			}
+			else { // create new filter name
+				// determine if this is the first filter name being created
+				Query query = entityManager.createQuery("SELECT filterName FROM DistributionRuleFilterName filterName WHERE filterName.municipality.id = :municipalityId AND filterName.type = '" + filterNamePO.getType() + "'");
+				query.setParameter("municipalityId", municipalityId);
+
+				boolean firstFilterName = query.getResultList() == null || query.getResultList().isEmpty();
+
+				distributionRuleFilterName = new DistributionRuleFilterName();
+				distributionRuleFilterName.setType(filterNamePO.getType()); // type is only needed for new filter names (changing types is not allowed)
+
+				if (firstFilterName) { // since this is the first filter name of its kind, it should be marked as default
+					distributionRuleFilterName.setDefaultName(true);
+				}
+			}
+
+			// set general values
+			distributionRuleFilterName.setName(filterNamePO.getName());
+			distributionRuleFilterName.setMunicipality(municipality);
+
+			distributionRuleFilterNameRepository.save(distributionRuleFilterName);
+
+			result = new FilterNamePO(distributionRuleFilterName);
+		}
+
+		return result;
+	}
+
+	@Override
+	public void deleteFilterName(long municipalityId, long filterId) {
+		Query query = entityManager.createQuery("DELETE FROM DistributionRuleFilterName filterName WHERE filterName.municipality.id = :municipalityId AND filterName.id = :filterId");
+		query.setParameter("municipalityId", municipalityId);
+		query.setParameter("filterId", filterId);
+		query.executeUpdate();
+	}
+
+	@Override
+	public FilterNamePO getDefaultTextFilterName(long municipalityId) {
+		Query query = entityManager.createQuery("SELECT filterName FROM DistributionRuleFilterName filterName WHERE filterName.municipality.id = :municipalityId AND filterName.type = 'TextDistributionRuleFilter' AND filterName.defaultName = true");
+		query.setParameter("municipalityId", municipalityId);
+
+		List results = query.getResultList();
+
+		if (results != null && !results.isEmpty()) {
+			if (results.size() == 1) {
+				return new FilterNamePO((DistributionRuleFilterName)query.getSingleResult());
+			}
+			else {
+				log.error("More than one default text filter name found!");
+				return null;
+			}
+		}
+		else { // return default filter name
+			return new FilterNamePO(-1L, TextDistributionRuleFilter.DEFAULT_FILTER_NAME, TextDistributionRuleFilter.TYPE, true);
+		}
+	}
+
+	@Override
+	public void setDefaultTextFilterName(long municipalityId, long filterId) {
+		Query query = entityManager.createQuery("SELECT filterName FROM DistributionRuleFilterName filterName WHERE filterName.municipality.id = :municipalityId AND filterName.type = 'TextDistributionRuleFilter'");
+		query.setParameter("municipalityId", municipalityId);
+		setDefaultFilterName(query.getResultList(), filterId);
+	}
 
     /**
      * Finds DistributionRules for that are top level and unassigned.
@@ -405,4 +563,20 @@ public class DistributionServiceImpl implements DistributionService {
 //			return getImplicitOwner(dr.getParent().orElse(null));
 //		}
 //	}
+
+	private void setDefaultFilterName(List<DistributionRuleFilterName> filterNames, long filterId) {
+		for (DistributionRuleFilterName currFilterName: filterNames) {
+			if (currFilterName.isDefaultName() && currFilterName.getId() != filterId) {
+				log.info("Disabling default for {}" + currFilterName.getName());
+				currFilterName.setDefaultName(false);
+			}
+			else if (currFilterName.getId() == filterId) {
+				log.info("Setting default to {}" + currFilterName.getName());
+				currFilterName.setDefaultName(true);
+			}
+
+			distributionRuleFilterNameRepository.save(currFilterName);
+		}
+	}
+
 }

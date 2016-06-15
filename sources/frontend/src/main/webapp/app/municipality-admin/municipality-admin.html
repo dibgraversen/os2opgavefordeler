@@ -91,17 +91,100 @@
 					</div>
 				</div>
 			</tab>
+			<tab heading="Dato-parametre">
+				<div class="panel panel-default margin-top">
+					<div class="panel-heading">
+						Vedligehold dato-parametre
+					</div>
+					<div class="panel-body">
+						<p>
+							Her kan du vedligeholde navnene på de parametre, som sendes med i API-kald og benyttes til datofordeling.
+						</p>
+
+						<p>
+							<b>NB:</b> Hvis ingen navne er angivet, så vil parameternavnet "dato" være tilgængelig ved oprettelse af udvidede fordelingsregler.
+						</p>
+
+						<table class="table table-hover" style="table-layout: auto">
+							<thead>
+							<tr>
+								<th style="width: 400px">Navn</th>
+								<th style="width: 200px"></th>
+							</tr>
+							</thead>
+							<tbody>
+								<tr ng-repeat="dateParam in dateParameters | filter: idFilter">
+									<td>{{ dateParam.name }}
+										<span ng-show="dateParam.defaultName"
+										      class="glyphicon glyphicon-exclamation-sign"
+										      style="color:lightskyblue"
+										      popover-trigger="mouseenter" popover-append-to-body="true"
+										      popover="Dette parameternavn er default"></span>
+									</td>
+									<td align="right">
+										<a ng-hide="dateParam.defaultName" href="" class="btn btn-primary" ng-click="setDefaultDateParameter(dateParam)">Vælg som default</a>
+										<a href="" class="btn btn-primary" ng-click="editParameter(dateParam)">Rediger</a>
+										<a href="" class="btn btn-danger" ng-click="deleteDateParameter(dateParam)">Slet</a>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+
+						<div class="actions">
+							<div class="text-right">
+								<button class="btn btn-default" ng-click="addDateParameter()">Tilføj parameter</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</tab>
+			<tab heading="Tekst-parametre">
+				<div class="panel panel-default margin-top">
+					<div class="panel-heading">
+						Vedligehold tekst-parametre
+					</div>
+					<div class="panel-body">
+						<p>
+							Her kan du vedligeholde navnene på de parametre, som sendes med i API-kald og benyttes til tekstfordeling.
+						</p>
+
+						<p>
+							<b>NB:</b> Hvis ingen navne er angivet, så vil parameternavnet "tekst" være tilgængelig ved oprettelse af udvidede fordelingsregler.
+						</p>
+
+						<table class="table table-hover" style="table-layout: fixed">
+							<thead>
+							<tr>
+								<th style="width: 400px">Navn</th>
+								<th style="width: 200px"></th>
+							</tr>
+							</thead>
+							<tbody>
+								<tr ng-repeat="textParam in textParameters | filter: idFilter">
+									<td>{{ textParam.name }}
+											<span ng-show="textParam.defaultName"
+											      class="glyphicon glyphicon-exclamation-sign"
+											      style="color:lightskyblue"
+											      popover-trigger="mouseenter" popover-append-to-body="true"
+											      popover="Dette parameternavn er default"></span>
+									</td>
+									<td align="right">
+										<a ng-hide="textParam.defaultName" href="" class="btn btn-primary" ng-click="setDefaultTextParameter(textParam)">Vælg som default</a>
+										<a href="" class="btn btn-primary" ng-click="editParameter(textParam)">Rediger</a>
+										<a href="" class="btn btn-danger" ng-click="deleteTextParameter(textParam)">Slet</a>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+
+						<div class="actions">
+							<div class="text-right">
+								<button class="btn btn-default" ng-click="addTextParameter()">Tilføj parameter</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</tab>
 		</tabset>
 	</div>
-
-	<!--
-	TODO:
-	*) Upload new KLE
-	*) Show status for upload-processing
-	*) List of municipalities, edit
-	*) Add new municipality (including primary responsible - set as email? Pick from OrgUnit tree?)
-	*) Delete (type in name to confirm)
-	*) Add / remove administrators
-
-	-->
 </div>

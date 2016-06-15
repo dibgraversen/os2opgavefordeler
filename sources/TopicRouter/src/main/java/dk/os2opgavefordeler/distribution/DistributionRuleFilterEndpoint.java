@@ -81,14 +81,12 @@ public class DistributionRuleFilterEndpoint extends Endpoint {
 
     @POST
     @Path("/{ruleId}/filters/{filterId}")
-    public Response updateFilter(
-            @PathParam("ruleId") long ruleId,
-            @PathParam("filterId") long filterId,
-            DistributionRuleFilterDTO dto) {
+    public Response updateFilter(@PathParam("ruleId") long ruleId, @PathParam("filterId") long filterId, DistributionRuleFilterDTO dto) {
         try {
             controller.updateFilter(ruleId, filterId, dto);
             return ok();
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             return badRequest(e.getMessage());
         }
     }
@@ -97,31 +95,32 @@ public class DistributionRuleFilterEndpoint extends Endpoint {
     @Path("/")
     public Response createFilter(DistributionRuleFilterDTO dto) {
         try {
-            if(dto.filterId == 0) {
+            if (dto.filterId == 0) {
                 controller.createFilter(dto);
-            } else {
+            }
+            else {
                 controller.updateFilter(dto.distributionRuleId, dto.filterId, dto);
             }
+
             return ok();
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             return badRequest(e.getMessage());
         }
     }
 
     @DELETE
     @Path("/{distributionRuleId}/{id}")
-    public Response deleteFilter(
-            @PathParam("distributionRuleId") long distributionRuleId,
-            @PathParam("id") long filterId) {
+    public Response deleteFilter(@PathParam("distributionRuleId") long distributionRuleId, @PathParam("id") long filterId) {
 
         try {
             controller.deleteFilter(distributionRuleId, filterId);
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             return badRequest(e.getMessage());
         }
 
         return ok();
-
     }
 
     public Response createRule(DistributionRulePO dto) {

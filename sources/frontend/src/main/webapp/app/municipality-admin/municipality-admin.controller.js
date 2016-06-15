@@ -33,14 +33,23 @@
 		$scope.uploadFile = null;
 		$scope.mAdminAlerts = [];
 		$scope.kles = [];
+		$scope.dateParameters = [];
+		$scope.textParameters = [];
 		$scope.apiKey = {};
-
 		$scope.upload = upload;
 		$scope.closeAlert = closeAlert;
 		$scope.addKle = addKle;
 		$scope.editKle = editKle;
 		$scope.deleteKle = deleteKle;
 		$scope.editApiKey = editApiKey;
+		$scope.setDefaultTextParameter = setDefaultTextParameter;
+		$scope.setDefaultDateParameter = setDefaultDateParameter;
+		$scope.addDateParameter = addDateParameter;
+		$scope.addTextParameter = addTextParameter;
+		$scope.editParameter = editParameter;
+		$scope.deleteTextParameter = deleteTextParameter;
+		$scope.deleteDateParameter = deleteDateParameter;
+		$scope.idFilter = idFilter;
 
 		activate();
 
@@ -51,12 +60,21 @@
 				$log.info("not privileged, redirecting to home");
 				$state.go("home");
 			}
+
 			topicRouterApi.getKlesForMunicipality($scope.user.municipality).then(function(kles){
 				$scope.kles = kles;
 			});
 
 			topicRouterApi.getApiKey($scope.user.municipality).then(function(apiKey){
 				$scope.apiKey = apiKey;
+			});
+
+			topicRouterApi.getTextParamsForMunicipality($scope.user.municipality).then(function(textParams){
+				$scope.textParameters = textParams;
+			});
+
+			topicRouterApi.getDateParamsForMunicipality($scope.user.municipality).then(function(dateParams){
+				$scope.dateParameters = dateParams;
 			});
 		}
 
@@ -99,6 +117,89 @@
 					msg: 'Du har ikke valgt en fil.'
 				}];
 			}
+		}
+
+		// API
+		function addDateParameter() {
+			var modalInstance = $modal.open({
+				templateUrl: 'app/municipality-admin/add-parameter-name-modal.html',
+				controller: 'AddParameterNameModalInstanceCtrl',
+				size: 'md',
+				resolve: {
+					parameter: function() {
+						return false;
+					},
+					type: function() {
+						return 'CprDistributionRuleFilter';
+					},
+					municipality: function() {
+						return $scope.user.municipality;
+					}
+				}
+			});
+
+			modalInstance.result.then(function(parameter) {
+				$scope.dateParameters.push(parameter);
+			});
+		}
+
+		function editParameter(parameter) {
+			var modalInstance = $modal.open({
+				templateUrl: 'app/municipality-admin/add-parameter-name-modal.html',
+				controller: 'AddParameterNameModalInstanceCtrl',
+				size: 'md',
+				resolve: {
+					parameter: function () {
+						return parameter;
+					},
+					type: function () {
+						return parameter.type;
+					},
+					municipality: function () {
+						return $scope.user.municipality;
+					}
+				}
+			});
+
+			modalInstance.result.then(function (updatedParameter) {
+				if (updatedParameter.type == 'TextDistributionRuleFilter') {
+					updateParameterName($scope.textParameters, updatedParameter);
+				}
+				else {
+					updateParameterName($scope.dateParameters, updatedParameter);
+				}
+			});
+		}
+
+		function updateParameterName(paramArray, updatedParameter) {
+			for (var i = 0; i < paramArray.length; i++) {
+				if (paramArray[i].id == updatedParameter.id) {
+					paramArray[i].name = updatedParameter.name;
+				}
+			}
+		}
+
+		function addTextParameter(){
+			var modalInstance = $modal.open({
+				templateUrl: 'app/municipality-admin/add-parameter-name-modal.html',
+				controller: 'AddParameterNameModalInstanceCtrl',
+				size: 'md',
+				resolve: {
+					parameter: function() {
+						return false;
+					},
+					type: function() {
+						return 'TextDistributionRuleFilter';
+					},
+					municipality: function() {
+						return $scope.user.municipality;
+					}
+				}
+			});
+
+			modalInstance.result.then(function(parameter) {
+				$scope.textParameters.push(parameter);
+			});
 		}
 
 		function closeAlert(index) {
@@ -173,8 +274,99 @@
 					});
 		}
 
+		function setDefaultTextParameter(textParam) {
+			textParam.defaultName = !textParam.defaultName;
+
+			topicRouterApi.setDefaultTextParamForMunicipality($scope.user.municipality, textParam).then(function() {
+				for (var i = 0; i < $scope.textParameters.length; i++) {
+					$scope.textParameters[i].defaultName = false;
+				}
+
+				textParam.defaultName = true;
+			},
+			function() { // call failed
+				textParam.defaultName = false;
+
+				$scope.mAdminAlerts = [{
+					type: 'warning',
+					msg: 'Kunne ikke sætte parameteren som default.'
+				}];
+			});
+		}
+
+		function setDefaultDateParameter(dateParam) {
+			topicRouterApi.setDefaultDateParamForMunicipality($scope.user.municipality, dateParam).then(function() {
+				for (var i = 0; i < $scope.dateParameters.length; i++) {
+					$scope.dateParameters[i].defaultName = false;
+				}
+
+				dateParam.defaultName = true;
+			},
+			function() { // call failed
+				dateParam.defaultName = false;
+
+				$scope.mAdminAlerts = [{
+					type: 'warning',
+					msg: 'Kunne ikke sætte parameteren som default.'
+				}];
+			});
+		}
+
+		function deleteDateParameter(parameter) {
+			topicRouterApi.deleteDateParameter($scope.user.municipality, parameter).then(function() {
+				// remove object from array
+				$scope.dateParameters = $scope.dateParameters.filter(function (el) {
+					return el.id !== parameter.id;
+				});
+				
+				// if the parameter was the default parameter, select a new default
+				if (parameter.defaultName) {
+					var storedParams = $scope.dateParameters.filter(function (el) {
+						return el.id !== -1;
+					});
+
+					if (storedParams && storedParams.length > 0) {
+						setDefaultDateParameter(storedParams[0]);
+					}
+				}
+			},
+			function() { // call failed
+				$scope.mAdminAlerts = [{
+					type: 'warning',
+					msg: 'Kunne ikke slette parameteren.'
+				}];
+			});
+		}
+
+		function deleteTextParameter(parameter) {
+			topicRouterApi.deleteTextParameter($scope.user.municipality, parameter).then(function() {
+				// remove object from array
+				$scope.textParameters = $scope.textParameters.filter(function (el) {
+					return el.id !== parameter.id;
+				});
+
+				// if the parameter was the default parameter, select a new default
+				if (parameter.defaultName) {
+					var storedParams = $scope.textParameters.filter(function (el) {
+						return el.id !== -1;
+					});
+
+					if (storedParams && storedParams.length > 0) {
+						setDefaultTextParameter(storedParams[0]);
+					}
+				}
+			},
+			function() { // call failed
+				$scope.mAdminAlerts = [{
+					type: 'warning',
+					msg: 'Kunne ikke slette parameteren.'
+				}];
+			});
+		}
+
 		function addKle(){
 			clearMessages();
+
 			$modal.open({
 				resolve: {
 					municipality: function(){
@@ -223,6 +415,10 @@
 									});
 						}
 					});
+		}
+
+		function idFilter(element) {
+			return element.id != -1;
 		}
 	}
 })();

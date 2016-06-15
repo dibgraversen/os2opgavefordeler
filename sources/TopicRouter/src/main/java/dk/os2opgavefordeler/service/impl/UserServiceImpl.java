@@ -252,30 +252,7 @@ public class UserServiceImpl implements UserService {
                 }
         );
 
-	    UserSettingsPO userSettingsPO = new UserSettingsPO(settings);
-
-	    // TODO: Once the extended responsibility functionality is fixed, remove this setting
-	    final User user = userRepository.findBy(userId);
-
-	    boolean extendedResponsibility = false;
-
-	    if (user != null) {
-		    if (user.getMunicipality() != null && user.getMunicipality().getId() == 20001) { // only Syddjurs municipality are using this for now
-			    extendedResponsibility = true;
-			    log.info("Extended responsibility always enabled for Syddjurs");
-		    }
-		    else {
-			    extendedResponsibility = configService.isExtendedResponsibilityEnabled();
-			    log.info("Extended responsibility enabled for {}: {}", user.getMunicipality().getName(), extendedResponsibility);
-		    }
-	    }
-	    else {
-		    log.error("No user with ID '{}' found when getting settings", userId);
-	    }
-
-	    userSettingsPO.setExtendedResponsibilityEnabled(extendedResponsibility);
-
-        return userSettingsPO;
+        return new UserSettingsPO(settings);
     }
 
     @Override

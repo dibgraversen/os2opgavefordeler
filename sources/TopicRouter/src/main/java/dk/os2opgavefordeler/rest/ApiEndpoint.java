@@ -129,7 +129,8 @@ public class ApiEndpoint extends Endpoint {
 
         if (everythingIsOk) {
             return ok("We get signal.");
-        } else {
+        }
+        else {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Somebody set up us the bomb.").build();
         }
     }

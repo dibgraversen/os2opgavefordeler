@@ -1,26 +1,34 @@
 package dk.os2opgavefordeler.model;
 
+import dk.os2opgavefordeler.util.FilterHelper;
+
+import java.util.Map;
+
 import javax.persistence.Entity;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public class CprDistributionRuleFilter extends DistributionRuleFilter {
 
+	public static final String DEFAULT_FILTER_NAME = "dato";
+	public static final String TYPE = "CprDistributionRuleFilter";
+
     /**
-     * String is in format of 3-5,10-15 which means from 3 to 5 and from 10 to 15. In long form:
-     * 3,4,5,10,11,12,13,14,15
+     * String is in format of 3-5,10-15 which means from 3 to 5 and from 10 to 15.
+     *
+     * In long form: 3,4,5,10,11,12,13,14,15
+     *
      * This signifies which days of the month to filter for
      */
     private String days;
 
     /**
-     * String is in format of 3-5,10-12 which means from 3 to 5 and from 10 to 12. In long form:
-     * 3,4,5,10,11,12
+     * String is in format of 3-5,10-12 which means from 3 to 5 and from 10 to 12.
+     *
+     * In long form: 3,4,5,10,11,12
+     *
      * This signifies which months in the year to filter for
      */
     private String months;
@@ -33,49 +41,31 @@ public class CprDistributionRuleFilter extends DistributionRuleFilter {
 
     }
 
-    private List<Integer> stringAsIntRangeList(String s) {
-        List<Integer> res = new ArrayList<>();
-        String[] daysArray = s.split(",");
-        for (String d : daysArray) {
-            // range
-            if (d.contains("-")) {
-                int begin = Integer.parseInt(d.split("-")[0]);
-                int end = Integer.parseInt(d.split("-")[1]);
-                if (end < begin) {
-                    int tmp = begin;
-                    begin = end;
-                    end = tmp;
-                }
-                for (int i = begin; i <= end; i++) {
-                    res.add(i);
-                }
-            } else {
-                res.add(Integer.parseInt(d));
-            }
-        }
-        return res;
-    }
-
     @Override
     public boolean matches(Map<String, String> parameters) {
-
-        if (!parameters.containsKey(getName())) {
+	    if (!parameters.containsKey(getName())) {
             return false;
         }
+
         String param = parameters.get(getName());
 
-        if (param.length() < 4) {
+	    if (param.length() < 4) {
             return false;
         }
 
         int day = Integer.parseInt(param.substring(0, 2));
         int month = Integer.parseInt(param.substring(2, 4));
 
-        if (!stringAsIntRangeList(days).contains(day)) {
-            return false;
-        }
+	    if (days == null || days.isEmpty()) { // only check for month
+		    return FilterHelper.stringAsIntRangeList(months).contains(month);
+	    }
 
-        return stringAsIntRangeList(months).contains(month);
+	    if (months != null && !months.isEmpty()) { // check for both month and day
+		    return FilterHelper.stringAsIntRangeList(months).contains(month) && FilterHelper.stringAsIntRangeList(days).contains(day);
+	    }
+	    else { // no months or days defined in filter
+		    return false;
+	    }
     }
 
     public String getDays() {

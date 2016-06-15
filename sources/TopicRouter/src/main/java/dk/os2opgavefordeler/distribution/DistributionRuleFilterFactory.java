@@ -40,11 +40,10 @@ public class DistributionRuleFilterFactory {
 	 * @return the resulting DistributionRuleFilter
 	 */
     public DistributionRuleFilter fromDto(DistributionRuleFilterDTO dto) {
-        // Try to create from existing
+        // try to create from existing
         DistributionRule rule = repository.findBy(dto.distributionRuleId);
 
         if (CprDistributionRuleFilterDTO.FILTER_TYPE.equals(dto.type)) {
-
             CprDistributionRuleFilter filter = new CprDistributionRuleFilter();
 
             if (rule.getFilterById(dto.filterId) != null) {
@@ -62,7 +61,6 @@ public class DistributionRuleFilterFactory {
             return filter;
         }
         else if (TextDistributionRuleFilterDTO.FILTER_TYPE.equals(dto.type)) {
-
             TextDistributionRuleFilter filter = new TextDistributionRuleFilter();
 
             if (rule.getFilterById(dto.filterId) != null) {
@@ -76,8 +74,6 @@ public class DistributionRuleFilterFactory {
             filter.setDistributionRule(rule);
 
             return filter;
-
-
         }
 
         throw new RuntimeException("Bad data");

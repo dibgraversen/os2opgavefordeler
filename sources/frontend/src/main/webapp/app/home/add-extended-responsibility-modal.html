@@ -26,8 +26,8 @@
 	                    <td>{{ filter.assignedOrgName }}</td>
 	                    <td>{{ filter.assignedEmployeeName }}</td>
 	                    <td align="right">
-		                    <a href="" class="btn btn-primary" ng-click="show(filter.filterId, filter.type)">Vis</a>
-		                    <a href="" class="btn btn-danger" ng-click="removeFilter(filter.filterId)">Slet</a>
+		                    <a href="" class="btn btn-primary" ng-click="show(filter)">Vis</a>
+		                    <a href="" class="btn btn-danger" ng-click="removeFilter(filter)">Slet</a>
 	                    </td>
 	                </tr>
                 </tbody>
@@ -40,9 +40,8 @@
 	                <!-- Date based filter -->
                     <tab ng-click="model.type='cpr'" heading="Dato" active="active.cpr">
                         <p>
-                            <label for="filter_name">Navn:
-                                <input type="text" class="form-control" ng-model="model.name" name="filter_name" id="filter_name">
-                            </label>
+                            <label for="filter_name_date">Navn: </label>
+                            <select class="form-control" style="width:300px;" name="filter_name_date" id="filter_name_date" ng-change="setSelectedDateParam(selectedDateParam)" ng-model="selectedParams.cpr" ng-options="filter.name for filter in dateParameters track by filter.name"></select>
                         </p>
 
                         <p>
@@ -60,13 +59,12 @@
 
 	                <!-- Text based filter -->
                     <tab heading="Tekst" ng-click="model.type='text'" active="active.text">
-                        <p>
-                            <label for="filter_name2">Navn:
-                                <input type="text" class="form-control" ng-model="model.name" name="filter_name" id="filter_name2">
-                            </label>
-                        </p>
+	                    <p>
+		                    <label for="filter_name_text">Navn: </label>
+		                    <select class="form-control" style="width:300px;" name="filter_name_text" id="filter_name_text" ng-change="setSelectedTextParam(selectedTextParam)" ng-model="selectedParams.text" ng-options="filter.name for filter in textParameters track by filter.name"></select>
+	                    </p>
 
-                        <p>
+	                    <p>
                             <label for="filter_text">Tekst: <span>(Brug * til wildcard søgning. * kan placeres først og sidst i teksten.)</span>
                                 <input type="text" class="form-control" ng-model="model.text" name="filter_text" id="filter_text">
                             </label>
@@ -182,7 +180,7 @@
 	           style="width: 100%">{{alert.msg}}
 	    </alert>
 
-	    <a href="" class="btn btn-primary" ng-click="currentTab='list'">Annuller</a>
+	    <a href="" class="btn btn-primary" ng-click="cancelEdit()">Annuller</a>
         <a href="" class="btn btn-primary" ng-click="createFilter()">Opret</a>
     </div>
     <div class="modal-footer ng-cloak" ng-show="currentTab=='show'">
@@ -191,7 +189,7 @@
 	           style="width: 100%">{{alert.msg}}
 	    </alert>
 
-	    <a href="" class="btn btn-primary" ng-click="currentTab='list'">Annuller</a>
+	    <a href="" class="btn btn-primary" ng-click="cancelEdit()">Annuller</a>
         <a href="" class="btn btn-primary" ng-click="createFilter()">Opdater</a>
     </div>
 </div>

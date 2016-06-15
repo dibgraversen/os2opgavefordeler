@@ -42,6 +42,16 @@
 			deleteMunicipalityKle: deleteMunicipalityKle,
 			getApiKey: getApiKey,
 			saveApiKey: saveApiKey,
+			getTextParamsForMunicipality: getTextParamsForMunicipality,
+			getDateParamsForMunicipality: getDateParamsForMunicipality,
+			setDefaultTextParamForMunicipality: setDefaultTextParamForMunicipality,
+			getDefaultTextParamForMunicipality: getDefaultTextParamForMunicipality,
+			setDefaultDateParamForMunicipality: setDefaultDateParamForMunicipality,
+			getDefaultDateParamForMunicipality: getDefaultDateParamForMunicipality,
+			deleteTextParameter: deleteTextParameter,
+			deleteDateParameter: deleteDateParameter,
+			updateDateParameterName: updateDateParameterName,
+			updateTextParameterName: updateTextParameterName,
 
 			//
 			getFiltersForRule: getFiltersForRule,
@@ -378,6 +388,50 @@
 			return httpPost('/municipalities/' + municipality + '/apikey/' + apiKey);
 		}
 
+		function getTextParamsForMunicipality(municipality) {
+			return httpGet('/distribution-rules/text/names', {"municipalityId": municipality.id});
+		}
+
+		function getDateParamsForMunicipality(municipality) {
+			return httpGet('/distribution-rules/date/names', {"municipalityId": municipality.id});
+		}
+
+		function setDefaultTextParamForMunicipality(municipality, textParam) {
+			return httpPost('/distribution-rules/text/names/default/' + textParam.id + '?municipalityId=' + municipality.id);
+		}
+
+		function getDefaultTextParamForMunicipality(municipality) {
+			return httpGet('/distribution-rules/text/names/default'+ '?municipalityId=' + municipality.id);
+		}
+
+		function setDefaultDateParamForMunicipality(municipality, dateParam) {
+			return httpPost('/distribution-rules/date/names/default/' + dateParam.id + '?municipalityId=' + municipality.id);
+		}
+
+		function getDefaultDateParamForMunicipality(municipality) {
+			return httpGet('/distribution-rules/date/names/default' + '?municipalityId=' + municipality.id);
+		}
+
+		function deleteDateParameter(municipality, parameter) {
+			return httpDelete('/distribution-rules/date/names/' + parameter.id + '?municipalityId=' + municipality.id);
+		}
+
+		function deleteTextParameter(municipality, parameter) {
+			return httpDelete('/distribution-rules/text/names/' + parameter.id + '?municipalityId=' + municipality.id);
+		}
+
+		function updateDateParameterName(municipality, parameter) {
+			$log.info('Updating date parameter: ' + JSON.stringify(parameter));
+
+			return httpPost('/distribution-rules/date/names' + '?municipalityId=' + municipality.id, parameter);
+		}
+
+		function updateTextParameterName(municipality, parameter) {
+			$log.info('Updating text parameter: ' + JSON.stringify(parameter));
+
+			return httpPost('/distribution-rules/text/names' + '?municipalityId=' + municipality.id, parameter);
+		}
+		
 		// DTO classes.
 
 		/**

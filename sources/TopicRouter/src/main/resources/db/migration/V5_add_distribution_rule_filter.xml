@@ -52,5 +52,28 @@
                                  baseTableName="distributionrule_distributionrulefilter" baseColumnNames="filters_id"
                                  referencedTableName="distributionrulefilter" referencedColumnNames="id"/>
 
+        <!-- distributionrulefilternames -->
+        <createTable tableName="distributionrulefiltername">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true" unique="true"/>
+            </column>
+            <column name="name" type="varchar">
+                <constraints nullable="false"/>
+            </column>
+	        <column name="type" type="varchar">
+		        <constraints nullable="false"/>
+	        </column>
+            <column name="default" type="boolean" defaultValue="false">
+                <constraints nullable="false"/>
+            </column>
+	        <column name="municipality_id" type="bigint"/>
+        </createTable>
+
+	    <addForeignKeyConstraint constraintName="distributionrulefiltername2municipality"
+	                             baseTableName="distributionrulefiltername"
+	                             baseColumnNames="municipality_id"
+	                             referencedTableName="municipality"
+	                             referencedColumnNames="id"/>
+
     </changeSet>
 </databaseChangeLog>

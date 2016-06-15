@@ -15,12 +15,22 @@
         $scope.currentTab = 'list';
 	    $scope.ruleAlerts = [];
 	    $scope.initialType = '';
+	    $scope.initialName = '';
 	    $scope.municipalityId = $scope.user.municipality.id;
 
-        function cleanModel() {
-	        $log.info('ExtendedResponsibilityController::cleanModel (type: ' + $scope.type + ')');
+	    $scope.dateParameters = [];
+	    $scope.textParameters = [];
 
-            $scope.selectedOrgUnit = {};
+	    $scope.defaultDateParam = {};
+	    $scope.defaultTextParam = {};
+
+	    $scope.selectedParams = {
+		    cpr: false,
+		    text: false
+	    };
+
+        function cleanModel() {
+	        $scope.selectedOrgUnit = {};
 	        $scope.selectedEmp = {};
 
 	        $scope.searchResult = {};
@@ -60,6 +70,10 @@
         $scope.setSelectedEmp = setSelectedEmp;
         $scope.show = show;
 	    $scope.closeAlert = closeAlert;
+	    $scope.cancelEdit = cancelEdit;
+
+	    $scope.setSelectedDateParam = setSelectedDateParam;
+	    $scope.setSelectedTextParam = setSelectedTextParam;
 
         $scope.search = {
             municipalityId: $scope.user.municipality.id,
@@ -80,30 +94,43 @@
 		    cpr: true
 	    };
 
+	    function setDefaultDateParameterName() {
+		    topicRouterApi.getDefaultDateParamForMunicipality($scope.user.municipality).then(function(param) {
+			    $scope.defaultDateParam = param;
+			    $scope.selectedParams.cpr = param;
+		    });
+	    }
+
+	    function setDefaultTextParameterName() {
+		    topicRouterApi.getDefaultTextParamForMunicipality($scope.user.municipality).then(function (param) {
+			    $scope.defaultTextParam = param;
+			    $scope.selectedParams.text = param;
+		    });
+	    }
+
 	    var orgUnits = {};
 
 	    activate();
 
-        function show(filterId, filterType){
-            $log.info("ExtendedResponsibilityController::show filter " + filterId + " (type: " + filterType + ")");
-
+        function show(filter){
 	        $scope.ruleAlerts = [];
 
 	        $scope.model = cleanModel();
             $scope.currentTab = 'show';
-            $scope.model.filterId = filterId;
-	        $scope.model.type = filterType;
-	        $scope.type = filterType;
-	        $scope.initialType = filterType;
+            $scope.model.filterId = filter.filterId;
+	        $scope.model.type = filter.type;
+	        $scope.type = filter.type;
+	        $scope.initialType = filter.type;
+	        $scope.initialName = filter.name;
 
-	        activateTab(filterType); // select the correct tab based on filter type
+	        activateTab(filter.type); // select the correct tab based on filter type
 
 	        loadInitialData();
 
 	        topicRouterApi.getFiltersForRule($scope.topic.id).then(function(res){
                 for (var i in res) {
-                    if (res[i].filterId == filterId) {
-                        $scope.model = res[i];
+                    if (res[i].filterId == filter.filterId) {
+	                    $scope.model = res[i];
                     }
                 }
 
@@ -121,20 +148,36 @@
             });
         }
 
-        function updateFilter(){
-            $log.info("ExtendedResponsibilityController::updateFilter");
+	    function setSelectedDateParam(selectedParam) {
+		    if (selectedParam) {
+			    $scope.selectedParams.cpr = selectedParam;
+		    }
+	    }
 
+	    function setSelectedTextParam(selectedParam) {
+		    if (selectedParam) {
+			    $scope.selectedParams.text = selectedParam;
+		    }
+	    }
+
+        function updateFilter(){
 	        setFilterFromModel();
         }
 
         function createFilter(){
-	        $log.info("ExtendedResponsibilityController::createFilter (initial type was '" + $scope.initialType + "', new type is: '" + $scope.model.type + "')");
+	        // set correct name for model based on type
+	        if ($scope.model.type === 'cpr') {
+		        $scope.model.name = $scope.selectedParams.cpr.name;
+	        }
+	        else {
+		        $scope.model.name = $scope.selectedParams.text.name;
+	        }
 
 			if ($scope.model.name) { // the name must be supplied
 				if ($scope.selectedOrgUnit.id) { // the user must select an organisational unit
 					if ($scope.initialType === '' || $scope.initialType === $scope.model.type) {
 						if ($scope.model.type === 'cpr') { // make sure the user has provided days and/or months, if needed
-							if ($scope.model.days || $scope.model.months) {
+							if ($scope.model.months) {
 								// check that the numbers specified for days and/or months are valid
 								var validDays = true;
 								var validMonths = true;
@@ -169,7 +212,7 @@
 							else {
 								addAlert({
 									type: 'warning',
-									msg: 'Du skal angive dage og/eller måneder.'
+									msg: 'Du skal som minimum angive en eller flere måneder.'
 								});
 							}
 						}
@@ -211,8 +254,6 @@
         }
 
 	    function setFilterFromModel() {
-		    $log.info('ExtendedResponsibilityController::setFilterFromModel (type: ' + $scope.model.type + ')');
-
 		    topicRouterApi.createFilter($scope.model).then(function() {
 			    _refresh();
 			    $scope.currentTab = 'list'
@@ -290,8 +331,6 @@
         }
 
         function activate() {
-            $log.info("ExtendedResponsibilityController::activate");
-
             _refresh();
         }
 
@@ -299,32 +338,60 @@
 		    topicRouterApi.getEmployments($scope.municipalityId, currentEmployment, true).then(function(employments){
 			    $scope.employments = employments;
 		    });
+
+		    topicRouterApi.getTextParamsForMunicipality($scope.user.municipality).then(function(textParams){
+			    $scope.textParameters = textParams;
+
+			    if ($scope.initialName > '' && $scope.initialType == 'text') {
+				    for (var i = 0; i < $scope.textParameters.length; i++) {
+					    if ($scope.textParameters[i].name === $scope.initialName) {
+						    // select this parameter
+						    setSelectedTextParam($scope.textParameters[i]);
+						    break;
+					    }
+				    }
+
+				    setDefaultDateParameterName();
+			    }
+		    });
+
+		    topicRouterApi.getDateParamsForMunicipality($scope.user.municipality).then(function(dateParams){
+			    $scope.dateParameters = dateParams;
+
+			    if ($scope.initialName > '' && $scope.initialType == 'cpr') {
+				    for (var i = 0; i < $scope.dateParameters.length; i++) {
+					    if ($scope.dateParameters[i].name === $scope.initialName) {
+						    // select this parameter
+						    setSelectedDateParam($scope.dateParameters[i]);
+						    break;
+					    }
+				    }
+
+				    setDefaultTextParameterName();
+			    }
+		    });
 	    }
 
         function _refresh() {
-            $log.info("ExtendedResponsibilityController::_refresh (rule: " + $scope.topic.id + ")");
-
 	        topicRouterApi.getFiltersForRule($scope.topic.id).then(function (filters) {
                 $scope.filters = filters;
             });
         }
 
         function add() {
-	        $log.info('ExtendedResponsibilityController::add');
-
 	        loadInitialData();
 
             $scope.model = cleanModel();
-
 	        $scope.initialType = '';
-
+	        $scope.initialName = '';
             $scope.currentTab = "add";
+
+	        setDefaultDateParameterName();
+	        setDefaultTextParameterName();
         }
 
-        function removeFilter(filterId) {
-            $log.info("ExtendedResponsibilityController::removing filter " + filterId + ' for rule ' + $scope.topic.id);
-
-            topicRouterApi.removeFilter($scope.topic.id, filterId).then(function () {
+        function removeFilter(filter) {
+            topicRouterApi.removeFilter($scope.topic.id, filter.filterId).then(function () {
                 _refresh();
             });
 
@@ -332,10 +399,17 @@
         }
 
         function close() {
-            $log.info("ExtendedResponsibilityController::close");
-
 	        $modalStack.dismissAll('cancel');
         }
+
+	    function cancelEdit() {
+		    $scope.selectedParams.cpr = false;
+		    $scope.selectedParams.text = false;
+		    $scope.initialType = '';
+		    $scope.initialName = '';
+
+		    $scope.currentTab = 'list';
+	    }
 
 	    function addAlert(alert) {
 		    $scope.ruleAlerts.push(alert);

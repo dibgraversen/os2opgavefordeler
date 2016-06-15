@@ -3,6 +3,7 @@ package dk.os2opgavefordeler.rest;
 import dk.os2opgavefordeler.auth.AuthService;
 import dk.os2opgavefordeler.model.*;
 import dk.os2opgavefordeler.model.presentation.DistributionRulePO;
+import dk.os2opgavefordeler.model.presentation.FilterNamePO;
 import dk.os2opgavefordeler.service.DistributionService;
 import dk.os2opgavefordeler.service.OrgUnitService;
 import dk.os2opgavefordeler.service.PersistenceService;
@@ -41,6 +42,14 @@ public class DistributionRuleEndpoint extends Endpoint {
 	@Inject
 	private AuthService authService;
 
+	private static final String NOT_LOGGED_IN = "Not logged in";
+	private static final String NOT_AUTHORIZED = "Not authorized";
+	private static final String USER_NOT_FOUND = "User not found";
+	private static final String INVALID_MUNICIPALITY_ID = "You need to specify a valid municipality ID.";
+	private static final String NO_ORGUNIT_FOUND_FOR_USER = "Couldn't find organizational unit for user";
+	private static final String NO_EMPLOYMENT_FOUND_FOR_USER = "Couldn't find employment for user";
+	private static final String NO_ROLE_FOUND_FOR_USER = "Couldn't find role for user";
+
 	/**
 	 * Returns a list of distribution rules for the specified role and scope.
 	 *
@@ -55,7 +64,7 @@ public class DistributionRuleEndpoint extends Endpoint {
 		log.info("routesForEmployment[{},{}]", roleId, scope);
 
 		if (roleId == null || scope == null) {
-			return badRequest("need role and scope");
+			return badRequest("Invalid role and/or scope");
 		}
 
 		final Optional<Role> role = userService.findRoleById(roleId);
@@ -76,15 +85,15 @@ public class DistributionRuleEndpoint extends Endpoint {
 					}
 				}
 				else {
-					return badRequest("Kunne ikke finde ansættelsessted for bruger");
+					return badRequest(NO_ORGUNIT_FOUND_FOR_USER);
 				}
 			}
 			else {
-				return badRequest("Kunne ikke finde ansættelse for bruger");
+				return badRequest(NO_EMPLOYMENT_FOUND_FOR_USER);
 			}
 		}
 		else {
-			return badRequest("Kunne ikke finde rolle for bruger");
+			return badRequest(NO_ROLE_FOUND_FOR_USER);
 		}
 	}
 
@@ -99,7 +108,7 @@ public class DistributionRuleEndpoint extends Endpoint {
 		}
 
 		if (!authService.isAuthenticated()) {
-			return Response.status(Response.Status.UNAUTHORIZED).entity("Not logged in").build();
+			return Response.status(Response.Status.UNAUTHORIZED).entity(NOT_LOGGED_IN).build();
 		}
 
 		Optional<User> user = userService.findByEmail(authService.getAuthentication().getEmail());
@@ -122,11 +131,11 @@ public class DistributionRuleEndpoint extends Endpoint {
 						);
 			}
 			else {
-				return Response.status(Response.Status.UNAUTHORIZED).entity("Not authorized").build();
+				return Response.status(Response.Status.UNAUTHORIZED).entity(NOT_AUTHORIZED).build();
 			}
 		}
 		else {
-			return Response.status(Response.Status.NOT_FOUND).entity("User not found").build();
+			return Response.status(Response.Status.NOT_FOUND).entity(USER_NOT_FOUND).build();
 		}
 	}
 
@@ -148,27 +157,168 @@ public class DistributionRuleEndpoint extends Endpoint {
 				return ok(result);
 			}
 			else {
-				return badRequest("Could not find organizational unit for user");
+				return badRequest(NO_ORGUNIT_FOUND_FOR_USER);
 			}
 		}
 	}
 
 	@GET
 	@Path("/buildRules")
-	public Response buildRulesForMunicipality(@QueryParam("municipalityId") long municipalityId){
-		if(municipalityId < 0) {
+	public Response buildRulesForMunicipality(@QueryParam("municipalityId") long municipalityId) {
+		if (municipalityId < 0) {
 			log.info("buildRules - bad request[{}]", municipalityId);
-			return badRequest("municipalityId needed");
+			return badRequest(INVALID_MUNICIPALITY_ID);
 		}
+
 		distributionService.buildRulesForMunicipality(municipalityId);
+
 		return ok();
+	}
+
+	@GET
+	@Path("/text/names")
+	@Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
+	public Response getFilterNamesText(@QueryParam("municipalityId") long municipalityId) {
+		if (municipalityId < 0) {
+			log.info("#getFilterNames with no municipalityId");
+			return badRequest(INVALID_MUNICIPALITY_ID);
+		}
+		else {
+			return ok(distributionService.getFilterNamesText(municipalityId));
+		}
+	}
+
+	@POST
+	@Path("/text/names")
+	@Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
+	public Response updateTextFilterName(@QueryParam("municipalityId") long municipalityId, FilterNamePO filterNamePO) {
+		if (municipalityId < 0) {
+			log.info("#getFilterNames with no municipalityId");
+			return badRequest(INVALID_MUNICIPALITY_ID);
+		}
+		else {
+			return ok(distributionService.updateFilterName(municipalityId, filterNamePO));
+		}
+	}
+
+	@DELETE
+	@Path("/text/names/{filterNameId}")
+	@Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
+	public Response deleteTextFilterName(@PathParam("filterNameId") Long filterNameId, @QueryParam("municipalityId") long municipalityId) {
+		if (municipalityId < 0) {
+			log.info("#deleteFilterName with no municipalityId");
+			return badRequest(INVALID_MUNICIPALITY_ID);
+		}
+		else {
+			distributionService.deleteFilterName(municipalityId, filterNameId);
+
+			return ok();
+		}
+	}
+
+	@DELETE
+	@Path("/date/names/{filterNameId}")
+	@Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
+	public Response deleteDateFilterName(@PathParam("filterNameId") Long filterNameId, @QueryParam("municipalityId") long municipalityId) {
+		if (municipalityId < 0) {
+			log.info("#deleteFilterName with no municipalityId");
+			return badRequest(INVALID_MUNICIPALITY_ID);
+		}
+		else {
+			distributionService.deleteFilterName(municipalityId, filterNameId);
+
+			return ok();
+		}
+	}
+
+	@GET
+	@Path("/text/names/default")
+	@Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
+	public Response getDefaultFilterNameText(@QueryParam("municipalityId") long municipalityId) {
+		if (municipalityId < 0) {
+			log.info("#getFilterNames with no municipalityId");
+			return badRequest(INVALID_MUNICIPALITY_ID);
+		}
+		else {
+			return ok(distributionService.getDefaultTextFilterName(municipalityId));
+		}
+	}
+
+	@POST
+	@Path("/text/names/default/{filterNameId}")
+	@Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
+	public Response setDefaultFilterNameText(@PathParam("filterNameId") Long filterNameId, @QueryParam("municipalityId") long municipalityId) {
+		if (municipalityId < 0) {
+			log.info("#setDefaultFilterNameText with no municipalityId");
+			return badRequest(INVALID_MUNICIPALITY_ID);
+		}
+		else {
+			distributionService.setDefaultTextFilterName(municipalityId, filterNameId);
+
+			return ok();
+		}
+	}
+
+	@GET
+	@Path("/date/names")
+	@Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
+	public Response getFilterNamesDate(@QueryParam("municipalityId") long municipalityId) {
+		if (municipalityId < 0) {
+			log.info("#getFilterNames with no municipalityId");
+			return badRequest(INVALID_MUNICIPALITY_ID);
+		}
+		else {
+			return ok(distributionService.getFilterNamesDate(municipalityId));
+		}
+	}
+
+	@POST
+	@Path("/date/names")
+	@Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
+	public Response updateDateFilterName(@QueryParam("municipalityId") long municipalityId, FilterNamePO filterNamePO) {
+		if (municipalityId < 0) {
+			log.info("#getFilterNames with no municipalityId");
+			return badRequest(INVALID_MUNICIPALITY_ID);
+		}
+		else {
+			return ok(distributionService.updateFilterName(municipalityId, filterNamePO));
+		}
+	}
+
+	@GET
+	@Path("/date/names/default")
+	@Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
+	public Response getDefaultFilterNameDate(@QueryParam("municipalityId") long municipalityId) {
+		if (municipalityId < 0) {
+			log.info("#getFilterNames with no municipalityId");
+			return badRequest(INVALID_MUNICIPALITY_ID);
+		}
+		else {
+			return ok(distributionService.getDefaultDateFilterName(municipalityId));
+		}
+	}
+
+	@POST
+	@Path("/date/names/default/{filterNameId}")
+	@Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
+	public Response setDefaultFilterNameDate(@PathParam("filterNameId") Long filterNameId, @QueryParam("municipalityId") long municipalityId) {
+		if (municipalityId < 0) {
+			log.info("#setDefaultFilterNameText with no municipalityId");
+			return badRequest(INVALID_MUNICIPALITY_ID);
+		}
+		else {
+			distributionService.setDefaultDateFilterName(municipalityId, filterNameId);
+
+			return ok();
+		}
 	}
 
 	//TODO: code below this point should probably be refactored to service methods.
 	private Response doUpdateResponsibleOrganization(DistributionRule existing, DistributionRulePO updated) {
 		if(!allowedToUpdate(existing)) {
 			log.warn("User {} doesn't have permissions to update {}", "<WeDontHaveUsersYet>", existing);
-			return Response.status(Response.Status.FORBIDDEN).build();
+
+			return forbidden();
 		}
 		try {
 			updateDistributionRule(existing, updated);
@@ -179,7 +329,7 @@ public class DistributionRuleEndpoint extends Endpoint {
 			return Response.serverError().build();
 		}
 
-		return Response.ok().build();
+		return ok();
 	}
 
 	private boolean allowedToUpdate(DistributionRule existing) {
