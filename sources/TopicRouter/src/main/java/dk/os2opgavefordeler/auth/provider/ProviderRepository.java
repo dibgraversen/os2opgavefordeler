@@ -36,7 +36,7 @@ public class ProviderRepository {
         }
 
         providers.put(2L, IdentityProvider.builder()
-                .id(2).name("Kitos SSO")
+                .id(2).name("OS2 SSO")
                 .url("https://os2saml.syddjurs.dk/")
                 .clientId("suneclient")
                 .clientSecret("secret")

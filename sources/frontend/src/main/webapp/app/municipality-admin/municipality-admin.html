@@ -11,9 +11,11 @@
 						Upload ny organisationsstruktur
 					</div>
 					<div class="panel-body">
-						<p>Her kan du uploade en ny fil med organisationsstruktur. Bemærk at organisationsenheder, der ikke findes i filen vil blive slettet ved opdatering.</p>
+						<p>Her kan du uploade en ny JSON-fil med organisationsstruktur.</p>
 
-						<p>Klik <a target="_blank" href="/public/org_example.json">her</a> for eksempel.</p>
+						<p>Klik <a target="_blank" href="/public/miraclekoebing.json">her</a> for et eksempel på den struktur og de informationer, som JSON-filen skal indeholde.</p>
+
+						<p>Bemærk: Organisationsenheder, der ikke findes i filen vil blive slettet ved opdatering.</p>
 
 						<form>
 							<div class="form-group">
@@ -21,7 +23,7 @@
 								<input type="file" id="orgFileInput" file-model="uploadFile" multiple>
 							</div>
 							<div class="text-right">
-								<button type="button" class="btn btn-primary" ng-click="upload()">Upload</button>
+								<button type="button" class="btn btn-default" ng-click="upload()"><span class="glyphicon glyphicon-upload"></span> Upload</button>
 							</div>
 						</form>
 					</div>
@@ -59,15 +61,15 @@
 									{{ kle.serviceText | limitTo: 50 }}{{ kle.serviceText.length > 50 ? '&hellip;' : ''}}
 								</td>
 								<td>
-									<span class="glyphicon glyphicon-edit" tooltip="Redigér" ng-click="editKle(kle)"></span>
-									<span class="glyphicon glyphicon-remove" tooltip="Slet" ng-click="deleteKle(kle)"></span>
+									<button ng-click="editKle(kle)" class="btn btn-primary"><span class="glyphicon glyphicon-edit"></span> Rediger</button>
+									<button ng-click="deleteKle(kle)" class="btn btn-danger"><span class="glyphicon glyphicon-remove"></span> Slet</button>
 								</td>
 							</tr>
 							</tbody>
 						</table>
 						<div class="actions">
 							<div class="text-right">
-								<button class="btn btn-default" ng-click="addKle()">Tilføj KLE</button>
+								<button class="btn btn-default" ng-click="addKle()"><span class="glyphicon glyphicon-plus"></span> Tilføj KLE</button>
 							</div>
 						</div>
 					</div>
@@ -85,7 +87,7 @@
 
 						<div class="actions">
 							<div class="text-right">
-								<button class="btn btn-default" ng-click="editApiKey()">Rediger API key</button>
+								<button class="btn btn-default" ng-click="editApiKey()"><span class="glyphicon glyphicon-edit"></span> Rediger API key</button>
 							</div>
 						</div>
 					</div>
@@ -122,9 +124,9 @@
 										      popover="Dette parameternavn er default"></span>
 									</td>
 									<td align="right">
-										<a ng-hide="dateParam.defaultName" href="" class="btn btn-primary" ng-click="setDefaultDateParameter(dateParam)">Vælg som default</a>
-										<a href="" class="btn btn-primary" ng-click="editParameter(dateParam)">Rediger</a>
-										<a href="" class="btn btn-danger" ng-click="deleteDateParameter(dateParam)">Slet</a>
+										<button type="button" class="btn btn-primary" ng-hide="dateParam.defaultName" ng-click="setDefaultDateParameter(dateParam)"><span class="glyphicon glyphicon-ok"></span> Vælg som default</button>
+										<button type="button" class="btn btn-primary" ng-click="editParameter(dateParam)"><span class="glyphicon glyphicon-edit"></span> Rediger</button>
+										<button type="button" class="btn btn-danger" ng-click="deleteDateParameter(dateParam)"><span class="glyphicon glyphicon-remove"></span> Slet</button>
 									</td>
 								</tr>
 							</tbody>
@@ -132,7 +134,7 @@
 
 						<div class="actions">
 							<div class="text-right">
-								<button class="btn btn-default" ng-click="addDateParameter()">Tilføj parameter</button>
+								<button type="button" class="btn btn-default" ng-click="addDateParameter()"><span class="glyphicon glyphicon-plus"></span> Tilføj parameter</button>
 							</div>
 						</div>
 					</div>
@@ -169,9 +171,9 @@
 											      popover="Dette parameternavn er default"></span>
 									</td>
 									<td align="right">
-										<a ng-hide="textParam.defaultName" href="" class="btn btn-primary" ng-click="setDefaultTextParameter(textParam)">Vælg som default</a>
-										<a href="" class="btn btn-primary" ng-click="editParameter(textParam)">Rediger</a>
-										<a href="" class="btn btn-danger" ng-click="deleteTextParameter(textParam)">Slet</a>
+										<button type="button" class="btn btn-primary" ng-hide="textParam.defaultName" ng-click="setDefaultTextParameter(textParam)"><span class="glyphicon glyphicon-ok"></span> Vælg som default</button>
+										<button type="button" class="btn btn-primary" ng-click="editParameter(textParam)"><span class="glyphicon glyphicon-edit"></span> Rediger</button>
+										<button type="button" class="btn btn-danger" ng-click="deleteTextParameter(textParam)"><span class="glyphicon glyphicon-remove"></span> Slet</button>
 									</td>
 								</tr>
 							</tbody>
@@ -179,7 +181,7 @@
 
 						<div class="actions">
 							<div class="text-right">
-								<button class="btn btn-default" ng-click="addTextParameter()">Tilføj parameter</button>
+								<button type="button" class="btn btn-default" ng-click="addTextParameter()"><span class="glyphicon glyphicon-plus"></span> Tilføj parameter</button>
 							</div>
 						</div>
 					</div>

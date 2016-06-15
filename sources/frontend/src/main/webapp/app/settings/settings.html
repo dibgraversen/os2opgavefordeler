@@ -11,9 +11,7 @@
 				<th>Navn</th>
 				<th style="width: 70px">Id</th>
 				<th style="width: 50px">Aktiv</th>
-				<th style="width: 50px">Regler</th>
-				<th style="width: 25px"></th>
-				<th style="width: 25px"></th>
+				<th style="width: 100px"></th>
 			</tr>
 		</thead>
 		<tbody>
@@ -21,9 +19,11 @@
 				<td>{{ municipality.name }}</td>
 				<td>{{ municipality.id }}</td>
 				<td><input type="checkbox" name="municipalityActive" ng-checked="{{ municipality.active }}" ng-click="toggleActive(municipality)"></td>
-				<td><button type="button" class="btn btn-primary" ng-click="buildRules(municipality)">Opret</button></td>
-				<td><span class="glyphicon glyphicon-edit" tooltip="Redigér" ng-click="openEditMunicipality(municipality)"></span></td>
-				<td><span class="glyphicon glyphicon-remove" tooltip="Slet" ng-click="openDeleteMunicipality(municipality)"></span></td>
+				<td>
+					<button type="button" class="btn btn-primary" ng-click="buildRules(municipality)">Opret regler</button>
+					<button type="button" class="btn btn-primary" ng-click="openEditMunicipality(municipality)"><span class="glyphicon glyphicon-edit"></span> Rediger</button>
+					<button type="button" class="btn btn-danger" ng-click="openDeleteMunicipality(municipality)"><span class="glyphicon glyphicon-remove"></span> Slet</button>
+				</td>
 			</tr>
 		</tbody>
 	</table>
@@ -43,10 +43,10 @@
 		<thead>
 			<tr>
 				<th>Kommune</th>
-				<th>Navn</th>
-				<th>Systemadmin</th>
-				<th>Kommuneadmin</th>
-				<th>Leder
+				<th style="width: 70px">Navn</th>
+				<th style="width: 70px">Systemadmin</th>
+				<th style="width: 70px">Kommuneadmin</th>
+				<th style="width: 70px">Leder
 
 					<span ng-hide="user.roleSet"
 				      class="glyphicon glyphicon-exclamation-sign"
@@ -54,8 +54,7 @@
 				      popover-trigger="mouseenter" popover-append-to-body="true"
 				      popover="Hvorvidt brugeren er leder kan ikke sættes manuelt"></span>
 				</th>
-				<th></th>
-				<th></th>
+				<th style="width: 100px"></th>
 			</tr>
 		</thead>
 		<tbody>
@@ -74,9 +73,11 @@
 				</td>
 				<td><input type="checkbox" name="userAdmin" ng-checked="{{ currUser.admin }}" ng-click="toggleAdmin(currUser)"></td>
 				<td><input type="checkbox" name="userMunicipalityAdmin" ng-checked="{{ currUser.municipalityAdmin }}" ng-click="toggleMunicipalityAdmin(currUser)"></td>
-				<td><input type="checkbox" name="userAdmin" ng-checked="{{ currUser.manager }}" disabled></td>
-				<td><span class="glyphicon glyphicon-edit" tooltip="Redigér" ng-click="openEditUser(currUser)"></span></td>
-				<td><span class="glyphicon glyphicon-remove" tooltip="Slet" ng-click="openDeleteUser(currUser)"></span></td>
+				<td><input type="checkbox" name="userManager" ng-checked="{{ currUser.manager }}" disabled></td>
+				<td>
+					<button type="button" class="btn btn-primary" ng-click="openEditUser(currUser)"><span class="glyphicon glyphicon-edit"></span> Rediger</button>
+					<button type="button" class="btn btn-danger" ng-click="openDeleteUser(currUser)"><span class="glyphicon glyphicon-remove"></span> Slet</button>
+				</td>
 			</tr>
 		</tbody>
 	</table>
