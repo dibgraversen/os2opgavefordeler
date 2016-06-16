@@ -29,7 +29,7 @@
 				<ul ng-show="user.loggedIn" class="nav navbar-nav navbar-right ng-cloak">
 					<li class="active dropdown" dropdown>
 						<a href="#" class="dropdown-toggle" dropdown-toggle>
-							<span class="glyphicon glyphicon-user"></span> {{ user.name }} ({{ user.currentRole.name }})
+							<span class="glyphicon glyphicon-user"></span> {{ user.currentRole.substitute ? user.name + ' (' + user.currentRole.name + ')' : user.currentRole.name }}
 							<span class="caret"></span>
 						</a>
 						<ul class="dropdown-menu">
