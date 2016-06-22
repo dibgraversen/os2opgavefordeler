@@ -1,0 +1,23 @@
+<h1>Eksisterende regler</h1>
+
+<table class="table table-hover">
+	<thead>
+	<tr>
+		<th>Regel</th>
+		<th>Organisationsenhed</th>
+		<th>Medarbejder</th>
+		<th>&nbsp;</th>
+	</tr>
+	</thead>
+	<tbody>
+	<tr ng-repeat="filter in filters">
+		<td>{{ filter.name }}</td>
+		<td>{{ filter.assignedOrgName }}</td>
+		<td>{{ filter.assignedEmployeeName }}</td>
+		<td align="right">
+			<a href="" class="btn btn-primary" ng-click="show(filter)">Vis</a>
+			<a href="" class="btn btn-danger" ng-click="removeFilter(filter)">Slet</a>
+		</td>
+	</tr>
+	</tbody>
+</table>
