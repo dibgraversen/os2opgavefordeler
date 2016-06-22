@@ -70,6 +70,7 @@ public class ApiEndpoint extends Endpoint {
     @Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
     public Response lookup(@QueryParam("kle") String kleNumber, @Context UriInfo uriInfo, @Context HttpServletRequest request) {
 
+        String email = authService.getAuthentication().getEmail();
         String token = authService.getAuthentication().getToken();
 
         if (token == null || token.isEmpty()) {
@@ -115,6 +116,8 @@ public class ApiEndpoint extends Endpoint {
         EmploymentApiResultPO manager = new EmploymentApiResultPO(orgUnitService.findResponsibleManager(assignee.getOrgUnit()).orElse(null));
         EmploymentApiResultPO employee = assignee.getEmployment().map(EmploymentApiResultPO::new).orElse(null);
         DistributionRuleApiResultPO resultPO = new DistributionRuleApiResultPO(assignee.getRule(), manager, employee);
+
+	    log.info("API endpoint called by {} for KLE: {}", email, resultPO.getKle().getNumber());
 
         return ok(resultPO);
     }
