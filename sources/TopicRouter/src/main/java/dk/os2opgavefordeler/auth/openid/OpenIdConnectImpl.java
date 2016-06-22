@@ -51,7 +51,7 @@ public class OpenIdConnectImpl implements OpenIdConnect {
 			OIDCProviderMetadata providerMetadata = getProvider(idp);
 
 			State state = new State(token);
-			Scope scope = Scope.parse("openid email");
+			Scope scope = Scope.parse("openid all_claims");
 
 			ClientID apiKey = new ClientID(idp.getClientId());
 			URI callback = new URI(callbackUrl);
