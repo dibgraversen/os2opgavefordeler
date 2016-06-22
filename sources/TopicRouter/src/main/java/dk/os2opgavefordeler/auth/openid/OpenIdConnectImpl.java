@@ -183,6 +183,8 @@ public class OpenIdConnectImpl implements OpenIdConnect {
 
 			final TokenResponse tokenResponse = OIDCTokenResponseParser.parse(tokenHTTPResp);
 			if (tokenResponse instanceof TokenErrorResponse) {
+				log.error("Authentication failed - token response error: {}", (((TokenErrorResponse) tokenResponse).toJSONObject()).toString());
+
 				ErrorObject error = ((TokenErrorResponse) tokenResponse).getErrorObject();
 				throw new AuthenticationException(error.getDescription());
 			}
