@@ -96,10 +96,19 @@ public class OpenIdConnectImpl implements OpenIdConnect {
 
 		try {
 			String email = claims.getStringClaim("email");
-			if(Strings.isNullOrEmpty(email)) {
-				log.info("email claim empty - trying UserInfo endpoint");
-				return getEmailFromUserInfoEndpoint(pmd, accessTokenResponse);
-			} else {
+			if (Strings.isNullOrEmpty(email)) {
+				log.info("email claim empty - trying name claim");
+				email = claims.getStringClaim("name");
+
+				if (Strings.isNullOrEmpty(email)) {
+					log.info("email claim empty - trying UserInfo endpoint");
+					return getEmailFromUserInfoEndpoint(pmd, accessTokenResponse);
+				}
+				else {
+					return email;
+				}
+			}
+			else {
 				return email;
 			}
 		} catch(java.text.ParseException ex) {
