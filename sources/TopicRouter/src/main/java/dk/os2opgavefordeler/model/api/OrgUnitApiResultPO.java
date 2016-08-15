@@ -8,6 +8,7 @@ import dk.os2opgavefordeler.model.OrgUnit;
 public class OrgUnitApiResultPO {
 	private EmploymentApiResultPO manager;
 
+	private String businessKey;
 	private String name;
 	private String esdhId;
 	private String esdhName;
@@ -16,6 +17,8 @@ public class OrgUnitApiResultPO {
 
 	public OrgUnitApiResultPO(OrgUnit from, EmploymentApiResultPO manager) {
 		this.manager = manager;
+
+		this.businessKey = from.getBusinessKey();
 		this.name = from.getName();
 		this.esdhId = from.getEsdhId();
 		this.esdhName = from.getEsdhLabel();
@@ -25,6 +28,10 @@ public class OrgUnitApiResultPO {
 
 	public EmploymentApiResultPO getManager() {
 		return manager;
+	}
+
+	public String getBusinessKey() {
+		return businessKey;
 	}
 
 	public String getName() {
