@@ -37,7 +37,7 @@ public class ProviderRepository {
 
         providers.put(2L, IdentityProvider.builder()
                 .id(2).name("OS2 SSO")
-                .url("https://os2sso-test.miracle.dk/")
+                .url("https://os2sso.miracle.dk/")
                 .clientId("opgavefordeler")
                 .clientSecret("secret")
                 .build()
