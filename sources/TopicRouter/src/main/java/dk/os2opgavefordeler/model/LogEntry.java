@@ -60,6 +60,7 @@ public class LogEntry {
     public static final String RESPONSIBILITY_TYPE = "Ansvar";
     public static final String DISTRIBUTION_TYPE = "Fordeling";
     public static final String EXTENDED_DISTRIBUTION_TYPE = "Udvidet fordeling";
+    public static final String PARAMETER_NAME_TYPE = "Parameternavn";
 
     // date format
     @Transient

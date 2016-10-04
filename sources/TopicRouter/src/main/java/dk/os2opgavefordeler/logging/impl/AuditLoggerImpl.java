@@ -24,13 +24,9 @@ public class AuditLoggerImpl implements AuditLogger {
     }
 
     @Override
-    public void create(String kle, String user, String type, String data, String orgUnit, String employment, Municipality municipality) {
-        event(kle, user, LogEntry.CREATE_TYPE, type, data, orgUnit, employment, municipality);
+    public void parameterEvent(String user, String operation, String type, String data, Municipality municipality) {
+        event("", user, operation, type, data, "", "", municipality);
     }
 
-    @Override
-    public void update(String kle, String user, String type, String data, String orgUnit, String employment, Municipality municipality) {
-        event(kle, user, LogEntry.UPDATE_TYPE, type, data, orgUnit, employment, municipality);
-    }
 
 }

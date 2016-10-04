@@ -1,8 +1,10 @@
 package dk.os2opgavefordeler.service.impl;
 
+import dk.os2opgavefordeler.auth.AuthService;
 import dk.os2opgavefordeler.distribution.DistributionRuleFilterNameRepository;
 import dk.os2opgavefordeler.distribution.DistributionRuleRepository;
 import dk.os2opgavefordeler.employment.MunicipalityRepository;
+import dk.os2opgavefordeler.logging.AuditLogger;
 import dk.os2opgavefordeler.model.*;
 import dk.os2opgavefordeler.model.presentation.DistributionRulePO;
 import dk.os2opgavefordeler.model.presentation.FilterNamePO;
@@ -11,6 +13,7 @@ import dk.os2opgavefordeler.service.DistributionService;
 import dk.os2opgavefordeler.service.OrgUnitService;
 import dk.os2opgavefordeler.service.PersistenceService;
 
+import dk.os2opgavefordeler.service.UserService;
 import org.apache.deltaspike.jpa.api.transaction.Transactional;
 
 import org.slf4j.Logger;
@@ -61,6 +64,15 @@ public class DistributionServiceImpl implements DistributionService {
 
     @Inject
     private PersistenceService persistenceService;
+
+    @Inject
+    UserService userService;
+
+    @Inject
+    private AuthService authService;
+
+    @Inject
+    private AuditLogger auditLogger;
 
     @Override
     public DistributionRule createDistributionRule(DistributionRule rule) {
@@ -166,10 +178,14 @@ public class DistributionServiceImpl implements DistributionService {
 		if (municipality != null) {
 			DistributionRuleFilterName distributionRuleFilterName;
 
+            String logType = "";
+
 			if (filterNamePO.getId() > 0) { // update existing filter name
 				distributionRuleFilterName = distributionRuleFilterNameRepository.findBy(filterNamePO.getId());
 				distributionRuleFilterName.setDefaultName(filterNamePO.isDefaultName());
-			}
+
+                logType = LogEntry.UPDATE_TYPE;
+            }
 			else { // create new filter name
 				// determine if this is the first filter name being created
 				Query query = entityManager.createQuery("SELECT filterName FROM DistributionRuleFilterName filterName WHERE filterName.municipality.id = :municipalityId AND filterName.type = '" + filterNamePO.getType() + "'");
@@ -183,7 +199,9 @@ public class DistributionServiceImpl implements DistributionService {
 				if (firstFilterName) { // since this is the first filter name of its kind, it should be marked as default
 					distributionRuleFilterName.setDefaultName(true);
 				}
-			}
+
+				logType = LogEntry.CREATE_TYPE;
+            }
 
 			// set general values
 			distributionRuleFilterName.setName(filterNamePO.getName());
@@ -191,7 +209,10 @@ public class DistributionServiceImpl implements DistributionService {
 
 			distributionRuleFilterNameRepository.save(distributionRuleFilterName);
 
-			result = new FilterNamePO(distributionRuleFilterName);
+            // log event
+            logEvent(logType, "Navn: " + distributionRuleFilterName.getName() + "; Type: " + distributionRuleFilterName.getType());
+
+            result = new FilterNamePO(distributionRuleFilterName);
 		}
 
 		return result;
@@ -199,7 +220,12 @@ public class DistributionServiceImpl implements DistributionService {
 
 	@Override
 	public void deleteFilterName(long municipalityId, long filterId) {
-		Query query = entityManager.createQuery("DELETE FROM DistributionRuleFilterName filterName WHERE filterName.municipality.id = :municipalityId AND filterName.id = :filterId");
+        DistributionRuleFilterName distributionRuleFilterName = distributionRuleFilterNameRepository.findBy(filterId);
+
+        // log event
+        logEvent(LogEntry.DELETE_TYPE, "Navn: " + distributionRuleFilterName.getName() + "; Type: " + distributionRuleFilterName.getType());
+
+        Query query = entityManager.createQuery("DELETE FROM DistributionRuleFilterName filterName WHERE filterName.municipality.id = :municipalityId AND filterName.id = :filterId");
 		query.setParameter("municipalityId", municipalityId);
 		query.setParameter("filterId", filterId);
 		query.executeUpdate();
@@ -572,11 +598,23 @@ public class DistributionServiceImpl implements DistributionService {
 			}
 			else if (currFilterName.getId() == filterId) {
 				log.info("Setting default to {}" + currFilterName.getName());
+
+                // log event
+                logEvent(LogEntry.UPDATE_TYPE, "Handling: Valgt som default; Navn: " + currFilterName.getName() + "; Type: " + currFilterName.getType());
+
 				currFilterName.setDefaultName(true);
 			}
 
 			distributionRuleFilterNameRepository.save(currFilterName);
 		}
 	}
+
+	private void logEvent(String operationType, String data) {
+        Optional<User> user = userService.findByEmail(authService.getAuthentication().getEmail());
+        final String userStr = user.isPresent() ? user.get().getEmail() : "";
+        final Municipality municipality = user.isPresent() ? user.get().getMunicipality() : null;
+
+        auditLogger.parameterEvent(userStr, operationType, LogEntry.PARAMETER_NAME_TYPE, data, municipality);
+    }
 
 }
