@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+		xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+	<changeSet author="Rune" id="create_table_auditlog">
+		<createTable tableName="auditlog">
+			<column name="id" type="bigint" autoIncrement="true">
+				<constraints nullable="false" primaryKey="true" unique="true"/>
+			</column>
+			<column name="eventtime" type="date"/>
+
+			<column name="kle" type="varchar"/>
+			<column name="userName" type="varchar"/>
+			<column name="operation" type="varchar"/>
+			<column name="eventtype" type="varchar"/>
+			<column name="eventdata" type="varchar"/>
+			<column name="orgunit" type="varchar"/>
+			<column name="employment" type="varchar"/>
+			<column name="municipality_id" type="bigint"/>
+		</createTable>
+	</changeSet>
+</databaseChangeLog>

@@ -1,6 +1,7 @@
 package dk.os2opgavefordeler.rest;
 
 import dk.os2opgavefordeler.auth.AuthService;
+import dk.os2opgavefordeler.logging.AuditLogger;
 import dk.os2opgavefordeler.model.*;
 import dk.os2opgavefordeler.model.presentation.DistributionRulePO;
 import dk.os2opgavefordeler.model.presentation.FilterNamePO;
@@ -41,6 +42,9 @@ public class DistributionRuleEndpoint extends Endpoint {
 
 	@Inject
 	private AuthService authService;
+
+	@Inject
+	private AuditLogger auditLogger;
 
 	private static final String NOT_LOGGED_IN = "Not logged in";
 	private static final String NOT_AUTHORIZED = "Not authorized";
@@ -117,6 +121,19 @@ public class DistributionRuleEndpoint extends Endpoint {
 			long userId = user.get().getId();
 
 			if (userService.isAdmin(userId) || userService.isMunicipalityAdmin(userId) || userService.isManager(userId)) { // only managers and admins can update responsibility
+				// determine if this is an update
+				boolean exists = distributionService.getDistribution(distId).isPresent();
+
+				String logType = LogEntry.CREATE_TYPE;
+
+				// log event
+				if (!exists) {
+					auditLogger.create(distribution.getKle().getNumber(), user.get().getEmail(), LogEntry.RESPONSIBILITY_TYPE, "", distribution.getResponsibleOrgName(), "Employee", user.get().getMunicipality());
+				}
+				else {
+					auditLogger.update(distribution.getKle().getNumber(), user.get().getEmail(), LogEntry.RESPONSIBILITY_TYPE, "", distribution.getResponsibleOrgName(), "Employee", user.get().getMunicipality());
+				}
+
 				//TODO: multi-tenancy considerations. Do we pass municipality to service methods, or do we inject that in the
 				//services? At any rate, make sure we can't get mess with other municipalities' data.
 				return distributionService.getDistribution(distId)

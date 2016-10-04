@@ -20,6 +20,7 @@
         <class>dk.os2opgavefordeler.model.IdentityProvider</class>
         <class>dk.os2opgavefordeler.model.Municipality</class>
         <class>dk.os2opgavefordeler.model.UserSettings</class>
+	    <class>dk.os2opgavefordeler.model.LogEntry</class>
 
         <properties>
             <property name="hibernate.transaction.jta.platform"

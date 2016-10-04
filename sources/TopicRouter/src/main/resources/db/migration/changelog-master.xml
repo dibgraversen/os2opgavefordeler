@@ -12,4 +12,5 @@
     <include file="/WEB-INF/classes/db/migration/V6_create_municipality_to_user_relation.xml"/>
     <include file="/WEB-INF/classes/db/migration/V7_create_text_distribution_filter.xml"/>
     <include file="/WEB-INF/classes/db/migration/V8_distributionrule_add_delete_on_parent_delete.xml"/>
+	<include file="/WEB-INF/classes/db/migration/V9_create_auditlog.xml"/>
 </databaseChangeLog>

@@ -93,6 +93,12 @@
             <scope>compile</scope>
         </dependency>
 
+        <!-- Import the JSON API (JSR 353:Java API for Processing JSON) -->
+        <dependency>
+            <groupId>javax.json</groupId>
+            <artifactId>javax.json-api</artifactId>
+            <version>1.0</version>
+        </dependency>
 
         <!-- Import the CDI API, we use provided scope as the API is included
                      in JBoss WildFly -->
