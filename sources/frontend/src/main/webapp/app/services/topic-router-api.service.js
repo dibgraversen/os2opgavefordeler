@@ -318,11 +318,12 @@
 			return httpPost('/search/employments', search);
 		}
 
-		function updateDistributionRule(distributionRule){
+		// updateType is either 'distribution' for distribution rules or 'responsibility' for assigning responsibility
+		function updateDistributionRule(distributionRule, updateType) {
 			var distRule = new DistributionRule(distributionRule.id, distributionRule.parent.id,
 					new KLE(distributionRule.kle.id, distributionRule.number, distributionRule.name, distributionRule.serviceText),
 					distributionRule.org.id, distributionRule.employee.id, distributionRule.responsible.id);
-			return httpPost('/distribution-rules/'+distributionRule.id, distRule);
+			return httpPost('/distribution-rules/'+distributionRule.id+'?type='+updateType, distRule);
 		}
 
 		function getSubstitutes(userRole) {

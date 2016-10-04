@@ -120,7 +120,7 @@
 					if($scope.selectedEmp){
 						$scope.topic.employee = $scope.selectedEmp;
 					}
-					topicRouterApi.updateDistributionRule($scope.topic);
+					topicRouterApi.updateDistributionRule($scope.topic, 'distribution');
 					$modalInstance.close(/* pass some value? */);
 				} else {
 					addAlert({

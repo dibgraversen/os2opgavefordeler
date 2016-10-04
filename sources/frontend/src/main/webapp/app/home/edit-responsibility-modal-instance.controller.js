@@ -83,7 +83,7 @@
 		function ok(){
 			if($scope.currentOrgUnit){
 				$scope.topic.responsible = $scope.currentOrgUnit;
-				topicRouterApi.updateDistributionRule(topic);
+				topicRouterApi.updateDistributionRule(topic, 'responsibility');
 				$modalInstance.close(/* pass some value? */);
 			} else {
 				addAlert({

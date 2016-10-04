@@ -182,7 +182,7 @@
 
 		function deleteResponsibility(topic) {
 			topic.responsible = 0;
-			topicRouterApi.updateDistributionRule(topic);
+			topicRouterApi.updateDistributionRule(topic, 'responsibility');
 		}
 
 		function toggleChildren(children, visible) {
@@ -221,7 +221,7 @@
 		function deleteRule(topic) {
 			topic.org = 0;
 			topic.employee = 0;
-			topicRouterApi.updateDistributionRule(topic);
+			topicRouterApi.updateDistributionRule(topic, 'distribution');
 		}
 
 		function listFilters(topic) {
