@@ -116,7 +116,7 @@ public class DistributionRuleEndpoint extends Endpoint {
 		if (user.isPresent()) {
 			long userId = user.get().getId();
 
-			if (userService.isAdmin(userId) || userService.isManager(userId)) { // only managers and admins can update responsibility
+			if (userService.isAdmin(userId) || userService.isMunicipalityAdmin(userId) || userService.isManager(userId)) { // only managers and admins can update responsibility
 				//TODO: multi-tenancy considerations. Do we pass municipality to service methods, or do we inject that in the
 				//services? At any rate, make sure we can't get mess with other municipalities' data.
 				return distributionService.getDistribution(distId)
