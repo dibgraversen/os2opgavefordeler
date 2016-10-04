@@ -5,10 +5,7 @@ import dk.os2opgavefordeler.logging.AuditLogger;
 import dk.os2opgavefordeler.model.*;
 import dk.os2opgavefordeler.model.presentation.DistributionRulePO;
 import dk.os2opgavefordeler.model.presentation.FilterNamePO;
-import dk.os2opgavefordeler.service.DistributionService;
-import dk.os2opgavefordeler.service.OrgUnitService;
-import dk.os2opgavefordeler.service.PersistenceService;
-import dk.os2opgavefordeler.service.UserService;
+import dk.os2opgavefordeler.service.*;
 import org.slf4j.Logger;
 
 import javax.enterprise.context.RequestScoped;
@@ -36,6 +33,12 @@ public class DistributionRuleEndpoint extends Endpoint {
 
 	@Inject
 	OrgUnitService orgUnitService;
+
+	@Inject
+	EmploymentService employmentService;
+
+	@Inject
+	KleService kleService;
 
 	@Inject
 	UserService userService;
@@ -121,18 +124,30 @@ public class DistributionRuleEndpoint extends Endpoint {
 			long userId = user.get().getId();
 
 			if (userService.isAdmin(userId) || userService.isMunicipalityAdmin(userId) || userService.isManager(userId)) { // only managers and admins can update responsibility
-				// determine if this is an update
-				boolean exists = distributionService.getDistribution(distId).isPresent();
+				// determine log type
+				final boolean deleting = distribution.getResponsible() == 0;
 
-				String logType = LogEntry.CREATE_TYPE;
+				log.info("Updating: " + distribution.toString());
 
-				// log event
-				if (!exists) {
-					auditLogger.create(distribution.getKle().getNumber(), user.get().getEmail(), LogEntry.RESPONSIBILITY_TYPE, "", distribution.getResponsibleOrgName(), "Employee", user.get().getMunicipality());
+				String logType;
+				String orgUnitStr = "";
+
+				if (deleting) {
+					logType = LogEntry.DELETE_TYPE;
 				}
 				else {
-					auditLogger.update(distribution.getKle().getNumber(), user.get().getEmail(), LogEntry.RESPONSIBILITY_TYPE, "", distribution.getResponsibleOrgName(), "Employee", user.get().getMunicipality());
+					logType = distributionService.getDistribution(distId).isPresent() ? LogEntry.UPDATE_TYPE : LogEntry.CREATE_TYPE;
+
+					// fetch organisational unit
+					Optional<OrgUnit> orgUnit = orgUnitService.getOrgUnit(distribution.getResponsible());
+					orgUnitStr = orgUnit.isPresent() ? orgUnit.get().getName() : "";
 				}
+
+				Kle kle = kleService.getKle(distribution.getKle().getId());
+				String kleStr = kle != null && !kle.getNumber().isEmpty() ? kle.getNumber() : "";
+
+				// log event
+				auditLogger.event(kleStr, user.get().getEmail(), logType, LogEntry.RESPONSIBILITY_TYPE, "", orgUnitStr, "", user.get().getMunicipality());
 
 				//TODO: multi-tenancy considerations. Do we pass municipality to service methods, or do we inject that in the
 				//services? At any rate, make sure we can't get mess with other municipalities' data.

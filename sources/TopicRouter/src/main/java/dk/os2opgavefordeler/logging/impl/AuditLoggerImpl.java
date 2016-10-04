@@ -18,15 +18,19 @@ public class AuditLoggerImpl implements AuditLogger {
     AuditLogService auditLogService;
 
     @Override
-    public void create(String kle, String user, String type, String data, String orgUnit, String employment, Municipality municipality) {
-        LogEntry logEntry = new LogEntry(kle, user, LogEntry.CREATE_TYPE, type, data, orgUnit, employment, municipality);
+    public void event(String kle, String user, String operation, String type, String data, String orgUnit, String employment, Municipality municipality) {
+        LogEntry logEntry = new LogEntry(kle, user, operation, type, data, orgUnit, employment, municipality);
         auditLogService.saveLogEntry(logEntry);
     }
 
     @Override
+    public void create(String kle, String user, String type, String data, String orgUnit, String employment, Municipality municipality) {
+        event(kle, user, LogEntry.CREATE_TYPE, type, data, orgUnit, employment, municipality);
+    }
+
+    @Override
     public void update(String kle, String user, String type, String data, String orgUnit, String employment, Municipality municipality) {
-        LogEntry logEntry = new LogEntry(kle, user, LogEntry.UPDATE_TYPE, type, data, orgUnit, employment, municipality);
-        auditLogService.saveLogEntry(logEntry);
+        event(kle, user, LogEntry.UPDATE_TYPE, type, data, orgUnit, employment, municipality);
     }
 
 }

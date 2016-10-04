@@ -120,4 +120,17 @@ public class DistributionRulePO {
 		this.responsible = responsible;
 	}
 
+	@Override
+	public String toString() {
+		return "DistributionRulePO{" +
+				"id=" + id +
+				", parent=" + parent +
+				", kle=" + kle +
+				", org=" + org +
+				", employee=" + employee +
+				", responsible=" + responsible +
+				", responsibleOrgName='" + responsibleOrgName + '\'' +
+				", responsibleManagerName='" + responsibleManagerName + '\'' +
+				'}';
+	}
 }
