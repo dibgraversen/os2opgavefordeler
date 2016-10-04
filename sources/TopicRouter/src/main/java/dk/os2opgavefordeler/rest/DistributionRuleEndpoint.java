@@ -127,8 +127,6 @@ public class DistributionRuleEndpoint extends Endpoint {
 			long userId = user.get().getId();
 
 			if (userService.isAdmin(userId) || userService.isMunicipalityAdmin(userId) || userService.isManager(userId)) { // only managers and admins can update responsibility
-				log.info("Type is: " + type + " - data object:" + distribution.toString());
-
 				final String userStr = user.get().getEmail();
 				final Kle kle = kleService.getKle(distribution.getKle().getId());
 				final String kleStr = kle != null && !kle.getNumber().isEmpty() ? kle.getNumber() : "";
