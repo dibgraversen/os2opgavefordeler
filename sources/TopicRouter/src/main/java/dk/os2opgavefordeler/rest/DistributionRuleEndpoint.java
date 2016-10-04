@@ -127,8 +127,6 @@ public class DistributionRuleEndpoint extends Endpoint {
 				// determine log type
 				final boolean deleting = distribution.getResponsible() == 0;
 
-				log.info("Updating: " + distribution.toString());
-
 				String logType;
 				String orgUnitStr = "";
 
@@ -136,11 +134,23 @@ public class DistributionRuleEndpoint extends Endpoint {
 					logType = LogEntry.DELETE_TYPE;
 				}
 				else {
-					logType = distributionService.getDistribution(distId).isPresent() ? LogEntry.UPDATE_TYPE : LogEntry.CREATE_TYPE;
+					Optional<DistributionRule> existingDistributionRule = distributionService.getDistribution(distId);
+
+					if (!existingDistributionRule.isPresent()) { // distribution rule didn't exist already
+						logType = LogEntry.CREATE_TYPE;
+					}
+					else { // distribution rule exists
+						if (existingDistributionRule.get().getResponsibleOrg().isPresent()) { // responsible org is set
+							logType = LogEntry.UPDATE_TYPE;
+						}
+						else {
+							logType = LogEntry.CREATE_TYPE;
+						}
+					}
 
 					// fetch organisational unit
 					Optional<OrgUnit> orgUnit = orgUnitService.getOrgUnit(distribution.getResponsible());
-					orgUnitStr = orgUnit.isPresent() ? orgUnit.get().getName() : "";
+					orgUnitStr = orgUnit.isPresent() ? orgUnit.get().getName() + " (" + orgUnit.get().getBusinessKey() + ")"  : "";
 				}
 
 				Kle kle = kleService.getKle(distribution.getKle().getId());
