@@ -1,5 +1,7 @@
 package dk.os2opgavefordeler.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.json.Json;
 
 import javax.persistence.*;
@@ -26,6 +28,9 @@ public class LogEntry {
     @Temporal(TemporalType.TIMESTAMP)
     private Date timeStamp;
 
+    @Transient
+    private String friendlyTimeStamp;
+
     @Column(name="kle")
     private String kle;
 
@@ -49,6 +54,7 @@ public class LogEntry {
 
     @NotNull
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
+    @JsonIgnore
     private Municipality municipality;
 
     // operations
@@ -69,6 +75,7 @@ public class LogEntry {
     public LogEntry() {
         //for JPA
         this.timeStamp = new Date();
+        this.friendlyTimeStamp = dateFormat.format(timeStamp);
 
         this.kle = null;
         this.user = null;
@@ -83,6 +90,7 @@ public class LogEntry {
 
     public LogEntry(String kle, String user, String operation, String type, String data, String orgUnit, String employment, Municipality municipality) {
         this.timeStamp = new Date();
+        this.friendlyTimeStamp = dateFormat.format(timeStamp);
 
         this.kle = kle;
         this.user = user;
@@ -102,12 +110,28 @@ public class LogEntry {
         this.id = id;
     }
 
-    public Date getTimestamp() {
+    public Date getTimeStamp() {
         return timeStamp;
     }
 
-    public void setTimestamp(Date timestamp) {
-        this.timeStamp = timestamp;
+    public void setTimeStamp(Date timeStamp) {
+        this.timeStamp = timeStamp;
+    }
+
+    public String getFriendlyTimeStamp() {
+        return friendlyTimeStamp;
+    }
+
+    public void setFriendlyTimeStamp(String friendlyTimeStamp) {
+        this.friendlyTimeStamp = friendlyTimeStamp;
+    }
+
+    public Municipality getMunicipality() {
+        return municipality;
+    }
+
+    public void setMunicipality(Municipality municipality) {
+        this.municipality = municipality;
     }
 
     public String getKle() {
@@ -175,7 +199,7 @@ public class LogEntry {
         return toJson();
     }
 
-    public String toJson() {
+    private String toJson() {
         return Json.createObjectBuilder().
                 add("id", id).
                 add("timeStamp", getReadableTimeStamp()).
