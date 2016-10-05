@@ -76,7 +76,6 @@ public class LogEntry {
         //for JPA
         this.timeStamp = new Date();
         this.friendlyTimeStamp = dateFormat.format(timeStamp);
-
         this.kle = null;
         this.user = null;
         this.operation = null;
@@ -119,7 +118,7 @@ public class LogEntry {
     }
 
     public String getFriendlyTimeStamp() {
-        return friendlyTimeStamp;
+        return dateFormat.format(timeStamp);
     }
 
     public void setFriendlyTimeStamp(String friendlyTimeStamp) {
@@ -190,10 +189,6 @@ public class LogEntry {
         this.employment = employment;
     }
 
-    private String getReadableTimeStamp() {
-        return dateFormat.format(timeStamp);
-    }
-
     @Override
     public String toString() {
         return toJson();
@@ -202,7 +197,7 @@ public class LogEntry {
     private String toJson() {
         return Json.createObjectBuilder().
                 add("id", id).
-                add("timeStamp", getReadableTimeStamp()).
+                add("timeStamp", getFriendlyTimeStamp()).
                 add("kle", kle).
                 add("user", user).
                 add("operation", operation).
