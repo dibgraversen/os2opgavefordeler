@@ -194,7 +194,7 @@
 					</div>
 
 					<div class="panel-body">
-						<a class="btn btn-primary" download="auditlog.json" href="{{logDownloadLink}}">
+						<a ng-disabled="!logDownloadLink" class="btn btn-primary" download="auditlog.json" href="{{logDownloadLink}}">
 							<span class="glyphicon glyphicon-download"></span> Hent log
 						</a>
 					</div>
