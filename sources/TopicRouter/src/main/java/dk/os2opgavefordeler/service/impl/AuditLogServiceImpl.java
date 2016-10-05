@@ -8,6 +8,7 @@ import dk.os2opgavefordeler.service.AuditLogService;
 
 import javax.inject.Inject;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -21,6 +22,11 @@ public class AuditLogServiceImpl implements AuditLogService {
     @Override
     public Optional<LogEntry> getLogEntry(long id) {
         return Optional.ofNullable(logEntryRepository.findBy(id));
+    }
+
+    @Override
+    public List<LogEntry> getAllLogEntries(long municipalityId) {
+        return logEntryRepository.findAll();
     }
 
     @Override

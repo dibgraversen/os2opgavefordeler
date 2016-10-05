@@ -1,6 +1,11 @@
 (function () {
 	'use strict';
-	angular.module('topicRouter').controller('MunicipalityAdminCtrl', MunicipalityAdminCtrl);
+	angular.module('topicRouter').controller('MunicipalityAdminCtrl', MunicipalityAdminCtrl).config([ '$compileProvider',
+		function($compileProvider) {
+			// we need this to make sure the log download URL isn't marked as unsafe
+			$compileProvider.aHrefSanitizationWhitelist(/^s*(https?|ftp|blob|mailto|chrome-extension):/);
+		}
+	]);
 
 	angular.module('topicRouter').directive('fileModel', ['$parse', '$log', function ($parse, $log) {
 		return {
@@ -50,6 +55,7 @@
 		$scope.deleteTextParameter = deleteTextParameter;
 		$scope.deleteDateParameter = deleteDateParameter;
 		$scope.idFilter = idFilter;
+		$scope.getFullLog = getFullLog;
 
 		activate();
 
@@ -199,6 +205,12 @@
 
 			modalInstance.result.then(function(parameter) {
 				$scope.textParameters.push(parameter);
+			});
+		}
+
+		function getFullLog() {
+			topicRouterApi.getFullLog().then(function(logData){
+				$scope.logDownloadLink = window.URL.createObjectURL(new Blob([JSON.stringify(logData)], {type: "application/json"}));
 			});
 		}
 

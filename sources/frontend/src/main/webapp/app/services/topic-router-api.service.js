@@ -52,6 +52,7 @@
 			deleteDateParameter: deleteDateParameter,
 			updateDateParameterName: updateDateParameterName,
 			updateTextParameterName: updateTextParameterName,
+			getFullLog: getFullLog,
 
 			//
 			getFiltersForRule: getFiltersForRule,
@@ -431,6 +432,10 @@
 			$log.info('Updating text parameter: ' + JSON.stringify(parameter));
 
 			return httpPost('/distribution-rules/text/names' + '?municipalityId=' + municipality.id, parameter);
+		}
+
+		function getFullLog(){
+			return httpGet('/auditlog');
 		}
 		
 		// DTO classes.

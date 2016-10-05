@@ -210,7 +210,7 @@ public class DistributionServiceImpl implements DistributionService {
 			distributionRuleFilterNameRepository.save(distributionRuleFilterName);
 
             // log event
-            logEvent(logType, "Navn: " + distributionRuleFilterName.getName() + "; Type: " + distributionRuleFilterName.getType());
+            logEvent(logType, "Navn: " + distributionRuleFilterName.getName() + "; Type: " + getFriendlyTypeName(distributionRuleFilterName));
 
             result = new FilterNamePO(distributionRuleFilterName);
 		}
@@ -223,7 +223,7 @@ public class DistributionServiceImpl implements DistributionService {
         DistributionRuleFilterName distributionRuleFilterName = distributionRuleFilterNameRepository.findBy(filterId);
 
         // log event
-        logEvent(LogEntry.DELETE_TYPE, "Navn: " + distributionRuleFilterName.getName() + "; Type: " + distributionRuleFilterName.getType());
+        logEvent(LogEntry.DELETE_TYPE, "Navn: " + distributionRuleFilterName.getName() + "; Type: " + getFriendlyTypeName(distributionRuleFilterName));
 
         Query query = entityManager.createQuery("DELETE FROM DistributionRuleFilterName filterName WHERE filterName.municipality.id = :municipalityId AND filterName.id = :filterId");
 		query.setParameter("municipalityId", municipalityId);
@@ -600,7 +600,7 @@ public class DistributionServiceImpl implements DistributionService {
 				log.info("Setting default to {}" + currFilterName.getName());
 
                 // log event
-                logEvent(LogEntry.UPDATE_TYPE, "Handling: Valgt som default; Navn: " + currFilterName.getName() + "; Type: " + currFilterName.getType());
+                logEvent(LogEntry.UPDATE_TYPE, "Handling: Valgt som default; Navn: " + currFilterName.getName() + "; Type: " + getFriendlyTypeName(currFilterName));
 
 				currFilterName.setDefaultName(true);
 			}
@@ -615,6 +615,19 @@ public class DistributionServiceImpl implements DistributionService {
         final Municipality municipality = user.isPresent() ? user.get().getMunicipality() : null;
 
         auditLogger.parameterEvent(userStr, operationType, LogEntry.PARAMETER_NAME_TYPE, data, municipality);
+    }
+
+    private String getFriendlyTypeName(DistributionRuleFilterName distributionRuleFilterName) {
+        String friendlyTypeStr = "";
+
+        if (distributionRuleFilterName.getType().equals(CprDistributionRuleFilter.TYPE)) {
+            friendlyTypeStr = "Dato";
+        }
+        else if (distributionRuleFilterName.getType().equals(TextDistributionRuleFilter.TYPE)) {
+            friendlyTypeStr = "Tekst";
+        }
+
+        return friendlyTypeStr;
     }
 
 }

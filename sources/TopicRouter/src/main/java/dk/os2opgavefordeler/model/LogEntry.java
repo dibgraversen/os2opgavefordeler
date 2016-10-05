@@ -172,17 +172,7 @@ public class LogEntry {
 
     @Override
     public String toString() {
-        return "LogEntry{" +
-                "id=" + id +
-                ", timeStamp=" + getReadableTimeStamp() +
-                ", kle='" + kle + '\'' +
-                ", user='" + user + '\'' +
-                ", operation='" + operation + '\'' +
-                ", type='" + type + '\'' +
-                ", data='" + data + '\'' +
-                ", orgUnit='" + orgUnit + '\'' +
-                ", employment='" + employment + '\'' +
-                '}';
+        return toJson();
     }
 
     public String toJson() {

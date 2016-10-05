@@ -187,6 +187,19 @@
 					</div>
 				</div>
 			</tab>
+			<tab heading="Log" ng-click="getFullLog()">
+				<div class="panel panel-default margin-top">
+					<div class="panel-heading">
+						Hændelseslog
+					</div>
+
+					<div class="panel-body">
+						<a class="btn btn-primary" download="auditlog.json" href="{{logDownloadLink}}">
+							<span class="glyphicon glyphicon-download"></span> Hent log
+						</a>
+					</div>
+				</div>
+			</tab>
 		</tabset>
 	</div>
 </div>
