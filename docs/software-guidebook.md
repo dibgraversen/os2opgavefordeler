@@ -10,7 +10,8 @@ Dette skriv giver et overblik for hvordan det er tænkt at lave OS2 OpgaveFordel
 
 2. Kontekst
 ===
-OS2 OpgaveFordeler laves som java applikation med REST interface samt tilhørende webapplikation. REST interface giver mulighed for opslag for mapningen mellem KLE-numre og ansvarlig entitet for håndtering af denne.
+OS2 OpgaveFordeler laves som java applikation med REST interface samt tilhørende webapplikation. 
+REST interface giver mulighed for opslag for mapningen mellem KLE-numre og ansvarlig entitet for håndtering af denne.
 Webapplikationen giver mulighed for at vedligholde de tilgængelige data/relationer.
 Følgende konteksdiagram viser applikation og aktører:
 ![Kontekstdiagram for OS2 OpgaveFordeler](img/context-diagram.png "Kontekstdiagram OS2 OpgaveFordeler")
@@ -148,4 +149,13 @@ Komponenter i Java applikation
 De tre primære komponenter i Java applikationen omhandler KLE, Kommuners organisationsstruktur samt selve fordelingerne.
 ![Componentdiagram for OS2 OpgaveFordeler](img/component-diagram.png "Componentdiagram OS2 OpgaveFordeler")
 
+# 8 Infrastructure Architecture
 
+
+# 9 Deployment
+Test system is available on os2opgavefordeler-test.miracle.dk
+Prod is located at os2opgavefordeler.dk
+
+
+# 10 Operations and support 
+From a security perspective, details about infrastructure are listed in a protected wiki.
