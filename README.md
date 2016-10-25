@@ -1,6 +1,8 @@
 Læs mig
 ====
 
+Se Software Guidebook i /docs/ !!!
+
 Licens
 ---
 OS2Opgavefordeler was programmed by Miracle A/S (http://www.miracle.dk/)

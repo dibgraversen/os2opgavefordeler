@@ -1,15 +1,13 @@
-Løsningsbeskrivelse for OS2 OpgaveFordeler
-===
+Software Guidebook for OS2 OpgaveFordeler
+=========================================
 
-1. Introduktion
-===
+# 1. Introduktion
 Dette skriv giver et overblik for hvordan det er tænkt at lave OS2 OpgaveFordeler. Det inkluderer følgende:
 
 1. Krav, constraints og principper.
 2. Software arkitekturen.
 
-2. Kontekst
-===
+# 2. Kontekst
 OS2 OpgaveFordeler laves som java applikation med REST interface samt tilhørende webapplikation. 
 REST interface giver mulighed for opslag for mapningen mellem KLE-numre og ansvarlig entitet for håndtering af denne.
 Webapplikationen giver mulighed for at vedligholde de tilgængelige data/relationer.
@@ -40,8 +38,7 @@ Der er flere eksterne systemer som interagerer med OS2 OpgaveFordeler.
 
 **3. Kommunale systemer** Disse systemer trækker oplysninger om en kommunes delegering af et KLE-nummer.
 
-3. Funktionelt Overblik
-===
+# 3. Funktionelt Overblik
 OS2 OpgaveFordeler handler om en kommunes forbindelse mellem KLE-numre og den entitet der håndterer det pågældende emne hvad enten det er en afdeling eller en medarbejder.
 
 KLE-numre
@@ -58,8 +55,7 @@ REST interface
 ---
 Oplysninger om hvem der håndterer KLE-numre for en kommune, kan trækkes via REST/JSON til brug ved integration.
 
-4. Quality Attributes/Nonfunktionelle krav
-===
+# 4. Quality Attributes/Nonfunktionelle krav
 Performance
 ---
 Alle funktioner i OS2 OpgaveFordeler skal svare på under n sekunder for n samtidige brugere.
@@ -96,16 +92,14 @@ Webapplikationen skal virke på nyeste versioner af følgende browsere med javas
 - Firefox
 - Safari
 
-5. Constraints
-===
+# 5. Constraints
 OS2 OpgaveFordeler skal udvikles med open source teknologi. Der er valgt Java og js.
 
 Deployment på Apache webserver og JBoss Wildfly/EAP6. 
 
 Der skal benyttes SAML til authentication.
 
-6. Principper
-===
+# 6. Principper
 Id'er defineres med long.
 
 tabs til indentation.
@@ -129,8 +123,7 @@ Configuration
 ---
 Al konfiguration vil foregå i .properties filer for at holde det ude af applikatonen og styre deployment på tværs af miljøer.
 
-7. Software Arkitektur
-===
+# 7. Software Arkitektur
 Her følger et overblik over arkitekturen.
 
 Containers
@@ -150,12 +143,20 @@ De tre primære komponenter i Java applikationen omhandler KLE, Kommuners organi
 ![Componentdiagram for OS2 OpgaveFordeler](img/component-diagram.png "Componentdiagram OS2 OpgaveFordeler")
 
 # 8 Infrastructure Architecture
-
+Testsystem er på os2opgavefordeler-test.miracle.dk (10.7.4.92)
+Prod er på os2opgavefordeler.dk (10.7.4.78)
+begge servere kan tilgås via ssh, når public key er installeret.
+Alle elementer i applikationen er installeret på hver server.
 
 # 9 Deployment
-Test system is available on os2opgavefordeler-test.miracle.dk
-Prod is located at os2opgavefordeler.dk
+Deploymentprocedure er som følger:
 
+- Byg release med mvn i parent dir og -P 'target-test' eller 'target-prod' alt efter hvor du skal deploye - så sørger maven for de korrekte properties.
+- Kopier fra /sources/frontend/target/frontend-version.jar og /sources/TopicRouter/target/TopicRouter.war til rette server og placer dem i ~/deploy/ med version for historik. E.g. med scp: scp /sti/til/war ssh-config-profil:~/ 
+- Der ligger deploy script til frontend. Pak jar filen ud i /home/miracle/deploy/web/ og kør scriptet.
+- Kopier backend war fil til /tmp/ eller andet og lav undeploy/deploy via ~/jboss-cli.sh
+ 
+Der bruges semantic versioning med mm.ss.pp hvor mm er hovedreleases, ss er mindre og pp er patches.
 
 # 10 Operations and support 
 From a security perspective, details about infrastructure are listed in a protected wiki.
