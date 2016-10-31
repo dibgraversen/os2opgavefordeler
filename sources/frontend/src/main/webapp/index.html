@@ -1,98 +1,63 @@
 <!doctype html>
 <html class="no-js" ng-app="topicRouter">
-<head>
-	<meta charset="utf-8">
-	<title>OS2 OpgaveFordeler</title>
-	<meta name="description" content="">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<head>
+		<title>OS2 OpgaveFordeler</title>
 
-	<link rel="stylesheet" href="/lib/bootstrap/dist/css/bootstrap.css">
-	<link rel="stylesheet" href="/styles/app.css"/>
+		<meta charset="utf-8">
+		<meta name="description" content="">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
 
-</head>
-<body>
-
-<div id="applicationHost" class="body-content admin-appHost">
-	<div data-ng-include="'/app/layout/shell.html'"></div>
-</div>
-
-<div id="footer" ng-controller="ShellCtrl as vm">
-	<div class="container-fluid">
-		<div class="col-sm-4 col-sm-offset-5 ng-cloak">Udviklet af <a href="http://miracle.dk" target="_blank">Miracle A/S</a> | Version {{ version }}
+		<link rel="stylesheet" href="/lib/bootstrap/dist/css/bootstrap.css?version=1.0">
+		<link rel="stylesheet" href="/styles/app.css?version=1.0"/>
+	</head>
+	<body>
+		<div id="applicationHost" class="body-content admin-appHost">
+			<div data-ng-include="'/app/layout/shell.html'"></div>
 		</div>
-		<span class="pull-right text-info credit">OS2 OpgaveFordeler - &copy; OS2</span>
-	</div>
-</div>
 
+		<div id="footer" ng-controller="ShellCtrl as vm">
+			<div class="container-fluid">
+				<div class="col-sm-4 col-sm-offset-5 ng-cloak">
+					Udviklet af <a href="http://miracle.dk" target="_blank">Miracle A/S</a> | Version {{ version }}
+				</div>
+				<span class="pull-right text-info credit">OS2 OpgaveFordeler - &copy; OS2</span>
+			</div>
+		</div>
 
-<!-- Vendor Scripts -->
-<script src="/lib/angular/angular.js"></script>
-<script src="/lib/angular-animate/angular-animate.js"></script>
-<script src="/lib/angular-bootstrap/ui-bootstrap-tpls.js"></script>
-<script src="/lib/angular-sanitize/angular-sanitize.js"></script>
-<script src="/lib/angular-ui-router/release/angular-ui-router.js"></script>
-<script src="/lib/angular-ui-uploader/dist/uploader.js"></script>
-<!--<script src="lib/angular-route/angular-route.min.js"></script>-->
-<script src="/lib/lodash/lodash.js"></script>
-<script src="/lib/htmlsave/dist/htmlsave.min.js"></script>
-<script src="/lib/spin.js/spin.js"></script>
-<!-- <script src="lib/moment/min/moment.min.js"></script>-->
+		<!-- Vendor Scripts -->
+		<script src="/lib/angular/angular.js?version=1.0"></script>
+		<script src="/lib/angular-animate/angular-animate.js?version=1.0"></script>
+		<script src="/lib/angular-bootstrap/ui-bootstrap-tpls.js?version=1.0"></script>
+		<script src="/lib/angular-sanitize/angular-sanitize.js?version=1.0"></script>
+		<script src="/lib/angular-ui-router/release/angular-ui-router.js?version=1.0"></script>
+		<script src="/lib/angular-ui-uploader/dist/uploader.js?version=1.0"></script>
+		<script src="/lib/lodash/lodash.js?version=1.0"></script>
+		<script src="/lib/htmlsave/dist/htmlsave.min.js?version=1.0"></script>
+		<script src="/lib/spin.js/spin.js?version=1.0"></script>
+		<script src="/lib/angular-ui-alias/src/alias.js?version=1.0"></script>
 
-<!--<script src="lib/angular-ui-calendar/src/calendar.js"></script>
-<script src="lib/fullcalendar/fullcalendar.min.js"></script>
-<script src="lib/angular-google-maps/dist/angular-google-maps.min.js"></script>
-<script src="lib/angular-ui-ace/ui-ace.min.js"></script>
-<script src="lib/showdown/compressed/showdown.js"></script>
-<script src="lib/angular-ui-grid/ui-grid.min.js"></script>
-<script src="lib/csv-js/csv.js"></script>
-<script src="lib/angular-ui-select/dist/select.min.js"></script>-->
-<script src="/lib/angular-ui-alias/src/alias.js"></script>
-
-<script src="/app/aliases.js"></script>
-<script src="/app/constants.js"></script>
-<script src="/app/app.js"></script>
-
-<script src="/app/services/topic-router-api.service.js"></script>
-
-<script src="/app/services/app-spinner.service.js"></script>
-
-<script src="/app/settings/settings.controller.js"></script>
-
-<script src="/app/settings/edit-user-modal-instance.controller.js"></script>
-
-<script src="/app/settings/delete-user-modal-instance.controller.js"></script>
-
-<script src="/app/settings/add-municipality-modal-instance.controller.js"></script>
-
-<script src="/app/settings/delete-municipality-modal-instance.controller.js"></script>
-
-<script src="/app/home/home.controller.js"></script>
-
-<script src="/app/home/edit-rule-modal-instance.controller.js"></script>
-
-<script src="/app/home/edit-responsibility-modal-instance.controller.js"></script>
-
-<script src="/app/home/extended-responsibility.controller.js"></script>
-
-<script src="/app/home/add-substitute-modal-instance.controller.js"></script>
-
-<script src="/app/municipality-admin/municipality-admin.controller.js"></script>
-
-<script src="/app/municipality-admin/add-kle-modal-instance.controller.js"></script>
-
-<script src="/app/municipality-admin/edit-api-key-modal-instance-controller.js"></script>
-
-<script src="/app/municipality-admin/add-parameter-name-modal-instance.controller.js"></script>
-
-<script src="/app/layout/shell.controller.js"></script>
-
-<script src="/app/layout/login.controller.js"></script>
-
-<script src="/app/common/kle-servicetext-modal-instance.controller.js"></script>
-
-<script src="/app/common/confirmation-modal-instance.controller.js"></script>
-
-
-
-</body>
+		<script src="/app/aliases.js?version=1.0"></script>
+		<script src="/app/constants.js?version=1.0"></script>
+		<script src="/app/app.js?version=1.0"></script>
+		<script src="/app/services/topic-router-api.service.js?version=1.0"></script>
+		<script src="/app/services/app-spinner.service.js?version=1.0"></script>
+		<script src="/app/settings/settings.controller.js?version=1.0"></script>
+		<script src="/app/settings/edit-user-modal-instance.controller.js?version=1.0"></script>
+		<script src="/app/settings/delete-user-modal-instance.controller.js?version=1.0"></script>
+		<script src="/app/settings/add-municipality-modal-instance.controller.js?version=1.0"></script>
+		<script src="/app/settings/delete-municipality-modal-instance.controller.js?version=1.0"></script>
+		<script src="/app/home/home.controller.js?version=1.0"></script>
+		<script src="/app/home/edit-rule-modal-instance.controller.js?version=1.0"></script>
+		<script src="/app/home/edit-responsibility-modal-instance.controller.js?version=1.0"></script>
+		<script src="/app/home/extended-responsibility.controller.js?version=1.0"></script>
+		<script src="/app/home/add-substitute-modal-instance.controller.js?version=1.0"></script>
+		<script src="/app/municipality-admin/municipality-admin.controller.js?version=1.0"></script>
+		<script src="/app/municipality-admin/add-kle-modal-instance.controller.js?version=1.0"></script>
+		<script src="/app/municipality-admin/edit-api-key-modal-instance-controller.js?version=1.0"></script>
+		<script src="/app/municipality-admin/add-parameter-name-modal-instance.controller.js?version=1.0"></script>
+		<script src="/app/layout/shell.controller.js?version=1.0"></script>
+		<script src="/app/layout/login.controller.js?version=1.0"></script>
+		<script src="/app/common/kle-servicetext-modal-instance.controller.js?version=1.0"></script>
+		<script src="/app/common/confirmation-modal-instance.controller.js?version=1.0"></script>
+	</body>
 </html>
