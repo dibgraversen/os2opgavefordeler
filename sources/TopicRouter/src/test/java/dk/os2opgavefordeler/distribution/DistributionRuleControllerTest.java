@@ -1,8 +1,10 @@
 package dk.os2opgavefordeler.distribution;
 
 import com.google.common.collect.Iterables;
+import dk.os2opgavefordeler.Kle.KleRepository;
 import dk.os2opgavefordeler.distribution.dto.CprDistributionRuleFilterDTO;
 import dk.os2opgavefordeler.model.DistributionRule;
+import dk.os2opgavefordeler.model.Kle;
 import dk.os2opgavefordeler.model.Municipality;
 import dk.os2opgavefordeler.model.OrgUnit;
 import dk.os2opgavefordeler.test.UnitTest;
@@ -28,6 +30,9 @@ public class DistributionRuleControllerTest {
 
     @Inject
     private DistributionRuleRepository repository;
+
+    @Inject
+    private KleRepository kleRepository;
 
     @Test
     public void testCanCreateFilter() throws Exception {
@@ -101,10 +106,17 @@ public class DistributionRuleControllerTest {
                 .municipality(m)
                 .build();
 
+        Kle kle = new Kle();
+        kle.setNumber("00.00");
+        kle.setTitle("Kommunens styrelse");
+
+        kleRepository.save(kle);
+
         DistributionRule rule = new DistributionRule();
         rule.setMunicipality(m);
         rule.setAssignedOrg(o);
         rule.setResponsibleOrg(o);
+        rule.setKle(kle);
 
         repository.save(rule);
 
