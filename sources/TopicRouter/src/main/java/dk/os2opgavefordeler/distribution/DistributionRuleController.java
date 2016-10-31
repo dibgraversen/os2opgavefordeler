@@ -223,4 +223,8 @@ public class DistributionRuleController {
             auditLogger.event(rule.getKle().getNumber(), userStr, logType, LogEntry.EXTENDED_DISTRIBUTION_TYPE, dataStr, orgUnitStr, employmentStr, municipality);
         }
     }
+
+    public void setConfigService(ConfigService configService) {
+        this.configService = configService;
+    }
 }

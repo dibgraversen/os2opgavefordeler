@@ -5,10 +5,7 @@ import dk.os2opgavefordeler.assigneesearch.Assignee;
 import dk.os2opgavefordeler.assigneesearch.FindAssignedForKleService;
 import dk.os2opgavefordeler.distribution.DistributionRuleRepository;
 import dk.os2opgavefordeler.model.*;
-import dk.os2opgavefordeler.service.BootstrappingDataProviderSingleton;
-import dk.os2opgavefordeler.service.DistributionService;
-import dk.os2opgavefordeler.service.KleService;
-import dk.os2opgavefordeler.service.MunicipalityService;
+import dk.os2opgavefordeler.service.*;
 import org.apache.deltaspike.core.api.projectstage.ProjectStage;
 import org.apache.deltaspike.testcontrol.api.TestControl;
 import org.apache.deltaspike.testcontrol.api.junit.CdiTestRunner;
@@ -17,6 +14,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
@@ -25,7 +23,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
 
 @Category(UnitTest.class)
 @RunWith(CdiTestRunner.class)
@@ -62,7 +59,6 @@ public class DistributionRuleFilterTest {
         Kle kle = new Kle("1.1.1", "test kle", "blank", DateTime.now().toDate());
         kle.setMunicipality(municipality);
         kleRepository.save(kle);
-
 
         OrgUnit orgUnit = OrgUnit.builder()
                 .name("f")
