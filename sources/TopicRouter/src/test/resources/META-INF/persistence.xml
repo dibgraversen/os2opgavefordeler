@@ -13,7 +13,6 @@
         <class>dk.os2opgavefordeler.model.OrgUnit</class>
         <class>dk.os2opgavefordeler.model.Role</class>
         <class>dk.os2opgavefordeler.model.User</class>
-        <class>dk.os2opgavefordeler.model.DistributionAssignment</class>
         <class>dk.os2opgavefordeler.model.DistributionRule</class>
         <class>dk.os2opgavefordeler.model.IdentityProvider</class>
         <class>dk.os2opgavefordeler.model.Municipality</class>
@@ -38,7 +37,6 @@
         <class>dk.os2opgavefordeler.model.OrgUnit</class>
         <class>dk.os2opgavefordeler.model.Role</class>
         <class>dk.os2opgavefordeler.model.User</class>
-        <class>dk.os2opgavefordeler.model.DistributionAssignment</class>
         <class>dk.os2opgavefordeler.model.DistributionRule</class>
         <class>dk.os2opgavefordeler.model.IdentityProvider</class>
         <class>dk.os2opgavefordeler.model.Municipality</class>

@@ -5,19 +5,6 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9
                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
     <changeSet author="Kresten" id="create_table_distributionassignment">
-        <!-- distributionassignment -->
-        <createTable tableName="distributionassignment">
-            <column name="id" type="bigint" autoIncrement="true">
-                <constraints nullable="false" primaryKey="true" unique="true"/>
-            </column>
-            <column name="isactive" type="boolean">
-                <constraints nullable="false"/>
-            </column>
-            <column name="validfrom" type="date"/>
-            <column name="validto" type="date"/>
-            <column name="employee_id" type="bigint"/>
-            <column name="org_id" type="bigint"/>
-        </createTable>
 
         <!-- distribution rule -->
         <createTable tableName="distributionrule">
@@ -241,12 +228,6 @@
                                  referencedTableName="kle"
                                  referencedColumnNames="id"/>
 
-        <addForeignKeyConstraint constraintName="distributionassignment2employment"
-                                 baseTableName="distributionassignment"
-                                 baseColumnNames="employee_id"
-                                 referencedTableName="employment"
-                                 referencedColumnNames="id"/>
-
         <addForeignKeyConstraint constraintName="role2tr_user"
                                  baseTableName="role"
                                  baseColumnNames="owner_id"
@@ -271,12 +252,6 @@
                                  referencedTableName="municipality"
                                  referencedColumnNames="id"/>
 
-        <addForeignKeyConstraint constraintName="distributionassignment2orgunit"
-                                 baseTableName="distributionassignment"
-                                 baseColumnNames="org_id"
-                                 referencedTableName="orgunit"
-                                 referencedColumnNames="id"/>
-
         <addForeignKeyConstraint constraintName="distributionrule2distributionrule"
                                  baseTableName="distributionrule"
                                  baseColumnNames="parent_id"
@@ -291,7 +266,6 @@
 
 
         <rollback>
-            <dropTable tableName="distributionassignment"/>
             <dropTable tableName="distributionrule"/>
             <dropTable tableName="identityprovider"/>
         </rollback>

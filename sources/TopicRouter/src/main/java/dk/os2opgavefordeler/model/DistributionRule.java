@@ -85,8 +85,6 @@ public class DistributionRule implements Serializable {
     public void setAssignedOrg(OrgUnit assignedOrg) {
         this.assignedOrg = assignedOrg;
     }
-//	@OneToMany
-//	private List<DistributionAssignmentRule> assignments; // once we add support for additional, rule-based assignments.
 
     public long getAssignedEmp() {
         return assignedEmp;
