@@ -4,6 +4,7 @@ import dk.os2opgavefordeler.auth.AuthService;
 import dk.os2opgavefordeler.distribution.dto.CprDistributionRuleFilterDTO;
 import dk.os2opgavefordeler.distribution.dto.TextDistributionRuleFilterDTO;
 import dk.os2opgavefordeler.logging.AuditLogger;
+import dk.os2opgavefordeler.service.ConfigService;
 import dk.os2opgavefordeler.service.UserService;
 import org.apache.deltaspike.jpa.api.transaction.Transactional;
 
@@ -49,6 +50,9 @@ public class DistributionRuleController {
 
     @Inject
     private AuthService authService;
+
+    @Inject
+    private ConfigService configService;
 
 	/**
 	 * Creates a new distribution rule filter
@@ -159,15 +163,16 @@ public class DistributionRuleController {
             dataStr = "Navn: " + f.getName() + "; Tekst: " + f.getText();
         }
 
-        final Optional<User> user = userService.findByEmail(authService.getAuthentication().getEmail());
-        final String userStr = user.isPresent() ? user.get().getEmail() : "";
-        final String orgUnitStr = orgUnit != null ? orgUnit.getName() + " (" + orgUnit.getBusinessKey() + ")" : "";
-        final String employmentStr = employment != null ? employment.getName() + " (" + employment.getInitials() + ")" : "";
-        final Municipality municipality = user.isPresent() ? user.get().getMunicipality() : null;
+        if (configService.isAuditLogEnabled()) {
+            final Optional<User> user = userService.findByEmail(authService.getAuthentication().getEmail());
+            final String userStr = user.isPresent() ? user.get().getEmail() : "";
+            final String orgUnitStr = orgUnit != null ? orgUnit.getName() + " (" + orgUnit.getBusinessKey() + ")" : "";
+            final String employmentStr = employment != null ? employment.getName() + " (" + employment.getInitials() + ")" : "";
+            final Municipality municipality = user.isPresent() ? user.get().getMunicipality() : null;
 
-        // log event
-        auditLogger.event(rule.getKle().getNumber(), userStr, LogEntry.DELETE_TYPE, LogEntry.EXTENDED_DISTRIBUTION_TYPE, dataStr, orgUnitStr, employmentStr, municipality);
-
+            // log event
+            auditLogger.event(rule.getKle().getNumber(), userStr, LogEntry.DELETE_TYPE, LogEntry.EXTENDED_DISTRIBUTION_TYPE, dataStr, orgUnitStr, employmentStr, municipality);
+        }
 
         filterById.setDistributionRule(null);
         rule.removeFilter(filterById);
@@ -197,24 +202,25 @@ public class DistributionRuleController {
     }
 
     private void logEvent(DistributionRule rule, DistributionRuleFilterDTO dto, OrgUnit orgUnit, String logType) {
-        final Optional<User> user = userService.findByEmail(authService.getAuthentication().getEmail());
-        final Employment employment = employmentRepository.findBy(dto.assignedEmployeeId);
+        if (configService.isAuditLogEnabled()) {
+            final Optional<User> user = userService.findByEmail(authService.getAuthentication().getEmail());
+            final Employment employment = employmentRepository.findBy(dto.assignedEmployeeId);
+            final String userStr = user.isPresent() ? user.get().getEmail() : "";
+            final Municipality municipality = user.isPresent() ? user.get().getMunicipality() : null;
+            final String orgUnitStr = orgUnit.getName() + " (" + orgUnit.getBusinessKey() + ")";
+            final String employmentStr = employment != null ? employment.getName() + " (" + employment.getInitials() + ")" : "";
 
-        final String userStr = user.isPresent() ? user.get().getEmail() : "";
-        final Municipality municipality = user.isPresent() ? user.get().getMunicipality() : null;
-        final String orgUnitStr = orgUnit.getName() + " (" + orgUnit.getBusinessKey() + ")";
-        final String employmentStr = employment != null ? employment.getName() + " (" + employment.getInitials() + ")" : "";
+            String dataStr = "";
 
-        String dataStr = "";
+            if (CprDistributionRuleFilterDTO.FILTER_TYPE.equals(dto.type)) {
+                dataStr = "Navn: " + dto.name + "; Dage: " + dto.days + "; Måneder: " + dto.months;
+            }
+            else if (TextDistributionRuleFilterDTO.FILTER_TYPE.equals(dto.type)) {
+                dataStr = "Navn: " + dto.name + "; Tekst: " + dto.text;
+            }
 
-        if (CprDistributionRuleFilterDTO.FILTER_TYPE.equals(dto.type)) {
-            dataStr = "Navn: " + dto.name + "; Dage: " + dto.days + "; Måneder: " + dto.months;
+            // log event
+            auditLogger.event(rule.getKle().getNumber(), userStr, logType, LogEntry.EXTENDED_DISTRIBUTION_TYPE, dataStr, orgUnitStr, employmentStr, municipality);
         }
-        else if (TextDistributionRuleFilterDTO.FILTER_TYPE.equals(dto.type)) {
-            dataStr = "Navn: " + dto.name + "; Tekst: " + dto.text;
-        }
-
-        // log event
-        auditLogger.event(rule.getKle().getNumber(), userStr, logType, LogEntry.EXTENDED_DISTRIBUTION_TYPE, dataStr, orgUnitStr, employmentStr, municipality);
     }
 }

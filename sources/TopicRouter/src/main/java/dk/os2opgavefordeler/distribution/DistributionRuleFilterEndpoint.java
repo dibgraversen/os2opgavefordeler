@@ -94,6 +94,8 @@ public class DistributionRuleFilterEndpoint extends Endpoint {
     @POST
     @Path("/")
     public Response createFilter(DistributionRuleFilterDTO dto) {
+        System.out.println("Start");
+
         try {
             if (dto.filterId == 0) {
                 controller.createFilter(dto);
@@ -105,6 +107,8 @@ public class DistributionRuleFilterEndpoint extends Endpoint {
             return ok();
         }
         catch (Exception e) {
+            System.out.println("Oh no: " + e.getMessage());
+
             return badRequest(e.getMessage());
         }
     }

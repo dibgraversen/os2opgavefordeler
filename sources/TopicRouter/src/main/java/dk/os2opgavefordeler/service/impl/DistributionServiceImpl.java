@@ -9,11 +9,8 @@ import dk.os2opgavefordeler.model.*;
 import dk.os2opgavefordeler.model.presentation.DistributionRulePO;
 import dk.os2opgavefordeler.model.presentation.FilterNamePO;
 import dk.os2opgavefordeler.rest.DistributionRuleScope;
-import dk.os2opgavefordeler.service.DistributionService;
-import dk.os2opgavefordeler.service.OrgUnitService;
-import dk.os2opgavefordeler.service.PersistenceService;
+import dk.os2opgavefordeler.service.*;
 
-import dk.os2opgavefordeler.service.UserService;
 import org.apache.deltaspike.jpa.api.transaction.Transactional;
 
 import org.slf4j.Logger;
@@ -73,6 +70,9 @@ public class DistributionServiceImpl implements DistributionService {
 
     @Inject
     private AuditLogger auditLogger;
+
+    @Inject
+    private ConfigService configService;
 
     @Override
     public DistributionRule createDistributionRule(DistributionRule rule) {
@@ -610,11 +610,13 @@ public class DistributionServiceImpl implements DistributionService {
 	}
 
 	private void logEvent(String operationType, String data) {
-        Optional<User> user = userService.findByEmail(authService.getAuthentication().getEmail());
-        final String userStr = user.isPresent() ? user.get().getEmail() : "";
-        final Municipality municipality = user.isPresent() ? user.get().getMunicipality() : null;
+        if (configService.isAuditLogEnabled()) {
+            Optional<User> user = userService.findByEmail(authService.getAuthentication().getEmail());
+            final String userStr = user.isPresent() ? user.get().getEmail() : "";
+            final Municipality municipality = user.isPresent() ? user.get().getMunicipality() : null;
 
-        auditLogger.parameterEvent(userStr, operationType, LogEntry.PARAMETER_NAME_TYPE, data, municipality);
+            auditLogger.parameterEvent(userStr, operationType, LogEntry.PARAMETER_NAME_TYPE, data, municipality);
+        }
     }
 
     private String getFriendlyTypeName(DistributionRuleFilterName distributionRuleFilterName) {

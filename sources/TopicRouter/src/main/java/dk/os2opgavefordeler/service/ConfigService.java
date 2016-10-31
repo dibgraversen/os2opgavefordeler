@@ -6,5 +6,6 @@ public interface ConfigService {
 	String getOpenIdCallbackUrl();
 	boolean isGodModeLoginEnabled();
 	boolean enableGoogleLogin();
+	boolean isAuditLogEnabled();
 	boolean isExtendedResponsibilityEnabled();
 }
