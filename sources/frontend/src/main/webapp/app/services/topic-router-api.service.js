@@ -53,6 +53,7 @@
 			updateDateParameterName: updateDateParameterName,
 			updateTextParameterName: updateTextParameterName,
 			getFullLog: getFullLog,
+			getFullLogCsv: getFullLogCsv,
 
 			//
 			getFiltersForRule: getFiltersForRule,
@@ -436,6 +437,10 @@
 
 		function getFullLog(){
 			return httpGet('/auditlog');
+		}
+
+		function getFullLogCsv(){
+			return httpGet('/auditlog/csv');
 		}
 		
 		// DTO classes.

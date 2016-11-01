@@ -187,7 +187,7 @@
 					</div>
 				</div>
 			</tab>
-			<tab heading="Log" ng-click="getFullLog()">
+			<tab heading="Log" ng-click="getAuditLogs()">
 				<div class="panel panel-default margin-top">
 					<div class="panel-heading">
 						Hændelseslog
@@ -195,7 +195,11 @@
 
 					<div class="panel-body">
 						<a ng-disabled="!logDownloadLink" class="btn btn-primary" download="auditlog.json" href="{{logDownloadLink}}">
-							<span class="glyphicon glyphicon-download"></span> Hent log
+							<span class="glyphicon glyphicon-download"></span> Hent log (JSON)
+						</a>
+
+						<a ng-disabled="!csvLogDownloadLink" class="btn btn-primary" download="auditlog.csv" href="{{csvLogDownloadLink}}">
+							<span class="glyphicon glyphicon-download"></span> Hent log (CSV)
 						</a>
 					</div>
 				</div>

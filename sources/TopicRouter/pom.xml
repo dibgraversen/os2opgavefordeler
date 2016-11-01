@@ -323,6 +323,13 @@
         </dependency>
         <!-- / Common sense libraries -->
 
+        <!-- CSV -->
+        <dependency>
+            <groupId>net.sf.opencsv</groupId>
+            <artifactId>opencsv</artifactId>
+            <version>2.3</version>
+            <scope>compile</scope>
+        </dependency>
 
         <!-- Testing -->
         <dependency>

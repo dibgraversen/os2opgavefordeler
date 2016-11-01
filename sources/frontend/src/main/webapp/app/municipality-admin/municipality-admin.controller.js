@@ -55,7 +55,9 @@
 		$scope.deleteTextParameter = deleteTextParameter;
 		$scope.deleteDateParameter = deleteDateParameter;
 		$scope.idFilter = idFilter;
+		$scope.getAuditLogs = getAuditLogs;
 		$scope.getFullLog = getFullLog;
+		$scope.getFullLogCsv = getFullLogCsv;
 
 		activate();
 
@@ -208,9 +210,20 @@
 			});
 		}
 
+		function getAuditLogs() {
+			getFullLog();
+			getFullLogCsv();
+		}
+
 		function getFullLog() {
 			topicRouterApi.getFullLog().then(function(logData){
 				$scope.logDownloadLink = window.URL.createObjectURL(new Blob([JSON.stringify(logData)], {type: "application/json"}));
+			});
+		}
+
+		function getFullLogCsv() {
+			topicRouterApi.getFullLogCsv().then(function(logDataCsv){
+				$scope.csvLogDownloadLink = window.URL.createObjectURL(new Blob([logDataCsv], {type: "text/csv"}));
 			});
 		}
 
