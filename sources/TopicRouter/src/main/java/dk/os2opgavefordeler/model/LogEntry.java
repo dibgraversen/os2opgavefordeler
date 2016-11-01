@@ -195,7 +195,7 @@ public class LogEntry {
     }
 
     public String[] toStringArray() {
-        return new String[]{Long.toString(id), getFriendlyTimeStamp(), kle, user, operation, type, data, orgUnit, employment};
+        return new String[]{Long.toString(id), Long.toString(timeStamp.getTime()), getFriendlyTimeStamp(), kle, user, operation, type, data, orgUnit, employment};
     }
 
     private String toJson() {
