@@ -70,7 +70,7 @@ public class LogEntry {
 
     // date format
     @Transient
-    private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
+    private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 
     public LogEntry() {
         //for JPA
@@ -194,6 +194,10 @@ public class LogEntry {
         return toJson();
     }
 
+    public String[] toStringArray() {
+        return new String[]{Long.toString(id), getFriendlyTimeStamp(), kle, user, operation, type, data, orgUnit, employment};
+    }
+
     private String toJson() {
         return Json.createObjectBuilder().
                 add("id", id).
@@ -206,4 +210,5 @@ public class LogEntry {
                 add("orgUnit", orgUnit).
                 add("employment", employment).build().toString();
     }
+
 }
