@@ -212,6 +212,10 @@ For at crontab-scriptet kan generere ovenstående output udføres:
   \echo '\\.'
 ~~~~
 
+For at restore data fra en backup-fil, så køres følgende:
+
+`cat topicrouter.20001.2016-11-02.sql | psql -e topicrouter`
+
 Se ovennævnte SQL-script for flere informationer.
 
 # 9 Deployment
