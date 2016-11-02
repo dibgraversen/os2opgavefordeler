@@ -166,7 +166,7 @@ Det kaldende script er som følger:
 
 ~~~~
 #!/bin/sh
-cat topicrouter.crontab.sql | psql --no-align --tuples-only --dbname=topicrouter --set=MuId=20001 > /opt/miracle/backups/topicrouter.20001.$(date +%F).sql;
+cat /etc/topicrouter.crontab.sql | psql --no-align --tuples-only --dbname=topicrouter --set=MuId=20001 > /opt/miracle/backups/topicrouter.20001.$(date +%F).sql;
 exit 0
 ~~~~
 
