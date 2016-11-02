@@ -148,6 +148,72 @@ Prod er på os2opgavefordeler.dk (10.7.4.78)
 begge servere kan tilgås via ssh, når public key er installeret.
 Alle elementer i applikationen er installeret på hver server.
 
+**Backup og restore**
+
+Systemet indeholder mulighed for at restore data for en given kommune i tilfælde af, at data (fordelingsregler, ansvar osv.) skulle gå tabt.
+
+Backup af de enkelte kommuners data i systemet foregår vha. et script, som kører hver nat kl 02.
+
+Dette er konfigureret i postgres-brugerens crontab (som kan ses ved at køre kommandoen "crontab -e", mens du er logget ind som postgres).
+
+Crontab'en kalder følgende script:
+
+`0 2 * * * /etc/topicrouter-backup >/dev/null 2>&1`
+
+som så igen kalder psql med indholdet af topicrouter.crontab.sql-filen. Det er denne, der indeholder selve restore-/backup-funktionaliteten.
+
+Det kaldende script er som følger:
+
+~~~~
+#!/bin/sh
+cat topicrouter.crontab.sql | psql --no-align --tuples-only --dbname=topicrouter --set=MuId=20001 > /opt/miracle/backups/topicrouter.20001.$(date +%F).sql;
+exit 0
+~~~~
+
+Det er også her der defineres hvilket kommune-id, der skal foretages backup for, så nye kommuner skal tilføjes til denne fil.
+
+I ovenstående foretages indtil videre kun backup for Syddjurs, der har kommune-id 20001.
+
+Selve SQL backup-/restore-scriptet kan findes her:
+
+`/TopicRouter/src/main/resources/scripts/topicrouter.crontab.sql`
+
+Scriptet er skrevet i PostgreSQL og fungerer ved at danne en serie SQL-udtryk, som kan benyttes til at restore data for én kommune til tilstanden for en given dato.
+
+Udtrykkene sletter først eksisterende data i topicrouter-databasen for en given
+kommune og importerer derefter data for den givne dato.
+
+Disse data er indeholdt i selve scriptet i det format som pg_dump anvender.
+
+Mere lavpraktisk, så foregår det som følger:
+
+1) Alle tabeller låses
+2) Eksisterende data for det givne kommune-id slettes
+3) CONSTRAINTS fjernes, så der kan bruges COPY...FROM
+4) Data for det givne kommune-id indlæses med COPY...FROM
+5) CONSTRAINTS genetableres
+
+Med udgangspunkt i at ligne pg_dump mest muligt, anvendes “COPY FROM” og ikke den langsommere “INSERT INTO”.
+
+Eksempel på indlæsning af data til en tabel fra et genereret script, fx "topicrouter.20001.2016-11-02.sql":
+
+~~~~
+  COPY table_1 (id, value) FROM stdin;
+  7    9
+  7    13
+  \.
+~~~~
+
+For at crontab-scriptet kan generere ovenstående output udføres:
+
+~~~~
+  \echo COPY table_1 (id, value) FROM stdin;
+  COPY (SELECT id, value FROM table_1 WHERE id=7) TO stdout;
+  \echo '\\.'
+~~~~
+
+Se ovennævnte SQL-script for flere informationer.
+
 # 9 Deployment
 Deploymentprocedure er som følger:
 
