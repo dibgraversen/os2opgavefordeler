@@ -44,26 +44,29 @@ public class TextDistributionRuleFilter extends DistributionRuleFilter {
             return false;
         }
 
+        // lowercase parameter value before comparisons
+        parameter = parameter.toLowerCase();
+
         if (text.startsWith("*") && text.endsWith("*")) {
             String s = StringUtils.removeEnd(text, "*");
             s = StringUtils.removeStart(s, "*");
 
-            return parameter.contains(s);
+            return parameter.contains(s.toLowerCase());
         }
 
         if (text.startsWith("*")) {
             String s = StringUtils.removeStart(text, "*");
 
-            return parameter.endsWith(s);
+            return parameter.endsWith(s.toLowerCase());
         }
 
         if (text.endsWith("*")) {
             String s = StringUtils.removeEnd(text, "*");
 
-            return parameter.startsWith(s);
+            return parameter.startsWith(s.toLowerCase());
         }
 
-        return parameter.equals(text);
+        return parameter.equalsIgnoreCase(text);
     }
 
     public String getText() {
