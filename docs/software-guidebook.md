@@ -212,7 +212,7 @@ For at crontab-scriptet kan generere ovenstående output udføres:
   \echo '\\.'
 ~~~~
 
-For at restore data fra en backup-fil, så køres følgende:
+For at restore data fra en backup-fil, så køres følgende efter at have skiftet til postgres-brugeren med "sudo su postgres":
 
 `cat topicrouter.20001.2016-11-02.sql | psql -e topicrouter`
 
