@@ -53,7 +53,7 @@ public class AuditLogEndpoint extends Endpoint {
     private static final String NOT_AUTHORIZED = "Not authorized";
     private static final String USER_NOT_FOUND = "User not found";
 
-    private static final char CSV_SEPARATOR_CHAR = '\t'; // tab character
+    private static final char CSV_SEPARATOR_CHAR = ';';
 
     /**
      * Returns the full list of audit log entries for the user's municipality
@@ -111,6 +111,10 @@ public class AuditLogEndpoint extends Endpoint {
                 try {
                     List<String[]> valuesList = new ArrayList<>();
 
+                    // add header row
+                    valuesList.add(new String[]{"ID", "Tidspunkt", "KLE", "Bruger", "Operation", "Type", "Data", "Org", "Ansættelse"});
+
+                    // add content rows
                     auditLogService.getAllLogEntries(user.get().getMunicipality().getId()).forEach(e -> valuesList.add(e.toStringArray()));
 
                     StringWriter stringWriter = new StringWriter();
