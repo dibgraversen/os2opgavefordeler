@@ -5,6 +5,7 @@ import com.google.common.collect.Lists;
 import dk.os2opgavefordeler.employment.EmploymentRepository;
 import dk.os2opgavefordeler.employment.MunicipalityRepository;
 import dk.os2opgavefordeler.employment.OrgUnitRepository;
+import dk.os2opgavefordeler.model.DistributionRule;
 import dk.os2opgavefordeler.model.Employment;
 import dk.os2opgavefordeler.model.Municipality;
 import dk.os2opgavefordeler.model.OrgUnit;
@@ -36,6 +37,8 @@ public class ImportService {
     @Inject
     private EntityManager entityManager;
 
+	private static final boolean debugLogging = false;
+
     /**
      * Imports an organization into a municipality.
      *
@@ -53,7 +56,8 @@ public class ImportService {
 
 	    inactivateOrgUnitsForMunicipality(municipalityId); // inactivate all organisation units in preparation of import
         OrgUnit orgUnit = importOrgUnit(municipality, null, orgUnitDTO); // import root organisation unit
-	    cleanup(); // delete inactive records
+
+	    cleanup(municipalityId); // delete inactive records
 
         return orgUnit;
     }
@@ -67,17 +71,17 @@ public class ImportService {
 	 * @return the resulting organisational unit
 	 */
     private OrgUnit importOrgUnit(Municipality municipality, OrgUnit parent, OrgUnitDTO orgUnitDTO) {
-        logger.info("Importing OrgUnit: {}, Business key: {}", orgUnitDTO.name, orgUnitDTO.businessKey);
+        if (debugLogging) logger.info("Importing OrgUnit: {}, Business key: {}", orgUnitDTO.name, orgUnitDTO.businessKey);
 
 	    // retrieve an existing organisational unit or create a new one, if needed
 	    OrgUnit orgUnit = orgUnitRepository.findByBusinessKeyAndMunicipalityId(orgUnitDTO.businessKey, municipality.getId());
 
 	    if (orgUnit == null) {
-            logger.info("OrgUnit did not exist, creating new.");
+		    if (debugLogging) logger.info("OrgUnit did not exist, creating new.");
             orgUnit = new OrgUnit();
         }
         else {
-            logger.info("OrgUnit already exists, updating.");
+		    if (debugLogging) logger.info("OrgUnit already exists, updating.");
         }
 
         if (parent != null) {
@@ -111,7 +115,7 @@ public class ImportService {
             importOrgUnit(municipality, orgUnit, o);
         }
 
-        logger.info("Imported OrgUnit: {}", orgUnit);
+	    if (debugLogging) logger.info("Imported OrgUnit: {}", orgUnit);
 
         return orgUnit;
 
@@ -183,10 +187,10 @@ public class ImportService {
 	 * @return list of employments for the organisational unit
 	 */
     private List<Employment> importEmployments(OrgUnit orgUnit, OrgUnitDTO orgUnitDTO) {
-        logger.info("Importing employments {}", orgUnitDTO.employees);
+	    if (debugLogging) logger.info("Importing employments {}", orgUnitDTO.employees);
 
         if (orgUnitDTO.employees.isEmpty()) {
-            logger.info("No employments found!");
+	        if (debugLogging) logger.info("No employments found!");
             return Lists.newArrayList();
         }
 
@@ -226,38 +230,121 @@ public class ImportService {
 	}
 
 	/**
+	 * Returns all inactive org units
+	 *
+	 * @return the list of org units
+	 */
+	private List getInactiveOrgUnits() {
+		entityManager.getTransaction().begin();
+		List resultList = entityManager.createQuery("SELECT o FROM OrgUnit o WHERE o.isActive = false").getResultList();
+		entityManager.getTransaction().commit();
+
+		return resultList;
+	}
+
+	private List<DistributionRule> getDeletableDistributionRules(long municipalityId) {
+		entityManager.getTransaction().begin();
+		List<DistributionRule> resultList = (List<DistributionRule>)entityManager.createQuery("SELECT d FROM DistributionRule d WHERE d.responsibleOrg.isActive = false OR d.assignedOrg.isActive = false").getResultList();
+		entityManager.getTransaction().commit();
+
+		return resultList;
+	}
+
+	/**
 	 * Deletes inactive records
 	 */
-	private void cleanup() {
+	private void cleanup(long municipalityId) {
+		logger.info("Performing cleanup..");
+
+		logger.info("Deleting org units: {}", getInactiveOrgUnits());
+
+		// start transaction
 		entityManager.getTransaction().begin();
 
+		logger.info("Deleting inactive distribution rule <-> filter mappings..");
+
 		entityManager.createNativeQuery(
-				" DELETE FROM distributionrule WHERE assignedemp IN (SELECT id FROM employment WHERE isactive = FALSE);" +
-						" DELETE FROM distributionrule_distributionrulefilter WHERE filters_id IN (SELECT id FROM distributionrule WHERE assignedemp IN (SELECT id FROM employment WHERE isactive = FALSE));" +
-						" DELETE FROM distributionrulefilter drf WHERE drf.distributionrule_id IN (SELECT id FROM distributionrule WHERE assignedemp IN (SELECT id FROM employment WHERE isactive = FALSE));" +
+			// delete mapping if the filter has an inactive employment assigned to it
+			" DELETE FROM distributionrule_distributionrulefilter WHERE filters_id IN (SELECT id FROM distributionrulefilter WHERE assignedemp IN (SELECT id FROM employment WHERE isactive = FALSE AND municipality_id = " + municipalityId + "));" +
 
-						" DELETE FROM distributionrule_distributionrulefilter WHERE filters_id IN (SELECT id FROM distributionrulefilter drf WHERE drf.assignedemp IN (SELECT id FROM employment WHERE isactive = FALSE));" +
-						" DELETE FROM distributionrulefilter drf WHERE drf.assignedemp IN (SELECT id FROM employment WHERE isactive = FALSE);" +
+			// delete mapping if the distribution rule or filter has an inactive employment assigned to it
+			" DELETE FROM distributionrule_distributionrulefilter WHERE distributionrule_id IN (SELECT id FROM distributionrule WHERE assignedemp IN (SELECT id FROM employment WHERE isactive = FALSE AND municipality_id = " + municipalityId + "));" +
+			" DELETE FROM distributionrule_distributionrulefilter WHERE filters_id IN (SELECT id FROM distributionrulefilter WHERE assignedemp IN (SELECT id FROM employment WHERE isactive = FALSE AND municipality_id = " + municipalityId + "));" +
 
-						" DELETE FROM role WHERE employment_id IN (SELECT id FROM employment WHERE isactive = FALSE); " +
-						" UPDATE orgunit SET manager_id = NULL WHERE manager_id IN (SELECT id FROM employment WHERE isactive = FALSE);" +
+			// delete mapping if the distribution rule has a parent with an inactive employment assigned to it
+			" DELETE FROM distributionrule_distributionrulefilter WHERE distributionrule_id IN (SELECT id FROM distributionrule WHERE parent_id IN (SELECT id FROM distributionrule WHERE assignedemp IN (SELECT id FROM employment WHERE isactive = FALSE AND municipality_id = " + municipalityId + ")));" +
 
-						" UPDATE orgunit SET manager_id = NULL WHERE manager_id IN (SELECT id FROM employment WHERE employedin_id IN (SELECT id FROM orgunit WHERE isactive = FALSE));" +
-
-						" DELETE FROM role WHERE employment_id IN (SELECT id FROM employment WHERE employedin_id IN (SELECT id FROM orgunit WHERE isactive = FALSE));" +
-
-						" DELETE FROM distributionrule_distributionrulefilter WHERE distributionrule_id IN (SELECT id FROM distributionrule WHERE assignedemp IN (SELECT id FROM employment WHERE employedin_id IN (SELECT id FROM orgunit WHERE isactive = FALSE)));" +
-						" DELETE FROM distributionrule_distributionrulefilter WHERE distributionrule_id IN (SELECT id FROM distributionrule WHERE parent_id IN (SELECT id FROM distributionrule WHERE assignedemp IN (SELECT id FROM employment WHERE employedin_id IN (SELECT id FROM orgunit WHERE isactive = FALSE))));" +
-						" DELETE FROM distributionrule WHERE parent_id IN (SELECT id FROM distributionrule WHERE assignedemp IN (SELECT id FROM employment WHERE employedin_id IN (SELECT id FROM orgunit WHERE isactive = FALSE)));" +
-						" DELETE FROM distributionrule WHERE assignedemp IN (SELECT id FROM employment WHERE employedin_id IN (SELECT id FROM orgunit WHERE isactive = FALSE));" +
-
-						" DELETE FROM distributionrule_distributionrulefilter WHERE filters_id IN (SELECT id FROM distributionrulefilter WHERE assignedemp IN (SELECT id FROM employment WHERE employedin_id IN (SELECT id FROM orgunit WHERE isactive = FALSE)));" +
-						" DELETE FROM distributionrulefilter WHERE assignedemp IN (SELECT id FROM employment WHERE employedin_id IN (SELECT id FROM orgunit WHERE isactive = FALSE));" +
-
-						" DELETE FROM employment WHERE employedin_id IN (SELECT id FROM orgunit WHERE isactive = FALSE);" +
-						" DELETE FROM employment WHERE isactive = FALSE;"
+			// delete mapping if the distribution rule has an inactive organisational unit assigned to it
+			" DELETE FROM distributionrule_distributionrulefilter WHERE distributionrule_id IN (SELECT id FROM distributionrule WHERE assignedorg_id IN (SELECT id FROM orgunit WHERE isactive = FALSE AND municipality_id = " + municipalityId + "));"
 		).executeUpdate();
 
+		logger.info("Cleaning up distribution rule filters..");
+
+		entityManager.createNativeQuery(
+			// delete filter if the distribution rule has an inactive employment or organisational unit assigned to it
+			" DELETE FROM distributionrulefilter WHERE distributionrule_id IN (SELECT id FROM distributionrule WHERE assignedemp IN (SELECT id FROM employment WHERE isactive = FALSE AND municipality_id = " + municipalityId + "));" +
+			" DELETE FROM distributionrulefilter WHERE distributionrule_id IN (SELECT id FROM distributionrule WHERE assignedorg_id IN (SELECT id FROM orgunit WHERE isactive = FALSE AND municipality_id = " + municipalityId + "));" +
+
+			// delete filter if it has an inactive employment or organisational unit assigned to it
+			" DELETE FROM distributionrulefilter WHERE assignedemp IN (SELECT id FROM employment WHERE isactive = FALSE AND municipality_id = " + municipalityId + ");" +
+			" DELETE FROM distributionrulefilter WHERE assignedorg_id IN (SELECT id FROM orgunit WHERE isactive = FALSE AND municipality_id = " + municipalityId + ");"
+		).executeUpdate();
+
+		logger.info("Decoupling distribution rules..");
+
+		entityManager.createNativeQuery(
+				// decouple distribution rule from its parent if it has an inactive employment or organisational unit assigned to it or responsible for it
+				" UPDATE distributionrule SET parent_id = NULL WHERE responsibleorg_id IN (SELECT id FROM orgunit WHERE isactive = FALSE AND municipality_id = " + municipalityId + ") OR assignedorg_id IN (SELECT id FROM orgunit WHERE isactive = FALSE AND municipality_id = " + municipalityId + ");"
+		).executeUpdate();
+
+		List<DistributionRule> myList = getDeletableDistributionRules(municipalityId);
+
+		for (DistributionRule currDistRule: myList) {
+			logger.info("Trying to delete distribution rule with ID " + currDistRule.getId());
+			entityManager.createNativeQuery("DELETE FROM distributionrule WHERE id = " + currDistRule.getId() + ";").executeUpdate();
+		}
+
+		/*logger.info("Deleting distribution rules with inactive organisational unit assigned to it or responsible for it..");
+
+		entityManager.createNativeQuery(
+			// delete distribution rule if it has an inactive employment or organisational unit assigned to it or responsible for it
+			" DELETE FROM distributionrule WHERE responsibleorg_id IN (SELECT id FROM orgunit WHERE isactive = FALSE AND municipality_id = " + municipalityId + ") OR assignedorg_id IN (SELECT id FROM orgunit WHERE isactive = FALSE AND municipality_id = " + municipalityId + ");"
+		).executeUpdate();*/
+
+		logger.info("Deleting distribution rules with an inactive employment assigned to it..");
+
+		entityManager.createNativeQuery(
+			// delete distribution rule if it has an inactive employment or organisational unit assigned to it or responsible for it
+			" DELETE FROM distributionrule WHERE assignedemp IN (SELECT id FROM employment WHERE isactive = FALSE AND municipality_id = " + municipalityId + ");"
+		).executeUpdate();
+
+		logger.info("Deleting distribution rules with a parent that has an inactive employment assigned to it..");
+
+		entityManager.createNativeQuery(
+			// delete distribution rule if it has a parent that has an inactive employment assigned to it
+			" DELETE FROM distributionrule WHERE parent_id IN (SELECT id FROM distributionrule WHERE assignedemp IN (SELECT id FROM employment WHERE isactive = FALSE AND municipality_id = " + municipalityId + "));"
+		).executeUpdate();
+
+		logger.info("Deleting distribution rules with an inactive employment assigned to it..");
+
+		entityManager.createNativeQuery(
+			// delete distribution rule if it has an inactive employment assigned to it
+			" DELETE FROM distributionrule WHERE assignedemp IN (SELECT id FROM employment WHERE isactive = FALSE AND municipality_id = " + municipalityId + ");"
+		).executeUpdate();
+
+		logger.info("Deleting inactive roles, org units and employments..");
+
+		entityManager.createNativeQuery(
+			// delete records without a lot of circular references
+			" DELETE FROM role WHERE employment_id IN (SELECT id FROM employment WHERE isactive = FALSE AND municipality_id = " + municipalityId + ");" +
+			" DELETE FROM role WHERE employment_id IN (SELECT id FROM employment WHERE employedin_id IN (SELECT id FROM orgunit WHERE isactive = FALSE AND municipality_id = " + municipalityId + "));" +
+
+			" UPDATE orgunit SET manager_id = NULL WHERE manager_id IN (SELECT id FROM employment WHERE isactive = FALSE AND municipality_id = " + municipalityId + ");" +
+			" DELETE FROM employment WHERE isactive = FALSE AND municipality_id = " + municipalityId + ";" +
+			" DELETE FROM orgunit WHERE isactive = FALSE AND municipality_id = " + municipalityId + ";"
+		).executeUpdate();
+
+		// end transaction
 		entityManager.getTransaction().commit();
 	}
 
