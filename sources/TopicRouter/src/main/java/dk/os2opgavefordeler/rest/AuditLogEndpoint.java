@@ -1,8 +1,10 @@
 package dk.os2opgavefordeler.rest;
 
 import java.io.IOException;
+import java.io.PrintStream;
 import java.io.StringWriter;
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -15,6 +17,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -54,6 +57,7 @@ public class AuditLogEndpoint extends Endpoint {
     private static final String USER_NOT_FOUND = "User not found";
 
     private static final char CSV_SEPARATOR_CHAR = ';';
+    private static final char BOM_CHAR = '\uFEFF';
 
     /**
      * Returns the full list of audit log entries for the user's municipality
@@ -118,13 +122,18 @@ public class AuditLogEndpoint extends Endpoint {
                     auditLogService.getAllLogEntries(user.get().getMunicipality().getId()).forEach(e -> valuesList.add(e.toStringArray()));
 
                     StringWriter stringWriter = new StringWriter();
+
+                    stringWriter.append(BOM_CHAR); // we need to append a byte order mark (BOM) to help Excel's horrible handling of CSV files
+
                     CSVWriter csvWriter = new CSVWriter(stringWriter, CSV_SEPARATOR_CHAR);
                     csvWriter.writeAll(valuesList);
 
                     csvWriter.flush();
                     csvWriter.close();
 
-                    myCsvText = stringWriter.toString();
+                    String csvString = stringWriter.toString();
+
+                    myCsvText = new String(csvString.getBytes(), Charset.forName("UTF-8"));
                 }
                 catch (IOException e) {
                     log.error("Error while generating CSV log data", e);
