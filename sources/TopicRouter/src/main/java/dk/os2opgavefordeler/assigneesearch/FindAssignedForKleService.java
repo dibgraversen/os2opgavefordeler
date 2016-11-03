@@ -10,7 +10,6 @@ import javax.enterprise.context.ApplicationScoped;
 
 import javax.inject.Inject;
 
-import dk.os2opgavefordeler.util.FilterHelper;
 import org.slf4j.Logger;
 
 import dk.os2opgavefordeler.distribution.DistributionRuleRepository;
@@ -80,7 +79,7 @@ public class FindAssignedForKleService {
 
 	    for (DistributionRuleFilter filter: filters) {
 		    if (filter.matches(filterParameters)) {
-			    return createAssignee(distributionRule, filter.getAssignedOrg(), Optional.ofNullable(filter.getAssignedEmployee()));
+			    return createAssignee(filter.getDistributionRule(), filter.getAssignedOrg(), Optional.ofNullable(filter.getAssignedEmployee()));
             }
         }
 

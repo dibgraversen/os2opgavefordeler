@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import dk.os2opgavefordeler.model.OrgUnit;
 import org.jboss.resteasy.annotations.cache.NoCache;
 import org.slf4j.Logger;
 
@@ -115,9 +116,26 @@ public class ApiEndpoint extends Endpoint {
 
         EmploymentApiResultPO manager = new EmploymentApiResultPO(orgUnitService.findResponsibleManager(assignee.getOrgUnit()).orElse(null));
         EmploymentApiResultPO employee = assignee.getEmployment().map(EmploymentApiResultPO::new).orElse(null);
-        DistributionRuleApiResultPO resultPO = new DistributionRuleApiResultPO(assignee.getRule(), manager, employee);
 
-	    log.info("API endpoint called by {} for KLE: {}", email, resultPO.getKle().getNumber());
+        Optional<OrgUnit> distributionOrgUnit = assignee.getRule().getAssignedOrg();
+
+        OrgUnit assignedOrg;
+
+        if (distributionOrgUnit.isPresent()) {
+            if (distributionOrgUnit.get().equals(assignee.getOrgUnit())) {
+                assignedOrg = distributionOrgUnit.get();
+            }
+            else {
+                assignedOrg = assignee.getOrgUnit();
+            }
+        }
+        else {
+            assignedOrg = assignee.getOrgUnit();
+        }
+
+        DistributionRuleApiResultPO resultPO = new DistributionRuleApiResultPO(assignee.getRule().getKle(), assignedOrg, manager, employee);
+
+	    log.info("API endpoint called by {} for KLE: {} with result: {}", email, resultPO.getKle().getNumber(), resultPO.getOrg().getName());
 
         return ok(resultPO);
     }

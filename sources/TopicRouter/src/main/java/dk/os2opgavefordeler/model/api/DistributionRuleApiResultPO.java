@@ -1,7 +1,7 @@
 package dk.os2opgavefordeler.model.api;
 
-import dk.os2opgavefordeler.model.DistributionRule;
 import dk.os2opgavefordeler.model.Kle;
+import dk.os2opgavefordeler.model.OrgUnit;
 
 /**
  * A Presentation Object for the TopicRoute model ready for use in the UI.
@@ -27,13 +27,10 @@ public class DistributionRuleApiResultPO {
 	public DistributionRuleApiResultPO() {
 	}
 
-	public DistributionRuleApiResultPO(DistributionRule source, EmploymentApiResultPO manager, EmploymentApiResultPO employee) {
-		this.kle = kleFrom(source.getKle());
+	public DistributionRuleApiResultPO(Kle kle, OrgUnit assignedOrg, EmploymentApiResultPO manager, EmploymentApiResultPO employee) {
+		this.kle = kleFrom(kle);
 		this.employee = employee;
-		this.org = source.getAssignedOrg().map(orgUnit -> {
-			OrgUnitApiResultPO result = new OrgUnitApiResultPO(orgUnit, manager);
-			return result;
-		}).orElse(null);
+		this.org = new OrgUnitApiResultPO(assignedOrg, manager);
 	}
 
 	public KleApiResultPO getKle() {

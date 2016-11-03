@@ -282,4 +282,24 @@ public class OrgUnit implements Serializable, IHasChildren<OrgUnit> {
 			return this;
 		}
 	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+
+		OrgUnit orgUnit = (OrgUnit) o;
+
+		if (id != orgUnit.id) return false;
+		if (businessKey != null ? !businessKey.equals(orgUnit.businessKey) : orgUnit.businessKey != null) return false;
+		return municipality != null ? municipality.equals(orgUnit.municipality) : orgUnit.municipality == null;
+	}
+
+	@Override
+	public int hashCode() {
+		int result = (int) (id ^ (id >>> 32));
+		result = 31 * result + (businessKey != null ? businessKey.hashCode() : 0);
+		result = 31 * result + (municipality != null ? municipality.hashCode() : 0);
+		return result;
+	}
 }
