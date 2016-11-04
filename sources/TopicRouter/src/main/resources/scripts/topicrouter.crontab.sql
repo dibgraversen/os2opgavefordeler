@@ -1,4 +1,3 @@
-#!/usr/bin/env bash
 -- Dump all data for a municipality id in "topicrouter".
 -- by Hans Schou <hsc@miracle.dk> 2016-10-31
 --
@@ -29,35 +28,35 @@ SELECT '-- municipality: ' || name FROM municipality WHERE id=:MuId;
 \echo UPDATE orgunit SET isactive=FALSE WHERE municipality_id=:MuId;
 \echo UPDATE employment SET isactive=FALSE WHERE municipality_id=:MuId;
 
-\echo DELETE FROM distributionrule_distributionrulefilter WHERE filters_id IN (SELECT id FROM distributionrulefilter drf WHERE drf.assignedemp IN (SELECT id FROM employment WHERE isactive = FALSE));
-\echo DELETE FROM distributionrule_distributionrulefilter WHERE distributionrule_id IN (SELECT id FROM distributionrule WHERE assignedemp IN (SELECT id FROM employment WHERE employedin_id IN (SELECT id FROM orgunit WHERE isactive = FALSE)));
-\echo DELETE FROM distributionrule_distributionrulefilter WHERE distributionrule_id IN (SELECT id FROM distributionrule WHERE parent_id IN (SELECT id FROM distributionrule WHERE assignedemp IN (SELECT id FROM employment WHERE employedin_id IN (SELECT id FROM orgunit WHERE isactive = FALSE))));
+\echo DELETE FROM distributionrule_distributionrulefilter WHERE filters_id IN (SELECT id FROM distributionrulefilter drf WHERE drf.assignedemp IN (SELECT id FROM employment WHERE isactive = FALSE AND municipality_id=:MuId));
+\echo DELETE FROM distributionrule_distributionrulefilter WHERE distributionrule_id IN (SELECT id FROM distributionrule WHERE assignedemp IN (SELECT id FROM employment WHERE employedin_id IN (SELECT id FROM orgunit WHERE isactive = FALSE AND municipality_id=:MuId)));
+\echo DELETE FROM distributionrule_distributionrulefilter WHERE distributionrule_id IN (SELECT id FROM distributionrule WHERE parent_id IN (SELECT id FROM distributionrule WHERE assignedemp IN (SELECT id FROM employment WHERE employedin_id IN (SELECT id FROM orgunit WHERE isactive = FALSE AND municipality_id=:MuId))));
+\echo DELETE FROM distributionrule_distributionrulefilter WHERE filters_id IN (SELECT id FROM distributionrule WHERE assignedemp IN (SELECT id FROM employment WHERE isactive = FALSE AND municipality_id=:MuId));
+\echo DELETE FROM distributionrule_distributionrulefilter WHERE distributionrule_id IN (SELECT id FROM distributionrule WHERE assignedorg_id IN (SELECT id FROM orgunit WHERE isactive = FALSE AND municipality_id=:MuId));
 
-\echo UPDATE distributionrule SET parent_id = NULL WHERE responsibleorg_id IN (SELECT id FROM orgunit WHERE isactive = FALSE) OR assignedorg_id IN (SELECT id FROM employment WHERE isactive = FALSE);
-\echo DELETE FROM distributionrule WHERE assignedemp IN (SELECT id FROM employment WHERE isactive = FALSE);
-\echo DELETE FROM distributionrule WHERE responsibleorg_id IN (SELECT id FROM orgunit WHERE isactive = FALSE) OR assignedorg_id IN (SELECT id FROM orgunit WHERE isactive = FALSE);
+\echo UPDATE distributionrule SET parent_id = NULL WHERE responsibleorg_id IN (SELECT id FROM orgunit WHERE isactive = FALSE AND municipality_id=:MuId) OR assignedorg_id IN (SELECT id FROM employment WHERE isactive = FALSE AND municipality_id=:MuId);
+\echo DELETE FROM distributionrule WHERE assignedemp IN (SELECT id FROM employment WHERE isactive = FALSE AND municipality_id=:MuId);
+\echo DELETE FROM distributionrule WHERE responsibleorg_id IN (SELECT id FROM orgunit WHERE isactive = FALSE AND municipality_id=:MuId) OR assignedorg_id IN (SELECT id FROM orgunit WHERE isactive = FALSE AND municipality_id=:MuId);
 
-\echo DELETE FROM distributionrule_distributionrulefilter WHERE filters_id IN (SELECT id FROM distributionrule WHERE assignedemp IN (SELECT id FROM employment WHERE isactive = FALSE));
-\echo DELETE FROM distributionrulefilter drf WHERE drf.distributionrule_id IN (SELECT id FROM distributionrule WHERE assignedemp IN (SELECT id FROM employment WHERE isactive = FALSE));
+\echo DELETE FROM distributionrulefilter drf WHERE drf.distributionrule_id IN (SELECT id FROM distributionrule WHERE assignedemp IN (SELECT id FROM employment WHERE isactive = FALSE AND municipality_id=:MuId));
+\echo DELETE FROM distributionrulefilter drf WHERE drf.assignedemp IN (SELECT id FROM employment WHERE isactive = FALSE AND municipality_id=:MuId);
+\echo DELETE FROM distributionrulefilter drf WHERE drf.assignedorg_id IN (SELECT id FROM orgunit WHERE isactive = FALSE AND municipality_id=:MuId);
 
-\echo DELETE FROM distributionrulefilter drf WHERE drf.assignedemp IN (SELECT id FROM employment WHERE isactive = FALSE);
-\echo DELETE FROM distributionrulefilter drf WHERE drf.assignedorg_id IN (SELECT id FROM orgunit WHERE isactive = FALSE);
+\echo DELETE FROM role WHERE employment_id IN (SELECT id FROM employment WHERE isactive = FALSE AND municipality_id=:MuId);
+\echo UPDATE orgunit SET manager_id = NULL WHERE manager_id IN (SELECT id FROM employment WHERE isactive = FALSE AND municipality_id=:MuId);
 
-\echo DELETE FROM role WHERE employment_id IN (SELECT id FROM employment WHERE isactive = FALSE);
-\echo UPDATE orgunit SET manager_id = NULL WHERE manager_id IN (SELECT id FROM employment WHERE isactive = FALSE);
+\echo UPDATE orgunit SET manager_id = NULL WHERE manager_id IN (SELECT id FROM employment WHERE employedin_id IN (SELECT id FROM orgunit WHERE isactive = FALSE AND municipality_id=:MuId));
 
-\echo UPDATE orgunit SET manager_id = NULL WHERE manager_id IN (SELECT id FROM employment WHERE employedin_id IN (SELECT id FROM orgunit WHERE isactive = FALSE));
+\echo DELETE FROM role WHERE employment_id IN (SELECT id FROM employment WHERE employedin_id IN (SELECT id FROM orgunit WHERE isactive = FALSE AND municipality_id=:MuId));
 
-\echo DELETE FROM role WHERE employment_id IN (SELECT id FROM employment WHERE employedin_id IN (SELECT id FROM orgunit WHERE isactive = FALSE));
+\echo UPDATE distributionrule SET parent_id = NULL WHERE assignedorg_id IN (SELECT id FROM orgunit WHERE isactive = FALSE AND municipality_id=:MuId) OR responsibleorg_id IN (SELECT id FROM orgunit WHERE isactive = FALSE AND municipality_id=:MuId);
+\echo DELETE FROM distributionrule WHERE parent_id IN (SELECT id FROM distributionrule WHERE assignedemp IN (SELECT id FROM employment WHERE employedin_id IN (SELECT id FROM orgunit WHERE isactive = FALSE AND municipality_id=:MuId)));
+\echo DELETE FROM distributionrule WHERE assignedemp IN (SELECT id FROM employment WHERE employedin_id IN (SELECT id FROM orgunit WHERE isactive = FALSE AND municipality_id=:MuId));
 
-\echo UPDATE distributionrule SET parent_id = NULL WHERE assignedorg_id IN (SELECT id FROM orgunit WHERE isactive = FALSE) OR responsibleorg_id IN (SELECT id FROM orgunit WHERE isactive = FALSE);
-\echo DELETE FROM distributionrule WHERE parent_id IN (SELECT id FROM distributionrule WHERE assignedemp IN (SELECT id FROM employment WHERE employedin_id IN (SELECT id FROM orgunit WHERE isactive = FALSE)));
-\echo DELETE FROM distributionrule WHERE assignedemp IN (SELECT id FROM employment WHERE employedin_id IN (SELECT id FROM orgunit WHERE isactive = FALSE));
+\echo DELETE FROM distributionrulefilter WHERE assignedemp IN (SELECT id FROM employment WHERE employedin_id IN (SELECT id FROM orgunit WHERE isactive = FALSE AND municipality_id=:MuId));
 
-\echo DELETE FROM distributionrulefilter WHERE assignedemp IN (SELECT id FROM employment WHERE employedin_id IN (SELECT id FROM orgunit WHERE isactive = FALSE));
-
-\echo DELETE FROM employment WHERE isactive = FALSE;
-\echo DELETE FROM orgunit WHERE isactive = FALSE;
+\echo DELETE FROM employment WHERE isactive = FALSE AND municipality_id=:MuId;
+\echo DELETE FROM orgunit WHERE isactive = FALSE AND municipality_id=:MuId;
 
 \echo DELETE FROM distributionrulefiltername WHERE municipality_id=:MuId;
 \echo DELETE FROM distributionrule WHERE municipality_id=:MuId;
@@ -136,6 +135,8 @@ COPY (SELECT id, admin, manager, municipalityadmin, name, substitute, employment
 \echo COPY "distributionrule_distributionrulefilter" (distributionrule_id, filters_id) FROM stdin;
 COPY (SELECT distributionrule_id, filters_id FROM "distributionrule_distributionrulefilter" WHERE distributionrule_id IN (SELECT id FROM distributionrule WHERE municipality_id=:MuId) ORDER BY distributionrule_id, filters_id) TO stdout;
 \echo '\\.'
+
+\echo INSERT INTO auditlog (eventtime, kle, username, operation, eventtype, eventdata, orgunit, employment, municipality_id) VALUES (current_timestamp, NULL, '\''System User'\'', '\''System'\'', '\''Restore'\'', '\''Database restore'\'', NULL, NULL, :MuId);
 
 \echo
 \echo ALTER TABLE ONLY distributionrule ADD CONSTRAINT distributionrule2orgunit FOREIGN KEY (responsibleorg_id) REFERENCES orgunit(id);
