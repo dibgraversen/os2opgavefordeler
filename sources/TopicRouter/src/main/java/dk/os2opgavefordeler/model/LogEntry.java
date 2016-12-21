@@ -22,7 +22,7 @@ public class LogEntry {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private int id;
 
     @Column(name="eventtime", nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
@@ -101,11 +101,11 @@ public class LogEntry {
         this.municipality = municipality;
     }
 
-    public long getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(int id) {
         this.id = id;
     }
 
@@ -195,7 +195,7 @@ public class LogEntry {
     }
 
     public String[] toStringArray() {
-        return new String[]{Long.toString(id), getFriendlyTimeStamp(), kle, user, operation, type, data, orgUnit, employment};
+        return new String[]{Integer.toString(id), getFriendlyTimeStamp(), kle, user, operation, type, data, orgUnit, employment};
     }
 
     private String toJson() {
