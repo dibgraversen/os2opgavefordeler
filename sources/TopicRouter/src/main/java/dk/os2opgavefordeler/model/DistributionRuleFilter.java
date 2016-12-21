@@ -13,7 +13,7 @@ public abstract class DistributionRuleFilter {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     private DistributionRule distributionRule;
 
     @NotBlank
