@@ -363,7 +363,7 @@
 		function buildRules(municipality) {
 			return httpGet('/distribution-rules/buildRules', {
 				"municipalityId": municipality.id
-			})
+			});
 		}
 
 		function getKlesForMunicipality(municipality){
