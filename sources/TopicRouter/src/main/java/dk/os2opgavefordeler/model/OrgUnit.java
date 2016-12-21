@@ -43,6 +43,9 @@ public class OrgUnit implements Serializable, IHasChildren<OrgUnit> {
 	@ManyToOne(fetch = FetchType.EAGER)
 	private Municipality municipality;
 
+	@OneToMany(mappedBy = "assignedOrg", cascade = CascadeType.REMOVE)
+	private List<DistributionRuleFilter> responsibleForFilters;
+
 
 	public OrgUnit() {
 		children = new ArrayList<>();
