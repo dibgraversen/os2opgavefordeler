@@ -14,6 +14,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -59,6 +60,8 @@ public class DistributionRuleEndpoint extends Endpoint {
 
 	private static final String RESPONSIBILITY_UPDATE_TYPE = "responsibility";
 	private static final String DISTRIBUTION_UPDATE_TYPE = "distribution";
+
+	private final List<String> validUpdateTypes = Arrays.asList("responsibility", "distribution");
 
 	/**
 	 * Returns a list of distribution rules for the specified role and scope.
@@ -112,109 +115,112 @@ public class DistributionRuleEndpoint extends Endpoint {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
 	public Response updateResponsibleOrganization(@PathParam("distId") Long distId, DistributionRulePO distribution, @QueryParam("type") String type) {
+		// comp: validate
 		if (distId == null || distribution == null) {
-			log.info("updateResponsibleOrganization - bad request[{},{}]", distId, distribution);
+			log.warn("updateResponsibleOrganization - bad request[{},{}]", distId, distribution);
 			return badRequest("need distId and distribution object");
 		}
-
+		if(!validUpdateTypes.contains(type)){
+			log.warn("invalid update type given. Type: "+type);
+			return badRequest("Invalid type given as parameter.");
+		}
 		if (!authService.isAuthenticated()) {
+			log.warn("returning from not authenticated");
 			return Response.status(Response.Status.UNAUTHORIZED).entity(NOT_LOGGED_IN).build();
 		}
-
 		Optional<User> user = userService.findByEmail(authService.getAuthentication().getEmail());
+		if(!user.isPresent()){
+			log.warn("returning from user not found.");
+			return Response.status(Response.Status.NOT_FOUND).entity(USER_NOT_FOUND).build();
+		}
+		long userId = user.get().getId();
+		if (hasUpdatePermission(userId)) { // only managers and admins can update responsibility
+			final String userStr = user.get().getEmail();
+			final Kle kle = kleService.getKle(distribution.getKle().getId());
+			final String kleStr = kle != null && !kle.getNumber().isEmpty() ? kle.getNumber() : "";
+			final Municipality municipality = user.get().getMunicipality();
+			final Optional<DistributionRule> existingDistributionRule = distributionService.getDistribution(distId);
 
-		if (user.isPresent()) {
-			long userId = user.get().getId();
+			String operationType = "";
+			String eventType = "";
+			String orgUnitStr = "";
+			String employmentStr = "";
+			String dataStr = "";
 
-			if (userService.isAdmin(userId) || userService.isMunicipalityAdmin(userId) || userService.isManager(userId)) { // only managers and admins can update responsibility
-				final String userStr = user.get().getEmail();
-				final Kle kle = kleService.getKle(distribution.getKle().getId());
-				final String kleStr = kle != null && !kle.getNumber().isEmpty() ? kle.getNumber() : "";
-				final Municipality municipality = user.get().getMunicipality();
-				final Optional<DistributionRule> existingDistributionRule = distributionService.getDistribution(distId);
+			if (updatingResponsible(type)) {
+				eventType = LogEntry.RESPONSIBILITY_TYPE;
 
-				String operationType = "";
-				String eventType = "";
-				String orgUnitStr = "";
-				String employmentStr = "";
-				String dataStr = "";
-
-				if (RESPONSIBILITY_UPDATE_TYPE.equals(type)) {
-					eventType = LogEntry.RESPONSIBILITY_TYPE;
-
-					if (distribution.getResponsible() == 0) { // deleting responsible org unit
-						operationType = LogEntry.DELETE_TYPE;
-					}
-					else {
-						if (!existingDistributionRule.isPresent()) { // distribution rule didn't already exist
-							operationType = LogEntry.CREATE_TYPE;
-						}
-						else { // distribution rule exists
-							if (existingDistributionRule.get().getResponsibleOrg().isPresent()) { // responsible org is set
-								operationType = LogEntry.UPDATE_TYPE;
-							}
-							else {
-								operationType = LogEntry.CREATE_TYPE;
-							}
-						}
-
-						// fetch organisational unit
-						Optional<OrgUnit> orgUnit = orgUnitService.getOrgUnit(distribution.getResponsible());
-						orgUnitStr = orgUnit.isPresent() ? orgUnit.get().getName() + " (" + orgUnit.get().getBusinessKey() + ")"  : "";
-					}
+				if (distribution.getResponsible() == 0) { // deleting responsible org unit
+					operationType = LogEntry.DELETE_TYPE;
 				}
-				else if (DISTRIBUTION_UPDATE_TYPE.equals(type)) {
-					eventType = LogEntry.DISTRIBUTION_TYPE;
-
-					if (distribution.getOrg() == 0 && distribution.getEmployee() == 0) { // deleting distribution rule
-						operationType = LogEntry.DELETE_TYPE;
+				else {
+					if (!existingDistributionRule.isPresent()) { // distribution rule didn't already exist
+						operationType = LogEntry.CREATE_TYPE;
 					}
-					else {
-						if (!existingDistributionRule.isPresent()) { // distribution rule didn't already exist
-							operationType = LogEntry.CREATE_TYPE;
+					else { // distribution rule exists
+						if (existingDistributionRule.get().getResponsibleOrg().isPresent()) { // responsible org is set
+							operationType = LogEntry.UPDATE_TYPE;
 						}
-						else { // distribution rule exists
-							if (existingDistributionRule.get().getAssignedOrg().isPresent()) { // assigned org is set
-								operationType = LogEntry.UPDATE_TYPE;
-							}
-							else {
-								operationType = LogEntry.CREATE_TYPE;
-							}
+						else {
+							operationType = LogEntry.CREATE_TYPE;
 						}
 					}
 
 					// fetch organisational unit
-					Optional<OrgUnit> orgUnit = orgUnitService.getOrgUnit(distribution.getOrg());
+					Optional<OrgUnit> orgUnit = orgUnitService.getOrgUnit(distribution.getResponsible());
 					orgUnitStr = orgUnit.isPresent() ? orgUnit.get().getName() + " (" + orgUnit.get().getBusinessKey() + ")"  : "";
+				}
+			}	else if (DISTRIBUTION_UPDATE_TYPE.equals(type)) {
+				eventType = LogEntry.DISTRIBUTION_TYPE;
 
-					// fetch employment
-					Optional<Employment> employment = employmentService.getEmployment(distribution.getEmployee());
-					employmentStr = employment.isPresent() ? employment.get().getName() + " (" + employment.get().getInitials() + ")": "";
+				if (distribution.getOrg() == 0 && distribution.getEmployee() == 0) { // deleting distribution rule
+					operationType = LogEntry.DELETE_TYPE;
+				}
+				else {
+					if (!existingDistributionRule.isPresent()) { // distribution rule didn't already exist
+						operationType = LogEntry.CREATE_TYPE;
+					}
+					else { // distribution rule exists
+						if (existingDistributionRule.get().getAssignedOrg().isPresent()) { // assigned org is set
+							operationType = LogEntry.UPDATE_TYPE;
+						}
+						else {
+							operationType = LogEntry.CREATE_TYPE;
+						}
+					}
 				}
 
-				// log event
-				auditLogger.event(kleStr, userStr, operationType, eventType, dataStr, orgUnitStr, employmentStr, municipality);
+				// fetch organisational unit
+				Optional<OrgUnit> orgUnit = orgUnitService.getOrgUnit(distribution.getOrg());
+				orgUnitStr = orgUnit.isPresent() ? orgUnit.get().getName() + " (" + orgUnit.get().getBusinessKey() + ")"  : "";
 
-				//TODO: multi-tenancy considerations. Do we pass municipality to service methods, or do we inject that in the
-				//services? At any rate, make sure we can't get mess with other municipalities' data.
-				return distributionService.getDistribution(distId)
-						.map(existing -> {
-							log.info("updateResponsibleOrganization - updating resource");
-							return doUpdateResponsibleOrganization(existing, distribution);
-						})
-						.orElseGet(() -> {
-									log.info("updateResponsibleOrganization - nonexisting distributionRule[{}]", distId);
-									return Response.status(Response.Status.NOT_FOUND).build();
-								}
-						);
+				// fetch employment
+				Optional<Employment> employment = employmentService.getEmployment(distribution.getEmployee());
+				employmentStr = employment.isPresent() ? employment.get().getName() + " (" + employment.get().getInitials() + ")": "";
+			} else {
+				log.warn("why do we end up here? type: "+type);
 			}
-			else {
-				return Response.status(Response.Status.UNAUTHORIZED).entity(NOT_AUTHORIZED).build();
-			}
+
+			// log event
+			auditLogger.event(kleStr, userStr, operationType, eventType, dataStr, orgUnitStr, employmentStr, municipality);
+
+			//TODO: multi-tenancy considerations. Do we pass municipality to service methods, or do we inject that in the
+			//services? At any rate, make sure we can't get mess with other municipalities' data.
+			return distributionService.getDistribution(distId)
+					.map(existing -> {
+						log.info("updateResponsibleOrganization - updating resource");
+						return doUpdateResponsibleOrganization(existing, distribution);
+					})
+					.orElseGet(() -> {
+								log.info("updateResponsibleOrganization - nonexisting distributionRule[{}]", distId);
+								return Response.status(Response.Status.NOT_FOUND).build();
+							}
+					);
+		} else {
+			log.warn("returned since user does not have permission to update. User: "+user);
+			return badRequest("Does not have permission to update");
 		}
-		else {
-			return Response.status(Response.Status.NOT_FOUND).entity(USER_NOT_FOUND).build();
-		}
+
 	}
 
 	@GET
@@ -453,5 +459,13 @@ public class DistributionRuleEndpoint extends Endpoint {
 		if(!newVal.equals(oldVal)) {
 			updater.accept(newVal);
 		}
+	}
+
+	private boolean updatingResponsible(String type){
+		return RESPONSIBILITY_UPDATE_TYPE.equals(type);
+	}
+
+	private boolean hasUpdatePermission(long userId){
+		return userService.isAdmin(userId) || userService.isMunicipalityAdmin(userId) || userService.isManager(userId);
 	}
 }
