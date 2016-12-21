@@ -103,65 +103,64 @@
             "email": "ll@kommune.dk",
             "esdhId": "lale"
           }
+        }
+      ]
+    },
+    {
+      "businessKey": "K7",
+      "name": "Udvikling",
+      "email": "udvikling@kommune.dk",
+      "phone": "555-8456",
+      "esdhId": "Udvi",
+      "esdhLabel": "Udvikling",
+      "manager": {
+        "businessKey": "E101",
+        "name": "Henrik Løvborg",
+        "email": "hlo@miracle.dk",
+        "esdhId": "hlo"
+      },
+      "employees": [
+        {
+          "businessKey": "E102",
+          "name": "Rune Nielsen",
+          "email": "rni@miracle.dk",
+          "esdhId": "rni"
         },
         {
-          "businessKey": "K7",
-          "name": "Udvikling",
-          "email": "udvikling@kommune.dk",
-          "phone": "555-8456",
-          "esdhId": "Udvi",
-          "esdhLabel": "Udvikling",
+          "businessKey": "E102",
+          "name": "Rune Nielsen",
+          "email": "rni@miracle.dk",
+          "esdhId": "rni"
+        }
+      ],
+      "children": [
+        {
+          "businessKey": "K8",
+          "name": "Backend",
+          "email": "backend@kommune.dk",
+          "phone": "555-8989",
+          "esdhId": "back",
+          "esdhLabel": "Backend",
           "manager": {
-            "businessKey": "E9",
-            "name": "Ervin Jensen",
-            "email": "kodah@kommune.dk",
-            "esdhId": "erje"
-          },
-          "employees": [
-            {
-              "businessKey": "E101",
-              "name": "Henrik Løvborg",
-              "email": "hlo@miracle.dk",
-              "esdhId": "hlo"
-            },
-            {
-              "businessKey": "E102",
-              "name": "Rune Nielsen",
-              "email": "rni@miracle.dk",
-              "esdhId": "rni"
-            }
-
-          ],
-          "children": [
-            {
-              "businessKey": "K8",
-              "name": "Backend",
-              "email": "backend@kommune.dk",
-              "phone": "555-8989",
-              "esdhId": "back",
-              "esdhLabel": "Backend",
-              "manager": {
-                "businessKey": "E10",
-                "name": "Tyge Tordenskjold",
-                "email": "tt@kommune.dk",
-                "esdhId": "tyto"
-              }
-            },
-            {
-              "businessKey": "K9",
-              "name": "Borgervendt",
-              "email": "borger@kommune.dk",
-              "phone": "555-7575",
-              "esdhId": "borg",
-              "esdhLabel": "Borgervendt",
-              "manager": {
-                "businessKey": "E11",
-                "name": "Søren Andersen",
-                "email": "sa@kommune.dk",
-                "esdhId": "soan"
-              }
-            }
-          ]
+            "businessKey": "E10",
+            "name": "Tyge Tordenskjold",
+            "email": "tt@kommune.dk",
+            "esdhId": "tyto"
+          }
+        },
+        {
+          "businessKey": "K9",
+          "name": "Borgervendt",
+          "email": "borger@kommune.dk",
+          "phone": "555-7575",
+          "esdhId": "borg",
+          "esdhLabel": "Borgervendt",
+          "manager": {
+            "businessKey": "E11",
+            "name": "Søren Andersen",
+            "email": "sa@kommune.dk",
+            "esdhId": "soan"
+          }
         }
       ]
     },
