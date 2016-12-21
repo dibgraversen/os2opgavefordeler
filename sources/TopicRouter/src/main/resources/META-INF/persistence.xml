@@ -6,7 +6,10 @@
         http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd">
     <persistence-unit name="OS2TopicRouter" transaction-type="RESOURCE_LOCAL">
 
+        <!-- ENABLE FOR TEST AND PROD -->
         <jta-data-source>java:/OS2TopicRouterDS</jta-data-source>
+        <!-- ENABLE FOR TEST AND PROD -->
+
         <class>dk.os2opgavefordeler.model.DistributionRuleFilter</class>
         <class>dk.os2opgavefordeler.model.DistributionRuleFilterName</class>
         <class>dk.os2opgavefordeler.model.CprDistributionRuleFilter</class>
@@ -25,12 +28,21 @@
             <property name="hibernate.transaction.jta.platform"
                       value="org.hibernate.service.jta.platform.internal.JBossStandAloneJtaPlatform"/>
             <property name="hibernate.generate_statistics" value="false"/>
+            <!-- ENABLE FOR TEST AND PROD -->
             <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQL9Dialect"/>
+            <property name="hibernate.hbm2ddl.auto" value="validate"/>
+            <!-- ENABLE FOR TEST AND PROD -->
+
+            <!-- ENABLE FOR DOCKER DEV -->
+            <!--<property name="connection.driver_class" value="org.h2.Driver"/>-->
+            <!--<property name="hibernate.connection.url" value="jdbc:h2:mem:test;MVCC=TRUE"/>-->
+            <!--<property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect"/>-->
+            <!--<property name="hibernate.hbm2ddl.auto" value="create-drop"/>-->
+            <!-- ENABLE FOR DOCKER DEV -->
+
             <!-- Properties for Hibernate -->
-            <!--property name="hibernate.hbm2ddl.auto" value="create-drop" /-->
             <property name="hibernate.show_sql" value="false"/>
             <!--<property name="hibernate.hbm2ddl.auto" value="update" />-->
-            <property name="hibernate.hbm2ddl.auto" value="none"/>
         </properties>
     </persistence-unit>
 </persistence>
