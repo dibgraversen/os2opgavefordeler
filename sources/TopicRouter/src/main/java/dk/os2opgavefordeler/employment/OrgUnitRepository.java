@@ -8,8 +8,10 @@ import org.apache.deltaspike.data.api.SingleResultType;
 import java.util.List;
 
 import dk.os2opgavefordeler.model.OrgUnit;
+import org.apache.deltaspike.jpa.api.transaction.Transactional;
 
 @Repository(forEntity = OrgUnit.class)
+@Transactional
 public abstract class OrgUnitRepository extends AbstractEntityRepository<OrgUnit, Long> {
 
     @Query(value = "SELECT ou FROM OrgUnit ou WHERE ou.businessKey = ?1 AND ou.municipality.id = ?2", singleResult = SingleResultType.OPTIONAL)
