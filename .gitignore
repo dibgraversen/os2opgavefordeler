@@ -14,8 +14,9 @@ environment/puppet/modules/wildfly/spec/fixtures/modules/archive
 .idea
 *.iml
 dist.dev
-dist.dev.zip
+dist.test
+dist.prod
 src/app/constants.js
 src/lib
 local.zsh
-source/modules/frontend/node_modules
+node_modules

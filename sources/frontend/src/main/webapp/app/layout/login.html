@@ -18,6 +18,22 @@
                     </div>
                 </div>
             </div>
+            <div class="panel panel-default" ng-show="{{ dev }}">
+                <div class="panel-heading">Dev Tools</div>
+                <div class="panel-body">
+                    <form class="form-inline padded-top">
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="text" class="form-control" id="email" ng-model="email" placeholder="hlo@miracle.dk" />
+                            <a class="btn btn-default" href="http://localhost:8080/TopicRouter/rest/auth/iddqd?email={{email}}">Log ind</a>
+                        </div>
+                    </form>
+                    <hr />
+                    <div>
+                        <button class="btn btn-default" ng-click="bootstrap()">Bootstrap</button>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div ng-show="user.loggedIn">
@@ -53,6 +69,7 @@
                             <li>OS2 Opgavefordeler handler om en kommunes forbindelse mellem KLE-numre og den
                                 entitet, der håndterer det pågældende emne, hvad enten det er en afdeling eller en
                                 medarbejder.
+                            </li>
                             <li>KLE-numre kommer fra KL og indlæses af sysadmin. KLE-strukturen er fælles for alle
                                 kommuner.
                             </li>

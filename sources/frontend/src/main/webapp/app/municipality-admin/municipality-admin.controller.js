@@ -103,9 +103,10 @@
 					onCompleted: function(file, response, status) {
 						appSpinner.hideSpinner();
 						if(status != 200){
+							$log.warn(response);
 							$scope.mAdminAlerts = [{
 								type: 'danger',
-								msg: 'Filen kunne ikke parses, verificér syntaks og prøv igen.'
+								msg: 'Der skete en fejl ved upload af org-fil.'
 							}];
 						} else {
 							$scope.mAdminAlerts = [{

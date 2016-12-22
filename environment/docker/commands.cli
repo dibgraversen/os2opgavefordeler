@@ -1,0 +1,16 @@
+# Run the commands in an embedded server
+# embed-server
+
+# Add postgres module
+# module add --name=org.postgres --resources=/tmp/postgresql-${postgres.version}.jar --dependencies=javax.api,javax.transaction.api
+
+# Add Postgres driver
+# /subsystem=datasources/jdbc-driver=postgres:add(driver-name="postgres",driver-module-name="org.postgres",driver-class-name=org.postgresql.Driver)
+
+#stop-embedded-server
+
+# enable google auth
+# /system-property=topicrouter.login.google.enabled:add(value=true)
+
+# enable God mode
+/system-property=topicrouter.login.godmode.enabled:add(value=true)

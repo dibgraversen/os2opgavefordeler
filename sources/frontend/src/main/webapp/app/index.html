@@ -1,61 +1,73 @@
 <!doctype html>
 <html class="no-js" ng-app="topicRouter">
-	<head>
-		<title>OS2 OpgaveFordeler</title>
+<head>
+    <title>OS2 OpgaveFordeler</title>
 
-		<meta charset="utf-8">
-		<meta name="description" content="">
-		<meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-		<link rel="stylesheet" href="/lib/bootstrap/dist/css/bootstrap.css?version=1.0">
-		<link rel="stylesheet" href="/styles/app.css?version=1.0"/>
-	</head>
-	<body>
-		<div id="applicationHost" class="body-content admin-appHost">
-			<div data-ng-include="'/app/layout/shell.html'"></div>
-		</div>
+    <link rel="stylesheet" href="/lib/bootstrap/dist/css/bootstrap.css?version=1.0">
+    <link rel="stylesheet" href="/styles/app.css?version=1.0"/>
+</head>
+<body>
+<div id="applicationHost" class="body-content admin-appHost">
+    <div data-ng-include="'/app/layout/shell.html'"></div>
+</div>
 
-		<div id="footer" ng-controller="ShellCtrl as vm">
-			<div class="container-fluid">
-				<div class="col-sm-4 col-sm-offset-5 ng-cloak">
-					Udviklet af <a href="http://miracle.dk" target="_blank">Miracle A/S</a> | Version {{ version }}
-				</div>
-				<span class="pull-right text-info credit">OS2 OpgaveFordeler - &copy; OS2</span>
-			</div>
-		</div>
+<div id="footer" ng-controller="ShellCtrl as vm">
+    <div class="container-fluid">
+        <div class="col-sm-4 col-sm-offset-5 ng-cloak">
+            Udviklet af <a href="http://miracle.dk" target="_blank">Miracle A/S</a> | Version {{ version }}
+        </div>
+        <span class="pull-right text-info credit">OS2 OpgaveFordeler - &copy; OS2</span>
+    </div>
+</div>
 
-		<!-- Vendor Scripts -->
-		<script src="/lib/angular/angular.js?version=1.0"></script>
-		<script src="/lib/angular-animate/angular-animate.js?version=1.0"></script>
-		<script src="/lib/angular-bootstrap/ui-bootstrap-tpls.js?version=1.0"></script>
-		<script src="/lib/angular-sanitize/angular-sanitize.js?version=1.0"></script>
-		<script src="/lib/angular-ui-router/release/angular-ui-router.js?version=1.0"></script>
-		<script src="/lib/angular-ui-uploader/dist/uploader.js?version=1.0"></script>
-		<script src="/lib/lodash/lodash.js?version=1.0"></script>
-		<script src="/lib/htmlsave/dist/htmlsave.min.js?version=1.0"></script>
-		<script src="/lib/spin.js/spin.js?version=1.0"></script>
-		<script src="/lib/angular-ui-alias/src/alias.js?version=1.0"></script>
+<!-- Vendor Scripts -->
+<script src="/lib/angular/angular.js?version=1.0"></script>
+<script src="/lib/angular-animate/angular-animate.js?version=1.0"></script>
+<script src="/lib/angular-bootstrap/ui-bootstrap-tpls.js?version=1.0"></script>
+<script src="/lib/angular-sanitize/angular-sanitize.js?version=1.0"></script>
+<script src="/lib/angular-ui-router/release/angular-ui-router.js?version=1.0"></script>
+<script src="/lib/angular-ui-uploader/dist/uploader.js?version=1.0"></script>
+<script src="/lib/lodash/lodash.js?version=1.0"></script>
+<script src="/lib/htmlsave/dist/htmlsave.min.js?version=1.0"></script>
+<script src="/lib/spin.js/spin.js?version=1.0"></script>
+<script src="/lib/angular-ui-alias/src/alias.js?version=1.0"></script>
 
-		<script src="/app/aliases.js?version=1.0"></script>
-		<script src="/app/constants.js?version=1.0"></script>
-		<script src="/app/app.js?version=1.0"></script>
-		<script src="/app/services/topic-router-api.service.js?version=1.0"></script>
-		<script src="/app/services/app-spinner.service.js?version=1.0"></script>
-		<script src="/app/settings/settings.controller.js?version=1.0"></script>
-		<script src="/app/settings/edit-user-modal-instance.controller.js?version=1.0"></script>
-		<script src="/app/settings/delete-user-modal-instance.controller.js?version=1.0"></script>
-		<script src="/app/settings/add-municipality-modal-instance.controller.js?version=1.0"></script>
-		<script src="/app/home/home.controller.js?version=1.0"></script>
-		<script src="/app/home/edit-rule-modal-instance.controller.js?version=1.0"></script>
-		<script src="/app/home/edit-responsibility-modal-instance.controller.js?version=1.0"></script>
-		<script src="/app/home/add-substitute-modal-instance.controller.js?version=1.0"></script>
-		<script src="/app/municipality-admin/municipality-admin.controller.js?version=1.0"></script>
-		<script src="/app/municipality-admin/add-kle-modal-instance.controller.js?version=1.0"></script>
-		<script src="/app/municipality-admin/edit-api-key-modal-instance-controller.js?version=1.0"></script>
-		<script src="/app/municipality-admin/add-parameter-name-modal-instance.controller.js?version=1.0"></script>
-		<script src="/app/layout/shell.controller.js?version=1.0"></script>
-		<script src="/app/layout/login.controller.js?version=1.0"></script>
-		<script src="/app/common/kle-servicetext-modal-instance.controller.js?version=1.0"></script>
-		<script src="/app/common/confirmation-modal-instance.controller.js?version=1.0"></script>
-	</body>
+<!--<script src="/app/aliases.js?version=1.0"></script>-->
+<script src="/app/constants.js?version=1.0"></script>
+<!--<script src="/app/app.js?version=1.0"></script>-->
+<!--<script src="/app/services/topic-router-api.service.js?version=1.0"></script>-->
+<!--<script src="/app/services/bootstrap.service.js?version=1.0"></script>-->
+<!--<script src="/app/services/app-spinner.service.js?version=1.0"></script>-->
+<!--<script src="/app/settings/settings.controller.js?version=1.0"></script>-->
+<!--<script src="/app/settings/edit-user-modal-instance.controller.js?version=1.0"></script>-->
+<!--<script src="/app/settings/delete-user-modal-instance.controller.js?version=1.0"></script>-->
+<!--<script src="/app/settings/add-municipality-modal-instance.controller.js?version=1.0"></script>-->
+<!--<script src="/app/home/home.controller.js?version=1.0"></script>-->
+<!--<script src="/app/home/edit-rule-modal-instance.controller.js?version=1.0"></script>-->
+<!--<script src="/app/home/edit-responsibility-modal-instance.controller.js?version=1.0"></script>-->
+<!--<script src="/app/home/add-substitute-modal-instance.controller.js?version=1.0"></script>-->
+<!--<script src="/app/municipality-admin/municipality-admin.controller.js?version=1.0"></script>-->
+<!--<script src="/app/municipality-admin/add-kle-modal-instance.controller.js?version=1.0"></script>-->
+<!--<script src="/app/municipality-admin/edit-api-key-modal-instance-controller.js?version=1.0"></script>-->
+<!--<script src="/app/municipality-admin/add-parameter-name-modal-instance.controller.js?version=1.0"></script>-->
+<!--<script src="/app/layout/shell.controller.js?version=1.0"></script>-->
+<!--<script src="/app/layout/login.controller.js?version=1.0"></script>-->
+<!--<script src="/app/common/kle-servicetext-modal-instance.controller.js?version=1.0"></script>-->
+<!--<script src="/app/common/confirmation-modal-instance.controller.js?version=1.0"></script>-->
+<!-- inject:js -->
+
+<!-- endinject -->
+
+<!-- inject:bower -->
+
+<!-- endinject -->
+
+<!-- inject:app -->
+
+<!-- endinject -->
+</body>
 </html>

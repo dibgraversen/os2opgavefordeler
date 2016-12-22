@@ -97,7 +97,7 @@ OS2 OpgaveFordeler skal udvikles med open source teknologi. Der er valgt Java og
 
 Deployment på Apache webserver og JBoss Wildfly/EAP6. 
 
-Der skal benyttes SAML til authentication.
+Der skal benyttes OS2SSO til authentication.
 
 # 6. Principper
 Id'er defineres med long.
@@ -219,12 +219,18 @@ For at restore data fra en backup-fil, så køres følgende efter at have skifte
 Se ovennævnte SQL-script for flere informationer.
 
 # 9 Deployment
+For lokal udvikling se getting_started.md.
+
 Deploymentprocedure er som følger:
 
-- Byg release med mvn i parent dir og -P 'target-test' eller 'target-prod' alt efter hvor du skal deploye - så sørger maven for de korrekte properties.
-- Kopier fra /sources/frontend/target/frontend-version.jar og /sources/TopicRouter/target/TopicRouter.war til rette server og placer dem i ~/deploy/ med version for historik. E.g. med scp: scp /sti/til/war ssh-config-profil:~/ 
+- Check persistence.xml ikke har dev settings som create-drop!
+- Opdater versioner. Backend i maven og frontend i config.json.
+- Byg backend release med mvn i parent dir og -P 'target-test' eller 'target-prod' alt efter hvor du skal deploye - så sørger maven for de korrekte properties.
+- Byg frontend med `gulp clean-build-app-<env>` hvor env er test eller prod alt efter hvor der skal deployes
+- Kopier fra /sources/frontend/src/main/webapp/dist.<env> hvor <env> er test eller prod til server:~/deploy/web 
+- Kopier /sources/TopicRouter/target/TopicRouter.war til server. E.g. med scp: scp /sti/til/war ssh-config-profil:~/ 
 - Der ligger deploy script til frontend. Pak jar filen ud i /home/miracle/deploy/web/ og kør scriptet.
-- Kopier backend war fil til /tmp/ eller andet og lav undeploy/deploy via ~/jboss-cli.sh
+- Kopier backend war fil til /tmp/ eller andet og deploy med cli via ~/jboss-cli.sh
  
 Der bruges semantic versioning med mm.ss.pp hvor mm er hovedreleases, ss er mindre og pp er patches.
 

@@ -36,193 +36,191 @@ import java.util.Optional;
 @Path("/org-units")
 @RequestScoped
 public class OrgUnitEndpoint extends Endpoint {
-    public static final String FILE = "file";
-    @Inject
-    Logger log;
+	public static final String FILE = "file";
+	@Inject
+	Logger log;
 
-    @Inject
-    OrgUnitService orgUnitService;
+	@Inject
+	OrgUnitService orgUnitService;
 
 	@Inject
 	private ImportService importService;
 
-    @Inject
-    UserService userService;
+	@Inject
+	UserService userService;
 
-    @Context
-    private HttpServletRequest request;
+	@Context
+	private HttpServletRequest request;
 
-    @Inject
-    private UserRepository userRepository;
+	@Inject
+	private UserRepository userRepository;
 
-    @Inject
-    private AuthService authService;
+	@Inject
+	private AuthService authService;
 
-    @GET
-    @Path("/")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response listAll(@QueryParam("municipalityId") Long municipalityId, @QueryParam("employmentId") Long employmentId) {
-        // if employment, scope by that.
-        try {
-            Validate.nonZero(municipalityId, "Invalid municipalityId");
-            List<OrgUnitPO> ou = new ArrayList<>();
-            if (employmentId != null && employmentId > 0l) {
-                ou = orgUnitService.getManagedOrgUnitsPO(municipalityId, employmentId);
-            } else {
-                ou = orgUnitService.getToplevelOrgUnitPO(municipalityId);
-            }
+	@GET
+	@Path("/")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response listAll(@QueryParam("municipalityId") Long municipalityId, @QueryParam("employmentId") Long employmentId) {
+		// if employment, scope by that.
+		try {
+			Validate.nonZero(municipalityId, "Invalid municipalityId");
+			List<OrgUnitPO> ou = new ArrayList<>();
+			if (employmentId != null && employmentId > 0l) {
+				ou = orgUnitService.getManagedOrgUnitsPO(municipalityId, employmentId);
+			} else {
+				ou = orgUnitService.getToplevelOrgUnitPO(municipalityId);
+			}
 
 
-            if (!ou.isEmpty()) {
-                return Response.ok().entity(ou).build();
-            } else {
-                return Response.status(404).build();
-            }
-        } catch (BadRequestArgumentException e) {
-            return Response.status(Response.Status.BAD_REQUEST).entity(new SimpleMessage(e.getMessage())).build();
-        }
-    }
+			if (!ou.isEmpty()) {
+				return Response.ok().entity(ou).build();
+			} else {
+				return Response.status(404).build();
+			}
+		} catch (BadRequestArgumentException e) {
+			return Response.status(Response.Status.BAD_REQUEST).entity(new SimpleMessage(e.getMessage())).build();
+		}
+	}
 
-    @GET
-    @Path("/display")
-    @Produces(MediaType.TEXT_PLAIN)
-    public Response displayTree(@QueryParam("municipalityId") Long municipalityId) {
-        try {
-            Validate.nonZero(municipalityId, "Invalid municipalityId");
-            final Optional<OrgUnit> result = orgUnitService.getToplevelOrgUnit(municipalityId);
+	@GET
+	@Path("/display")
+	@Produces(MediaType.TEXT_PLAIN)
+	public Response displayTree(@QueryParam("municipalityId") Long municipalityId) {
+		try {
+			Validate.nonZero(municipalityId, "Invalid municipalityId");
+			final Optional<OrgUnit> result = orgUnitService.getToplevelOrgUnit(municipalityId);
 
-            return result.map(
-                    ou -> Response.ok().entity(printOrg(new StringBuilder(), 0, ou))
-            ).orElseGet(
-                    () -> Response.status(404)
-            ).build();
-        } catch (BadRequestArgumentException e) {
-            return Response.status(Response.Status.BAD_REQUEST).entity(new SimpleMessage(e.getMessage())).build();
-        }
-    }
+			return result.map(
+					ou -> Response.ok().entity(printOrg(new StringBuilder(), 0, ou))
+			).orElseGet(
+					() -> Response.status(404)
+			).build();
+		} catch (BadRequestArgumentException e) {
+			return Response.status(Response.Status.BAD_REQUEST).entity(new SimpleMessage(e.getMessage())).build();
+		}
+	}
 
-    @GET
-    @Path("/{orgId}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response get(@PathParam("orgId") Long orgId) {
-        try {
-            Validate.nonZero(orgId, "Invalid orgId");
-            final Optional<OrgUnitPO> result = orgUnitService.getOrgUnitPO(orgId);
+	@GET
+	@Path("/{orgId}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response get(@PathParam("orgId") Long orgId) {
+		try {
+			Validate.nonZero(orgId, "Invalid orgId");
+			final Optional<OrgUnitPO> result = orgUnitService.getOrgUnitPO(orgId);
 
-            return result.map(
-                    ou -> Response.ok().entity(ou)
-            ).orElseGet(
-                    () -> Response.status(404)
-            ).build();
-        } catch (BadRequestArgumentException e) {
-            return Response.status(Response.Status.BAD_REQUEST).entity(new SimpleMessage(e.getMessage())).build();
-        }
-    }
+			return result.map(
+					ou -> Response.ok().entity(ou)
+			).orElseGet(
+					() -> Response.status(404)
+			).build();
+		} catch (BadRequestArgumentException e) {
+			return Response.status(Response.Status.BAD_REQUEST).entity(new SimpleMessage(e.getMessage())).build();
+		}
+	}
 
-    @POST
-    @Path("/import")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response importOrg(OrgUnit input) {
-        Municipality currentMunicipality = userRepository.findByEmail(authService.getAuthentication().getEmail()).getMunicipality();
-        fixupOrgUnit(input, currentMunicipality);
+	@POST
+	@Path("/import")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response importOrg(OrgUnit input) {
+		Municipality currentMunicipality = userRepository.findByEmail(authService.getAuthentication().getEmail()).getMunicipality();
+		fixupOrgUnit(input, currentMunicipality);
 
-        orgUnitService.importOrganization(input);
+		orgUnitService.importOrganization(input);
 
-        return Response.ok().build();
-    }
+		return Response.ok().build();
+	}
 
-    @POST
-    @Path("/fileImport")
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response fileImport(MultipartFormDataInput multipartInput) {
-        Map<String, List<InputPart>> uploadForm = multipartInput.getFormDataMap();
-        List<InputPart> inputParts = uploadForm.get(FILE);
+	@POST
+	@Path("/fileImport")
+	@Consumes(MediaType.MULTIPART_FORM_DATA)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response fileImport(MultipartFormDataInput multipartInput) {
+		Map<String, List<InputPart>> uploadForm = multipartInput.getFormDataMap();
+		List<InputPart> inputParts = uploadForm.get(FILE);
 
-        StringBuilder completeString = new StringBuilder();
+		StringBuilder completeString = new StringBuilder();
 
-        for (InputPart inputPart : inputParts) {
-            try {
-                completeString.append(inputPart.getBodyAsString());
-            }
-            catch (IOException e) {
-                log.error("Error while reading import file: ", e);
-            }
-        }
+		for (InputPart inputPart : inputParts) {
+			try {
+				completeString.append(inputPart.getBodyAsString());
+			} catch (IOException e) {
+				log.error("Error while reading import file: ", e);
+			}
+		}
 
-	    User u = userRepository.findByEmail(authService.getAuthentication().getEmail());
+		User u = userRepository.findByEmail(authService.getAuthentication().getEmail());
 
-	    try {
-		    ObjectMapper mapper = new ObjectMapper();
-		    OrgUnitDTO orgUnitDTO = mapper.readValue(completeString.toString(), OrgUnitDTO.class);
+		try {
+			ObjectMapper mapper = new ObjectMapper();
+			OrgUnitDTO orgUnitDTO = mapper.readValue(completeString.toString(), OrgUnitDTO.class);
 
-		    OrgUnit o = importService.importOrganization(u.getMunicipality().getId(), orgUnitDTO);
+			OrgUnit o = importService.importOrganization(u.getMunicipality().getId(), orgUnitDTO);
 
-		    log.info("Imported the following OrgUnit: {}", o.toString());
 
-		    return Response
-				    .ok()
-				    .entity(o.getId())
-				    .build();
-	    }
-	    catch (ImportService.InvalidMunicipalityException e) {
-		    log.error("Invalid municipality for import: {}", e);
+			log.info("Imported the following OrgUnit: {}", o.toString());
 
-		    return badRequest("ERROR");
-	    }
-	    catch (IOException e) {
-		    log.error("Error while mapping JSON: ", e);
-	    }
+			return Response
+					.ok()
+					.entity(o.getId())
+					.build();
+		} catch (ImportService.InvalidMunicipalityException e) {
+			log.error("Invalid municipality for import: {}", e);
 
-	    return Response.ok().build();
-    }
+			return badRequest("ERROR");
+		} catch (IOException e) {
+			log.error("Error while mapping JSON: ", e);
+		}
 
-    private void fixupOrgUnit(OrgUnit input, Municipality municipality) {
-        deduplicateManager(input);
+		return Response.ok().build();
+	}
 
-        input.getEmployees().stream().forEach(this::fixupEmployee);
+	private void fixupOrgUnit(OrgUnit input, Municipality municipality) {
+		deduplicateManager(input);
 
-        input.setMunicipality(municipality);
+		input.getEmployees().stream().forEach(this::fixupEmployee);
 
-        for (OrgUnit orgUnit : input.getChildren()) {
-            fixupOrgUnit(orgUnit, municipality);
-        }
-    }
+		input.setMunicipality(municipality);
 
-    private void deduplicateManager(OrgUnit input) {
-        input.getManager().ifPresent(manager -> {
-            if (input.getEmployees().contains(manager)) {
-                // replace copy with reference
-                input.removeEmployee(manager);
-                input.addEmployee(manager);
-            }
-        });
-    }
+		for (OrgUnit orgUnit : input.getChildren()) {
+			fixupOrgUnit(orgUnit, municipality);
+		}
+	}
 
-    private void fixupEmployee(Employment employee) {
-        if (Strings.isNullOrEmpty(employee.getInitials())) {
-            employee.setInitials("");
-        }
-        if (Strings.isNullOrEmpty(employee.getEmail())) {
-            employee.setEmail(employee.getInitials() + "@syddjurs.dk");
-        }
-        if (Strings.isNullOrEmpty(employee.getPhone())) {
-            employee.setPhone("");
-        }
-    }
+	private void deduplicateManager(OrgUnit input) {
+		input.getManager().ifPresent(manager -> {
+			if (input.getEmployees().contains(manager)) {
+				// replace copy with reference
+				input.removeEmployee(manager);
+				input.addEmployee(manager);
+			}
+		});
+	}
 
-    private StringBuilder printOrg(StringBuilder sb, int indent, OrgUnit org) {
-        final String tabs = Strings.repeat("\t", indent);
+	private void fixupEmployee(Employment employee) {
+		if (Strings.isNullOrEmpty(employee.getInitials())) {
+			employee.setInitials("");
+		}
+		if (Strings.isNullOrEmpty(employee.getEmail())) {
+			employee.setEmail(employee.getInitials() + "@syddjurs.dk");
+		}
+		if (Strings.isNullOrEmpty(employee.getPhone())) {
+			employee.setPhone("");
+		}
+	}
 
-        sb.append(tabs).append(String.format("%s - manager: %s\n", org, org.getManager()));
+	private StringBuilder printOrg(StringBuilder sb, int indent, OrgUnit org) {
+		final String tabs = Strings.repeat("\t", indent);
 
-        sb.append(tabs).append("\tEmployees:\n");
-        org.getEmployees().stream().filter(Employment::isActive).forEach(e -> sb.append(tabs).append("\t\t").append(e).append("\n"));
+		sb.append(tabs).append(String.format("%s - manager: %s\n", org, org.getManager()));
 
-        sb.append(tabs).append("\tChildren:\n");
-        org.getChildren().forEach(t -> printOrg(sb, indent + 2, t));
+		sb.append(tabs).append("\tEmployees:\n");
+		org.getEmployees().stream().filter(Employment::isActive).forEach(e -> sb.append(tabs).append("\t\t").append(e).append("\n"));
 
-        return sb;
-    }
+		sb.append(tabs).append("\tChildren:\n");
+		org.getChildren().forEach(t -> printOrg(sb, indent + 2, t));
+
+		return sb;
+	}
 }

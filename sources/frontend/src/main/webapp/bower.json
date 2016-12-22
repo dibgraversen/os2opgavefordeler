@@ -7,7 +7,7 @@
   ],
   "private": true,
   "ignore": [
-    "**/.*",
+//    "**/.*",
     "node_modules",
     "bower_components",
     "src/lib",
@@ -28,8 +28,26 @@
     "spin.js": "~2.0.2"
   },
   "overrides": {
+    "angular": {
+      "main": "angular.js"
+    },
+    "angular-animate": {
+      "main": "angular-animate.js"
+    },
+    "angular-bootstrap": {
+      "main": "ui-bootstrap-tpls.js"
+    },
+    "angular-sanitize": {
+      "main": "angular-sanitize.js"
+    },
     "angular-ui-alias": {
       "main": "src/alias.js"
+    },
+    "angular-ui-router": {
+      "main": "release/angular-ui-router.js"
+    },
+    "angular-ui-uploader": {
+      "main": "dist/uploader.js"
     },
     "bootstrap": {
       "main": [
@@ -40,6 +58,21 @@
         "dist/fonts/glyphicons-halflings-regular.woff",
         "dist/fonts/glyphicons-halflings-regular.woff2"
       ]
+    },
+    "htmlsave": {
+      "main": "dist/htmlsave.min.js"
+    },
+    "jquery": {
+      "main": "dist/jquery.js"
+    },
+    "lodash": {
+      "main": "lodash.js"
+    },
+    "spin.js": {
+      "main": "spin.js"
     }
+  },
+  "resolutions": {
+    "angular": "1.3.20"
   }
 }
