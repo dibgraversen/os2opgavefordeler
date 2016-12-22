@@ -18,5 +18,4 @@ dist.test
 dist.prod
 src/app/constants.js
 src/lib
-local.zsh
 node_modules
