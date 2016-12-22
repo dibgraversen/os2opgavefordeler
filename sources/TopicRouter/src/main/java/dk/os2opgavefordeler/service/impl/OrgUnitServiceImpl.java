@@ -22,14 +22,14 @@ import java.util.stream.Collectors;
 @ApplicationScoped
 @Transactional
 public class OrgUnitServiceImpl implements OrgUnitService {
+
 	@Inject
 	Logger logger;
 
 	@Inject
 	PersistenceService persistence;
 
-	@Override
-	public OrgUnit saveOrgUnit(OrgUnit orgUnit) {
+	private OrgUnit saveOrgUnit(OrgUnit orgUnit) {
 		EntityManager em = persistence.getEm();
 
 		Municipality currentMunicipality = orgUnit.getMunicipality().get();
@@ -168,7 +168,6 @@ public class OrgUnitServiceImpl implements OrgUnitService {
 				}
 				else {
 					logger.info("creating new");
-
 					if (updating) {
 						employment.setEmployedIn(result);
 					}
@@ -177,7 +176,6 @@ public class OrgUnitServiceImpl implements OrgUnitService {
 						newEmployments.add(employment);
 					}
 					employment.setMunicipality(currentMunicipality);
-
 					logger.info("employment: {}", employment);
 					em.persist(employment);
 					newEmployeesCollection.add(employment);
@@ -296,14 +294,14 @@ public class OrgUnitServiceImpl implements OrgUnitService {
 		}
 	}
 
-	public void unlinkEmployments(List<Long> orgIds){
+	private void unlinkEmployments(List<Long> orgIds){
 		EntityManager em = persistence.getEm();
 		Query unlinkEmploymentsQuery = em.createQuery("UPDATE Employment e SET e.employedIn = null WHERE e.employedIn.id IN (:orgIds)");
 		unlinkEmploymentsQuery.setParameter("orgIds", orgIds);
 		unlinkEmploymentsQuery.executeUpdate();
 	}
 
-	public void deleteOrgs(List<Long> orgIds){
+	private void deleteOrgs(List<Long> orgIds){
 		EntityManager em = persistence.getEm();
 		Query unlinkEmploymentsQuery = em.createQuery("DELETE FROM OrgUnit org WHERE org.id IN (:orgIds)");
 		unlinkEmploymentsQuery.setParameter("orgIds", orgIds);
@@ -313,12 +311,13 @@ public class OrgUnitServiceImpl implements OrgUnitService {
 	@Override
 	public void importOrganization(OrgUnit orgUnit) {
 		// TODO MUY IMPORTANTE! The given orgUnit must be top level orgUnit.
+		if(!orgUnit.getMunicipality().isPresent()){
+			// return invalid params exception
+		}
+		Municipality currentMunicipality = orgUnit.getMunicipality().get();
 		fixRelations(orgUnit);
 
-		Municipality currentMunicipality = orgUnit.getMunicipality().get();
-
 		Optional<OrgUnit> existing = getOrgUnitFromBusinessKey(orgUnit.getBusinessKey(), currentMunicipality.getId());
-
 		if (existing.isPresent()){
 			// do update
 			List<String> businessKeys = getChildBusinessKeys(orgUnit);
@@ -456,6 +455,10 @@ public class OrgUnitServiceImpl implements OrgUnitService {
 		return ou;
 	}
 
+	/**
+	 * This method sets parents so that relations go both ways.
+	 * @param input an org node to fix - it's children will have current node as parent.
+	 */
 	private void fixRelations(OrgUnit input) {
 		input.getMunicipality().ifPresent(mun -> input.setMunicipality(findMunicipalityByName(mun.getName())));
 		input.getChildren().forEach(child -> {

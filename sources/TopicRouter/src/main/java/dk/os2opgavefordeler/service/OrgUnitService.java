@@ -9,12 +9,12 @@ import java.util.Optional;
 
 public interface OrgUnitService {
 
-	/**
+	/*
 	 * Persist an OrgUnit.
 	 * @param orgUnit
 	 * @return the input orgUnit, for possible ease of method chaining.
 	 */
-	OrgUnit saveOrgUnit(OrgUnit orgUnit);
+//	OrgUnit saveOrgUnit(OrgUnit orgUnit);
 
 	/**
 	 * Imports an organization tree.
