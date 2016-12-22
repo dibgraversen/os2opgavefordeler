@@ -2,15 +2,18 @@ package dk.os2opgavefordeler.orgunit;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import dk.os2opgavefordeler.distribution.DistributionRuleController;
 import dk.os2opgavefordeler.employment.EmploymentRepository;
 import dk.os2opgavefordeler.employment.MunicipalityRepository;
 import dk.os2opgavefordeler.employment.OrgUnitRepository;
+import dk.os2opgavefordeler.model.DistributionRuleFilter;
 import dk.os2opgavefordeler.model.Employment;
 import dk.os2opgavefordeler.model.Municipality;
 import dk.os2opgavefordeler.model.OrgUnit;
+import org.apache.deltaspike.jpa.api.transaction.Transactional;
 import org.slf4j.Logger;
 
-import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -18,104 +21,108 @@ import javax.persistence.Query;
 import java.util.ArrayList;
 import java.util.List;
 
-@ApplicationScoped
+@RequestScoped
+@Transactional
 public class ImportService {
 
-    @Inject
-    private Logger logger;
+	@Inject
+	private Logger logger;
 
-    @Inject
-    private MunicipalityRepository municipalityRepository;
+	@Inject
+	private MunicipalityRepository municipalityRepository;
 
-    @Inject
-    private OrgUnitRepository orgUnitRepository;
+	@Inject
+	private OrgUnitRepository orgUnitRepository;
 
-    @Inject
-    private EmploymentRepository employmentRepository;
+	@Inject
+	private EmploymentRepository employmentRepository;
 
-    @Inject
-    private EntityManager entityManager;
+	@Inject
+	private DistributionRuleController distributionRuleController;
 
-    /**
-     * Imports an organization into a municipality.
-     *
-     * @param municipalityId The municipality to import for
-     * @param orgUnitDTO     A dto to describe the new OrgUnit structure
-     */
-    public OrgUnit importOrganization(long municipalityId, OrgUnitDTO orgUnitDTO) throws InvalidMunicipalityException {
-        Municipality municipality = municipalityRepository.findBy(municipalityId);
+	@Inject
+	private EntityManager entityManager;
 
-        if (municipality == null) {
-            throw new InvalidMunicipalityException("No municipality with ID: " + municipalityId);
-        }
+	@Inject
+	private OrgUpdateManager updateManager;
 
-	    logger.info("Deleting employees: {}", getInactiveEmployees());
-
-	    inactivateOrgUnitsForMunicipality(municipalityId); // inactivate all organisation units in preparation of import
-        OrgUnit orgUnit = importOrgUnit(municipality, null, orgUnitDTO); // import root organisation unit
-	    cleanup(); // delete inactive records
-
-        return orgUnit;
-    }
+	/**
+	 * Imports an organization into a municipality.
+	 *
+	 * @param municipalityId The municipality to import for
+	 * @param orgUnitDTO     A dto to describe the new OrgUnit structure
+	 */
+	public OrgUnit importOrganization(long municipalityId, OrgUnitDTO orgUnitDTO) throws InvalidMunicipalityException {
+		Municipality municipality = municipalityRepository.findBy(municipalityId);
+		if (municipality == null) {
+			throw new InvalidMunicipalityException("No municipality with ID: " + municipalityId);
+		}
+		if(!updateManager.importJobAllowedFor(municipalityId)){
+			logger.warn("Job already running for {}", municipalityId);
+			return null;
+		}
+		OrgUnit orgUnit = new OrgUnit();
+		try {
+			inactivateOrgUnitsForMunicipality(municipalityId); // inactivate all organisation units in preparation of import
+			orgUnit = importOrgUnit(municipality, null, orgUnitDTO); // import root organisation unit
+			cleanup(municipalityId); // delete inactive records
+		} finally {
+			updateManager.endJob(municipalityId);
+		}
+		return orgUnit;
+	}
 
 	/**
 	 * Imports the given organisational unit for the specified municipality
 	 *
 	 * @param municipality municipality to import the organisational unit for
-	 * @param parent parent of the organisational unit (null if it's the root org. unit)
-	 * @param orgUnitDTO DTO object to get values from
+	 * @param parent       parent of the organisational unit (null if it's the root org. unit)
+	 * @param orgUnitDTO   DTO object to get values from
 	 * @return the resulting organisational unit
 	 */
-    private OrgUnit importOrgUnit(Municipality municipality, OrgUnit parent, OrgUnitDTO orgUnitDTO) {
-        logger.info("Importing OrgUnit: {}, Business key: {}", orgUnitDTO.name, orgUnitDTO.businessKey);
+	private OrgUnit importOrgUnit(Municipality municipality, OrgUnit parent, OrgUnitDTO orgUnitDTO) {
+		logger.info("Importing OrgUnit: {}, Business key: {}", orgUnitDTO.name, orgUnitDTO.businessKey);
 
-	    // retrieve an existing organisational unit or create a new one, if needed
-	    OrgUnit orgUnit = orgUnitRepository.findByBusinessKeyAndMunicipalityId(orgUnitDTO.businessKey, municipality.getId());
+		// retrieve an existing organisational unit or create a new one, if needed
+		OrgUnit orgUnit = orgUnitRepository.findByBusinessKeyAndMunicipalityId(orgUnitDTO.businessKey, municipality.getId());
 
-	    if (orgUnit == null) {
-            logger.info("OrgUnit did not exist, creating new.");
-            orgUnit = new OrgUnit();
-        }
-        else {
-            logger.info("OrgUnit already exists, updating.");
-        }
+		if (orgUnit == null) {
+			orgUnit = new OrgUnit();
+			orgUnit.setBusinessKey(orgUnitDTO.businessKey);
+			orgUnit.setMunicipality(municipality);
+		} else {
+//			logger.info("OrgUnit already exists, updating.");
+		}
+		if (parent != null) {
+			orgUnit.setParent(parent);
+		}
+		orgUnit.setIsActive(true);
+		orgUnit.setName(orgUnitDTO.name);
+		orgUnit.setEsdhId(orgUnitDTO.esdhId);
+		orgUnit.setEsdhLabel(orgUnitDTO.esdhLabel);
 
-        if (parent != null) {
-            orgUnit.setParent(parent);
-        }
+		orgUnitRepository.saveAndFlushAndRefresh(orgUnit);
 
-        orgUnit.setBusinessKey(orgUnitDTO.businessKey);
-        orgUnit.setMunicipality(municipality);
-        orgUnit.setIsActive(true);
-        orgUnit.setName(orgUnitDTO.name);
-        orgUnit.setEsdhId(orgUnitDTO.esdhId);
-        orgUnit.setEsdhLabel(orgUnitDTO.esdhLabel);
+		inactivateEmploymentsForOrgUnit(orgUnit); // mark all employments for the organisation unit as inactive
 
-        orgUnitRepository.saveAndFlushAndRefresh(orgUnit);
+		// create an employment for the manager of the organisational unit, if needed
+		if (orgUnitDTO.manager != null) {
+			orgUnit.setManager(createEmployment(orgUnit, orgUnitDTO.manager));
+		} else {
+			orgUnit.setManager(null);
+		}
 
-	    inactivateEmploymentsForOrgUnit(orgUnit); // mark all employments for the organisation unit as inactive
+		orgUnit.setEmployees(importEmployments(orgUnit, orgUnitDTO));
 
-	    // create an employment for the manager of the organisational unit, if needed
-        if (orgUnitDTO.manager != null) {
-            orgUnit.setManager(createEmployment(orgUnit, orgUnitDTO.manager));
-        }
-        else {
-            orgUnit.setManager(null);
-        }
+		orgUnitRepository.saveAndFlushAndRefresh(orgUnit);
 
-        orgUnit.setEmployees(importEmployments(orgUnit, orgUnitDTO));
-
-        orgUnitRepository.saveAndFlushAndRefresh(orgUnit);
-
-        for (OrgUnitDTO o : orgUnitDTO.children) {
-            importOrgUnit(municipality, orgUnit, o);
-        }
-
-        logger.info("Imported OrgUnit: {}", orgUnit);
-
-        return orgUnit;
-
-    }
+		for (OrgUnitDTO o : orgUnitDTO.children) {
+			importOrgUnit(municipality, orgUnit, o);
+		}
+		orgUnitRepository.saveAndFlushAndRefresh(orgUnit);
+		logger.info("Imported OrgUnit: {}", orgUnit);
+		return orgUnit;
+	}
 
 	/**
 	 * Inactivates all employments for a given organisational unit
@@ -125,7 +132,7 @@ public class ImportService {
 	private void inactivateEmploymentsForOrgUnit(OrgUnit orgUnit) {
 		ImmutableList<Employment> employments = orgUnit.getEmployees();
 
-		for (Employment employment: employments) {
+		for (Employment employment : employments) {
 			employment.setIsActive(false);
 			employmentRepository.saveAndFlushAndRefresh(employment);
 		}
@@ -135,69 +142,64 @@ public class ImportService {
 	 * Creates an employment for the specified organisational unit
 	 *
 	 * @param orgUnit organisational unit
-	 * @param e DTO object with values to use for the new employment record
+	 * @param e       DTO object with values to use for the new employment record
 	 * @return the created Employment
 	 */
-    private Employment createEmployment(OrgUnit orgUnit, EmployeeDTO e) {
-	    if (orgUnit.getMunicipality().isPresent()) { // municipality correctly defined
-		    Municipality municipality = orgUnit.getMunicipality().get();
+	private Employment createEmployment(OrgUnit orgUnit, EmployeeDTO e) {
+//		logger.info("Creating employment, name: {}", e.name);
+		if (orgUnit.getMunicipality().isPresent()) { // municipality correctly defined
+			Municipality municipality = orgUnit.getMunicipality().get();
 
-		    // get existing employment or create a new one, if needed
-		    Employment employment;
+			// get existing employment or create a new one, if needed
+			Employment employment;
 
-		    try {
-			    employment = employmentRepository.findByEmailAndMunicipality(e.email, municipality);
-		    }
-		    catch (NoResultException e1) {
-			    employment = new Employment();
-		    }
+			try {
+				// TODO find by businessKey. That's what it's there for.
+				employment = employmentRepository.findByEmailAndMunicipality(e.email, municipality);
+			} catch (NoResultException e1) {
+				employment = new Employment();
+			}
 
-		    // set values for employment
-		    employment.setMunicipality(municipality);
-		    employment.setBusinessKey(e.businessKey);
-		    employment.setEmail(e.email);
-		    employment.setEmployedIn(orgUnit);
-		    employment.setEsdhId(e.esdhId);
-		    employment.setInitials(e.initials);
-		    employment.setIsActive(true);
-		    employment.setJobTitle(e.jobTitle);
-		    employment.setName(e.name);
-		    employment.setPhone(e.phone);
+			// set values for employment
+			employment.setMunicipality(municipality);
+			employment.setBusinessKey(e.businessKey);
+			employment.setEmail(e.email);
+			employment.setEmployedIn(orgUnit);
+			employment.setEsdhId(e.esdhId);
+			employment.setInitials(e.initials);
+			employment.setIsActive(true);
+			employment.setJobTitle(e.jobTitle);
+			employment.setName(e.name);
+			employment.setPhone(e.phone);
 
-		    // save employment
-		    employmentRepository.save(employment);
+			// save employment
+			employmentRepository.save(employment);
 
-		    return employment;
-	    }
-	    else { // no municipality defined
-		    logger.error("Municipality not defined for OrgUnit '{}'. Unable to create employment.", orgUnit.getName());
-		    return null;
-	    }
-    }
+			return employment;
+		} else { // no municipality defined
+			logger.warn("Municipality not defined for OrgUnit '{}'. Unable to create employment.", orgUnit.getName());
+			return null;
+		}
+	}
 
 	/**
 	 * Imports employments for the given organisational unit
 	 *
-	 * @param orgUnit organisational unit to create employments for
+	 * @param orgUnit    organisational unit to create employments for
 	 * @param orgUnitDTO DTO object for the organisational unit to get values from
 	 * @return list of employments for the organisational unit
 	 */
-    private List<Employment> importEmployments(OrgUnit orgUnit, OrgUnitDTO orgUnitDTO) {
-        logger.info("Importing employments {}", orgUnitDTO.employees);
-
-        if (orgUnitDTO.employees.isEmpty()) {
-            logger.info("No employments found!");
-            return Lists.newArrayList();
-        }
-
-        List<Employment> employments = new ArrayList<>();
-
-        for (EmployeeDTO e : orgUnitDTO.employees) {
-            employments.add(createEmployment(orgUnit, e));
-        }
-
-        return employments;
-    }
+	private List<Employment> importEmployments(OrgUnit orgUnit, OrgUnitDTO orgUnitDTO) {
+//		logger.info("Importing employments {}", orgUnitDTO.employees);
+		if (orgUnitDTO.employees.isEmpty()) {
+			return Lists.newArrayList();
+		}
+		List<Employment> employments = new ArrayList<>();
+		for (EmployeeDTO e : orgUnitDTO.employees) {
+			employments.add(createEmployment(orgUnit, e));
+		}
+		return employments;
+	}
 
 	/**
 	 * Inactivates all organisational units for a given municipality
@@ -205,11 +207,9 @@ public class ImportService {
 	 * @param municipalityId ID for the municipality to inactivate organisational units for
 	 */
 	private void inactivateOrgUnitsForMunicipality(long municipalityId) {
-		entityManager.getTransaction().begin();
-		Query query = entityManager.createQuery("UPDATE OrgUnit ou SET ou.isActive = false WHERE ou.municipality.id = :municipalityId");
+		Query query = entityManager.createQuery("update OrgUnit ou set ou.isActive = false where ou.municipality.id = :municipalityId");
 		query.setParameter("municipalityId", municipalityId);
 		query.executeUpdate();
-		entityManager.getTransaction().commit();
 	}
 
 	/**
@@ -218,56 +218,135 @@ public class ImportService {
 	 * @return the list of employees
 	 */
 	private List getInactiveEmployees() {
-		entityManager.getTransaction().begin();
-		List resultList = entityManager.createQuery("SELECT e FROM Employment e WHERE e.isActive = false").getResultList();
-		entityManager.getTransaction().commit();
-
+		List resultList = entityManager.createQuery("select e from Employment e where e.isActive = false").getResultList();
 		return resultList;
 	}
 
 	/**
 	 * Deletes inactive records
 	 */
-	private void cleanup() {
-		entityManager.getTransaction().begin();
+	private void cleanup(long municipalityId) {
+		// find employments for deletion.
+		Query getEmploymentsForDelete = entityManager.createQuery("select emp.id from Employment emp where emp.isActive = false and emp.municipality.id = :municipalityId");
+		getEmploymentsForDelete.setParameter("municipalityId", municipalityId);
+		List empsForDeletion = getEmploymentsForDelete.getResultList();
 
-		entityManager.createNativeQuery(
-				" DELETE FROM distributionrule WHERE assignedemp IN (SELECT id FROM employment WHERE isactive = FALSE);" +
-						" DELETE FROM distributionrule_distributionrulefilter WHERE filters_id IN (SELECT id FROM distributionrule WHERE assignedemp IN (SELECT id FROM employment WHERE isactive = FALSE));" +
-						" DELETE FROM distributionrulefilter drf WHERE drf.distributionrule_id IN (SELECT id FROM distributionrule WHERE assignedemp IN (SELECT id FROM employment WHERE isactive = FALSE));" +
+		// find orgs for deletion.
+		Query getOrgsForDelete = entityManager.createQuery("select org.id from OrgUnit org where org.isActive = false and org.municipality.id = :municipalityId");
+		getOrgsForDelete.setParameter("municipalityId", municipalityId);
+		List<Long> orgsForDeletion = getOrgsForDelete.getResultList();
 
-						" DELETE FROM distributionrule_distributionrulefilter WHERE filters_id IN (SELECT id FROM distributionrulefilter drf WHERE drf.assignedemp IN (SELECT id FROM employment WHERE isactive = FALSE));" +
-						" DELETE FROM distributionrulefilter drf WHERE drf.assignedemp IN (SELECT id FROM employment WHERE isactive = FALSE);" +
+		// find rules for clearance with reason org.
+		List rulesForClearing = new ArrayList();
+		if (!orgsForDeletion.isEmpty()){
+			Query getRulesForClearing = entityManager.createQuery("select rule.id from DistributionRule rule where rule.assignedOrg.id in ( :orgsForDeletion ) ");
+			getRulesForClearing.setParameter("orgsForDeletion", orgsForDeletion);
+			rulesForClearing = getRulesForClearing.getResultList();
+		}
 
-						" DELETE FROM role WHERE employment_id IN (SELECT id FROM employment WHERE isactive = FALSE); " +
-						" UPDATE orgunit SET manager_id = NULL WHERE manager_id IN (SELECT id FROM employment WHERE isactive = FALSE);" +
+		cleanFilters(rulesForClearing, orgsForDeletion, empsForDeletion);
+		clearEntitiesForDeletion(orgsForDeletion, empsForDeletion);
 
-						" UPDATE orgunit SET manager_id = NULL WHERE manager_id IN (SELECT id FROM employment WHERE employedin_id IN (SELECT id FROM orgunit WHERE isactive = FALSE));" +
+		// delete employments
+		if(!empsForDeletion.isEmpty()){
+			Query deleteRoles = entityManager.createQuery("delete from Role role where role.employment.id in ( :empsForDeletion )");
+			deleteRoles.setParameter("empsForDeletion", empsForDeletion).executeUpdate();
 
-						" DELETE FROM role WHERE employment_id IN (SELECT id FROM employment WHERE employedin_id IN (SELECT id FROM orgunit WHERE isactive = FALSE));" +
+			Query deleteEmployments = entityManager.createQuery("delete from Employment emp where emp.id in ( :empsForDeletion )");
+			deleteEmployments.setParameter("empsForDeletion", empsForDeletion).executeUpdate();
+		}
 
-						" DELETE FROM distributionrule_distributionrulefilter WHERE distributionrule_id IN (SELECT id FROM distributionrule WHERE assignedemp IN (SELECT id FROM employment WHERE employedin_id IN (SELECT id FROM orgunit WHERE isactive = FALSE)));" +
-						" DELETE FROM distributionrule_distributionrulefilter WHERE distributionrule_id IN (SELECT id FROM distributionrule WHERE parent_id IN (SELECT id FROM distributionrule WHERE assignedemp IN (SELECT id FROM employment WHERE employedin_id IN (SELECT id FROM orgunit WHERE isactive = FALSE))));" +
-						" DELETE FROM distributionrule WHERE parent_id IN (SELECT id FROM distributionrule WHERE assignedemp IN (SELECT id FROM employment WHERE employedin_id IN (SELECT id FROM orgunit WHERE isactive = FALSE)));" +
-						" DELETE FROM distributionrule WHERE assignedemp IN (SELECT id FROM employment WHERE employedin_id IN (SELECT id FROM orgunit WHERE isactive = FALSE));" +
+		if(!orgsForDeletion.isEmpty()){
+			// delete org units
+			for (Long orgId : orgsForDeletion) {
+				OrgUnit orgUnit = entityManager.find(OrgUnit.class, orgId);
+				if(orgUnit != null){
+					entityManager.remove(orgUnit);
+				}
+			}
+		}
+	}
 
-						" DELETE FROM distributionrule_distributionrulefilter WHERE filters_id IN (SELECT id FROM distributionrulefilter WHERE assignedemp IN (SELECT id FROM employment WHERE employedin_id IN (SELECT id FROM orgunit WHERE isactive = FALSE)));" +
-						" DELETE FROM distributionrulefilter WHERE assignedemp IN (SELECT id FROM employment WHERE employedin_id IN (SELECT id FROM orgunit WHERE isactive = FALSE));" +
+	/**
+	 * This method makes sure that filters are cleaned and deleted.
+	 */
+	@SuppressWarnings("unchecked")
+	private void cleanFilters(List rulesForClearing, List orgsForDeletion, List empsForDeletion){
+		List<Long> filtersToBeDeleted = new ArrayList<>();
 
-						" DELETE FROM employment WHERE employedin_id IN (SELECT id FROM orgunit WHERE isactive = FALSE);" +
-						" DELETE FROM employment WHERE isactive = FALSE;"
-		).executeUpdate();
+		if(!rulesForClearing.isEmpty()) {
+			Query getAssociatedFiltersForDeletion = entityManager.createQuery("select filter.id from DistributionRuleFilter filter where filter.distributionRule.id in ( :rulesForClearing )");
+			getAssociatedFiltersForDeletion.setParameter("rulesForClearing", rulesForClearing);
+			filtersToBeDeleted.addAll(getAssociatedFiltersForDeletion.getResultList());
+		}
 
-		entityManager.getTransaction().commit();
+		if(!orgsForDeletion.isEmpty()){
+			// unset org for filters.
+			Query getFiltersWithDeletedOrg = entityManager.createQuery("select filter.id from DistributionRuleFilter filter where filter.assignedOrg.id in ( :orgsForDeletion )");
+			filtersToBeDeleted.addAll(getFiltersWithDeletedOrg.setParameter("orgsForDeletion", orgsForDeletion).getResultList());
+		}
+
+		if(!empsForDeletion.isEmpty()){
+			Query unsetEmpForFilters = entityManager.createQuery("update DistributionRuleFilter filter set filter.assignedEmp = null where filter.assignedEmp.id in ( :empsForDeletion )");
+			unsetEmpForFilters.setParameter("empsForDeletion", empsForDeletion).executeUpdate();
+		}
+
+		// delete filters with no org and no empl.
+		Query findAbandonedFilters = entityManager.createQuery("select filter.id from DistributionRuleFilter filter where filter.assignedEmp is null and filter.assignedOrg is null");
+		filtersToBeDeleted.addAll(findAbandonedFilters.getResultList());
+
+		// delete filter rules for rules that are to be cleared.
+		for (Long filterId : filtersToBeDeleted) {
+			DistributionRuleFilter filter = entityManager.find(DistributionRuleFilter.class, filterId);
+			if(filter != null){
+				entityManager.remove(filter);
+			}
+		}
+	}
+
+	/**
+	 * This method sets reference blank where entity will be deleted.
+	 */
+	private void clearEntitiesForDeletion(List orgsForDeletion, List empsForDeletion){
+		if(!empsForDeletion.isEmpty()){
+
+			// clear assigned emp.
+			Query clearAssignedEmp = entityManager.createQuery("update DistributionRule rule set rule.assignedEmp = null where rule.assignedEmp in ( :empsForDeletion )");
+			clearAssignedEmp.setParameter("empsForDeletion", empsForDeletion).executeUpdate();
+
+			// clear managers
+			Query clearManagers = entityManager.createQuery("update OrgUnit org set org.manager = null where org.manager.id in ( :empsForDeletion )");
+			clearManagers.setParameter("empsForDeletion", empsForDeletion).executeUpdate();
+		}
+
+		if(!orgsForDeletion.isEmpty()){
+			// clear responsible org.
+			Query clearResponsible = entityManager.createQuery("update DistributionRule rule set rule.responsibleOrg = null where rule.responsibleOrg.id in ( :orgsForDeletion )");
+			clearResponsible.setParameter("orgsForDeletion", orgsForDeletion).executeUpdate();
+
+			// clear assigned org
+			Query clearAssignedOrg = entityManager.createQuery("update DistributionRule rule set rule.assignedOrg = null where rule.assignedOrg.id in ( :orgsForDeletion )");
+			clearAssignedOrg.setParameter("orgsForDeletion", orgsForDeletion).executeUpdate();
+
+			// rinse org units
+			Query rinseOrgUnits = entityManager.createQuery("update OrgUnit org set org.manager = null where org.id in ( :orgsForDeletion )");
+			rinseOrgUnits.setParameter("orgsForDeletion", orgsForDeletion).executeUpdate();
+
+			// clear employed in
+			Query clearEmployedIn = entityManager.createQuery("update Employment emp set emp.employedIn = null where emp.employedIn.id in ( :orgsForDeletion )");
+			clearEmployedIn.setParameter("orgsForDeletion", orgsForDeletion).executeUpdate();
+		}
+
+
 	}
 
 	/**
 	 * Exception used when in invalid municipality is used
 	 */
-    public class InvalidMunicipalityException extends Exception {
-        public InvalidMunicipalityException(String message) {
-            super(message);
-        }
-    }
+	public class InvalidMunicipalityException extends Exception {
+		public InvalidMunicipalityException(String message) {
+			super(message);
+		}
+	}
 
 }
