@@ -60,7 +60,7 @@ public class DistributionRulePO {
 			}
 		}
 
-		this.employee = source.getAssignedEmp();
+		this.employee = source.getAssignedEmp().orElse(0L);
 		this.org = source.getAssignedOrg().map(OrgUnit::getId).orElse(0L);
 	}
 
