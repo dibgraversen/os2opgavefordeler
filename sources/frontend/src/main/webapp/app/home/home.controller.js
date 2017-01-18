@@ -42,7 +42,6 @@
 
 		// keep all for data integrity;
 		var orgUnits = {};
-		var employments = {};
 
 		function activate() {
 			$log.info("Home::activate");
@@ -63,15 +62,14 @@
 			});
 
 			$scope.$watch("settings.scope", function(){
-				if($scope.user.currentRole && $scope.user.currentRole.employment)
-					refreshTopicRoutes();
+				if($scope.user.currentRole && $scope.user.currentRole.employment)	refreshTopicRoutes();
 			});
 		}
 
 		function ensureSubordinates(){
 			if(!currentRole().subordinates){
 				employmentService.getSubordinates(currentRole().employmentId).then(function(subordinateEmployments){
-					currentRole().subordinates = subordinateEmployments
+					currentRole().subordinates = subordinateEmployments;
 				});
 			}
 		}
@@ -391,7 +389,7 @@
 		function subordinates(){
 			var deferred = $q.deferred;
 			if(currentRole().subordinates){
-				deferred.resolve(currentRole().subordinates)
+				deferred.resolve(currentRole().subordinates);
 			} else {
 				employmentService.getSubordinates(currentRole().employment).then(function(employments){
 					currentRole().subordinates = employments;
@@ -419,7 +417,7 @@
 				return true;
 			}
 
-			return (canManage(distributionRule))
+			return (canManage(distributionRule));
 		}
 
 		function getChildren(rule, force){
