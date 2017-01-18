@@ -1,9 +1,9 @@
 package dk.os2opgavefordeler.rest;
 
 import dk.os2opgavefordeler.auth.AuthService;
-import dk.os2opgavefordeler.employment.MunicipalityRepository;
-import dk.os2opgavefordeler.employment.OrgUnitRepository;
-import dk.os2opgavefordeler.employment.UserRepository;
+import dk.os2opgavefordeler.repository.MunicipalityRepository;
+import dk.os2opgavefordeler.repository.OrgUnitRepository;
+import dk.os2opgavefordeler.repository.UserRepository;
 import dk.os2opgavefordeler.model.Municipality;
 import dk.os2opgavefordeler.model.User;
 import dk.os2opgavefordeler.model.ValidationException;

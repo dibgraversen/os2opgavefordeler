@@ -3,10 +3,10 @@ package dk.os2opgavefordeler.rest;
 import dk.os2opgavefordeler.auth.AuthService;
 import dk.os2opgavefordeler.auth.openid.OpenIdAuthenticationFlow;
 import dk.os2opgavefordeler.model.Role;
-import dk.os2opgavefordeler.model.User;
-import dk.os2opgavefordeler.model.presentation.RolePO;
 import dk.os2opgavefordeler.model.presentation.SimpleMessage;
 import dk.os2opgavefordeler.model.presentation.SubstitutePO;
+import dk.os2opgavefordeler.repository.EmploymentRepository;
+import dk.os2opgavefordeler.repository.UserRepository;
 import dk.os2opgavefordeler.service.*;
 import dk.os2opgavefordeler.util.Validate;
 import org.jboss.resteasy.annotations.cache.NoCache;
@@ -29,7 +29,11 @@ public class RoleEndpoint {
 	private UserService userService;
 
 	@Inject
-	private EmploymentService employmentService;
+	private UserRepository userRepo;
+
+	@Inject
+//	private EmploymentService employmentService;
+  private EmploymentRepository employmentRepo;
 
 	@Inject
 	private AuthService authService;
@@ -108,6 +112,12 @@ public class RoleEndpoint {
 		}
 	}
 
+	/**
+	 * Creates a substitute role for the given role.
+	 * @param roleId This is the role that is to be substituted.
+	 * @param employmentId This employmentId specifies the substitute.
+	 * @return A role that now substitutes given role, assigned to the user matching the given employmentId.
+	 */
 	@POST
 	@Path("/{roleId}/substitutes/add")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -119,7 +129,6 @@ public class RoleEndpoint {
 			Validate.nonZero(employmentId, INVALID_EMPLOYMENT_ID);
 
 			final Role role = userService.createSubstituteRole(employmentId, roleId);
-
 			return Response.status(Response.Status.OK).entity(new SubstitutePO(role.getOwner().getName(), role.getId())).build();
 		}
 		catch(ResourceNotFoundException e) {

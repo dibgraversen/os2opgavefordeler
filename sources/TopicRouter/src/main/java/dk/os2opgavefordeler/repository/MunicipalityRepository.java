@@ -1,4 +1,4 @@
-package dk.os2opgavefordeler.employment;
+package dk.os2opgavefordeler.repository;
 
 import org.apache.deltaspike.data.api.AbstractEntityRepository;
 import org.apache.deltaspike.data.api.Repository;

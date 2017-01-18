@@ -3,7 +3,7 @@ package dk.os2opgavefordeler.service.impl;
 import dk.os2opgavefordeler.auth.AuthService;
 import dk.os2opgavefordeler.distribution.DistributionRuleFilterNameRepository;
 import dk.os2opgavefordeler.distribution.DistributionRuleRepository;
-import dk.os2opgavefordeler.employment.MunicipalityRepository;
+import dk.os2opgavefordeler.repository.MunicipalityRepository;
 import dk.os2opgavefordeler.logging.AuditLogger;
 import dk.os2opgavefordeler.model.*;
 import dk.os2opgavefordeler.model.presentation.DistributionRulePO;
@@ -474,8 +474,8 @@ public class DistributionServiceImpl implements DistributionService {
 
     @Override
     public Optional<Employment> findResponsibleEmployee(DistributionRule rule) {
-        if (rule.getAssignedEmp() > 0l) {
-            return getEmployment(rule.getAssignedEmp());
+        if (rule.getAssignedEmp().isPresent()) {
+            return getEmployment(rule.getAssignedEmp().get());
         }
         else if (rule.getParent().isPresent()) {
             return findResponsibleEmployee(rule.getParent().get());
@@ -545,10 +545,10 @@ public class DistributionServiceImpl implements DistributionService {
     //--------------------------------------------------------------------------
 
     /**
-     * Employment lookup to avoid injecting employment service.
+     * Employment lookup to avoid injecting repository service.
      *
-     * @param id of employment
-     * @return employment if found, otherwise empty Optional.
+     * @param id of repository
+     * @return repository if found, otherwise empty Optional.
      */
     private Optional<Employment> getEmployment(long id) {
         try {

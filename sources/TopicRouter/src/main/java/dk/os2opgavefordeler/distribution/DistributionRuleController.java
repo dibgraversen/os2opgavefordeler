@@ -16,8 +16,8 @@ import javax.persistence.EntityManager;
 
 import dk.os2opgavefordeler.distribution.dto.DistributionRuleFilterDTO;
 
-import dk.os2opgavefordeler.employment.EmploymentRepository;
-import dk.os2opgavefordeler.employment.OrgUnitRepository;
+import dk.os2opgavefordeler.repository.EmploymentRepository;
+import dk.os2opgavefordeler.repository.OrgUnitRepository;
 
 import dk.os2opgavefordeler.model.*;
 

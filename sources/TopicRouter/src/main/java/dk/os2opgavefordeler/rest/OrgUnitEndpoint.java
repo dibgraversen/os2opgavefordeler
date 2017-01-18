@@ -3,7 +3,7 @@ package dk.os2opgavefordeler.rest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
 import dk.os2opgavefordeler.auth.AuthService;
-import dk.os2opgavefordeler.employment.UserRepository;
+import dk.os2opgavefordeler.repository.UserRepository;
 import dk.os2opgavefordeler.model.Employment;
 import dk.os2opgavefordeler.model.Municipality;
 import dk.os2opgavefordeler.model.OrgUnit;

@@ -1,8 +1,8 @@
 package dk.os2opgavefordeler.orgunit;
 
 import com.google.common.collect.Lists;
-import dk.os2opgavefordeler.employment.MunicipalityRepository;
-import dk.os2opgavefordeler.employment.OrgUnitRepository;
+import dk.os2opgavefordeler.repository.MunicipalityRepository;
+import dk.os2opgavefordeler.repository.OrgUnitRepository;
 import dk.os2opgavefordeler.model.Municipality;
 import dk.os2opgavefordeler.model.OrgUnit;
 import dk.os2opgavefordeler.test.UnitTest;
