@@ -1,5 +1,6 @@
 package dk.os2opgavefordeler.rest;
 
+import dk.os2opgavefordeler.auth.AuthService;
 import dk.os2opgavefordeler.model.presentation.EmploymentPO;
 import dk.os2opgavefordeler.model.presentation.SimpleMessage;
 import dk.os2opgavefordeler.service.BadRequestArgumentException;
@@ -23,6 +24,9 @@ public class EmploymentEndpoint extends Endpoint {
 
 	@Inject
 	EmploymentService employmentService;
+
+	@Inject
+	private AuthService authService;
 
 	@GET
 	@Path("/")
@@ -72,7 +76,7 @@ public class EmploymentEndpoint extends Endpoint {
 	@Path("/{empId}/subordinates")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getSubordinates(@PathParam("empId") Long employmentId){
-		// TODO validate rights
+		if(authService.hasEmployment(employmentId))
 		try {
 			Validate.nonZero(employmentId, "Invalid employmentId");
 		} catch (BadRequestArgumentException e) {
