@@ -17,7 +17,7 @@ import java.util.Optional;
 
 @Path("/employments")
 @RequestScoped
-public class EmploymentEndpoint {
+public class EmploymentEndpoint extends Endpoint {
 	@Inject
 	Logger log;
 
@@ -40,13 +40,13 @@ public class EmploymentEndpoint {
 				employees = employmentService.getAllPO(municipalityId, employmentId);
 			}
 			if(!employees.isEmpty()) {
-				return Response.ok().entity(employees).build();
+				return ok(employees);
 			} else {
-				return Response.status(404).build();
+				return notFound();
 			}
 		}
 		catch(BadRequestArgumentException e) {
-			return Response.status(Response.Status.BAD_REQUEST).entity(new SimpleMessage(e.getMessage())).build();
+			return badRequest(e.getMessage());
 		}
 	}
 
@@ -66,5 +66,19 @@ public class EmploymentEndpoint {
 		} catch (BadRequestArgumentException e) {
 			return Response.status(Response.Status.BAD_REQUEST).entity(new SimpleMessage(e.getMessage())).build();
 		}
+	}
+
+	@GET
+	@Path("/{empId}/subordinates")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getSubordinates(@PathParam("empId") Long employmentId){
+		// TODO validate rights
+		try {
+			Validate.nonZero(employmentId, "Invalid employmentId");
+		} catch (BadRequestArgumentException e) {
+			return  Response.status(Response.Status.BAD_REQUEST).entity(new SimpleMessage(e.getMessage())).build();
+		}
+		final List<EmploymentPO> result = employmentService.getSubordinates(employmentId);
+		return ok(result);
 	}
 }

@@ -9,13 +9,14 @@ import java.util.List;
 import java.util.Optional;
 
 public interface EmploymentService {
-	Optional<Employment> getEmployment(long id);
-	Optional<EmploymentPO> getEmploymentPO(long id);
-	List<Employment> findByEmail(String email);
+	Optional<Employment> getEmployment(Long id);
+	Optional<EmploymentPO> getEmploymentPO(Long id);
+	@Deprecated List<Employment> findByEmail(String email);
 
 	List<EmploymentPO> getManagedAsPO(long municipalityId, long employmentId);
-	List<Employment> getAll(long municipalityId);
+	@Deprecated List<Employment> getAll(long municipalityId);
 	List<EmploymentPO> getAllPO(long municipalityId, long employmentId);
 
 	SearchResult<EmploymentPO> search(EmploymentSearch options);
+	List<EmploymentPO> getSubordinates(Long employmentId);
 }
