@@ -12,7 +12,11 @@
 		$scope.users = [];
 		$scope.ous = [];
 		$scope.setCurrentOrgUnit = setCurrentOrgUnit;
+		$scope.containsKle = containsKle;
 		$scope.filterStr="";
+		$scope.kleChanged = kleChanged;
+
+		$scope.kles = [];
 
 		$scope.search = {};
 		$scope.search.municipality = $scope.user.municipality;	
@@ -24,20 +28,42 @@
 				$scope.municipalities = municipalities;
 				});
 
+			orgUnitService.getKLEs().then(function(kles){
+				$scope.kles = kles;
+			});
+
+
 			orgUnitService.getOrgUnits().then(function(orgUnits){
 				$scope.ous = orgUnits;
+				setCurrentOrgUnit(orgUnits[0]);
 			});
 			//refreshUserList();
 			
 		}
 
-		function filter(filterStr){
-			$scope.filterStr=filterStr;
-			$log("filterStr value : " + $scope.filterStr);
+		function containsKle(kle, orgUnit){
+			return orgUnitService.containsKle(kle,orgUnit);
 		}
 
 		function setCurrentOrgUnit(orgUnit){
 			$scope.currentOrgUnit = orgUnit;
+		}
+
+		function addKle(kle,orgunit){
+			$log("add kle: " + kle + " , " + orgUnit)
+		}
+
+		function removeKle(kle,orgunit){
+			$log("remove kle: " + kle + " , " + orgUnit)
+		}
+
+		function kleChanged(value){
+			if(value){
+				console.log("value true");
+			}
+			else{
+				console.log("value false");
+			}
 		}
 
 		// API methods go here 

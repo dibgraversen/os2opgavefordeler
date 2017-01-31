@@ -3,27 +3,71 @@
 	<div ng-include="'/app/home/side-menu.html'"></div>
 </div>
 -->
-<div class="col-md-6">
-	<h1>OrgUnit</h1>
-	    <input type="text" data-ng-model="filterStr"/>
-
-		<table class="table table-hover">
-				<thead>
-				<tr>
-					<th>id</th>
-					<th>Navn</th>
-				</tr>
-				</thead>
-				<tbody data-ng-repeat="ou in ous | filter: { name : filterStr }">
-				<tr data-ng-class="currentOrgUnit === ou ? 'success' : ''" data-ng-click="setCurrentOrgUnit(orgUnit)">
-					<td>{{ ou.id }}</td>
-					<td>
-						{{ ou.name | limitTo: 50 }}
-					</td>					
-				</tr>
-				</tbody>
-			</table>
-</div>
-<div class="col-md-6">
+<div class="col-md-8 col-md-offset-2">
 	<h1>KLE Opmærkning</h1>
+	<div class="col-md-4">
+		    <input type="text" data-ng-model="filterStr" placeholder="OrgUnit" />
+
+			<table class="table table-hover">
+					<thead>
+					<tr>
+						<th>id</th>
+						<th>Navn</th>
+					</tr>
+					</thead>
+					<tbody data-ng-repeat="ou in ous | filter: { name : filterStr }">
+						<tr data-ng-class="currentOrgUnit === ou ? 'success' : ''" data-ng-click="setCurrentOrgUnit(ou)">
+							<td>{{ ou.id }}</td>
+							<td>
+								{{ ou.name | limitTo: 50 }}
+							</td>					
+						</tr>
+					</tbody>
+			</table>
+	</div>
+	<div class="col-md-8">
+		<h2> {{currentOrgUnit.name}}</h2>
+
+		<tabset justified="true">
+			<tab heading="Udførende">
+				<div class="panel panel-default margin-top">
+					<div class="panel-heading">					
+						Udførende
+					</div>
+					<div class="panel-body">
+						<table class="table table-hover">
+							<thead>
+							<tr>
+								<th></th>
+								<th>Nummer</th>
+								<th>Navn</th>
+							</tr>
+							</thead>
+							<tbody data-ng-repeat="kle in kles">
+								<tr >
+									<td> 
+										<input 
+										type="checkbox"
+										/>
+									</td>
+									<td>{{ kle.number }}</td>
+									<td>
+										{{ kle.name | limitTo: 50 }}
+									</td>					
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</tab>
+			<tab heading="Indsigt">
+				<div class="panel panel-default margin-top">
+					<div class="panel-heading">Indsigt</div>
+					<div class="panel-body">
+												
+					</div>
+				</div>
+			</tab>
+		</tabset>
+	</div>
 </div>
