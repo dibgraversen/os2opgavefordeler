@@ -25,6 +25,9 @@
 					<li ng-show="user.currentRole.municipalityAdmin" ng-class="{ active: $state.is('municipalityAdmin') }">
 						<a data-toggle="collapse" data-target=".navbar-collapse" ui-sref="municipalityAdmin">Administrer kommune</a>
 					</li>
+					<li ng-show="user.currentRole.municipalityAdmin" ng-class="{ active: $state.is('municipalityAdmin') }">
+						<a data-toggle="collapse" data-target=".navbar-collapse" ui-sref="kleadmin">KLE Opmærkning</a>
+					</li>
 				</ul>
 				<ul ng-show="user.loggedIn" class="nav navbar-nav navbar-right ng-cloak">
 					<li class="active dropdown" dropdown>

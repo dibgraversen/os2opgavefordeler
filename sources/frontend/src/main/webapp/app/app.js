@@ -41,6 +41,12 @@
 					templateUrl: '/app/layout/login.html',
 					controller: 'LoginCtrl',
 					controllerAs: 'vm'
+				})
+				.state('kleadmin', {
+					url: "/kleadmin",
+					templateUrl: '/app/kle-admin/kle-admin.html',
+					controller: 'KleAdminCtrl',
+					controllerAs: 'vm'
 				});
 		$urlRouterProvider.otherwise('/');
 	}
