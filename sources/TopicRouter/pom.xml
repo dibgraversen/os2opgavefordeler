@@ -436,8 +436,39 @@
             </dependencies>
 
         </profile>
+        <profile>
+            <id>dev</id>
+            <activation>
+                <property>
+                    <name>env</name>
+                    <value>dev</value>
+                </property>
+            </activation>
+            <properties>
+                <hibernate.connection.url>jdbc:h2:mem:test;MVCC=TRUE</hibernate.connection.url>
+                <hibernate.datasource />
+                <hibernate.dialect>org.hibernate.dialect.H2Dialect</hibernate.dialect>
+                <hibernate.hbm2ddl.auto>create-drop</hibernate.hbm2ddl.auto>
+                <connection.driver_class>org.h2.Driver</connection.driver_class>
+            </properties>
+        </profile>
+        <profile>
+            <id>test</id>
+            <activation>
+                <property>
+                    <name>env</name>
+                    <value>test</value>
+                </property>
+            </activation>
+            <properties>
+                <hibernate.connection.url />
+                <hibernate.datasource>java:/OS2TopicRouterDS</hibernate.datasource>
+                <hibernate.dialect>org.hibernate.dialect.PostgreSQL9Dialect</hibernate.dialect>
+                <hibernate.hbm2ddl.auto>validate</hibernate.hbm2ddl.auto>
+                <connection.driver_class />
+            </properties>
+        </profile>
     </profiles>
-
     <build>
         <!-- Maven will append the version to the finalName (which is the name
              given to the generated war, and hence the context root) -->
@@ -464,5 +495,11 @@
                 <version>${version.org.jboss.as.plugins.maven.plugin}</version>
             </plugin>
         </plugins>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
     </build>
 </project>
