@@ -1,8 +1,4 @@
 
-<!--<div ng-show="sidemenuVisible" class="col-md-2">
-	<div ng-include="'/app/home/side-menu.html'"></div>
-</div>
--->
 <div class="col-md-8 col-md-offset-2">
 	<h1>KLE Opmærkning</h1>
 	<div class="col-md-4">
@@ -15,7 +11,7 @@
 						<th>Navn</th>
 					</tr>
 					</thead>
-					<tbody data-ng-repeat="ou in ous | filter: { name : filterStr }">
+					<tbody data-ng-repeat="ou in displayOus | filter: { name : filterStr }">
 						<tr data-ng-class="currentOrgUnit === ou ? 'success' : ''" data-ng-click="setCurrentOrgUnit(ou)">
 							<td>{{ ou.id }}</td>
 							<td>
@@ -27,7 +23,6 @@
 	</div>
 	<div class="col-md-8">
 		<h2> {{currentOrgUnit.name}}</h2>
-
 		<tabset justified="true">
 			<tab heading="Udførende">
 				<div class="panel panel-default margin-top">
@@ -35,6 +30,7 @@
 						Udførende
 					</div>
 					<div class="panel-body">
+
 						<table class="table table-hover">
 							<thead>
 							<tr>
@@ -43,16 +39,18 @@
 								<th>Navn</th>
 							</tr>
 							</thead>
-							<tbody data-ng-repeat="kle in kles">
+							<tbody data-ng-repeat="displayKle in getDisplayKlesFromScope(currentOrgUnit)">
 								<tr >
 									<td> 
 										<input 
 										type="checkbox"
+										data-ng-model="displayKle.checked"
+										data-ng-change="modifyKle(displayKle.checked,displayKle,currentOrgUnit)"							
 										/>
 									</td>
-									<td>{{ kle.number }}</td>
+									<td>{{ displayKle.kle.number }}</td>
 									<td>
-										{{ kle.name | limitTo: 50 }}
+										{{ displayKle.kle.name | limitTo: 50 }}
 									</td>					
 								</tr>
 							</tbody>

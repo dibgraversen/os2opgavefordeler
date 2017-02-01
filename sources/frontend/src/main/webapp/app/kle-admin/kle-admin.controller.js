@@ -8,65 +8,79 @@
 	function KleAdminCtrl($scope, $state, $log, topicRouterApi, orgUnitService, $modal) {
 		/* jshint validthis: true */
 		var vm = this;
-		$scope.municipalities = [];
-		$scope.users = [];
-		$scope.ous = [];
-		$scope.setCurrentOrgUnit = setCurrentOrgUnit;
-		$scope.containsKle = containsKle;
-		$scope.filterStr="";
-		$scope.kleChanged = kleChanged;
+		$scope.currentOrgUnit ="";
+		$scope.filterStr = "";
+		$scope.$log=$log;
 
 		$scope.kles = [];
+		$scope.displayOus = [];
 
-		$scope.search = {};
-		$scope.search.municipality = $scope.user.municipality;	
-
+		$scope.setCurrentOrgUnit = setCurrentOrgUnit;
+		$scope.getDisplayKlesFromScope = getDisplayKlesFromScope;
+		$scope.modifyKle = modifyKle;
 		activate();
 
 		function activate() {
 			topicRouterApi.getMunicipalities().then(function(municipalities){
 				$scope.municipalities = municipalities;
-				});
+			});
 
 			orgUnitService.getKLEs().then(function(kles){
 				$scope.kles = kles;
 			});
 
-
 			orgUnitService.getOrgUnits().then(function(orgUnits){
-				$scope.ous = orgUnits;
 				setCurrentOrgUnit(orgUnits[0]);
+				initDisplayObjects(orgUnits);
+
 			});
-			//refreshUserList();
-			
 		}
 
-		function containsKle(kle, orgUnit){
-			return orgUnitService.containsKle(kle,orgUnit);
+		function initDisplayObjects(ous) {
+			for (let ou of ous){
+				var ouWithDisplayData = ou;
+				ouWithDisplayData.displayKles = getDisplayKles(ou);
+				$scope.displayOus.push(ouWithDisplayData);				
+			}
+		}
+
+		function getDisplayKles(orgunit) {
+			var klesWithDisplayData = [];
+			
+			for (let kle of $scope.kles){
+				var newKle= JSON.parse(JSON.stringify(kle));
+				newKle.checked = orgUnitService.containsKle(kle,orgunit,kle.assignmentType);
+				klesWithDisplayData.push(newKle);				
+			}
+			return klesWithDisplayData;
+		}
+		
+
+		function getDisplayKlesFromScope(orgunit) {				
+			for (let ou of $scope.displayOus){
+				if(orgunit.id== ou.id){
+					return ou.displayKles;
+				}				
+			}
+			return null;
 		}
 
 		function setCurrentOrgUnit(orgUnit){
 			$scope.currentOrgUnit = orgUnit;
 		}
 
-		function addKle(kle,orgunit){
-			$log("add kle: " + kle + " , " + orgUnit)
-		}
-
-		function removeKle(kle,orgunit){
-			$log("remove kle: " + kle + " , " + orgUnit)
-		}
-
-		function kleChanged(value){
-			if(value){
-				console.log("value true");
+		function modifyKle(checked,kle,orgunit){
+			if(checked){
+					orgUnitService.addKle(kle,orgunit).then(function(){
+													console.log("added kle");
+												});
 			}
-			else{
-				console.log("value false");
+			else {
+				orgUnitService.removeKle(kle,orgunit).then(function(){
+													console.log("removed kle");
+												});
 			}
+					
 		}
-
-		// API methods go here 
-
 	}
 })();
