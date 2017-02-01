@@ -51,33 +51,6 @@
         <!--<module>sources/frontend</module>-->
     </modules>
 
-    <profiles>
-        <profile>
-            <id>target-dev</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <properties>
-                <application.version>DEV-${project.version}</application.version>
-                <application.backendUrl>http://localhost:1080/rest</application.backendUrl>
-            </properties>
-        </profile>
-        <profile>
-            <id>target-test</id>
-            <properties>
-                <application.version>TEST-${project.version}</application.version>
-                <application.backendUrl>http://os2opgavefordeler-test.miracle.dk/rest</application.backendUrl>
-            </properties>
-        </profile>
-        <profile>
-            <id>target-prod</id>
-            <properties>
-                <application.version>${project.version}</application.version>
-                <application.backendUrl>https://os2opgavefordeler.dk/rest</application.backendUrl>
-            </properties>
-        </profile>
-    </profiles>
-
     <build>
         <plugins>
             <plugin>

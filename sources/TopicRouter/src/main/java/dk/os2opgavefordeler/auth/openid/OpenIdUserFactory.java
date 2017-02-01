@@ -1,7 +1,7 @@
 package dk.os2opgavefordeler.auth.openid;
 
 import com.google.common.collect.Lists;
-import dk.os2opgavefordeler.employment.EmploymentRepository;
+import dk.os2opgavefordeler.repository.EmploymentRepository;
 import dk.os2opgavefordeler.model.Employment;
 import dk.os2opgavefordeler.model.Role;
 import dk.os2opgavefordeler.model.User;

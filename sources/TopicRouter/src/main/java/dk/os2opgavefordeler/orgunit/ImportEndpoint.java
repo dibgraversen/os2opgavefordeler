@@ -1,7 +1,7 @@
 package dk.os2opgavefordeler.orgunit;
 
 import dk.os2opgavefordeler.auth.AuthService;
-import dk.os2opgavefordeler.employment.UserRepository;
+import dk.os2opgavefordeler.repository.UserRepository;
 import dk.os2opgavefordeler.model.OrgUnit;
 import dk.os2opgavefordeler.model.User;
 import dk.os2opgavefordeler.rest.Endpoint;

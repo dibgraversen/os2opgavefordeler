@@ -2,9 +2,9 @@ package dk.os2opgavefordeler.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
-import dk.os2opgavefordeler.employment.EmploymentRepository;
-import dk.os2opgavefordeler.employment.MunicipalityRepository;
-import dk.os2opgavefordeler.employment.UserRepository;
+import dk.os2opgavefordeler.repository.EmploymentRepository;
+import dk.os2opgavefordeler.repository.MunicipalityRepository;
+import dk.os2opgavefordeler.repository.UserRepository;
 import dk.os2opgavefordeler.model.*;
 import dk.os2opgavefordeler.orgunit.ImportService;
 import dk.os2opgavefordeler.orgunit.OrgUnitDTO;
@@ -34,6 +34,8 @@ public class BootstrappingDataProviderSingleton {
 	private static final String CULTURE = "Kultur";
 	private static final String MIRACLE_NAME = "Miracle";
 	private static final String SYDDJURS_NAME = "Syddjurs Kommune";
+
+	private boolean buildLight = false;
 
 	@Inject
 	private Logger log;
@@ -74,7 +76,6 @@ public class BootstrappingDataProviderSingleton {
 	private Municipality miracle;
 	private Municipality syddjurs;
 
-
 	public void bootstrap() {
 		if( municipalityRepository.findAll().size() > 0 ){
 			log.warn("Bootstrap attempted with municipalities existing, returning without action");
@@ -88,9 +89,11 @@ public class BootstrappingDataProviderSingleton {
 		buildUsers();
 
 		loadBootstrapKle();
-		// Swap the ones below for faster load or more comprehensive rule set.
-		buildDistributionRulesForMunicipality(miracle, findOrg(DIGITALISERING), findOrg(MODERN_ART));
-//		buildAllRules();
+		if(buildLight){
+			buildDistributionRulesForMunicipality(miracle, findOrg(DIGITALISERING), findOrg(MODERN_ART));
+		} else {
+			buildAllRules();
+		}
 	}	private void addMunicipalities() {
 		if (mService.getMunicipalities().size() == 0) {
 			miracle = addMunicipality(MIRACLE_NAME, "ABC");

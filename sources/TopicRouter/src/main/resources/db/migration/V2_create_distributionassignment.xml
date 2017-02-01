@@ -11,9 +11,7 @@
             <column name="id" autoIncrement="true" type="bigint">
                 <constraints nullable="false" primaryKey="true" unique="true"/>
             </column>
-            <column name="assignedemp" type="bigint">
-                <constraints nullable="false"/>
-            </column>
+            <column name="assignedemp" type="bigint" />
             <column name="assignedorg_id" type="bigint"/>
             <column name="kle_id" type="bigint"/>
             <column name="municipality_id" type="bigint"/>

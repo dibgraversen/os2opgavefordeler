@@ -45,7 +45,10 @@ public class EmploymentServiceImpl implements EmploymentService {
 	EntityManager em;
 
 	@Override
-	public Optional<Employment> getEmployment(long id) {
+	public Optional<Employment> getEmployment(Long id) {
+		if(id == 0L){
+			return Optional.empty();
+		}
 		final List<Employment> results = persistence.criteriaFind(Employment.class,
 			(cb, cq, ou) -> cq.where(cb.equal(ou.get(Employment_.id), id)
 			)
@@ -67,7 +70,7 @@ public class EmploymentServiceImpl implements EmploymentService {
 	}
 
 	@Override
-	public Optional<EmploymentPO> getEmploymentPO(long id) {
+	public Optional<EmploymentPO> getEmploymentPO(Long id) {
 		return getEmployment(id).map(EmploymentPO::new);
 	}
 
@@ -147,6 +150,41 @@ public class EmploymentServiceImpl implements EmploymentService {
 		result.setTotalMatches(getSearchCount(search, municipality));
 		result.setResults(getSearchResults(search, municipality));
 		return result;
+	}
+
+	@Override
+	public List<EmploymentPO> getSubordinates(Long employmentId) {
+		List<EmploymentPO> result = new ArrayList<>();
+		Optional<Employment> employmentMaybe = getEmployment(employmentId);
+		if(employmentMaybe.isPresent()){
+			Employment employment = employmentMaybe.get();
+			List<OrgUnit> managedOrgUnits = orgUnitService.getManagedOrgUnits(employment.getMunicipality().getId(), employmentId);
+			result.addAll(getManagers(managedOrgUnits));
+		} else {
+			log.warn("trying to get subordinates but found no employment for: {}", employmentId);
+		}
+		return result;
+	}
+
+	private List<EmploymentPO> getManagers(List<OrgUnit> orgUnits){
+		List<EmploymentPO> result = new ArrayList<>();
+		List<Employment> managers = new ArrayList<>();
+		getManagersAcc(orgUnits, managers);
+		for (Employment manager : managers) {
+			result.add(new EmploymentPO(manager));
+		}
+		return result;
+	}
+
+	private void getManagersAcc(List<OrgUnit> orgUnits, List<Employment> managersAcc){
+		if(orgUnits != null && !orgUnits.isEmpty()){
+			for (OrgUnit orgUnit : orgUnits) {
+				if(orgUnit.getManager().isPresent()){
+					managersAcc.add(orgUnit.getManager().get());
+				}
+				getManagersAcc(orgUnit.getChildren(), managersAcc);
+			}
+		}
 	}
 
 	private Municipality getMunicipality(long id){

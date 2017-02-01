@@ -1,6 +1,6 @@
 package dk.os2opgavefordeler.service.impl;
 
-import dk.os2opgavefordeler.employment.MunicipalityRepository;
+import dk.os2opgavefordeler.repository.MunicipalityRepository;
 import dk.os2opgavefordeler.model.DistributionRule;
 import dk.os2opgavefordeler.model.Kle;
 import dk.os2opgavefordeler.model.Municipality;

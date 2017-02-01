@@ -230,6 +230,7 @@ pipes.builtAppTest = function () {
 	return es.merge(pipes.builtIndexTest(), pipes.config('test', paths.distTest), pipes.builtPartialsTest(), pipes.processedImagesTest());
 };
 
+// TODO verify
 pipes.builtAppProd = function () {
 	return es.merge(pipes.builtIndexProd(), pipes.processedImagesProd());
 };

@@ -2,7 +2,7 @@ package dk.os2opgavefordeler.auth.openid;
 
 import com.google.common.base.Strings;
 import com.nimbusds.oauth2.sdk.id.State;
-import dk.os2opgavefordeler.employment.UserRepository;
+import dk.os2opgavefordeler.repository.UserRepository;
 import dk.os2opgavefordeler.model.IdentityProvider;
 import dk.os2opgavefordeler.model.User;
 import dk.os2opgavefordeler.service.*;

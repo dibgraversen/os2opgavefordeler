@@ -42,117 +42,114 @@ import dk.os2opgavefordeler.service.*;
 @RequestScoped
 public class ApiEndpoint extends Endpoint {
 
-    @Inject
-    Logger log;
+	@Inject
+	Logger log;
 
-    @Inject
-    KleService kleService;
+	@Inject
+	KleService kleService;
 
-    @Inject
-    MunicipalityService municipalityService;
+	@Inject
+	MunicipalityService municipalityService;
 
-    @Inject
-    DistributionService distributionService;
+	@Inject
+	DistributionService distributionService;
 
-    @Inject
-    OrgUnitService orgUnitService;
+	@Inject
+	OrgUnitService orgUnitService;
 
-    @Inject
-    EmploymentService employmentService;
+	@Inject
+	EmploymentService employmentService;
 
-    @Inject
-    private FindAssignedForKleService findAssignedForKleService;
+	@Inject
+	private FindAssignedForKleService findAssignedForKleService;
 
-    @Inject
-    private AuthService authService;
+	@Inject
+	private AuthService authService;
 
-    @GET
-    @Path("/")
-    @Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
-    public Response lookup(@QueryParam("kle") String kleNumber, @Context UriInfo uriInfo, @Context HttpServletRequest request) {
+	@GET
+	@Path("/")
+	@Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
+	public Response lookup(@QueryParam("kle") String kleNumber, @Context UriInfo uriInfo, @Context HttpServletRequest request) {
 
-        String email = authService.getAuthentication().getEmail();
-        String token = authService.getAuthentication().getToken();
+		String email = authService.getAuthentication().getEmail();
+		String token = authService.getAuthentication().getToken();
 
-        if (token == null || token.isEmpty()) {
-            return Response.status(Response.Status.UNAUTHORIZED).build();
-        }
+		if (token == null || token.isEmpty()) {
+			return Response.status(Response.Status.UNAUTHORIZED).build();
+		}
 
-        Optional<Municipality> municipalityMaybe = municipalityService.getMunicipalityFromToken(token);
+		Optional<Municipality> municipalityMaybe = municipalityService.getMunicipalityFromToken(token);
 
-        if (!municipalityMaybe.isPresent()) {
-            return Response.status(Response.Status.UNAUTHORIZED).type(TEXT_PLAIN)
-                    .entity("Did not find a municipality based on given authorization.")
-		            .build();
-        }
+		if (!municipalityMaybe.isPresent()) {
+			return Response.status(Response.Status.UNAUTHORIZED).type(TEXT_PLAIN)
+					.entity("Did not find a municipality based on given authorization.")
+					.build();
+		}
 
-        Municipality municipality = municipalityMaybe.get();
+		Municipality municipality = municipalityMaybe.get();
 
-	    if (!municipality.isActive()) {
-            return Response.status(PAYMENT_REQUIRED).type(TEXT_PLAIN)
-                    .entity("Your subscription is not active and therefor the api cannot be used.")
-		            .build();
-        }
+		if (!municipality.isActive()) {
+			return Response.status(PAYMENT_REQUIRED).type(TEXT_PLAIN)
+					.entity("Your subscription is not active and therefor the api cannot be used.")
+					.build();
+		}
 
-        Optional<Kle> kleMaybe = kleService.fetchMainGroup(kleNumber, municipality.getId());
+		Optional<Kle> kleMaybe = kleService.fetchMainGroup(kleNumber, municipality.getId());
 
-        if (!kleMaybe.isPresent()) {
-            return badRequest("Did not find a Kle based on given number.");
-        }
+		if (!kleMaybe.isPresent()) {
+			return badRequest("Did not find a Kle based on given number.");
+		}
 
-	    Kle kle = kleMaybe.get();
+		Kle kle = kleMaybe.get();
 
-	    Map<String, String> parameters = new HashMap<>();
+		Map<String, String> parameters = new HashMap<>();
 
-        for (Map.Entry<String, List<String>> m : uriInfo.getQueryParameters().entrySet()) {
-            parameters.put(m.getKey(), m.getValue().get(0));
-        }
+		for (Map.Entry<String, List<String>> m : uriInfo.getQueryParameters().entrySet()) {
+			parameters.put(m.getKey(), m.getValue().get(0));
+		}
 
-        Assignee assignee = findAssignedForKleService.findAssignedForKle(kle, municipality, parameters);
+		Assignee assignee = findAssignedForKleService.findAssignedForKle(kle, municipality, parameters);
 
-        if (assignee == null) {
-            return Response.status(Response.Status.NOT_FOUND).type(TEXT_PLAIN).entity("No one seems to be handling the given kle for municipality.").build();
-        }
+		if (assignee == null) {
+			return Response.status(Response.Status.NOT_FOUND).type(TEXT_PLAIN).entity("No one seems to be handling the given kle for municipality.").build();
+		}
 
-        EmploymentApiResultPO manager = new EmploymentApiResultPO(orgUnitService.findResponsibleManager(assignee.getOrgUnit()).orElse(null));
-        EmploymentApiResultPO employee = assignee.getEmployment().map(EmploymentApiResultPO::new).orElse(null);
+		EmploymentApiResultPO manager = new EmploymentApiResultPO(orgUnitService.findResponsibleManager(assignee.getOrgUnit()).orElse(null));
+		EmploymentApiResultPO employee = assignee.getEmployment().map(EmploymentApiResultPO::new).orElse(null);
 
-        Optional<OrgUnit> distributionOrgUnit = assignee.getRule().getAssignedOrg();
+		Optional<OrgUnit> distributionOrgUnit = assignee.getRule().getAssignedOrg();
 
-        OrgUnit assignedOrg;
+		OrgUnit assignedOrg;
 
-        if (distributionOrgUnit.isPresent()) {
-            if (distributionOrgUnit.get().equals(assignee.getOrgUnit())) {
-                assignedOrg = distributionOrgUnit.get();
-            }
-            else {
-                assignedOrg = assignee.getOrgUnit();
-            }
-        }
-        else {
-            assignedOrg = assignee.getOrgUnit();
-        }
+		if (distributionOrgUnit.isPresent()) {
+			if (distributionOrgUnit.get().equals(assignee.getOrgUnit())) {
+				assignedOrg = distributionOrgUnit.get();
+			} else {
+				assignedOrg = assignee.getOrgUnit();
+			}
+		} else {
+			assignedOrg = assignee.getOrgUnit();
+		}
 
-        DistributionRuleApiResultPO resultPO = new DistributionRuleApiResultPO(assignee.getRule().getKle(), assignedOrg, manager, employee);
+		DistributionRuleApiResultPO resultPO = new DistributionRuleApiResultPO(assignee.getRule().getKle(), assignedOrg, manager, employee);
 
-	    log.info("API endpoint called by {} for KLE: {} with result: {}", email, resultPO.getKle().getNumber(), resultPO.getOrg().getName());
+		log.info("API endpoint called by {} for KLE: {} with result: {}", email, resultPO.getKle().getNumber(), resultPO.getOrg().getName());
 
-        return ok(resultPO);
-    }
+		return ok(resultPO);
+	}
 
-    @GET
-    @Path("/healthcheck")
-    @Produces(MediaType.TEXT_PLAIN + "; charset=UTF-8")
-    @NoCache
-    public Response healthCheck() {
-        //TODO: perform (light-weight) sanity checks.
-        boolean everythingIsOk = true;
+	@GET
+	@Path("/healthcheck")
+	@Produces(MediaType.TEXT_PLAIN + "; charset=UTF-8")
+	@NoCache
+	public Response healthCheck() {
+		//TODO: perform (light-weight) sanity checks.
+		boolean everythingIsOk = true;
 
-        if (everythingIsOk) {
-            return ok("We get signal.");
-        }
-        else {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Somebody set up us the bomb.").build();
-        }
-    }
+		if (everythingIsOk) {
+			return ok("We get signal.");
+		} else {
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Somebody set up us the bomb.").build();
+		}
+	}
 }

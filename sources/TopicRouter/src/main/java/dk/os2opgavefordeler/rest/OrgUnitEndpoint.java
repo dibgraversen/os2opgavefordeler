@@ -3,7 +3,8 @@ package dk.os2opgavefordeler.rest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
 import dk.os2opgavefordeler.auth.AuthService;
-import dk.os2opgavefordeler.employment.UserRepository;
+import dk.os2opgavefordeler.auth.UserLoggedIn;
+import dk.os2opgavefordeler.repository.UserRepository;
 import dk.os2opgavefordeler.model.Employment;
 import dk.os2opgavefordeler.model.Municipality;
 import dk.os2opgavefordeler.model.OrgUnit;
@@ -33,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+@UserLoggedIn
 @Path("/org-units")
 @RequestScoped
 public class OrgUnitEndpoint extends Endpoint {
@@ -119,10 +121,12 @@ public class OrgUnitEndpoint extends Endpoint {
 		}
 	}
 
+	// TODO municipality admin functionality.
 	@POST
 	@Path("/import")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
+	@Deprecated
 	public Response importOrg(OrgUnit input) {
 		Municipality currentMunicipality = userRepository.findByEmail(authService.getAuthentication().getEmail()).getMunicipality();
 		fixupOrgUnit(input, currentMunicipality);
@@ -132,6 +136,8 @@ public class OrgUnitEndpoint extends Endpoint {
 		return Response.ok().build();
 	}
 
+
+	// TODO municipality admin functionality.
 	@POST
 	@Path("/fileImport")
 	@Consumes(MediaType.MULTIPART_FORM_DATA)

@@ -57,7 +57,22 @@
             "email": "jej@kommune.dk",
             "esdhId": "jeje",
             "jobTitle": "Personalechef"
-          }
+          },
+          "children": [
+            {
+              "businessKey": "udd",
+              "name": "Uddannelse",
+              "email": "udd@kommune.dk",
+              "esdhId": "udd",
+              "esdhLabel": "Uddannelse",
+              "manager": {
+                "businessKey": "pet",
+                "name": "Peter Thomsen",
+                "email": "pet@kommune.dk",
+                "jobTitle": "Uddannelsesansvarlig"
+              }
+            }
+          ]
         },
         {
           "businessKey": "K4",

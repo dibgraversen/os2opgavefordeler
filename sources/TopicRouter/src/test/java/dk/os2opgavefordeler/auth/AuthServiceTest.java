@@ -1,6 +1,6 @@
 package dk.os2opgavefordeler.auth;
 
-import dk.os2opgavefordeler.employment.UserRepository;
+import dk.os2opgavefordeler.repository.UserRepository;
 import dk.os2opgavefordeler.model.Municipality;
 import dk.os2opgavefordeler.model.User;
 import dk.os2opgavefordeler.test.UnitTest;

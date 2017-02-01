@@ -94,7 +94,7 @@ public class FindAssignedForKleService {
         }
 
         if (rule.getAssignedOrg().isPresent()) {
-            return createAssignee(rule, rule.getAssignedOrg().get(), employmentService.getEmployment(rule.getAssignedEmp()));
+            return createAssignee(rule, rule.getAssignedOrg().get(), employmentService.getEmployment(rule.getAssignedEmp().orElse(0L)));
         }
         else if (rule.getParent().isPresent()) {
             return findResponsible(rule.getParent().get(), filterParameters);

@@ -53,4 +53,13 @@ public abstract class Endpoint {
 	public Response forbidden() {
 		return Response.status(Response.Status.FORBIDDEN).build();
 	}
+
+	/**
+	 * Creates a not found response.
+	 *
+	 * @return a built Response with not found and no entity set.
+	 */
+	public Response notFound() {
+		return Response.status(Status.NOT_FOUND).build();
+	}
 }

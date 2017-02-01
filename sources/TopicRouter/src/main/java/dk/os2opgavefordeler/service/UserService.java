@@ -15,8 +15,8 @@ import java.util.Optional;
  * @author hlo@miracle.dk
  */
 public interface UserService {
-	Optional<User> findById(long userId);
-	Optional<User> findByEmail(String email);
+	@Deprecated Optional<User> findById(long userId);
+	@Deprecated Optional<User> findByEmail(String email);
 
 	List<UserRolePO> getAllUsers();
 

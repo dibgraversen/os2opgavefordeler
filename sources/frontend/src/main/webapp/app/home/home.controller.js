@@ -2,10 +2,10 @@
 	'use strict';
 	angular.module('topicRouter').controller('HomeCtrl', HomeCtrl);
 
-	HomeCtrl.$inject = ['$scope', 'topicRouterApi', '$state', '$q', '$modal', '$log', 'serverUrl'];
+	HomeCtrl.$inject = ['$scope', 'topicRouterApi', 'employmentService', '$state', '$q', '$modal', '$log', 'serverUrl'];
 
 	/* @ngInject */
-	function HomeCtrl($scope, topicRouterApi, $state, $q, $modal, $log, serverUrl) {
+	function HomeCtrl($scope, topicRouterApi, employmentService, $state, $q, $modal, $log, serverUrl) {
 		/* jshint validthis: true */
 
 		$scope.topicRoutes = [];
@@ -53,6 +53,8 @@
 				if (newValue && newValue.employment > 0) {
 					refreshSubstitutes();
 					refreshTopicRoutes();
+					if(!currentRole().employmentId) currentRole().employmentId = currentRole().employment;
+					ensureSubordinates();
 				}
 				else {
 					$scope.topicRoutes = [];
@@ -60,9 +62,16 @@
 			});
 
 			$scope.$watch("settings.scope", function(){
-				if($scope.user.currentRole && $scope.user.currentRole.employment)
-					refreshTopicRoutes();
+				if($scope.user.currentRole && $scope.user.currentRole.employment)	refreshTopicRoutes();
 			});
+		}
+
+		function ensureSubordinates(){
+			if(!currentRole().subordinates){
+				employmentService.getSubordinates(currentRole().employmentId).then(function(subordinateEmployments){
+					currentRole().subordinates = subordinateEmployments;
+				});
+			}
 		}
 
 		function addSubstitute(){
@@ -106,6 +115,21 @@
 			return org;
 		}
 
+		// function getEmployment(id){
+		// 	var deferred = $q.defer();
+		// 	if(employments[id]){
+		// 		if(employments[id].promise) return employments[id].promise; // existing request.
+		// 		else deferred.resolve(employments[id]); // cached.
+		// 	}	else { // get from backend
+		// 		employments[id] = { promise: deferred.promise }; // note that we are fetching
+		// 		topicRouterApi.getEmployment(id).then(function (employment) {
+		// 			employments[id] = employment;
+		// 			deferred.resolve(employment);
+		// 		});
+		// 	}
+		// 	return deferred.promise;
+		// }
+		//
 		function refreshTopicRoutes(){
 			$log.info('HomeCtrl::refreshTopicRoutes');
 
@@ -146,6 +170,7 @@
 					},
 					function(error){
 					  $log.error('Error: '+ error.data);
+						addAlert({ type: 'danger', msg: error.data });
 					}
 			);
 		}
@@ -308,24 +333,74 @@
 			if (!responsibility(distributionRule) && $scope.user.currentRole.manager) {
 				return true; // not already handled.
 			}
-
 			if ($scope.user.currentRole.municipalityAdmin) {
 				return true;
 			}
-
-			if (canManage(distributionRule)) {
-				return true;
-			}
-
-			return false;
+			return (canManage(distributionRule) || isBossFor(distributionRule));
 		}
 
+		/**
+		 * Determines if current role is manager for given rule by responsible or parents responsible.
+		 * @param rule
+		 * @returns {*}
+		 */
 		function canManage(rule){
 			if(rule.responsible){ // org is set, chain stops here.
 				return getManager(rule.responsible).id === $scope.user.currentRole.employment;
 			} else {
 				return rule.parent && canManage(rule.parent);
 			}
+		}
+
+		function isBossFor(rule){
+			var responsibleOrg = findResponsible(rule);
+			return responsible && isManaged(responsibleOrg.manager);
+		}
+
+		/**
+		 * determines responsible employment from rule or parents.
+		 * @param rule
+		 * @returns Employment or null.
+		 */
+		function findResponsible(rule){
+			if(rule.parent) {
+				if(rule.responsible) return responsible;
+				else return findResponsible(rule.parent);
+			} else {
+				return rule.responsible;
+			}
+		}
+
+		/**
+		 * Determines if given employment is a subordinate of current user.
+		 * @param employment for which to check if current user is a boss for.
+		 * @returns true if employment is subordinate.
+		 */
+		function isManaged(employment){
+			var result = false;
+			_.each(currentRole().subordinates, function(subordinate){
+				if(employment.id === subordinate.id) {
+					result = true;
+				}
+			});
+			return result;
+		}
+
+		function subordinates(){
+			var deferred = $q.deferred;
+			if(currentRole().subordinates){
+				deferred.resolve(currentRole().subordinates);
+			} else {
+				employmentService.getSubordinates(currentRole().employment).then(function(employments){
+					currentRole().subordinates = employments;
+				});
+			}
+			return deferred.promise;
+		}
+
+
+		function currentRole(){
+			return $scope.user.currentRole;
 		}
 
 		function getManager(org){
@@ -342,11 +417,7 @@
 				return true;
 			}
 
-			if (canManage(distributionRule)) {
-				return true;
-			}
-
-			return false;
+			return (canManage(distributionRule));
 		}
 
 		function getChildren(rule, force){

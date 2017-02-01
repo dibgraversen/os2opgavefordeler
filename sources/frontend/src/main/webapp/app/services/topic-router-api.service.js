@@ -77,26 +77,26 @@
 		return service;
 
 		function getFiltersForRule(ruleId) {
-			return httpGet("/distributionrulefilter/"+ruleId+"/filters");
+			return httpGet("/distributionrulefilter/" + ruleId + "/filters");
 		}
 
-		function createFilter(model){
+		function createFilter(model) {
 			return httpPost("/distributionrulefilter/", model);
 		}
 
-		function removeFilter(ruleId, filterId){
-			return httpDelete("/distributionrulefilter/"+ruleId+"/"+filterId);
+		function removeFilter(ruleId, filterId) {
+			return httpDelete("/distributionrulefilter/" + ruleId + "/" + filterId);
 		}
 
-		function updateFilter(model){
-			return post("/distributionrulefilter/"+model.distributionRuleId+"/filters/"+model.filterId, model);
+		function updateFilter(model) {
+			return post("/distributionrulefilter/" + model.distributionRuleId + "/filters/" + model.filterId, model);
 		}
 
 		function getIdentityProviders() {
 			return httpGet("/auth/providers");
 		}
 
-		function updateUser(model){
+		function updateUser(model) {
 			return httpPost("/users/", model);
 		}
 
@@ -121,11 +121,11 @@
 		}
 
 		function setMunicipalityAdmin(roleId, municipalityAdmin) {
-			return httpPost('/roles/' + roleId + '/municipalityadmin/' + (municipalityAdmin?'1':'0'));
+			return httpPost('/roles/' + roleId + '/municipalityadmin/' + (municipalityAdmin ? '1' : '0'));
 		}
 
 		function setAdmin(roleId, admin) {
-			return httpPost('/roles/' + roleId + '/admin/' + (admin?'1':'0'));
+			return httpPost('/roles/' + roleId + '/admin/' + (admin ? '1' : '0'));
 		}
 
 		function getTopicRoutes(role, scope) {
@@ -134,34 +134,38 @@
 			httpGet('/distribution-rules', {
 				"role": role,
 				"scope": scope
-			}).then(function (data) {
-				var objectMap = {};
+			})
+					.then(function (data) {
+						var objectMap = {};
 
-				_.each(data, function(rule){
-					objectMap[rule.id] = rule;
-					rule.children = [];
-				});
+						_.each(data, function (rule) {
+							objectMap[rule.id] = rule;
+							rule.children = [];
+						});
 
-				var rulePromises = [];
-				_.each(data, function (rule) {
-					rulePromises.push(processRule(rule, objectMap));
-				});
+						var rulePromises = [];
+						_.each(data, function (rule) {
+							rulePromises.push(processRule(rule, objectMap));
+						});
 
-				$q.all(rulePromises).then(function(){
-					deferred.resolve(data);
-				});
-			});
+						$q.all(rulePromises).then(function () {
+							deferred.resolve(data);
+						});
+					}, function(error) {
+						deferred.reject(error);
+					}
+			);
 			return deferred.promise;
 		}
 
 		function getRuleChildren(ruleId, employment, scope) {
-			return httpGet('/distribution-rules/'+ruleId+'/children', {
+			return httpGet('/distribution-rules/' + ruleId + '/children', {
 				"employment": employment,
 				"scope": scope
-			}).then(function(rules){
+			}).then(function (rules) {
 				var objectMap = {};
 
-				_.each(rules, function(rule){
+				_.each(rules, function (rule) {
 					objectMap[rule.id] = rule;
 					rule.children = [];
 				});
@@ -170,37 +174,37 @@
 					processRule(rule, objectMap);
 				});
 
-				_.each(rules, function(rule){
-					rule.kle.serviceTextPopover = htmlsave.truncate(rule.kle.serviceText, maxPopoverLength, { breakword:false });
+				_.each(rules, function (rule) {
+					rule.kle.serviceTextPopover = htmlsave.truncate(rule.kle.serviceText, maxPopoverLength, {breakword: false});
 				});
 
 				return rules;
 			});
 		}
 
-		function processRule(rule, objectMap){
+		function processRule(rule, objectMap) {
 			var deferred = $q.defer();
 
 			rule.visible = true;
 			rule.open = (rule.children && rule.children.length > 0);
-			rule.kle.serviceTextPopover = htmlsave.truncate(rule.kle.serviceText, maxPopoverLength, { breakword:false });
+			rule.kle.serviceTextPopover = htmlsave.truncate(rule.kle.serviceText, maxPopoverLength, {breakword: false});
 
 			var promises = [];
 
-			if (rule.org > 0){
-				promises.push(getOrgUnit(rule.org).then(function(orgUnit){
+			if (rule.org > 0) {
+				promises.push(getOrgUnit(rule.org).then(function (orgUnit) {
 					rule.org = orgUnit;
 				}));
 			}
 
 			if (rule.responsible > 0) {
-				promises.push(getOrgUnit(rule.responsible).then(function(orgUnit){
+				promises.push(getOrgUnit(rule.responsible).then(function (orgUnit) {
 					rule.responsible = orgUnit;
 				}));
 			}
 
-			if (rule.employee > 0){
-				promises.push(getEmployment(rule.employee).then(function(employee){
+			if (rule.employee > 0) {
+				promises.push(getEmployment(rule.employee).then(function (employee) {
 					rule.employee = employee;
 				}));
 			}
@@ -215,30 +219,30 @@
 				}
 			}
 
-			$q.all(promises).then(function(){
+			$q.all(promises).then(function () {
 				deferred.resolve();
 			});
 
 			return deferred.promise;
 		}
 
-		function getOrgUnit(orgId){
+		function getOrgUnit(orgId) {
 			var deferred = $q.defer();
 
 			var promises = [];
 
-			promises.push(httpGet('/org-units/'+orgId).then(function(orgUnit){
-				if(orgUnit.managerId > 0){
-					promises.push(getEmployment(orgUnit.managerId).then(function(employment){
+			promises.push(httpGet('/org-units/' + orgId).then(function (orgUnit) {
+				if (orgUnit.managerId > 0) {
+					promises.push(getEmployment(orgUnit.managerId).then(function (employment) {
 						orgUnit.manager = employment;
 					}));
 				}
-				if(orgUnit.parentId > 0 && orgUnit.parent === undefined){
-					promises.push(getOrgUnit(orgUnit.parentId).then(function(loadedParent){
+				if (orgUnit.parentId > 0 && orgUnit.parent === undefined) {
+					promises.push(getOrgUnit(orgUnit.parentId).then(function (loadedParent) {
 						orgUnit.parent = loadedParent;
 					}));
 				}
-				$q.all(promises).then(function(){
+				$q.all(promises).then(function () {
 					deferred.resolve(orgUnit);
 				});
 			}));
@@ -248,7 +252,7 @@
 		function getRoles(userId) {
 			return httpGet('/users/' + userId + '/roles');
 		}
-		
+
 		function getAllUsers() {
 			return httpGet('/users');
 		}
@@ -257,42 +261,42 @@
 		 * Returns a list of orgUnits to choose from.
 		 * @returns {Object[]} OrgUnit - A list of all OrgUnits.
 		 */
-		function getOrgUnitsForResponsibility(municipalityId, currentEmploymentId, managedOnly){
-			var params = { municipalityId: municipalityId };
-			if(managedOnly && currentEmploymentId){
+		function getOrgUnitsForResponsibility(municipalityId, currentEmploymentId, managedOnly) {
+			var params = {municipalityId: municipalityId};
+			if (managedOnly && currentEmploymentId) {
 				params.employmentId = currentEmploymentId;
 			}
-			return httpGet('/org-units', params).then(function(orgUnits){
+			return httpGet('/org-units', params).then(function (orgUnits) {
 				// fetch manager employments
-				_.each(orgUnits, function(orgUnit){
-					if(orgUnit.managerId > 0){
-						getEmployment(orgUnit.managerId).then(function(employment){
+				_.each(orgUnits, function (orgUnit) {
+					if (orgUnit.managerId > 0) {
+						getEmployment(orgUnit.managerId).then(function (employment) {
 							orgUnit.manager = employment;
 						});
 					}
 				});
-				if(currentEmploymentId){
+				if (currentEmploymentId) {
 					setSubordinate(orgUnits, currentEmploymentId);
 				}
 				return orgUnits;
 			});
 		}
 
-		function setSubordinate(orgUnits, currentEmploymentId){
-			if(orgUnits && orgUnits.length && orgUnits.length > 0){
+		function setSubordinate(orgUnits, currentEmploymentId) {
+			if (orgUnits && orgUnits.length && orgUnits.length > 0) {
 				var orgUnitMap = {};
-				_.each(orgUnits, function(orgUnit){
+				_.each(orgUnits, function (orgUnit) {
 					orgUnitMap[orgUnit.id] = orgUnit;
 				});
-				_.each(orgUnits, function(orgUnit){
+				_.each(orgUnits, function (orgUnit) {
 					isSubordinate(orgUnit, currentEmploymentId, orgUnitMap);
 				});
 			}
 		}
 
-		function isSubordinate(orgUnit, currentEmploymentId, orgUnitMap){
-			if(orgUnit.managerId === currentEmploymentId) orgUnit.subordinate = true;
-			else if(orgUnit.parentId > 0) {
+		function isSubordinate(orgUnit, currentEmploymentId, orgUnitMap) {
+			if (orgUnit.managerId === currentEmploymentId) orgUnit.subordinate = true;
+			else if (orgUnit.parentId > 0) {
 				var parent = orgUnitMap[orgUnit.parentId];
 				orgUnit.subordinate = isSubordinate(parent, currentEmploymentId, orgUnitMap);
 			} else {
@@ -301,31 +305,35 @@
 			return orgUnit.subordinate;
 		}
 
-		function getEmployments(municipalityId, employmentId, managedOnly){
+		function getEmployments(municipalityId, employmentId, managedOnly) {
 			var params = {
 				municipalityId: municipalityId,
 				employmentId: employmentId
 			};
-			if(employmentId && managedOnly){
+			if (employmentId && managedOnly) {
 				params.managedOnly = true;
 			}
 			return httpGet('/employments', params);
 		}
 
-		function getEmployment(empId){
-			return httpGet('/employments/'+empId);
+		function getEmployment(empId) {
+			return httpGet('/employments/' + empId);
 		}
 
-		function employmentSearch(search){
+		function employmentSearch(search) {
 			return httpPost('/search/employments', search);
 		}
 
 		// updateType is either 'distribution' for distribution rules or 'responsibility' for assigning responsibility
 		function updateDistributionRule(distributionRule, updateType) {
+			var employee = null;
+			if (distributionRule.employee) {
+				employee = distributionRule.employee.id;
+			}
 			var distRule = new DistributionRule(distributionRule.id, distributionRule.parent.id,
 					new KLE(distributionRule.kle.id, distributionRule.number, distributionRule.name, distributionRule.serviceText),
-					distributionRule.org.id, distributionRule.employee.id, distributionRule.responsible.id);
-			return httpPost('/distribution-rules/'+distributionRule.id+'?type='+updateType, distRule);
+					distributionRule.org.id, employee, distributionRule.responsible.id);
+			return httpPost('/distribution-rules/' + distributionRule.id + '?type=' + updateType, distRule);
 		}
 
 		function getSubstitutes(userRole) {
@@ -341,23 +349,23 @@
 			return httpDelete("/roles/" + substitute.roleId);
 		}
 
-		function getMunicipalities(){
+		function getMunicipalities() {
 			return httpGet('/municipalities');
 		}
 
 		/**
 		 * @param name The name of the municipality
 		 */
-		function createMunicipality(name){
-			return httpPost('/municipalities', { name: name });
+		function createMunicipality(name) {
+			return httpPost('/municipalities', {name: name});
 		}
 
-		function updateMunicipality(municipality){
-			return httpPost('/municipalities/'+municipality.id, municipality);
+		function updateMunicipality(municipality) {
+			return httpPost('/municipalities/' + municipality.id, municipality);
 		}
 
-		function deleteMunicipality(municipality){
-			return httpDelete('/municipalities/'+municipality.id);
+		function deleteMunicipality(municipality) {
+			return httpDelete('/municipalities/' + municipality.id);
 		}
 
 		function buildRules(municipality) {
@@ -366,22 +374,22 @@
 			});
 		}
 
-		function getKlesForMunicipality(municipality){
-			if(municipality){
+		function getKlesForMunicipality(municipality) {
+			if (municipality) {
 				$log.info(municipality);
-				return httpGet('/municipalities/'+municipality.id+'/kle');
+				return httpGet('/municipalities/' + municipality.id + '/kle');
 			}
 		}
 
-		function saveMunicipalityKle(kle){
-			return httpPost('/municipalities/'+kle.municipalityId+'/kle', kle);
+		function saveMunicipalityKle(kle) {
+			return httpPost('/municipalities/' + kle.municipalityId + '/kle', kle);
 		}
 
-		function deleteMunicipalityKle(kle){
-			return httpDelete('/municipalities/'+kle.municipalityId+'/kle/'+kle.id);
+		function deleteMunicipalityKle(kle) {
+			return httpDelete('/municipalities/' + kle.municipalityId + '/kle/' + kle.id);
 		}
 
-		function getApiKey(municipality){
+		function getApiKey(municipality) {
 			if (municipality) {
 				return httpGet('/municipalities/' + municipality.id + '/apikey');
 			}
@@ -404,7 +412,7 @@
 		}
 
 		function getDefaultTextParamForMunicipality(municipality) {
-			return httpGet('/distribution-rules/text/names/default'+ '?municipalityId=' + municipality.id);
+			return httpGet('/distribution-rules/text/names/default' + '?municipalityId=' + municipality.id);
 		}
 
 		function setDefaultDateParamForMunicipality(municipality, dateParam) {
@@ -435,14 +443,14 @@
 			return httpPost('/distribution-rules/text/names' + '?municipalityId=' + municipality.id, parameter);
 		}
 
-		function getFullLog(){
+		function getFullLog() {
 			return httpGet('/auditlog');
 		}
 
-		function getFullLogCsv(){
+		function getFullLogCsv() {
 			return httpGet('/auditlog/csv');
 		}
-		
+
 		// DTO classes.
 
 		/**
@@ -456,7 +464,7 @@
 		 * @returns {{id: *, name: *, loggedIn: *, municipality: *}}
 		 * @constructor
 		 */
-		function User(id, name, loggedIn, municipality){
+		function User(id, name, loggedIn, municipality) {
 			return {
 				id: id,
 				name: name,
@@ -475,7 +483,7 @@
 		 * @returns {{id: *, name: *, active: *}}
 		 * @constructor
 		 */
-		function Municipality(id, name, active){
+		function Municipality(id, name, active) {
 			return {
 				id: id,
 				name: name,
@@ -497,13 +505,13 @@
 		 */
 		function OrgUnit(id, parentId, managerId, name, esdhId, email, phone) {
 			return {
-				id:id,
-				parentId:parentId,
-				managerId:managerId,
-				name:name,
-				esdhId:esdhId,
-				email:email,
-				phone:phone
+				id: id,
+				parentId: parentId,
+				managerId: managerId,
+				name: name,
+				esdhId: esdhId,
+				email: email,
+				phone: phone
 			};
 		}
 
@@ -516,12 +524,12 @@
 		 * @property {string} name The common name of the KLE topic.
 		 * @property {string} serviceText A description of the KLE including HTML formatting.
 		 */
-		function KLE(id, number, name, serviceText){
+		function KLE(id, number, name, serviceText) {
 			return {
-				id:id,
-				number:number,
-				name:name,
-				serviceText:serviceText
+				id: id,
+				number: number,
+				name: name,
+				serviceText: serviceText
 			};
 		}
 
@@ -536,14 +544,14 @@
 		 * @property {number} employee The system id of the employment that handles request on KLE.
 		 * @property {number} responsible The system id of the employment that manages this rule.
 		 */
-		function DistributionRule(id, parent, kle, org, employee, responsible){
+		function DistributionRule(id, parent, kle, org, employee, responsible) {
 			return {
-				id:id,
+				id: id,
 				parent: parent,
-				kle:kle,
-				org:org,
-				employee:employee,
-				responsible:responsible
+				kle: kle,
+				org: org,
+				employee: employee,
+				responsible: responsible
 			};
 		}
 
@@ -558,13 +566,13 @@
 		 * @property {string} initials The initials of the employee.
 		 * @property {string} jobTitle The job title of the employee.
 		 */
-		function Employment(id, name, email, esdhId, initials, jobTitle){
+		function Employment(id, name, email, esdhId, initials, jobTitle) {
 			return {
-				id:id,
-				name:name,
-				email:email,
-				esdhId:esdhId,
-				intitials:initials,
+				id: id,
+				name: name,
+				email: email,
+				esdhId: esdhId,
+				intitials: initials,
 				jobTitle: jobTitle
 			};
 		}
@@ -580,7 +588,7 @@
 		 * @returns {{page: *, pageSize: *, nameTerm: *, initialsTerm: *}}
 		 * @constructor
 		 */
-		function EmploymentSearch(page, pageSize, nameTerm, initialsTerm, totalMatches, results){
+		function EmploymentSearch(page, pageSize, nameTerm, initialsTerm, totalMatches, results) {
 			return {
 				page: page,
 				pageSize: pageSize,
@@ -626,7 +634,7 @@
 						appSpinner.hideSpinner();
 						return response.data;
 					},
-					function(reason){
+					function (reason) {
 						appSpinner.hideSpinner();
 						return $q.reject(reason);
 					});

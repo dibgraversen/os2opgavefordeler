@@ -1,5 +1,7 @@
 package dk.os2opgavefordeler.rest;
 
+import dk.os2opgavefordeler.auth.AuthService;
+import dk.os2opgavefordeler.auth.UserLoggedIn;
 import dk.os2opgavefordeler.model.presentation.EmploymentPO;
 import dk.os2opgavefordeler.model.presentation.SimpleMessage;
 import dk.os2opgavefordeler.service.BadRequestArgumentException;
@@ -15,14 +17,18 @@ import javax.ws.rs.core.Response;
 import java.util.List;
 import java.util.Optional;
 
+@UserLoggedIn
 @Path("/employments")
 @RequestScoped
-public class EmploymentEndpoint {
+public class EmploymentEndpoint extends Endpoint {
 	@Inject
 	Logger log;
 
 	@Inject
 	EmploymentService employmentService;
+
+	@Inject
+	private AuthService authService;
 
 	@GET
 	@Path("/")
@@ -40,13 +46,13 @@ public class EmploymentEndpoint {
 				employees = employmentService.getAllPO(municipalityId, employmentId);
 			}
 			if(!employees.isEmpty()) {
-				return Response.ok().entity(employees).build();
+				return ok(employees);
 			} else {
-				return Response.status(404).build();
+				return notFound();
 			}
 		}
 		catch(BadRequestArgumentException e) {
-			return Response.status(Response.Status.BAD_REQUEST).entity(new SimpleMessage(e.getMessage())).build();
+			return badRequest(e.getMessage());
 		}
 	}
 
@@ -66,5 +72,19 @@ public class EmploymentEndpoint {
 		} catch (BadRequestArgumentException e) {
 			return Response.status(Response.Status.BAD_REQUEST).entity(new SimpleMessage(e.getMessage())).build();
 		}
+	}
+
+	@GET
+	@Path("/{empId}/subordinates")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getSubordinates(@PathParam("empId") Long employmentId){
+		if(authService.hasEmployment(employmentId))
+		try {
+			Validate.nonZero(employmentId, "Invalid employmentId");
+		} catch (BadRequestArgumentException e) {
+			return  Response.status(Response.Status.BAD_REQUEST).entity(new SimpleMessage(e.getMessage())).build();
+		}
+		final List<EmploymentPO> result = employmentService.getSubordinates(employmentId);
+		return ok(result);
 	}
 }
