@@ -1,5 +1,6 @@
 package dk.os2opgavefordeler.rest;
 
+import dk.os2opgavefordeler.auth.AdminRequired;
 import dk.os2opgavefordeler.auth.AuthService;
 import dk.os2opgavefordeler.auth.UserLoggedIn;
 import dk.os2opgavefordeler.repository.MunicipalityRepository;
@@ -83,8 +84,8 @@ public class UserEndpoint {
 	@Path("/")
 	@Consumes("application/json")
 	@Produces("application/json")
+	@AdminRequired
 	public Response create(User user) {
-		// TODO admin functionality
 		log.info("Creating user: {}", user.toString());
 
 		Municipality municipality = municipalityRepository.findBy(user.getMunicipality().getId());
@@ -98,8 +99,8 @@ public class UserEndpoint {
 	@DELETE
 	@Path("/{userId}")
 	@Produces("application/json")
+	@AdminRequired
 	public Response delete(@PathParam("userId") long userId) {
-		// TODO admin functionality
 		Optional<User> user = userService.findByEmail(authService.getAuthentication().getEmail());
 
 		if (user.isPresent()) {

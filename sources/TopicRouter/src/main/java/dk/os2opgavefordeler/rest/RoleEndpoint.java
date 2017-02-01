@@ -1,5 +1,6 @@
 package dk.os2opgavefordeler.rest;
 
+import dk.os2opgavefordeler.auth.AdminRequired;
 import dk.os2opgavefordeler.auth.AuthService;
 import dk.os2opgavefordeler.auth.UserLoggedIn;
 import dk.os2opgavefordeler.auth.openid.OpenIdAuthenticationFlow;
@@ -143,10 +144,10 @@ public class RoleEndpoint {
 		}
 	}
 
-	// TODO sys adm functionality?
 	@POST
 	@Path("/{roleId}/municipalityadmin/{valueId}")
 	@Produces(MediaType.APPLICATION_JSON)
+	@AdminRequired
 	public Response setMunicipalityAdmin(@PathParam("roleId") Long roleId, @PathParam("valueId") Long valueId) {
 		if (userService.isAdmin(authService.getAuthentication().getEmail())) {
 			try {
@@ -175,10 +176,10 @@ public class RoleEndpoint {
 		}
 	}
 
-	// TODO sys adm functionality
 	@POST
 	@Path("/{roleId}/admin/{valueId}")
 	@Produces(MediaType.APPLICATION_JSON)
+	@AdminRequired
 	public Response setAdmin(@PathParam("roleId") Long roleId, @PathParam("valueId") Long valueId) {
 		if (userService.isAdmin(authService.getAuthentication().getEmail())) {
 			try {
