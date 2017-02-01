@@ -115,6 +115,7 @@ public class BootstrappingDataProviderSingleton {
 		addUser("Henrik Løvborg", "hlo@miracle.dk", miracle, buildRole("Henrik Løvborg", "hlo@miracle.dk", true, true, true));
 		addUser("Simon Møgelvang Bang", "smb@miracle.dk", miracle, buildRoles());
 		addUser("Sune Marcher", "sum@miracle.dk", miracle, buildRoles());
+		addUser("Rasmus Rosendal", "rro@miracle.dk", miracle, buildRole("Rasmus Rosendal", "rro@miracle.dk", true, true, true));
 		List<Role> syddsjursRoles = new ArrayList<>();
 		syddsjursRoles.add(Role.builder().name("Henrik (Syddjurs)").admin(true).municipalityAdmin(true).build());
 		addUser("Henrik", "henrikloevborg@syddjurs.dk", syddjurs, syddsjursRoles);
