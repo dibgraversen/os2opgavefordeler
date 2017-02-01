@@ -1,6 +1,7 @@
 package dk.os2opgavefordeler.rest;
 
 import dk.os2opgavefordeler.auth.AuthService;
+import dk.os2opgavefordeler.auth.UserLoggedIn;
 import dk.os2opgavefordeler.logging.AuditLogger;
 import dk.os2opgavefordeler.model.*;
 import dk.os2opgavefordeler.model.presentation.DistributionRulePO;
@@ -20,9 +21,11 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+@UserLoggedIn
 @Path("/distribution-rules")
 @RequestScoped
 public class DistributionRuleEndpoint extends Endpoint {
+
 	@Inject
 	Logger log;
 
@@ -50,8 +53,6 @@ public class DistributionRuleEndpoint extends Endpoint {
 	@Inject
 	private AuditLogger auditLogger;
 
-	private static final String NOT_LOGGED_IN = "Der er ikke en gyldig session.";
-	private static final String NOT_AUTHORIZED = "Not authorized";
 	private static final String USER_NOT_FOUND = "Bruger ikke fundet.";
 	private static final String INVALID_MUNICIPALITY_ID = "Denne bruger er ikke tilknyttet aktiv kommune.";
 	private static final String NO_ORGUNIT_FOUND_FOR_USER = "Bruger er ikke knyttet til afdeling, derfor kan der ikke findes fordelingsregler.";
@@ -123,10 +124,6 @@ public class DistributionRuleEndpoint extends Endpoint {
 		if(!validUpdateTypes.contains(type)){
 			log.warn("invalid update type given. Type: "+type);
 			return badRequest("Invalid type given as parameter.");
-		}
-		if (!authService.isAuthenticated()) {
-			log.warn("returning from not authenticated");
-			return Response.status(Response.Status.UNAUTHORIZED).entity(NOT_LOGGED_IN).build();
 		}
 		Optional<User> user = userService.findByEmail(authService.getAuthentication().getEmail());
 		if(!user.isPresent()){
@@ -246,6 +243,7 @@ public class DistributionRuleEndpoint extends Endpoint {
 		}
 	}
 
+	// TODO admin rights
 	@GET
 	@Path("/buildRules")
 	public Response buildRulesForMunicipality(@QueryParam("municipalityId") long municipalityId) {
@@ -272,6 +270,7 @@ public class DistributionRuleEndpoint extends Endpoint {
 		}
 	}
 
+	// TODO municipality admin rights
 	@POST
 	@Path("/text/names")
 	@Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
@@ -285,6 +284,7 @@ public class DistributionRuleEndpoint extends Endpoint {
 		}
 	}
 
+	// TODO municipality admin rights
 	@DELETE
 	@Path("/text/names/{filterNameId}")
 	@Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
@@ -300,6 +300,7 @@ public class DistributionRuleEndpoint extends Endpoint {
 		}
 	}
 
+	// TODO municipality admin rights
 	@DELETE
 	@Path("/date/names/{filterNameId}")
 	@Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
@@ -328,6 +329,7 @@ public class DistributionRuleEndpoint extends Endpoint {
 		}
 	}
 
+	// TODO municipality admin rights
 	@POST
 	@Path("/text/names/default/{filterNameId}")
 	@Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
@@ -356,6 +358,7 @@ public class DistributionRuleEndpoint extends Endpoint {
 		}
 	}
 
+	// TODO municipality admin rights
 	@POST
 	@Path("/date/names")
 	@Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
@@ -382,6 +385,7 @@ public class DistributionRuleEndpoint extends Endpoint {
 		}
 	}
 
+	// TODO municipality admin rights
 	@POST
 	@Path("/date/names/default/{filterNameId}")
 	@Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")

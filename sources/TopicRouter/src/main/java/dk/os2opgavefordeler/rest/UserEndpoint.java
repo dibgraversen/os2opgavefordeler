@@ -1,6 +1,7 @@
 package dk.os2opgavefordeler.rest;
 
 import dk.os2opgavefordeler.auth.AuthService;
+import dk.os2opgavefordeler.auth.UserLoggedIn;
 import dk.os2opgavefordeler.repository.MunicipalityRepository;
 import dk.os2opgavefordeler.repository.UserRepository;
 import dk.os2opgavefordeler.model.Municipality;
@@ -25,6 +26,7 @@ import java.util.Optional;
 /**
  * @author hlo@miracle.dk
  */
+@UserLoggedIn
 @Path("/users")
 public class UserEndpoint {
 	@Inject
@@ -50,12 +52,7 @@ public class UserEndpoint {
 	@Produces(MediaType.APPLICATION_JSON)
 	@NoCache
 	public Response getUsers() {
-		if (!authService.isAuthenticated()) {
-			return Response.status(Response.Status.UNAUTHORIZED).entity("Not logged in").build();
-		}
-
 		Optional<User> user = userService.findByEmail(authService.getAuthentication().getEmail());
-
 		if (user.isPresent()) {
 			if (userService.isAdmin(user.get().getId())) {
 				return Response.ok().entity(userService.getAllUsers()).build();
@@ -73,9 +70,6 @@ public class UserEndpoint {
 	@NoCache
 	public Response getUserInfo() {
 		log.info("Returning user info for {}", authService.getAuthentication());
-		if (!authService.isAuthenticated()) {
-			return Response.ok().entity(UserInfoPO.INVALID).build();
-		}
 		try {
 			return Response.ok().entity(new UserInfoPO(userRepository.findByEmail(authService.getAuthentication().getEmail())))
 					.build();
@@ -90,6 +84,7 @@ public class UserEndpoint {
 	@Consumes("application/json")
 	@Produces("application/json")
 	public Response create(User user) {
+		// TODO admin functionality
 		log.info("Creating user: {}", user.toString());
 
 		Municipality municipality = municipalityRepository.findBy(user.getMunicipality().getId());
@@ -104,10 +99,7 @@ public class UserEndpoint {
 	@Path("/{userId}")
 	@Produces("application/json")
 	public Response delete(@PathParam("userId") long userId) {
-		if (!authService.isAuthenticated()) {
-			return Response.status(Response.Status.UNAUTHORIZED).entity("Not logged in").build();
-		}
-
+		// TODO admin functionality
 		Optional<User> user = userService.findByEmail(authService.getAuthentication().getEmail());
 
 		if (user.isPresent()) {
@@ -148,7 +140,6 @@ public class UserEndpoint {
 			log.warn("invalid userId");
 			return Response.status(Response.Status.BAD_REQUEST).entity("invalid userId").build();
 		}
-
 		return Response.ok(userService.getSettingsPO(userId)).build();
 	}
 

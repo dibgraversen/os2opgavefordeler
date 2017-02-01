@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
+import dk.os2opgavefordeler.auth.UserLoggedIn;
 import dk.os2opgavefordeler.model.Kle;
 import dk.os2opgavefordeler.service.KleService;
 import org.jboss.resteasy.annotations.cache.NoCache;
@@ -18,6 +19,7 @@ import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 import dk.os2opgavefordeler.service.KleImportService;
 import org.slf4j.Logger;
 
+@UserLoggedIn
 @Path("/kle")
 @RequestScoped
 public class KleRestEndpoint extends Endpoint {
@@ -69,6 +71,8 @@ public class KleRestEndpoint extends Endpoint {
 			Response.status(Response.Status.NOT_FOUND).build();
 	}
 
+	// TODO admin functionality
+	// TODO verify functionality
 	@POST @NoCache
 	@Path("/import")
 	@Produces("text/plain")

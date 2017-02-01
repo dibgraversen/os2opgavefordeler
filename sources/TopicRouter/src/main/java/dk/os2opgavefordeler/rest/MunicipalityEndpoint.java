@@ -1,6 +1,7 @@
 package dk.os2opgavefordeler.rest;
 
 import dk.os2opgavefordeler.auth.AuthService;
+import dk.os2opgavefordeler.auth.UserLoggedIn;
 import dk.os2opgavefordeler.repository.MunicipalityRepository;
 import dk.os2opgavefordeler.repository.OrgUnitRepository;
 import dk.os2opgavefordeler.repository.UserRepository;
@@ -26,23 +27,24 @@ import java.util.List;
 /**
  * @author hlo@miracle.dk
  */
+@UserLoggedIn
 @Path("/municipalities")
 public class MunicipalityEndpoint extends Endpoint {
 
-    @Inject
-    Logger log;
+	@Inject
+	Logger log;
 
-    @Inject
-    MunicipalityService municipalityService;
+	@Inject
+	MunicipalityService municipalityService;
 
-    @Inject
-    private OrgUnitRepository orgUnitRepository;
+	@Inject
+	private OrgUnitRepository orgUnitRepository;
 
-    @Inject
-    private MunicipalityRepository municipalityRepository;
+	@Inject
+	private MunicipalityRepository municipalityRepository;
 
-    @Inject
-    private EntityManager entityManager;
+	@Inject
+	private EntityManager entityManager;
 
 	@Inject
 	private AuthService authService;
@@ -53,177 +55,177 @@ public class MunicipalityEndpoint extends Endpoint {
 	@Inject
 	private UserService userService;
 
-    @GET
-    @Path("/")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getMunicipalities() {
-        List<Municipality> result = municipalityService.getMunicipalities();
-        return ok(result);
-    }
+	@GET
+	@Path("/")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getMunicipalities() {
+		List<Municipality> result = municipalityService.getMunicipalities();
+		return ok(result);
+	}
 
-    @DELETE
-    @Path("/{municipalityId}")
-    @Produces("application/json")
-    public Response deleteMunicipality(@PathParam("municipalityId") long municipalityId) {
-	    log.info("Deleting structure for municipality with ID: {}", municipalityId);
+	// TODO sys adm functionality
+	@DELETE
+	@Path("/{municipalityId}")
+	@Produces("application/json")
+	public Response deleteMunicipality(@PathParam("municipalityId") long municipalityId) {
+		log.info("Deleting structure for municipality with ID: {}", municipalityId);
 
-	    // start transaction
-        EntityTransaction transaction = entityManager.getTransaction();
-        transaction.begin();
+		// start transaction
+		EntityTransaction transaction = entityManager.getTransaction();
+		transaction.begin();
 
-	    // prepare query statements
-	    StringBuilder sb = new StringBuilder();
+		// TODO delegate this to service - if even appropriate.
 
-	    sb.append("DELETE FROM distributionrule_distributionrulefilter WHERE distributionrule_id IN (SELECT id FROM distributionrule WHERE municipality_id = ");
-	    sb.append(municipalityId);
-	    sb.append(");");
+		// prepare query statements
+		StringBuilder sb = new StringBuilder();
 
-	    sb.append("DELETE FROM distributionrulefilter drf WHERE drf.distributionrule_id IN (SELECT id FROM distributionrule WHERE municipality_id = ");
-	    sb.append(municipalityId);
-	    sb.append(");");
+		sb.append("DELETE FROM distributionrule_distributionrulefilter WHERE distributionrule_id IN (SELECT id FROM distributionrule WHERE municipality_id = ");
+		sb.append(municipalityId);
+		sb.append(");");
 
-	    sb.append("DELETE FROM distributionrule WHERE municipality_id = ");
-	    sb.append(municipalityId);
-	    sb.append(";");
+		sb.append("DELETE FROM distributionrulefilter drf WHERE drf.distributionrule_id IN (SELECT id FROM distributionrule WHERE municipality_id = ");
+		sb.append(municipalityId);
+		sb.append(");");
 
-	    sb.append("DELETE FROM role r WHERE r.employment_id IN (SELECT id FROM employment WHERE municipality_id = ");
-	    sb.append(municipalityId);
-	    sb.append(");");
+		sb.append("DELETE FROM distributionrule WHERE municipality_id = ");
+		sb.append(municipalityId);
+		sb.append(";");
 
-	    sb.append("UPDATE employment SET employedin_id = NULL WHERE municipality_id = ");
-	    sb.append(municipalityId);
-	    sb.append(";");
+		sb.append("DELETE FROM role r WHERE r.employment_id IN (SELECT id FROM employment WHERE municipality_id = ");
+		sb.append(municipalityId);
+		sb.append(");");
 
-	    sb.append("UPDATE orgunit SET manager_id = NULL WHERE municipality_id = ");
-	    sb.append(municipalityId);
-	    sb.append(";");
+		sb.append("UPDATE employment SET employedin_id = NULL WHERE municipality_id = ");
+		sb.append(municipalityId);
+		sb.append(";");
 
-	    sb.append("DELETE FROM employment WHERE municipality_id = ");
-	    sb.append(municipalityId);
-	    sb.append(";");
+		sb.append("UPDATE orgunit SET manager_id = NULL WHERE municipality_id = ");
+		sb.append(municipalityId);
+		sb.append(";");
 
-	    sb.append("DELETE FROM orgunit WHERE municipality_id = ");
-	    sb.append(municipalityId);
-	    sb.append(";");
+		sb.append("DELETE FROM employment WHERE municipality_id = ");
+		sb.append(municipalityId);
+		sb.append(";");
 
-	    sb.append("DELETE FROM tr_user WHERE municipality_id = ");
-	    sb.append(municipalityId);
-	    sb.append(";");
+		sb.append("DELETE FROM orgunit WHERE municipality_id = ");
+		sb.append(municipalityId);
+		sb.append(";");
 
-	    sb.append("DELETE FROM kle WHERE municipality_id = ");
-	    sb.append(municipalityId);
-	    sb.append(";");
+		sb.append("DELETE FROM tr_user WHERE municipality_id = ");
+		sb.append(municipalityId);
+		sb.append(";");
 
-	    sb.append("DELETE FROM municipality WHERE id = ");
-	    sb.append(municipalityId);
-	    sb.append(";");
+		sb.append("DELETE FROM kle WHERE municipality_id = ");
+		sb.append(municipalityId);
+		sb.append(";");
 
-	    // create query
-	    Query query = entityManager.createNativeQuery(sb.toString());
+		sb.append("DELETE FROM municipality WHERE id = ");
+		sb.append(municipalityId);
+		sb.append(";");
 
-	    // execute the delete statements in the query and commit the transaction
-	    query.executeUpdate();
-        transaction.commit();
+		// create query
+		Query query = entityManager.createNativeQuery(sb.toString());
 
-        return ok();
-    }
+		// execute the delete statements in the query and commit the transaction
+		query.executeUpdate();
+		transaction.commit();
 
-    @POST
-    @Path("/")
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response createMunicipality(Municipality municipality) {
-        log.info("Creating municipality: {}", municipality);
+		return ok();
+	}
 
-        Municipality result = municipalityService.createMunicipality(municipality);
+	// TODO sys adm functionality
+	@POST
+	@Path("/")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response createMunicipality(Municipality municipality) {
+		log.info("Creating municipality: {}", municipality);
 
-        log.info("Municipality created: {}", municipality);
-        return ok(result);
-    }
+		Municipality result = municipalityService.createMunicipality(municipality);
 
-    @POST
-    @Path("/{municipalityId}")
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response createMunicipality(@PathParam("municipalityId") long municipalityId, Municipality municipality) {
-        Municipality result = municipalityService.createOrUpdateMunicipality(municipality);
-        return ok(result);
-    }
+		log.info("Municipality created: {}", municipality);
+		return ok(result);
+	}
 
-    @GET
-    @Path("/{municipalityId}/kle")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getMunicipalityKle(@PathParam("municipalityId") Long municipalityId) {
-        if (municipalityId == null) {
-            return badRequest("You need to specify municipalityId");
-        }
-        List<KlePO> result = municipalityService.getMunicipalityKle(municipalityId);
-        return ok(result);
-    }
+	// TODO sys adm functionality
+	@POST
+	@Path("/{municipalityId}")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response createMunicipality(@PathParam("municipalityId") long municipalityId, Municipality municipality) {
+		Municipality result = municipalityService.createOrUpdateMunicipality(municipality);
+		return ok(result);
+	}
 
-    @POST
-    @Path("/{municipalityId}/kle")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response saveMunicipalityKle(KlePO kle) {
-        if (kle == null) {
-            return badRequest("You need to provide a valid KlePO");
-        }
-        try {
-            KlePO result = municipalityService.saveMunicipalityKle(kle);
-            return ok(result);
-        } catch (ValidationException ve) {
-            return badRequest(ve.getMessage());
-        }
-    }
+	@GET
+	@Path("/{municipalityId}/kle")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getMunicipalityKle(@PathParam("municipalityId") Long municipalityId) {
+		if (municipalityId == null) {
+			return badRequest("You need to specify municipalityId");
+		}
+		List<KlePO> result = municipalityService.getMunicipalityKle(municipalityId);
+		return ok(result);
+	}
 
-    @DELETE
-    @Path("/{municipalityId}/kle/{id}")
-    public Response deleteMunicipalityId(@PathParam("municipalityId") Long municipalityId, @PathParam("id") Long kleId) {
-        if (municipalityId == null || kleId == null) {
-            return badRequest("You need to provide valid municipalityId and kleId");
-        }
+	// TODO municipality admin functionality
+	@POST
+	@Path("/{municipalityId}/kle")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response saveMunicipalityKle(KlePO kle) {
+		if (kle == null) {
+			return badRequest("You need to provide a valid KlePO");
+		}
+		try {
+			KlePO result = municipalityService.saveMunicipalityKle(kle);
+			return ok(result);
+		} catch (ValidationException ve) {
+			return badRequest(ve.getMessage());
+		}
+	}
 
-        try {
-            municipalityService.deleteMunicipalityKle(municipalityId, kleId);
-            return ok(kleId);
-        }
-        catch (ValidationException e) {
-            return badRequest(e.getMessage());
-        }
-    }
+	// TODO municipality admin functionality
+	@DELETE
+	@Path("/{municipalityId}/kle/{id}")
+	public Response deleteMunicipalityKle(@PathParam("municipalityId") Long municipalityId, @PathParam("id") Long kleId) {
+		if (municipalityId == null || kleId == null) {
+			return badRequest("You need to provide valid municipalityId and kleId");
+		}
 
-    @GET
-    @Path("/{municipalityId}/apikey")
-    @Produces(MediaType.APPLICATION_JSON)
-    @NoCache
-    public Response getApiKey(@PathParam("municipalityId") long municipalityId) {
-	    if (!authService.isAuthenticated()) {
-            return Response.status(Response.Status.UNAUTHORIZED).build();
-        }
+		try {
+			municipalityService.deleteMunicipalityKle(municipalityId, kleId);
+			return ok(kleId);
+		} catch (ValidationException e) {
+			return badRequest(e.getMessage());
+		}
+	}
 
-	    if (permissionsOk(municipalityId)) {
-		    String apiKey = municipalityService.getApiKey(municipalityId);
-		    return ok(new ApiKeyPO(apiKey));
-	    }
+	// TODO municipality admin functionality
+	@GET
+	@Path("/{municipalityId}/apikey")
+	@Produces(MediaType.APPLICATION_JSON)
+	@NoCache
+	public Response getApiKey(@PathParam("municipalityId") long municipalityId) {
+		if (permissionsOk(municipalityId)) {
+			String apiKey = municipalityService.getApiKey(municipalityId);
+			return ok(new ApiKeyPO(apiKey));
+		} else {
+			return badRequest("could not find municipality or validate permissions.");
+		}
+	}
 
-	    return Response.status(Response.Status.UNAUTHORIZED).build();
-    }
-
+	// TODO municipality admin functionality
 	@POST
 	@Path("/{municipalityId}/apikey/{apiKey}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response setApiKey(@PathParam("municipalityId") long municipalityId, @PathParam("apiKey") String apiKey) {
-		if (!authService.isAuthenticated()) {
-			return Response.status(Response.Status.UNAUTHORIZED).build();
-		}
-
 		if (permissionsOk(municipalityId)) {
 			municipalityService.setApiKey(municipalityId, apiKey);
 			return ok(new ApiKeyPO(apiKey));
+		} else {
+			return badRequest("could not find municipality or validate permissions.");
 		}
-
-		return Response.status(Response.Status.UNAUTHORIZED).build();
 	}
 
 	private boolean permissionsOk(long municipalityId) {
