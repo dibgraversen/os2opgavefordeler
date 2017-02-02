@@ -42,6 +42,13 @@ public class AuthService {
 	public boolean isAdmin() { return userService.isAdmin(currentUser().getEmail()); }
 
 	/**
+	 * Checks wether the user has municipality admin rights
+	 *
+	 * @return true if the user has municipality admin rights
+	 */
+	public boolean isMunicipalityAdmin() { return userService.isMunicipalityAdmin(currentUser().getId()); }
+
+	/**
 	 * Returns authentication information
 	 *
 	 * @return current authentication info.
