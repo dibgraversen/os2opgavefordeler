@@ -1,5 +1,6 @@
 package dk.os2opgavefordeler.rest;
 
+import dk.os2opgavefordeler.auth.AdminRequired;
 import dk.os2opgavefordeler.auth.AuthService;
 import dk.os2opgavefordeler.auth.UserLoggedIn;
 import dk.os2opgavefordeler.logging.AuditLogger;
@@ -243,9 +244,9 @@ public class DistributionRuleEndpoint extends Endpoint {
 		}
 	}
 
-	// TODO admin rights
 	@GET
 	@Path("/buildRules")
+	@AdminRequired
 	public Response buildRulesForMunicipality(@QueryParam("municipalityId") long municipalityId) {
 		if (municipalityId < 0) {
 			log.info("buildRules - bad request[{}]", municipalityId);

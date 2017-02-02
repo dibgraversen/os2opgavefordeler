@@ -1,5 +1,6 @@
 package dk.os2opgavefordeler.rest;
 
+import dk.os2opgavefordeler.auth.AdminRequired;
 import dk.os2opgavefordeler.auth.AuthService;
 import dk.os2opgavefordeler.auth.UserLoggedIn;
 import dk.os2opgavefordeler.repository.MunicipalityRepository;
@@ -63,10 +64,10 @@ public class MunicipalityEndpoint extends Endpoint {
 		return ok(result);
 	}
 
-	// TODO sys adm functionality
 	@DELETE
 	@Path("/{municipalityId}")
 	@Produces("application/json")
+	@AdminRequired
 	public Response deleteMunicipality(@PathParam("municipalityId") long municipalityId) {
 		log.info("Deleting structure for municipality with ID: {}", municipalityId);
 
@@ -133,11 +134,11 @@ public class MunicipalityEndpoint extends Endpoint {
 		return ok();
 	}
 
-	// TODO sys adm functionality
 	@POST
 	@Path("/")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
+	@AdminRequired
 	public Response createMunicipality(Municipality municipality) {
 		log.info("Creating municipality: {}", municipality);
 
@@ -147,11 +148,11 @@ public class MunicipalityEndpoint extends Endpoint {
 		return ok(result);
 	}
 
-	// TODO sys adm functionality
 	@POST
 	@Path("/{municipalityId}")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
+	@AdminRequired
 	public Response createMunicipality(@PathParam("municipalityId") long municipalityId, Municipality municipality) {
 		Municipality result = municipalityService.createOrUpdateMunicipality(municipality);
 		return ok(result);
