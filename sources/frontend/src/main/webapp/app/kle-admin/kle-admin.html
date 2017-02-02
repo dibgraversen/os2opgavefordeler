@@ -68,4 +68,23 @@
 			</tab>
 		</tabset>
 	</div>
-</div>
+
+	<div class="col-md-12">
+		<div data-ng-repeat="firstKle in restKles['KLE']">
+
+			<a class="list-group-item" ng-click="firstKle['visible'] = !firstKle['visible']">
+				<span class="glyphicon hover" ng-class="firstKle['visible'] ? 'glyphicon-chevron-down' : 'glyphicon-chevron-right' "></span>
+				{{firstKle.number}} {{firstKle.serviceText}}
+			</a>
+			<div data-ng-repeat="secondKle in firstKle.children" data-ng-show="firstKle['visible']">
+				<a class="list-group-item" ng-click="secondKle['visible'] = !secondKle['visible']">
+					<span class="glyphicon hover" ng-class="secondKle['visible'] ? 'glyphicon-chevron-down' : 'glyphicon-chevron-right' "></span>
+						{{secondKle.number}} {{secondKle.serviceText}}
+				</a>
+
+				<div  data-ng-repeat="thirdKle in secondKle.children" data-ng-show="secondKle['visible']">
+						<a class="list-group-item">{{thirdKle.number}} {{thirdKle.serviceText}}</a>
+				</div>
+			<div>
+		</div>
+	</div>

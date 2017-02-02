@@ -1,6 +1,7 @@
 (function () {
 	'use strict';
 
+
 	angular.module('topicRouter').factory('orgUnitService', orgUnitService);
 
 	orgUnitService.$inject = ['$http', '$q', '$timeout', '$cacheFactory', 'serverUrl', 'appSpinner', '$log'];
@@ -11,7 +12,8 @@
 			getKLEs: getKLEs,
 			containsKle: containsKle,
 			addKle : addKle,
-			removeKle : removeKle
+			removeKle : removeKle,
+			getRestKles : getRestKles
 		};
 
 		return service;
@@ -43,7 +45,9 @@
 		}
 
 		function addKle(kle,orgunit){
-			var func = function(orgunit,kle) {		};
+			var func = function(orgunit,kle) {	
+				//console.log(klesFromService);
+				};
 			return simulateRestCall(func);
 		}
 
@@ -65,14 +69,16 @@
 				return false;
 			}
 
- 		   for(let aKle of orgUnit.kles){
-				if( aKle.kle.id == kle.id && assignmentType == aKle.assignmentType){
+ 		   for(var i = 0; i < orgUnit.kles.length; i++){
+				if( orgUnit.kles[i].kle.id == kle.id && assignmentType == orgUnit.kles[i].assignmentType){
 					return true;
 				}
 			}
 
+
 			return false;
 		}
+
 
 		function OrgUnit(id, parentId, managerId, name, esdhId, email, phone, kles) {
 			return {
@@ -113,5 +119,127 @@
 				responsible: responsible
 			};
 		}
+
+
+	function getRestKles(){
+		var simulateCallToGetKles = function (){
+				return { "KLE": [
+				  {
+				    "number": "00",
+				    "serviceText": "Kommunens styrelse",
+				    "children": [
+				      {
+				        "number": "00.05",
+				        "serviceText": "Besøg, repræsentation mv.",
+				        "children": [
+				          {
+				            "number": "00.05.01",
+				            "serviceText": "Venskabsbysamarbejde",
+				            "children": []
+				          },
+				          {
+				            "number": "00.05.10",
+				            "serviceText": "Gaver til og fra kommunen/institutionen",
+				            "children": []
+				          }
+				        ]
+				      },
+				      {
+				        "number": "00.17",
+				        "serviceText": "Kommunalt/tværsektorielt samarbejde  Servicetekst  Stikord",
+				        "children": [
+				          {
+				            "number": "00.17.15",
+				            "serviceText": "Kommunale samarbejder",
+				            "children": []
+				          },
+				          {
+				            "number": "00.17.20",
+				            "serviceText": "Aftaler om samarbejde mellem kommuner (kommunale fællesskaber)",
+				            "children": []
+				          }
+				        ]
+				      }
+				    ]
+				  },
+				  {
+				    "number": "03",
+				    "serviceText": "Boliger",
+				    "children": [
+				      {
+				        "number": "03.01",
+				        "serviceText": "Benyttelse af boliger",
+				        "children": [
+				          {
+				            "number": "03.01.00",
+				            "serviceText": "Benyttelse af boliger i almindelighed",
+				            "children": []
+				          },
+				          {
+				            "number": "03.01.03",
+				            "serviceText": "Nedlæggelse af boliger",
+				            "children": []
+				          }
+				        ]
+				      },
+				      {
+				        "number": "03.22",
+				        "serviceText": "Friplejeboliger",
+				        "children": [
+				          {
+				            "number": "03.22.00",
+				            "serviceText": "Friplejeboliger i almindelighed",
+				            "children": []
+				          },
+				          {
+				            "number": "03.22.05",
+				            "serviceText": "Etablering af friplejeboliger",
+				            "children": []
+				          },
+				          {
+				            "number": "03.22.10",
+				            "serviceText": "Drift og afhændelse af friplejeboliger",
+				            "children": []
+				          }
+				        ]
+				      }
+				    ]
+				  },
+				  {
+				    "number": "13",
+				    "serviceText": "Forsyning",
+				    "children": [
+				      {
+				        "number": "13.02",
+				        "serviceText": "Vandforsyning",
+				        "children": [
+				          {
+				            "number": "13.02.00",
+				            "serviceText": "Vandforsyning i almindelighed",
+				            "children": []
+				          },
+				          {
+				            "number": "13.02.02",
+				            "serviceText": "Vandkvalitet",
+				            "children": []
+				          }
+				        ]
+				      },
+				      {
+				        "number": "13.03",
+				        "serviceText": "Varmeforsyning",
+				        "children": [
+				          {
+				            "number": "13.03.00",
+				            "serviceText": "Varmeforsyning i almindelighed",
+				            "children": []
+				          }
+				        ]
+				      }
+				    ]
+				  }
+				]}};
+			return simulateRestCall(simulateCallToGetKles);
+		} // end of getKleRestService
 	}
 })();

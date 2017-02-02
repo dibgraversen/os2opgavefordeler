@@ -14,10 +14,13 @@
 
 		$scope.kles = [];
 		$scope.displayOus = [];
+		$scope.restKles = [];
+
 
 		$scope.setCurrentOrgUnit = setCurrentOrgUnit;
 		$scope.getDisplayKlesFromScope = getDisplayKlesFromScope;
 		$scope.modifyKle = modifyKle;
+
 		activate();
 
 		function activate() {
@@ -34,39 +37,52 @@
 				initDisplayObjects(orgUnits);
 
 			});
+			getRestKles();
 		}
 
 		function initDisplayObjects(ous) {
-			for (let ou of ous){
-				var ouWithDisplayData = ou;
-				ouWithDisplayData.displayKles = getDisplayKles(ou);
+			for (var i = 0; i < ous.length; i++) {
+				var ouWithDisplayData = ous[i];
+				ouWithDisplayData.displayKles = getDisplayKles(ous[i]);
 				$scope.displayOus.push(ouWithDisplayData);				
-			}
+			}	
 		}
 
 		function getDisplayKles(orgunit) {
 			var klesWithDisplayData = [];
 			
-			for (let kle of $scope.kles){
-				var newKle= JSON.parse(JSON.stringify(kle));
-				newKle.checked = orgUnitService.containsKle(kle,orgunit,kle.assignmentType);
+			 for (var i = 0; i < $scope.kles.length; i++){
+				var newKle= JSON.parse(JSON.stringify($scope.kles[i]));
+				newKle.checked = orgUnitService.containsKle($scope.kles[i],orgunit,$scope.kles[i].assignmentType);
 				klesWithDisplayData.push(newKle);				
 			}
+			
 			return klesWithDisplayData;
 		}
 		
 
-		function getDisplayKlesFromScope(orgunit) {				
-			for (let ou of $scope.displayOus){
-				if(orgunit.id== ou.id){
-					return ou.displayKles;
+		function getDisplayKlesFromScope(orgunit) {	
+			for (var i = 0; i < $scope.displayOus.length; i++){
+				if(orgunit.id== $scope.displayOus[i].id) {
+					return orgunit.id;
 				}				
 			}
+			
 			return null;
+		}
+
+		function getRestKles(){
+			orgUnitService.getRestKles().then( function(restKles){
+				$scope.restKles = restKles;
+			});
 		}
 
 		function setCurrentOrgUnit(orgUnit){
 			$scope.currentOrgUnit = orgUnit;
+		}
+
+		function expand(kle){
+			kle.expanded = true;
 		}
 
 		function modifyKle(checked,kle,orgunit){
