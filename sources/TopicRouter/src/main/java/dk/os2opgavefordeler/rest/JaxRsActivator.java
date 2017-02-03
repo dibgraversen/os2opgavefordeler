@@ -36,6 +36,8 @@ public class JaxRsActivator extends Application {
         s.add(AuthEndpoint.class);
         s.add(ImportEndpoint.class);
         s.add(AuditLogEndpoint.class);
+        s.add(OUEndpoint.class);
+        s.add(KleEndpoint.class);
         return s;
     }
 
