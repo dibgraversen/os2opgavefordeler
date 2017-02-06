@@ -4,6 +4,7 @@ import dk.os2opgavefordeler.auth.AdminRequired;
 import dk.os2opgavefordeler.auth.AuthService;
 import dk.os2opgavefordeler.auth.MunicipalityAdminRequired;
 import dk.os2opgavefordeler.auth.UserLoggedIn;
+import dk.os2opgavefordeler.logging.AuditLogged;
 import dk.os2opgavefordeler.repository.MunicipalityRepository;
 import dk.os2opgavefordeler.repository.OrgUnitRepository;
 import dk.os2opgavefordeler.repository.UserRepository;
@@ -208,6 +209,7 @@ public class MunicipalityEndpoint extends Endpoint {
 	@Produces(MediaType.APPLICATION_JSON)
 	@NoCache
 	@MunicipalityAdminRequired
+	@AuditLogged
 	public Response getApiKey(@PathParam("municipalityId") long municipalityId) {
 		if (permissionsOk(municipalityId)) {
 			String apiKey = municipalityService.getApiKey(municipalityId);
