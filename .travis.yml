@@ -4,4 +4,6 @@ jdk:
 script:
   - mvn clean package -Denv=dev
 notifications:
-  email: false
+  email:
+    - rro@miracle.dk
+    - hlo@miracle.dk
