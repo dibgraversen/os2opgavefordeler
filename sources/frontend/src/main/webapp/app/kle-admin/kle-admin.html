@@ -12,8 +12,9 @@
 					</tr>
 					</thead>
 					<tbody data-ng-repeat="ou in ous | filter: { name : filterStr }">
-						<tr data-ng-class="currentOrgUnit === ou ? 'success' : ''" data-ng-click="setCurrentOrgUnit(ou)">
-							<td>{{ ou.id }}</td>
+					<h6>{{ou}}</h6>
+						<tr data-ng-class="currentOrgUnit.id === ou.id ? 'success' : ''" data-ng-click="setCurrentOrgUnit(ou.id)">
+							<td>{{ ou.id}} </td>
 							<td>
 								{{ ou.name | limitTo: 50 }}
 							</td>					
@@ -23,7 +24,6 @@
 	</div>
 	<div class="col-md-8">
 		<h2> {{currentOrgUnit.name}}</h2>
-
 		<div class="panel-body">
 			<div data-ng-repeat="firstKle in currentOrgUnit.displayKles">							
 				<div class="list-group-item">	
@@ -37,7 +37,7 @@
 					data-ng-click="modifyKle(firstKle.assigned,firstKle,currentOrgUnit)"></input>
 					{{firstKle.number}} &nbsp;&nbsp;{{firstKle.serviceText}}
 				</div>
-						
+
 				<div data-ng-repeat="secondKle in firstKle.children" data-ng-show="firstKle['visible']">
 					<div class="list-group-item">	
 					<a ng-click="secondKle['visible'] = !secondKle['visible']">
@@ -53,7 +53,6 @@
 					<div  data-ng-repeat="thirdKle in secondKle.children" data-ng-show="secondKle['visible']">
 							<div class="list-group-item">	
 							<a ng-click="thirdKle['visible'] = !thirdKle['visible']">
-								<span class="glyphicon hover" ng-class="thirdKle['visible'] ? 'glyphicon-chevron-down' : 'glyphicon-chevron-right' "></span>
 							</a>
 							&nbsp;&nbsp;
 							<input 
