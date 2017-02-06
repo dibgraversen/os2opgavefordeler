@@ -21,6 +21,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import dk.os2opgavefordeler.auth.UserLoggedIn;
 import org.slf4j.Logger;
 
 import au.com.bytecode.opencsv.CSVWriter;
@@ -36,122 +37,118 @@ import dk.os2opgavefordeler.service.UserService;
 /**
  * Endpoint for retrieving audit log information
  */
+@UserLoggedIn
 @Path("/auditlog")
 @RequestScoped
 public class AuditLogEndpoint extends Endpoint {
 
-    @Inject
-    private AuthService authService;
+	@Inject
+	private AuthService authService;
 
-    @Inject
-    UserService userService;
+	@Inject
+	UserService userService;
 
-    @Inject
-    AuditLogService auditLogService;
+	@Inject
+	AuditLogService auditLogService;
 
-    @Inject
-    Logger log;
+	@Inject
+	Logger log;
 
-    private static final String NOT_LOGGED_IN = "Not logged in";
-    private static final String NOT_AUTHORIZED = "Not authorized";
-    private static final String USER_NOT_FOUND = "User not found";
+	private static final String NOT_LOGGED_IN = "Not logged in";
+	private static final String NOT_AUTHORIZED = "Not authorized";
+	private static final String USER_NOT_FOUND = "User not found";
 
-    private static final char CSV_SEPARATOR_CHAR = ';';
-    private static final char BOM_CHAR = '\uFEFF';
+	private static final char CSV_SEPARATOR_CHAR = ';';
+	private static final char BOM_CHAR = '\uFEFF';
 
-    /**
-     * Returns the full list of audit log entries for the user's municipality
-     *
-     * @return list of audit log entries in JSON format
-     */
-    @GET
-    @Path("/")
-    @Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
-    public Response getLogEntries() {
-        if (!authService.isAuthenticated()) {
-            return Response.status(Response.Status.UNAUTHORIZED).entity(NOT_LOGGED_IN).build();
-        }
+	/**
+	 * Returns the full list of audit log entries for the user's municipality
+	 *
+	 * @return list of audit log entries in JSON format
+	 */
+	@GET
+	@Path("/")
+	@Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
+	public Response getLogEntries() {
+		if (!authService.isAuthenticated()) {
+			return Response.status(Response.Status.UNAUTHORIZED).entity(NOT_LOGGED_IN).build();
+		}
 
-        Optional<User> user = userService.findByEmail(authService.getAuthentication().getEmail());
+		Optional<User> user = userService.findByEmail(authService.getAuthentication().getEmail());
 
-        if (user.isPresent()) {
-            long userId = user.get().getId();
+		if (user.isPresent()) {
+			long userId = user.get().getId();
 
-            if (accessGranted(userId)) { // only managers and admins can fetch audit log data
-                return ok(auditLogService.getAllLogEntries(user.get().getMunicipality().getId()));
-            }
-            else {
-                return Response.status(Response.Status.UNAUTHORIZED).entity(NOT_AUTHORIZED).build();
-            }
+			if (accessGranted(userId)) { // only managers and admins can fetch audit log data
+				return ok(auditLogService.getAllLogEntries(user.get().getMunicipality().getId()));
+			} else {
+				return Response.status(Response.Status.UNAUTHORIZED).entity(NOT_AUTHORIZED).build();
+			}
 
 
-        }
-        else {
-            return Response.status(Response.Status.NOT_FOUND).entity(USER_NOT_FOUND).build();
-        }
-    }
+		} else {
+			return Response.status(Response.Status.NOT_FOUND).entity(USER_NOT_FOUND).build();
+		}
+	}
 
-    /**
-     * Returns the full list of audit log entries for the user's municipality
-     *
-     * @return list of audit log entries in CSV format
-     */
-    @GET
-    @Path("/csv")
-    @Produces("text/csv; charset=UTF-8")
-    public Response getLogEntriesCsv() {
-        if (!authService.isAuthenticated()) {
-            return Response.status(Response.Status.UNAUTHORIZED).entity(NOT_LOGGED_IN).build();
-        }
+	/**
+	 * Returns the full list of audit log entries for the user's municipality
+	 *
+	 * @return list of audit log entries in CSV format
+	 */
+	@GET
+	@Path("/csv")
+	@Produces("text/csv; charset=UTF-8")
+	public Response getLogEntriesCsv() {
+		if (!authService.isAuthenticated()) {
+			return Response.status(Response.Status.UNAUTHORIZED).entity(NOT_LOGGED_IN).build();
+		}
 
-        Optional<User> user = userService.findByEmail(authService.getAuthentication().getEmail());
+		Optional<User> user = userService.findByEmail(authService.getAuthentication().getEmail());
 
-        if (user.isPresent()) {
-            long userId = user.get().getId();
+		if (user.isPresent()) {
+			long userId = user.get().getId();
 
-            if (accessGranted(userId)) { // only managers and admins can fetch audit log data
-                String myCsvText = "";
+			if (accessGranted(userId)) { // only managers and admins can fetch audit log data
+				String myCsvText = "";
 
-                try {
-                    List<String[]> valuesList = new ArrayList<>();
+				try {
+					List<String[]> valuesList = new ArrayList<>();
 
-                    // add header row
-                    valuesList.add(new String[]{"ID", "Tidspunkt", "KLE", "Bruger", "Operation", "Type", "Data", "Org", "Ansættelse"});
+					// add header row
+					valuesList.add(new String[]{"ID", "Tidspunkt", "KLE", "Bruger", "Operation", "Type", "Data", "Org", "Ansættelse"});
 
-                    // add content rows
-                    auditLogService.getAllLogEntries(user.get().getMunicipality().getId()).forEach(e -> valuesList.add(e.toStringArray()));
+					// add content rows
+					auditLogService.getAllLogEntries(user.get().getMunicipality().getId()).forEach(e -> valuesList.add(e.toStringArray()));
 
-                    StringWriter stringWriter = new StringWriter();
+					StringWriter stringWriter = new StringWriter();
 
-                    stringWriter.append(BOM_CHAR); // we need to append a byte order mark (BOM) to help Excel's horrible handling of CSV files
+					stringWriter.append(BOM_CHAR); // we need to append a byte order mark (BOM) to help Excel's horrible handling of CSV files
 
-                    CSVWriter csvWriter = new CSVWriter(stringWriter, CSV_SEPARATOR_CHAR);
-                    csvWriter.writeAll(valuesList);
+					CSVWriter csvWriter = new CSVWriter(stringWriter, CSV_SEPARATOR_CHAR);
+					csvWriter.writeAll(valuesList);
 
-                    csvWriter.flush();
-                    csvWriter.close();
+					csvWriter.flush();
+					csvWriter.close();
 
-                    String csvString = stringWriter.toString();
+					String csvString = stringWriter.toString();
 
-                    myCsvText = new String(csvString.getBytes(), Charset.forName("UTF-8"));
-                }
-                catch (IOException e) {
-                    log.error("Error while generating CSV log data", e);
-                }
+					myCsvText = new String(csvString.getBytes(), Charset.forName("UTF-8"));
+				} catch (IOException e) {
+					log.error("Error while generating CSV log data", e);
+				}
 
-                return Response.ok(myCsvText).build();
-            }
-            else {
-                return Response.status(Response.Status.UNAUTHORIZED).entity(NOT_AUTHORIZED).build();
-            }
-        }
-        else {
-            return Response.status(Response.Status.NOT_FOUND).entity(USER_NOT_FOUND).build();
-        }
-    }
+				return Response.ok(myCsvText).build();
+			} else {
+				return Response.status(Response.Status.UNAUTHORIZED).entity(NOT_AUTHORIZED).build();
+			}
+		} else {
+			return Response.status(Response.Status.NOT_FOUND).entity(USER_NOT_FOUND).build();
+		}
+	}
 
-    private boolean accessGranted(long userId) {
-        return userService.isAdmin(userId) || userService.isMunicipalityAdmin(userId) || userService.isManager(userId);
-    }
+	private boolean accessGranted(long userId) {
+		return userService.isAdmin(userId) || userService.isMunicipalityAdmin(userId) || userService.isManager(userId);
+	}
 
 }

@@ -1,6 +1,8 @@
 package dk.os2opgavefordeler.rest;
 
+import dk.os2opgavefordeler.auth.AdminRequired;
 import dk.os2opgavefordeler.auth.AuthService;
+import dk.os2opgavefordeler.auth.UserLoggedIn;
 import dk.os2opgavefordeler.auth.openid.OpenIdAuthenticationFlow;
 import dk.os2opgavefordeler.model.Role;
 import dk.os2opgavefordeler.model.presentation.SimpleMessage;
@@ -20,8 +22,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@UserLoggedIn
 @Path("/roles")
 public class RoleEndpoint {
+
 	@Inject
 	private Logger log;
 
@@ -49,10 +53,6 @@ public class RoleEndpoint {
 	@Produces(MediaType.APPLICATION_JSON)
 	@NoCache
 	public Response getRoles() {
-		if (!authService.isAuthenticated()) {
-			return Response.status(Response.Status.UNAUTHORIZED).entity("Not logged in").build();
-		}
-
 		if (userService.isAdmin(authService.getAuthentication().getEmail())) {
 			return Response.ok().entity(userService.getAllRoles()).build();
 		}
@@ -62,9 +62,11 @@ public class RoleEndpoint {
 
 	}
 
+	// TODO verify ownership of role.
 	@DELETE
 	@Path("/{roleId}")
 	@Produces(MediaType.APPLICATION_JSON)
+	@Deprecated
 	public Response deleteRole(@PathParam("roleId") Long roleId) {
 		log.info("deleteRole({})", roleId);
 
@@ -145,11 +147,8 @@ public class RoleEndpoint {
 	@POST
 	@Path("/{roleId}/municipalityadmin/{valueId}")
 	@Produces(MediaType.APPLICATION_JSON)
+	@AdminRequired
 	public Response setMunicipalityAdmin(@PathParam("roleId") Long roleId, @PathParam("valueId") Long valueId) {
-		if (!authService.isAuthenticated()) {
-			return Response.status(Response.Status.UNAUTHORIZED).entity("Not logged in").build();
-		}
-
 		if (userService.isAdmin(authService.getAuthentication().getEmail())) {
 			try {
 				Validate.nonZero(roleId, INVALID_ROLE_ID);
@@ -180,11 +179,8 @@ public class RoleEndpoint {
 	@POST
 	@Path("/{roleId}/admin/{valueId}")
 	@Produces(MediaType.APPLICATION_JSON)
+	@AdminRequired
 	public Response setAdmin(@PathParam("roleId") Long roleId, @PathParam("valueId") Long valueId) {
-		if (!authService.isAuthenticated()) {
-			return Response.status(Response.Status.UNAUTHORIZED).entity("Not logged in").build();
-		}
-
 		if (userService.isAdmin(authService.getAuthentication().getEmail())) {
 			try {
 				Validate.nonZero(roleId, INVALID_ROLE_ID);
