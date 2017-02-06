@@ -5,7 +5,3 @@ script:
   - mvn clean package -Denv=dev
 notifications:
   email: false
-branches:
-  only:
-    - develop
-    - master
