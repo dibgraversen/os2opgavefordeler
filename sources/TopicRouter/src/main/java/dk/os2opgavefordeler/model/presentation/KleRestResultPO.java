@@ -1,4 +1,4 @@
-package dk.os2opgavefordeler.model.rest;
+package dk.os2opgavefordeler.model.presentation;
 
 import java.util.ArrayList;
 import java.util.List;
