@@ -1,0 +1,3 @@
+#!/bin/bash
+mvn clean install -Dmaven.test.skip=true -Denv=dev
+cp sources/TopicRouter/target/TopicRouter.war tmp/deployments
