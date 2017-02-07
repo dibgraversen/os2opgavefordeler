@@ -14,6 +14,6 @@ public class AccessDeniedExceptionHandler implements ExceptionMapper<AccessDenie
 
 	@Override
 	public Response toResponse(AccessDeniedException e) {
-		return Response.status(Response.Status.FORBIDDEN).entity("User not logged in.").build();
+		return Response.status(Response.Status.FORBIDDEN).entity("User not logged in, or cannot access resource.").build();
 	}
 }

@@ -1,6 +1,8 @@
 package dk.os2opgavefordeler.rest;
 
+import dk.os2opgavefordeler.auth.AdminRequired;
 import dk.os2opgavefordeler.auth.AuthService;
+import dk.os2opgavefordeler.auth.MunicipalityAdminRequired;
 import dk.os2opgavefordeler.auth.UserLoggedIn;
 import dk.os2opgavefordeler.logging.AuditLogger;
 import dk.os2opgavefordeler.model.*;
@@ -243,9 +245,9 @@ public class DistributionRuleEndpoint extends Endpoint {
 		}
 	}
 
-	// TODO admin rights
 	@GET
 	@Path("/buildRules")
+	@AdminRequired
 	public Response buildRulesForMunicipality(@QueryParam("municipalityId") long municipalityId) {
 		if (municipalityId < 0) {
 			log.info("buildRules - bad request[{}]", municipalityId);
@@ -270,10 +272,10 @@ public class DistributionRuleEndpoint extends Endpoint {
 		}
 	}
 
-	// TODO municipality admin rights
 	@POST
 	@Path("/text/names")
 	@Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
+	@MunicipalityAdminRequired
 	public Response updateTextFilterName(@QueryParam("municipalityId") long municipalityId, FilterNamePO filterNamePO) {
 		if (municipalityId < 0) {
 			log.info("#getFilterNames with no municipalityId");
@@ -284,10 +286,10 @@ public class DistributionRuleEndpoint extends Endpoint {
 		}
 	}
 
-	// TODO municipality admin rights
 	@DELETE
 	@Path("/text/names/{filterNameId}")
 	@Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
+	@MunicipalityAdminRequired
 	public Response deleteTextFilterName(@PathParam("filterNameId") Long filterNameId, @QueryParam("municipalityId") long municipalityId) {
 		if (municipalityId < 0) {
 			log.info("#deleteFilterName with no municipalityId");
@@ -300,10 +302,10 @@ public class DistributionRuleEndpoint extends Endpoint {
 		}
 	}
 
-	// TODO municipality admin rights
 	@DELETE
 	@Path("/date/names/{filterNameId}")
 	@Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
+	@MunicipalityAdminRequired
 	public Response deleteDateFilterName(@PathParam("filterNameId") Long filterNameId, @QueryParam("municipalityId") long municipalityId) {
 		if (municipalityId < 0) {
 			log.info("#deleteFilterName with no municipalityId");
@@ -329,10 +331,10 @@ public class DistributionRuleEndpoint extends Endpoint {
 		}
 	}
 
-	// TODO municipality admin rights
 	@POST
 	@Path("/text/names/default/{filterNameId}")
 	@Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
+	@MunicipalityAdminRequired
 	public Response setDefaultFilterNameText(@PathParam("filterNameId") Long filterNameId, @QueryParam("municipalityId") long municipalityId) {
 		if (municipalityId < 0) {
 			log.info("#setDefaultFilterNameText with no municipalityId");
@@ -358,10 +360,10 @@ public class DistributionRuleEndpoint extends Endpoint {
 		}
 	}
 
-	// TODO municipality admin rights
 	@POST
 	@Path("/date/names")
 	@Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
+	@MunicipalityAdminRequired
 	public Response updateDateFilterName(@QueryParam("municipalityId") long municipalityId, FilterNamePO filterNamePO) {
 		if (municipalityId < 0) {
 			log.info("#getFilterNames with no municipalityId");
@@ -385,10 +387,10 @@ public class DistributionRuleEndpoint extends Endpoint {
 		}
 	}
 
-	// TODO municipality admin rights
 	@POST
 	@Path("/date/names/default/{filterNameId}")
 	@Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
+	@MunicipalityAdminRequired
 	public Response setDefaultFilterNameDate(@PathParam("filterNameId") Long filterNameId, @QueryParam("municipalityId") long municipalityId) {
 		if (municipalityId < 0) {
 			log.info("#setDefaultFilterNameText with no municipalityId");

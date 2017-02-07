@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
+import dk.os2opgavefordeler.auth.AdminRequired;
 import dk.os2opgavefordeler.auth.UserLoggedIn;
 import dk.os2opgavefordeler.model.Kle;
 import dk.os2opgavefordeler.service.KleService;
@@ -71,12 +72,12 @@ public class KleRestEndpoint extends Endpoint {
 			Response.status(Response.Status.NOT_FOUND).build();
 	}
 
-	// TODO admin functionality
 	// TODO verify functionality
 	@POST @NoCache
 	@Path("/import")
 	@Produces("text/plain")
 	@Consumes(MediaType.MULTIPART_FORM_DATA)
+	@AdminRequired
 	public Response importXml(@MultipartForm KleXmlUploadData request) {
 		// XML is mandatory, XSD is optional.
 		final InputStream xml = request.getXml();

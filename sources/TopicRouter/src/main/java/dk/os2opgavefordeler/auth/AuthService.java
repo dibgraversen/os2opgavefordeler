@@ -4,6 +4,7 @@ import javax.enterprise.context.ApplicationScoped;
 
 import javax.inject.Inject;
 
+import dk.os2opgavefordeler.service.UserService;
 import org.apache.commons.lang3.StringUtils;
 
 import dk.os2opgavefordeler.repository.UserRepository;
@@ -21,6 +22,9 @@ public class AuthService {
 	@Inject
 	private UserRepository userRepository;
 
+	@Inject
+	private UserService userService;
+
 	/**
 	 * Checks whether the uses has been authenticated
 	 *
@@ -29,6 +33,20 @@ public class AuthService {
 	public boolean isAuthenticated() {
 		return StringUtils.isNotEmpty(authenticationHolder.getEmail());
 	}
+
+	/**
+	 * Checks wether the user has admin rights.
+	 *
+	 * @return true if the user has admin rights.
+	 */
+	public boolean isAdmin() { return userService.isAdmin(currentUser().getEmail()); }
+
+	/**
+	 * Checks wether the user has municipality admin rights
+	 *
+	 * @return true if the user has municipality admin rights
+	 */
+	public boolean isMunicipalityAdmin() { return userService.isMunicipalityAdmin(currentUser().getId()); }
 
 	/**
 	 * Returns authentication information

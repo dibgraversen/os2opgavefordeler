@@ -1,6 +1,8 @@
 package dk.os2opgavefordeler.rest;
 
+import dk.os2opgavefordeler.auth.AdminRequired;
 import dk.os2opgavefordeler.auth.AuthService;
+import dk.os2opgavefordeler.auth.MunicipalityAdminRequired;
 import dk.os2opgavefordeler.auth.UserLoggedIn;
 import dk.os2opgavefordeler.repository.MunicipalityRepository;
 import dk.os2opgavefordeler.repository.OrgUnitRepository;
@@ -63,10 +65,10 @@ public class MunicipalityEndpoint extends Endpoint {
 		return ok(result);
 	}
 
-	// TODO sys adm functionality
 	@DELETE
 	@Path("/{municipalityId}")
 	@Produces("application/json")
+	@AdminRequired
 	public Response deleteMunicipality(@PathParam("municipalityId") long municipalityId) {
 		log.info("Deleting structure for municipality with ID: {}", municipalityId);
 
@@ -133,11 +135,11 @@ public class MunicipalityEndpoint extends Endpoint {
 		return ok();
 	}
 
-	// TODO sys adm functionality
 	@POST
 	@Path("/")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
+	@AdminRequired
 	public Response createMunicipality(Municipality municipality) {
 		log.info("Creating municipality: {}", municipality);
 
@@ -147,11 +149,11 @@ public class MunicipalityEndpoint extends Endpoint {
 		return ok(result);
 	}
 
-	// TODO sys adm functionality
 	@POST
 	@Path("/{municipalityId}")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
+	@AdminRequired
 	public Response createMunicipality(@PathParam("municipalityId") long municipalityId, Municipality municipality) {
 		Municipality result = municipalityService.createOrUpdateMunicipality(municipality);
 		return ok(result);
@@ -168,11 +170,11 @@ public class MunicipalityEndpoint extends Endpoint {
 		return ok(result);
 	}
 
-	// TODO municipality admin functionality
 	@POST
 	@Path("/{municipalityId}/kle")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
+	@MunicipalityAdminRequired
 	public Response saveMunicipalityKle(KlePO kle) {
 		if (kle == null) {
 			return badRequest("You need to provide a valid KlePO");
@@ -185,9 +187,9 @@ public class MunicipalityEndpoint extends Endpoint {
 		}
 	}
 
-	// TODO municipality admin functionality
 	@DELETE
 	@Path("/{municipalityId}/kle/{id}")
+	@MunicipalityAdminRequired
 	public Response deleteMunicipalityKle(@PathParam("municipalityId") Long municipalityId, @PathParam("id") Long kleId) {
 		if (municipalityId == null || kleId == null) {
 			return badRequest("You need to provide valid municipalityId and kleId");
@@ -201,11 +203,11 @@ public class MunicipalityEndpoint extends Endpoint {
 		}
 	}
 
-	// TODO municipality admin functionality
 	@GET
 	@Path("/{municipalityId}/apikey")
 	@Produces(MediaType.APPLICATION_JSON)
 	@NoCache
+	@MunicipalityAdminRequired
 	public Response getApiKey(@PathParam("municipalityId") long municipalityId) {
 		if (permissionsOk(municipalityId)) {
 			String apiKey = municipalityService.getApiKey(municipalityId);
@@ -215,10 +217,10 @@ public class MunicipalityEndpoint extends Endpoint {
 		}
 	}
 
-	// TODO municipality admin functionality
 	@POST
 	@Path("/{municipalityId}/apikey/{apiKey}")
 	@Produces(MediaType.APPLICATION_JSON)
+	@MunicipalityAdminRequired
 	public Response setApiKey(@PathParam("municipalityId") long municipalityId, @PathParam("apiKey") String apiKey) {
 		if (permissionsOk(municipalityId)) {
 			municipalityService.setApiKey(municipalityId, apiKey);
