@@ -49,6 +49,13 @@ public class AuthService {
 	public boolean isMunicipalityAdmin() { return userService.isMunicipalityAdmin(currentUser().getId()); }
 
 	/**
+	 * Verifies that the user has the KleAssigner role
+	 * 
+	 * @return true if the user has the KleAssigner role
+	 */
+	public boolean isKleAssigner() { return userService.isKleAssigner(currentUser().getId()); }
+	
+	/**
 	 * Returns authentication information
 	 *
 	 * @return current authentication info.
