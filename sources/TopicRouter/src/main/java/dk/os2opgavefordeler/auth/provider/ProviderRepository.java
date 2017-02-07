@@ -3,6 +3,7 @@ package dk.os2opgavefordeler.auth.provider;
 import dk.os2opgavefordeler.model.IdentityProvider;
 import dk.os2opgavefordeler.model.presentation.IdentityProviderPO;
 import dk.os2opgavefordeler.service.ConfigService;
+import org.slf4j.Logger;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
@@ -22,26 +23,21 @@ public class ProviderRepository {
     @Inject
     private ConfigService configService;
 
+    @Inject
+    private Logger logger;
+
     @PostConstruct
     public void init() {
-
-        if (configService.enableGoogleLogin()) {
-            providers.put(1L, IdentityProvider.builder()
-                    .id(1).name("Google account")
-                    .url("https://accounts.google.com/")
-                    .clientId("89170361789-mg8l3t3f11vo0cf0hce4h85epi0qqq3q.apps.googleusercontent.com")
-                    .clientSecret("itCIp2JGR2NKBAu4Se9LCAjp")
-                    .build()
-            );
-        }
-
+        String clientId = configService.getClientId();
+        String clientSecret = configService.getClientSecret();
         providers.put(2L, IdentityProvider.builder()
                 .id(2).name("OS2 SSO")
                 .url("https://os2sso.miracle.dk/")
-                .clientId("opgavefordeler")
-                .clientSecret("secret")
+                .clientId(clientId)
+                .clientSecret(clientSecret)
                 .build()
         );
+        logger.info("ClientId = "+clientId+", ClientSecret = "+clientSecret);
     }
 
     public Optional<IdentityProvider> findProvider(long id) {
