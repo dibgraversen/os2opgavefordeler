@@ -369,4 +369,19 @@ public class UserServiceImpl implements UserService {
 
 		return isMunicipalityAdmin;
 	}
+	
+	@Override
+	public boolean isKleAssigner(long userId) {
+		List<RolePO> roles = getRoles(userId);
+
+		Iterator<RolePO> roleIterator = roles.iterator();
+
+		boolean isKleAssigner = false;
+
+		while (roleIterator.hasNext() && !isKleAssigner) {
+			isKleAssigner = roleIterator.next().isKleAssigner();
+		}
+
+		return isKleAssigner;
+	}
 }
