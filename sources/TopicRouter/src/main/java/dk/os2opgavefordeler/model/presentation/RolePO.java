@@ -41,6 +41,11 @@ public class RolePO {
 	 * Specifies whether this role enables admin features for a municipality.
 	 */
 	private boolean municipalityAdmin;
+	
+	/**
+	 * Does the role allow assigning KLE values to OrgUnits
+	 */
+	private boolean kleAssigner;
 
 	/**
 	 * Specifies whether this role is a substitute role for another employment.
@@ -59,6 +64,7 @@ public class RolePO {
 		admin = role.isAdmin();
 		municipalityAdmin = role.isMunicipalityAdmin();
 		substitute = role.isSubstitute();
+		kleAssigner = role.isKleAssigner();
 	}
 
 	private RolePO(Builder builder) {
@@ -71,6 +77,7 @@ public class RolePO {
 		admin = builder.admin;
 		municipalityAdmin = builder.municipalityAdmin;
 		substitute = builder.substitute;
+		kleAssigner = builder.kleAssigner;
 	}
 
 	public long getId() {
@@ -124,6 +131,14 @@ public class RolePO {
 	public boolean isMunicipalityAdmin() {
 		return municipalityAdmin;
 	}
+	
+	public void setKleAssigner(boolean kleAssigner) {
+		this.kleAssigner = kleAssigner;
+	}
+	
+	public boolean isKleAssigner() {
+		return kleAssigner;
+	}
 
 	public void setMunicipalityAdmin(boolean municipalityAdmin) {
 		this.municipalityAdmin = municipalityAdmin;
@@ -148,6 +163,7 @@ public class RolePO {
 				", admin=" + admin +
 				", municipalityAdmin=" + municipalityAdmin +
 				", substitute=" + substitute +
+				", kleAssigner=" + kleAssigner +
 				'}';
 	}
 
@@ -167,6 +183,7 @@ public class RolePO {
 		private boolean admin;
 		private boolean municipalityAdmin;
 		private boolean substitute;
+		private boolean kleAssigner;
 
 		public RolePO build() { return new RolePO(this); }
 
@@ -207,6 +224,11 @@ public class RolePO {
 
 		public Builder substitute(boolean substitute) {
 			this.substitute = substitute;
+			return this;
+		}
+		
+		public Builder kleAssigner(boolean kleAssigner) {
+			this.kleAssigner = kleAssigner;
 			return this;
 		}
 	}

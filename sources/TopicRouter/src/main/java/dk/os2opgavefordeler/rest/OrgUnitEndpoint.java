@@ -3,6 +3,8 @@ package dk.os2opgavefordeler.rest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
 import dk.os2opgavefordeler.auth.AuthService;
+import dk.os2opgavefordeler.auth.MunicipalityAdminRequired;
+import dk.os2opgavefordeler.auth.UserLoggedIn;
 import dk.os2opgavefordeler.repository.UserRepository;
 import dk.os2opgavefordeler.model.Employment;
 import dk.os2opgavefordeler.model.Municipality;
@@ -33,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+@UserLoggedIn
 @Path("/org-units")
 @RequestScoped
 public class OrgUnitEndpoint extends Endpoint {
@@ -123,6 +126,8 @@ public class OrgUnitEndpoint extends Endpoint {
 	@Path("/import")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
+	@Deprecated
+	@MunicipalityAdminRequired
 	public Response importOrg(OrgUnit input) {
 		Municipality currentMunicipality = userRepository.findByEmail(authService.getAuthentication().getEmail()).getMunicipality();
 		fixupOrgUnit(input, currentMunicipality);
@@ -132,10 +137,12 @@ public class OrgUnitEndpoint extends Endpoint {
 		return Response.ok().build();
 	}
 
+
 	@POST
 	@Path("/fileImport")
 	@Consumes(MediaType.MULTIPART_FORM_DATA)
 	@Produces(MediaType.APPLICATION_JSON)
+	@MunicipalityAdminRequired
 	public Response fileImport(MultipartFormDataInput multipartInput) {
 		Map<String, List<InputPart>> uploadForm = multipartInput.getFormDataMap();
 		List<InputPart> inputParts = uploadForm.get(FILE);

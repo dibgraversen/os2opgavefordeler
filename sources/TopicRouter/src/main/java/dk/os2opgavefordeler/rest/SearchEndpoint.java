@@ -1,5 +1,6 @@
 package dk.os2opgavefordeler.rest;
 
+import dk.os2opgavefordeler.auth.UserLoggedIn;
 import dk.os2opgavefordeler.model.presentation.EmploymentPO;
 import dk.os2opgavefordeler.model.search.EmploymentSearch;
 import dk.os2opgavefordeler.model.search.SearchResult;
@@ -17,6 +18,7 @@ import javax.ws.rs.core.Response;
 /**
  * @author hlo@miracle.dk
  */
+@UserLoggedIn
 @Path("/search")
 @RequestScoped
 public class SearchEndpoint {
