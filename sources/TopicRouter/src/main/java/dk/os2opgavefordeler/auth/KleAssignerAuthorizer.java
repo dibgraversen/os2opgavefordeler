@@ -11,12 +11,13 @@ import org.apache.deltaspike.security.api.authorization.Secures;
 @ApplicationScoped
 public class KleAssignerAuthorizer {
 
-	@Inject
-	private AuthService authService;
+  @Inject
+  private AuthService authService;
 
-	@Secures
-	@MunicipalityAdminRequired
-	public boolean doMunicipalityAdminCheck() throws Exception {
-		return authService.isMunicipalityAdmin();
-	}
+  @Secures
+  @KleAssignerRequired
+  public boolean doKleAssignerCheck() throws Exception {
+    return authService.isKleAssigner();
+  }
 }
+
