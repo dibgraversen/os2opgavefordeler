@@ -1,15 +1,24 @@
 package dk.os2opgavefordeler.model;
 
-import com.google.common.base.MoreObjects;
-import com.google.common.collect.ImmutableList;
-
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.validation.constraints.NotNull;
+
+import com.google.common.base.MoreObjects;
+import com.google.common.collect.ImmutableList;
 
 @Entity
 public class OrgUnit implements Serializable, IHasChildren<OrgUnit> {
@@ -46,7 +55,9 @@ public class OrgUnit implements Serializable, IHasChildren<OrgUnit> {
 
 	@OneToMany(mappedBy = "assignedOrg", cascade = CascadeType.REMOVE)
 	private List<DistributionRuleFilter> responsibleForFilters;
-
+	
+	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	private List<Kle> kles = new ArrayList<>();
 
 	public OrgUnit() {
 		children = new ArrayList<>();
@@ -207,6 +218,16 @@ public class OrgUnit implements Serializable, IHasChildren<OrgUnit> {
 	public void setMunicipality(Municipality municipality) {
 		this.municipality = municipality;
 	}
+	
+	
+
+	public List<Kle> getKles() {
+		return ImmutableList.copyOf(kles);
+	}
+
+	public void addKle(Kle kle) {
+		this.kles.add(kle);		
+	}
 
 	@Override
 	public String toString() {
@@ -218,6 +239,7 @@ public class OrgUnit implements Serializable, IHasChildren<OrgUnit> {
 				.add("pNumber", pNumber)
 				.add("businessKey", businessKey)
 				.add("municipality", municipality)
+				.add("kles", kles)
 				.toString();
 	}
 

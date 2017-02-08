@@ -11,6 +11,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import dk.os2opgavefordeler.auth.KleAssignerRequired;
 import dk.os2opgavefordeler.model.presentation.OrgUnitWithKLEPO;
 import dk.os2opgavefordeler.service.OrgUnitWithKLEService;
 
@@ -32,6 +33,7 @@ public class OUEndpoint extends Endpoint {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/{Id}")
+//	@KleAssignerRequired
 	public Response get(@PathParam("Id") long id) {
 		OrgUnitWithKLEPO result = orgUnitService.get(id);
 		if (result != null) {
