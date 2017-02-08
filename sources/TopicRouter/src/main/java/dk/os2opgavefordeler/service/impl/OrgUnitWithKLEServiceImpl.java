@@ -1,7 +1,10 @@
 package dk.os2opgavefordeler.service.impl;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -11,7 +14,9 @@ import javax.persistence.TypedQuery;
 import org.slf4j.Logger;
 
 import dk.os2opgavefordeler.auth.AuthService;
+import dk.os2opgavefordeler.model.Kle;
 import dk.os2opgavefordeler.model.OrgUnit;
+import dk.os2opgavefordeler.model.OrgUnit_;
 import dk.os2opgavefordeler.model.presentation.KleAssignmentType;
 import dk.os2opgavefordeler.model.presentation.OrgUnitWithKLEPO;
 import dk.os2opgavefordeler.repository.UserRepository;
@@ -56,18 +61,18 @@ public class OrgUnitWithKLEServiceImpl implements OrgUnitWithKLEService {
 
 	@Override
 	public OrgUnitWithKLEPO get(long id) {
-		TypedQuery<OrgUnit> query = persistence.getEm().createQuery(
-				"SELECT org FROM OrgUnit org WHERE org.isActive = true AND org.id = :orgId", OrgUnit.class);
-		query.setParameter("orgId", id);
-		OrgUnitWithKLEPO result;
-		try {
-			final OrgUnit orgUnit = query.getSingleResult();
-			result = new OrgUnitWithKLEPO(orgUnit.getId(), orgUnit.getName(),
-					orgUnit.getParent().isPresent() ? orgUnit.getParent().get().getName() : null);
-		} catch (NoResultException nre) {
-			result = null;
+		final List<OrgUnit> results = persistence.criteriaFind(OrgUnit.class,
+				(cb, cq, ou) -> cq.where(cb.equal(ou.get(OrgUnit_.id), id)));
+		if (!results.isEmpty()) {
+			OrgUnit ouEntity = results.get(0);
+			System.out.println("KLE: " + ouEntity.toString());
+			OrgUnitWithKLEPO ou = new OrgUnitWithKLEPO(ouEntity.getId(), ouEntity.getName(),
+					ouEntity.getParent().isPresent() ? ouEntity.getParent().get().getName() : null);
+			ou.setInterestKLE(ouEntity.getKles().stream().map(Kle::getNumber).collect(Collectors.toList()));
+			return ou;
+		} else {
+			return null;
 		}
-		return result;
 	}
 
 	@Override
