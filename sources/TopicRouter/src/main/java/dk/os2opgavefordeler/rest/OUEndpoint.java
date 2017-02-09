@@ -1,5 +1,6 @@
 package dk.os2opgavefordeler.rest;
 
+import java.util.List;
 import java.util.Optional;
 
 import javax.enterprise.context.RequestScoped;
@@ -31,16 +32,17 @@ public class OUEndpoint extends Endpoint {
 	private OrgUnitService ouService;
 	
 
-//	@GET
-//	@Produces(MediaType.APPLICATION_JSON)
-//	public Response list() {
-//		List<OrgUnitWithKLEPO> result = orgUnitService.getAll(1L);
-//		return Response.ok().entity(result).build();
-//	}
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	@Path("/list")
+	public Response list() {
+		List<OrgUnitWithKLEPO> result = orgUnitService.getAll(1L);
+		return Response.ok().entity(result).build();
+	}
 	
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response list() {
+	public Response tree() {
 		Optional<OrgUnit> result = ouService.getToplevelOrgUnit(1L);
 		if(result.isPresent()){
 			OrgUnitTreePO value = new OrgUnitTreePO(result.get());
