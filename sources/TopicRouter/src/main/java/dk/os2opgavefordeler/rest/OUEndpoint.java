@@ -1,8 +1,7 @@
 package dk.os2opgavefordeler.rest;
 
-import java.util.List;
+import java.util.Optional;
 
-import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.ws.rs.DELETE;
@@ -14,9 +13,11 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import dk.os2opgavefordeler.auth.KleAssignerRequired;
+import dk.os2opgavefordeler.model.OrgUnit;
 import dk.os2opgavefordeler.model.presentation.KleAssignmentType;
+import dk.os2opgavefordeler.model.presentation.OrgUnitTreePO;
 import dk.os2opgavefordeler.model.presentation.OrgUnitWithKLEPO;
+import dk.os2opgavefordeler.service.OrgUnitService;
 import dk.os2opgavefordeler.service.OrgUnitWithKLEService;
 
 @Path("/ou")
@@ -25,12 +26,27 @@ public class OUEndpoint extends Endpoint {
 
 	@Inject
 	private OrgUnitWithKLEService orgUnitService;
+	
+	@Inject
+	private OrgUnitService ouService;
+	
 
+//	@GET
+//	@Produces(MediaType.APPLICATION_JSON)
+//	public Response list() {
+//		List<OrgUnitWithKLEPO> result = orgUnitService.getAll(1L);
+//		return Response.ok().entity(result).build();
+//	}
+	
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response list() {
-		List<OrgUnitWithKLEPO> result = orgUnitService.getAll(1L);
-		return Response.ok().entity(result).build();
+		Optional<OrgUnit> result = ouService.getToplevelOrgUnit(1L);
+		if(result.isPresent()){
+			OrgUnitTreePO value = new OrgUnitTreePO(result.get());
+			return Response.ok().entity(value).build();
+		}
+		return Response.status(404).entity("No data found.").build();
 	}
 
 	@GET
