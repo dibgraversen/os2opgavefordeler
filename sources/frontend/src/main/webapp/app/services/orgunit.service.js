@@ -27,36 +27,23 @@
 		return service;
 
 		function getOrgUnits() {
-			//console.log("GET /ou");
-
 			return httpGet('/ou');
 		}
 
 		function getOrgUnit(id) {
-			//console.log("GET /ou/" + id);
-
 			return httpGet('/ou/' + id);
 		}
 
-		function getKles(){	
-			//console.log("GET /kle2'");
-	
-			return httpGet('/kle2');
+		function getKles(){		
+			return httpGet('/kle/tree'); 
 		}
 
-		function addKle(kle,orgunit){
-			//console.log("httpPost " + "/ou/" + orgunit.id + "/addKLE");
-			var payload = {"number": kle.number, "assignmentType" : kle.assignmentType};
-
-			return httpPost("/ou/" + orgunit.id + "/addKLE", payload);
+		function addKle(kle,orgunit,assignment){
+			return httpPost("/ou/" + orgunit.id + "/" + assignment + "/" + kle.number, null);
 		}
 
-		function removeKle(kle,orgunit){
-		//	console.log("/ou/" + orgunit.id + "/removeKLE");
-
-			var payload = {"number": kle.number, "assignmentType" : kle.assignmentType};
-
-			return httpPost("/ou/" + orgunit.id + "/removeKLE", payload);
+		function removeKle(kle,orgunit,assignment){
+			return httpDelete("/ou/" + orgunit.id + "/" + assignment + "/" + kle.number, null);
 		}
 
 		function simulateRestCall(functionToSimulate){ 
@@ -76,6 +63,10 @@
 
 		function httpPost(url, data) {
 			return httpExecute(url, 'POST', {data: data});
+		}
+
+		function httpDelete(url, data) {
+			return httpExecute(url, 'DELETE', {data: data});
 		}
 
 		function httpExecute(requestUrl, method, options) {

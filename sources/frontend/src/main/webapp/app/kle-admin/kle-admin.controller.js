@@ -21,53 +21,82 @@
 		activate();
 
 		function activate() {
-			orgUnitService.getKles().then(function(kles){
-				$scope.kles = kles; 
-			});
+			orgUnitService.getKles().then(
+									function(kles){
+										$scope.kles = kles;
+									});
 
-			orgUnitService.getOrgUnits().then(function(ous){
-				$scope.ous = JSON.parse(JSON.stringify(ous));
-				setCurrentOrgUnit($scope.ous[0].id);				
-			});		
+			orgUnitService.getOrgUnits().then(
+									function(ous){
+										$scope.ous = ous;
+										setCurrentOrgUnit($scope.ous[0].id);				
+									});		
 		}
 
-		function setCurrentOrgUnit(ouId){
-			orgUnitService.getOrgUnit(ouId).then(function(ou){
-				$scope.currentOrgUnit=ou;
-				$scope.currentOrgUnit.displayKles = JSON.parse(JSON.stringify($scope.kles));			
-				refreshTree($scope.currentOrgUnit.displayKles);
-			});	
+		function setCurrentOrgUnit(ouId){			
+			orgUnitService.getOrgUnit(ouId).then(
+				function(ou){
+					$scope.currentOrgUnit = ou;
+					$scope.currentOrgUnit.displayKles = $scope.kles;
+					refreshTree($scope.currentOrgUnit.displayKles);
+			});		
 		}
 
 		function refreshTree(kles){
 			if(kles === null){
 				return ;
 			}
+
 			for(var i = 0; i < kles.length; i++){
-				kles[i].assigned = isKleAssigned($scope.currentOrgUnit,kles[i].number);
+				kles[i].interest = isKleAssigned($scope.currentOrgUnit,kles[i].number,'INTEREST');
+				kles[i].performing = isKleAssigned($scope.currentOrgUnit,kles[i].number,'PERFORMING');
 				refreshTree(kles[i].children);
 			}
 		}
 
-		function isKleAssigned(ou, kleNumber){
-			for(var i = 0; i < ou.kles.length; i++){
-				if(ou.kles[i].kleNumber==kleNumber){
-					return true;
+		function isKleAssigned(ou, kleNumber,assignmentType){
+			if(assignmentType === "INTEREST"){
+				if (ou.interestKLE === null){
+					return false;
 				}
+
+				for(var i = 0; i < ou.interestKLE.length; i++){
+					if(ou.interestKLE[i]==kleNumber){
+
+						return true;
+					}
+				}
+				return false;
 			}
-			return false;
+			
+			if(assignmentType === "PERFORMING"){
+				if (ou.performingKLE === null){
+					return false;
+				}
+				for(var j = 0; j < ou.performingKLE.length; j++){
+					if(ou.performingKLE[j]==kleNumber){
+						return true;
+					}
+				}
+				return false;
+			}
+			return false;	
 		}
 
 		function expand(kle){
 			kle.expanded = true;
 		}
 
-		function modifyKle(checked,kle,ou){
+		function modifyKle(checked,kle,ou,assignment){
 			if(checked){
-					orgUnitService.addKle(kle,ou);
+					orgUnitService.addKle(kle,ou,assignment).then(function(){
+						//refreshTree(ou);
+					});
 			}
 			else {
-				orgUnitService.removeKle(kle,ou);
+				orgUnitService.removeKle(kle,ou,assignment).then(function(){
+						//kle.interest = false;
+				});
 			}			
 		}
 	}

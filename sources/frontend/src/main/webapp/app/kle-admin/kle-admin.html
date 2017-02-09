@@ -1,7 +1,7 @@
 
 <div class="col-md-8 col-md-offset-2">
 	<h1>KLE Opmærkning</h1>
-	<div class="col-md-4">
+	<div data-ng-show="false"  class="col-md-4"> <!-- PUT THIS BACK ONCE WE WANT THE OU TABLE LIST-->
 		    <input type="text" data-ng-model="filterStr" placeholder="OrgUnit" />
 
 			<table class="table table-hover">
@@ -15,6 +15,7 @@
 					<h6>{{ou}}</h6>
 						<tr data-ng-class="currentOrgUnit.id === ou.id ? 'success' : ''" data-ng-click="setCurrentOrgUnit(ou.id)">
 							<td>{{ ou.id}} </td>
+							<h6>{{ou}}</h6>
 							<td>
 								{{ ou.name | limitTo: 50 }}
 							</td>					
@@ -22,52 +23,121 @@
 					</tbody>
 			</table>
 	</div>
-	<div class="col-md-8">
-		<h2> {{currentOrgUnit.name}}</h2>
-		<div class="panel-body">
-			<div data-ng-repeat="firstKle in currentOrgUnit.displayKles">							
-				<div class="list-group-item">	
-					<a  ng-click="firstKle['visible'] = !firstKle['visible']">	
-						<span class="glyphicon hover" ng-class="firstKle['visible'] ? 'glyphicon-chevron-down' : 'glyphicon-chevron-right'"></span>
-					</a>
-					&nbsp;&nbsp;
-					<input 
-					type="checkbox" 
-					data-ng-model="firstKle.assigned" 
-					data-ng-click="modifyKle(firstKle.assigned,firstKle,currentOrgUnit)"></input>
-					{{firstKle.number}} &nbsp;&nbsp;{{firstKle.serviceText}}
-				</div>
+	<div data-ng-show="true"  class="col-md-4">
+		    <input type="text" data-ng-model="filterStr" placeholder="OrgUnit" />
 
-				<div data-ng-repeat="secondKle in firstKle.children" data-ng-show="firstKle['visible']">
-					<div class="list-group-item">	
-					<a ng-click="secondKle['visible'] = !secondKle['visible']">
-						<span class="glyphicon hover" ng-class="secondKle['visible'] ? 'glyphicon-chevron-down' : 'glyphicon-chevron-right' "></span>
-					</a>
-					&nbsp;&nbsp;
-					<input 
-					type="checkbox" 
-					data-ng-model="secondKle.assigned" 
-					data-ng-click="modifyKle(secondKle.assigned,secondKle,currentOrgUnit)">	</input>
-					{{secondKle.number}} &nbsp;&nbsp; {{secondKle.serviceText}}
-					</div>
-					<div  data-ng-repeat="thirdKle in secondKle.children" data-ng-show="secondKle['visible']">
-							<div class="list-group-item">	
-							<a ng-click="thirdKle['visible'] = !thirdKle['visible']">
-							</a>
-							&nbsp;&nbsp;
-							<input 
-							type="checkbox" 
-							data-ng-model="thirdKle.assigned" 
-							data-ng-click="modifyKle(thirdKle.assigned,thirdKle,currentOrgUnit)">	</input>
-							{{thirdKle.number}} &nbsp;&nbsp; {{thirdKle.serviceText}}
-							</div>
-					</div>
-				<div>
-			</div>
-		</div>
+			<table class="table table-hover">
+					<thead>
+					<tr>
+						<th>id</th>
+						<th>Navn</th>
+					</tr>
+					</thead>
+					<tbody data-ng-repeat="ou in ous | filter: { name : filterStr }">
+					<h6>{{ou}}</h6>
+						<tr data-ng-class="currentOrgUnit.id === ou.id ? 'success' : ''" data-ng-click="setCurrentOrgUnit(ou.id)">
+							<td>{{ ou.id}} </td>
+							<h6>{{ou}}</h6>
+							<td>
+								{{ ou.name | limitTo: 50 }}
+							</td>					
+						</tr>
+					</tbody>
+			</table>
 	</div>
 
 
-			
-		
+	<div class="col-md-8">
+		<h2> {{currentOrgUnit.name}}</h2>
 
+			<!--
+			<ul class="nav nav-tabs">
+						  <li class="active">
+						  	<a data-toggle="tab" data-target="#performingKLES">Performing</a>
+						  </li>
+						  <li>
+						  	<a data-toggle="tab" data-target="#interestKLES">Interest</a>
+						  </li>
+			</ul>
+			-->
+
+			<div class="tab-content">
+							<div id="performingKLES" class="tab-pane fade in active">
+									<div class="panel-body">
+										<div data-ng-repeat="firstKle in currentOrgUnit.displayKles">							
+											<div class="list-group-item">	
+												<a  ng-click="firstKle['visible'] = !firstKle['visible']">	
+													<span class="glyphicon hover" ng-class="firstKle['visible'] ? 'glyphicon-chevron-down' : 'glyphicon-chevron-right'"></span>
+												</a>
+												&nbsp;&nbsp;
+												<input type="checkbox" data-ng-model="firstKle.performing" data-ng-click="modifyKle(firstKle.performing,firstKle,currentOrgUnit,'PERFORMING')"></input>
+												<input type="checkbox" data-ng-model="firstKle.interest" data-ng-click="modifyKle(
+												firstKle.interest, firstKle, currentOrgUnit,'INTEREST')"></input>
+												{{firstKle.number}} &nbsp;&nbsp;{{firstKle.serviceText}}
+											</div>
+
+											<div  data-ng-repeat="secondKle in firstKle.children" data-ng-show="firstKle['visible']">
+												<div class="list-group-item">	
+													<a ng-click="secondKle['visible'] = !secondKle['visible']">
+														<span class="glyphicon hover" ng-class="secondKle['visible'] ? 'glyphicon-chevron-down' : 'glyphicon-chevron-right' "></span>
+													</a> 
+													<input 
+													type="checkbox" data-ng-model="secondKle.performing" data-ng-click="modifyKle(secondKle.performing,secondKle,currentOrgUnit,'PERFORMING')">	</input>
+													<input 
+													type="checkbox" data-ng-model="secondKle.interest" data-ng-click="modifyKle(secondKle.interest,secondKle,currentOrgUnit,'INTEREST')">	</input>
+													{{secondKle.number}} {{secondKle.serviceText}}
+												</div>
+												<div  data-ng-repeat="thirdKle in secondKle.children" data-ng-show="secondKle['visible']">
+														<div class="list-group-item">	
+														<a ng-click="thirdKle['visible'] = !thirdKle['visible']">
+														</a>
+														<input type="checkbox" data-ng-model="thirdKle.performing" data-ng-click="modifyKle(thirdKle.performing,thirdKle,currentOrgUnit,'PERFORMING')">	</input>
+														<input 
+														type="checkbox" data-ng-model="thirdKle.interest" data-ng-click="modifyKle(thirdKle.interest,thirdKle,currentOrgUnit,'INTEREST')">	</input>
+
+														{{thirdKle.number}} {{thirdKle.serviceText}}
+														</div>
+												</div>
+											<div>
+										</div>
+									</div>		
+							</div>
+							<!--
+							<div data-ng-show="false" id="interestKLES" class="tab-pane fade in active">
+									<div class="panel-body">
+										<div data-ng-repeat="firstKle in currentOrgUnit.displayKles">							
+											<div class="list-group-item">	
+												<a  ng-click="firstKle['visible'] = !firstKle['visible']">	
+													<span class="glyphicon hover" ng-class="firstKle['visible'] ? 'glyphicon-chevron-down' : 'glyphicon-chevron-right'"></span>
+												</a>
+												&nbsp;&nbsp;
+												<input type="checkbox" data-ng-model="firstKle.assigned" data-ng-click="modifyKle(firstKle.assigned,firstKle,currentOrgUnit)"></input>
+												{{firstKle.number}} &nbsp;&nbsp;{{firstKle.serviceText}}
+											</div>
+
+											<div  data-ng-repeat="secondKle in firstKle.children" data-ng-show="firstKle['visible']">
+												<div class="list-group-item">	
+													<a ng-click="secondKle['visible'] = !secondKle['visible']">
+														<span class="glyphicon hover" ng-class="secondKle['visible'] ? 'glyphicon-chevron-down' : 'glyphicon-chevron-right' "></span>
+													</a> 
+													<input 
+													type="checkbox" data-ng-model="secondKle.assigned" data-ng-click="modifyKle(secondKle.assigned,secondKle,currentOrgUnit)">	</input>
+													{{secondKle.number}} {{secondKle.serviceText}}
+												</div>
+												<div  data-ng-repeat="thirdKle in secondKle.children" data-ng-show="secondKle['visible']">
+														<div class="list-group-item">	
+														<a ng-click="thirdKle['visible'] = !thirdKle['visible']">
+														</a>
+														<input type="checkbox" data-ng-model="thirdKle.assigned" data-ng-click="modifyKle(thirdKle.assigned,thirdKle,currentOrgUnit)">	</input>
+														{{thirdKle.number}} {{thirdKle.serviceText}}
+														</div>
+												</div>
+											<div>
+										</div>
+									</div>		
+							</div>
+
+							!-->
+			</div>
+
+	</div>
