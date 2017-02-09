@@ -13,4 +13,6 @@ public interface KleService {
 	void storeAllKleMainGroups(List<Kle> groups);
 
 	Kle getKle(Long id);
+
+	Kle getKle(String kleNumber);
 }

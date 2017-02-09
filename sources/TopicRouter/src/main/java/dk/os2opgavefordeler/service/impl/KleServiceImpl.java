@@ -65,6 +65,13 @@ public class KleServiceImpl implements KleService {
 		query.setParameter("id", id);
 		return (Kle) query.getSingleResult();
 	}
+	
+	@Override
+	public Kle getKle(String kleNumber) {
+		Query query = persistence.getEm().createQuery("SELECT k FROM Kle k WHERE k.number = :kleNumber");
+		query.setParameter("kleNumber", kleNumber);
+		return (Kle) query.getSingleResult();
+	}
 
 	private List<Kle> touchChildren(List<Kle> kle) {
 		kle.forEach(k -> touchChildren(k.getChildren()));
