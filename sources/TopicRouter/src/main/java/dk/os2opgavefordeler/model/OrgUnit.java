@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -19,6 +20,8 @@ import javax.validation.constraints.NotNull;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableList;
+
+import dk.os2opgavefordeler.model.presentation.KleAssignmentType;
 
 @Entity
 public class OrgUnit implements Serializable, IHasChildren<OrgUnit> {
@@ -55,8 +58,11 @@ public class OrgUnit implements Serializable, IHasChildren<OrgUnit> {
 	@OneToMany(mappedBy = "assignedOrg", cascade = CascadeType.REMOVE)
 	private List<DistributionRuleFilter> responsibleForFilters;
 	
-	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-	private List<Kle> kles = new ArrayList<>();
+//	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+//	private List<Kle> kles = new ArrayList<>();
+	
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	private List<OuKleAssignment> kles = new ArrayList<>();
 
 	public OrgUnit() {
 		children = new ArrayList<>();
@@ -213,14 +219,32 @@ public class OrgUnit implements Serializable, IHasChildren<OrgUnit> {
 		this.municipality = municipality;
 	}
 	
-	
-
-	public List<Kle> getKles() {
-		return ImmutableList.copyOf(kles);
+	public List<Kle> getKles(KleAssignmentType assignmentType) {
+		//Probably shouldn't be in one line
+		return ImmutableList.copyOf(kles.stream().filter(x->x.getAssignmentType().equals(assignmentType)).map(OuKleAssignment::getKle).collect(Collectors.toList()));
 	}
 
-	public void addKle(Kle kle) {
-		this.kles.add(kle);		
+	public OuKleAssignment addKle(Kle kle, KleAssignmentType assignmentType) {
+		System.out.println("Inside the OrgUnit class. Called addKle("+kle+","+assignmentType+")");
+		if(this.kles.stream().anyMatch(x->x.getAssignmentType().equals(assignmentType) && x.getKle().equals(kle))){
+			//Error already exists.. what to do?			
+			System.err.println("Error: Kle with assignment "+assignmentType+" already exists.");
+		}else{
+			OuKleAssignment oka = new OuKleAssignment(this,kle,assignmentType);
+			System.out.println("Created OuKleAssignment "+oka);
+			this.kles.add(oka);
+			System.out.println("Added "+oka+ " to "+ this.kles);
+			return oka;
+		}
+		return null;
+	}
+	
+	public void removeKle(Kle kle, KleAssignmentType assignmentType){
+		System.out.println("Inside the OrgUnit class. Called removeKle("+kle+","+assignmentType+")");
+		if(!this.kles.removeIf(x->x.getAssignmentType().equals(assignmentType) && x.getKle().equals(kle))){
+			//Error not found.. what to do?			
+			System.err.println("Error: Kle with assignment "+assignmentType+" already exists.");
+		}				
 	}
 
 	@Override

@@ -9,7 +9,7 @@ public interface OrgUnitWithKLEService {
 	
 	List<OrgUnitWithKLEPO> getAll(long municipalityId); 
 	OrgUnitWithKLEPO get(long id);
-	OrgUnitWithKLEPO addKLE(long id, String kleNumber, KleAssignmentType assignmentType);
-	OrgUnitWithKLEPO removeKLE(long id, String kleNumber, KleAssignmentType assignmentType);
+	OrgUnitWithKLEPO addKLE(long ouId, String kleNumber, KleAssignmentType assignmentType);
+	OrgUnitWithKLEPO removeKLE(long ouId, String kleNumber, KleAssignmentType assignmentType);
 
 }

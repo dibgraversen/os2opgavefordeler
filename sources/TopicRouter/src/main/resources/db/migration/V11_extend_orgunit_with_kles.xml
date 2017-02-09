@@ -12,6 +12,9 @@
 			</column>
 			<column name="kle_id" type="bigint" />
 			<column name="ou_id" type="bigint" />
+			<column name="assignmentType" type="varchar" >
+				<constraints nullable="false" />
+			</column>
 		</createTable>
                 
         <addForeignKeyConstraint constraintName="kle2ou"

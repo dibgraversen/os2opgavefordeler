@@ -20,6 +20,7 @@ import dk.os2opgavefordeler.model.OrgUnit_;
 import dk.os2opgavefordeler.model.presentation.KleAssignmentType;
 import dk.os2opgavefordeler.model.presentation.OrgUnitWithKLEPO;
 import dk.os2opgavefordeler.repository.UserRepository;
+import dk.os2opgavefordeler.service.KleService;
 import dk.os2opgavefordeler.service.OrgUnitWithKLEService;
 import dk.os2opgavefordeler.service.PersistenceService;
 
@@ -37,6 +38,9 @@ public class OrgUnitWithKLEServiceImpl implements OrgUnitWithKLEService {
 
 	@Inject
 	private AuthService authService;
+	
+	@Inject
+	private KleService kleService;
 
 	@Override
 	public List<OrgUnitWithKLEPO> getAll(long municipalityId) {
@@ -68,22 +72,56 @@ public class OrgUnitWithKLEServiceImpl implements OrgUnitWithKLEService {
 			System.out.println("KLE: " + ouEntity.toString());
 			OrgUnitWithKLEPO ou = new OrgUnitWithKLEPO(ouEntity.getId(), ouEntity.getName(),
 					ouEntity.getParent().isPresent() ? ouEntity.getParent().get().getName() : null);
-			ou.setInterestKLE(ouEntity.getKles().stream().map(Kle::getNumber).collect(Collectors.toList()));
+			ou.setInterestKLE(ouEntity.getKles(KleAssignmentType.INTEREST).stream().map(Kle::getNumber).collect(Collectors.toList()));
+			ou.setPerformingKLE(ouEntity.getKles(KleAssignmentType.PERFORMING).stream().map(Kle::getNumber).collect(Collectors.toList()));
 			return ou;
-		} else {
-			return null;
 		}
-	}
-
-	@Override
-	public OrgUnitWithKLEPO addKLE(long id, String kleNumber, KleAssignmentType assignmentType) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public OrgUnitWithKLEPO removeKLE(long id, String kleNumber, KleAssignmentType assignmentType) {
-		// TODO Auto-generated method stub
+	public OrgUnitWithKLEPO addKLE(long ouId, String kleNumber, KleAssignmentType assignmentType) {
+		//System.out.print("Inside the addKLE method in the " + OrgUnitWithKLEServiceImpl.class.getName());
+		//System.out.println(" called addKLE(" + ouId + "," + kleNumber + "," + assignmentType + ")");
+		final List<OrgUnit> results = persistence.criteriaFind(OrgUnit.class,
+				(cb, cq, ou) -> cq.where(cb.equal(ou.get(OrgUnit_.id), ouId)));
+		//System.out.println(results.toString());
+		if (!results.isEmpty()) {
+			//System.out.println("Result is not empty");
+			OrgUnit orgUnit = results.get(0);
+			//System.out.println("Found OU:" + orgUnit);
+			Kle kle = kleService.getKle(kleNumber);
+			if (kle != null) {
+				//System.out.println("Found KLE:" + kle);
+				orgUnit.addKle(kle, assignmentType);
+				return get(orgUnit.getId());
+			} else {
+				//System.out.println("Kle with given code not found.");
+			}
+		}
+		return null;
+	}
+
+	@Override
+	public OrgUnitWithKLEPO removeKLE(long ouId, String kleNumber, KleAssignmentType assignmentType) {
+		//System.out.print("Inside the removeKLE method in the " + OrgUnitWithKLEServiceImpl.class.getName());
+		//System.out.println(" called removeKLE(" + ouId + "," + kleNumber + "," + assignmentType + ")");
+		final List<OrgUnit> results = persistence.criteriaFind(OrgUnit.class,
+				(cb, cq, ou) -> cq.where(cb.equal(ou.get(OrgUnit_.id), ouId)));
+		//System.out.println(results.toString());
+		if (!results.isEmpty()) {
+			//System.out.println("Result is not empty");
+			OrgUnit orgUnit = results.get(0);
+			//System.out.println("Found OU:" + orgUnit);
+			Kle kle = kleService.getKle(kleNumber);
+			if (kle != null) {
+				//System.out.println("Found KLE:" + kle);
+				orgUnit.removeKle(kle, assignmentType);
+				return get(orgUnit.getId());
+			} else {
+				//System.out.println("Kle with given code not found.");
+			}
+		}
 		return null;
 	}
 
