@@ -1,5 +1,6 @@
 package dk.os2opgavefordeler.rest;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -43,10 +44,10 @@ public class OUEndpoint extends Endpoint {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response tree() {
-		Optional<OrgUnit> result = ouService.getToplevelOrgUnit(1L);
+		Optional<OrgUnit> result = ouService.getToplevelOrgUnit(1L);		
 		if(result.isPresent()){
 			OrgUnitTreePO value = new OrgUnitTreePO(result.get());
-			return Response.ok().entity(value).build();
+			return Response.ok().entity(Arrays.asList(value)).build();
 		}
 		return Response.status(404).entity("No data found.").build();
 	}

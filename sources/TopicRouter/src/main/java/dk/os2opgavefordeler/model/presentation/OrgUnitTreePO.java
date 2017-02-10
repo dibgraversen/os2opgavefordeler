@@ -12,12 +12,14 @@ public class OrgUnitTreePO implements Serializable{
 	 */
 	private static final long serialVersionUID = 3159231060766644353L;
 	
+	private long id;
 	private String name;
 	private List<OrgUnitTreePO> children;
 
 	public OrgUnitTreePO(OrgUnit from) {
 		children = new ArrayList<>();
 		this.name = from.getName();
+		this.id = from.getId();
 		for (OrgUnit child :from.getChildren()) {
 			this.children.add(new OrgUnitTreePO(child));
 		}
@@ -38,5 +40,14 @@ public class OrgUnitTreePO implements Serializable{
 	public void setChildren(List<OrgUnitTreePO> children) {
 		this.children = children;
 	}
+
+	public long getId() {
+		return id;
+	}
+
+	public void setId(long id) {
+		this.id = id;
+	}
+	
 
 }
