@@ -404,6 +404,14 @@ public class OrgUnitServiceImpl implements OrgUnitService {
 		);
 		return results;
 	}
+	
+	@Override	
+	public List<OrgUnit> findByBusinessKey(String businessKey) {
+		final List<OrgUnit> results = persistence.criteriaFind(OrgUnit.class,
+			(cb, cq, ou) -> cq.where( cb.like(ou.get(OrgUnit_.businessKey), businessKey))
+		);
+		return results;
+	}
 
 //	public List<Employment> getSubordinateManagers(OrgUnit ou) {
 //		return ou.flattened().map(OrgUnit::getManager).collect(Collectors.toList());
