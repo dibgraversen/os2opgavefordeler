@@ -1,5 +1,6 @@
 package dk.os2opgavefordeler.rest;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,6 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
@@ -31,6 +33,8 @@ import dk.os2opgavefordeler.model.Kle;
 import dk.os2opgavefordeler.model.Municipality;
 import dk.os2opgavefordeler.model.api.DistributionRuleApiResultPO;
 import dk.os2opgavefordeler.model.api.EmploymentApiResultPO;
+import dk.os2opgavefordeler.model.presentation.KleAssignmentType;
+import dk.os2opgavefordeler.model.presentation.OrgUnitWithKLEPO;
 import dk.os2opgavefordeler.service.*;
 
 /**
@@ -136,6 +140,43 @@ public class ApiEndpoint extends Endpoint {
 		log.info("API endpoint called by {} for KLE: {} with result: {}", email, resultPO.getKle().getNumber(), resultPO.getOrg().getName());
 
 		return ok(resultPO);
+	}
+	
+	@GET
+	@Path("/ou/{businessKey}")
+	@Produces(MediaType.APPLICATION_JSON)	
+	public Response lookupOrgUnit(@PathParam("businessKey") String bkey) {
+		List<OrgUnit> ou;
+		try {
+			ou = orgUnitService.findByBusinessKey(bkey);
+			List<List<Kle>> result = new ArrayList<>();
+			for (KleAssignmentType assignmentType : KleAssignmentType.values()) {
+				result.add(ou.get(0).getKles(assignmentType));
+			}
+			return Response.ok().entity(result).build();
+		} catch (Exception e) {
+			return Response.status(404).entity("Entity not found for BusinessKey: " + bkey).build();
+		}
+	}
+	
+	@GET
+	@Path("/ou/{businessKey}/{assignmentType}")
+	@Produces(MediaType.APPLICATION_JSON)	
+	public Response lookupOrgUnit(@PathParam("businessKey") String businessKey,@PathParam("assignmentType") String assignmentTypeString) {	 
+		KleAssignmentType assignmentType;
+		try {
+			assignmentType = KleAssignmentType.fromString(assignmentTypeString);
+		} catch (IllegalArgumentException e) {
+			return Response.status(404).entity("Assignment type doesn't exist.").build();
+		}		
+		List<OrgUnit> ou;
+		try {
+			ou = orgUnitService.findByBusinessKey(businessKey);	
+			List<Kle> result = ou.get(0).getKles(assignmentType);			
+			return Response.ok().entity(result).build();			
+		} catch (Exception e) {
+			return Response.status(404).entity("Entity not found for Name: " + businessKey).build();
+		}
 	}
 
 	@GET
