@@ -35,7 +35,7 @@ public interface OrgUnitService {
 
 	List<OrgUnitPO> getManagedOrgUnitsPO(long municipalityId, long employmentId);
 	List<OrgUnit> findByName(String name);
-	List<OrgUnit> findByBusinessKey(String businessKey);
+	Optional<OrgUnit> findByBusinessKey(String businessKey);
 
 	List<OrgUnitPO> getToplevelOrgUnitPO(long municipalityId);
 	Optional<OrgUnitPO> getOrgUnitPO(long id);
