@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+    <changeSet author="Piotr" id="add_kle_ou_mapping">
+	     <!-- OU KLE mapping table -->
+		<createTable tableName="ou_kle_mapping">
+			<column name="id" autoIncrement="true" type="bigint">
+				<constraints nullable="false" primaryKey="true" unique="true" />
+			</column>
+			<column name="kle_id" type="bigint" />
+			<column name="ou_id" type="bigint" />
+			<column name="assignmentType" type="varchar" >
+				<constraints nullable="false" />
+			</column>
+		</createTable>
+                
+        <addForeignKeyConstraint constraintName="kle2ou"
+                                 baseTableName="ou_kle_mapping"
+                                 baseColumnNames="ou_id"
+                                 referencedTableName="orgunit"
+                                 referencedColumnNames="id"/>
+                                 
+        <addForeignKeyConstraint constraintName="ou2kle"
+                                 baseTableName="ou_kle_mapping"
+                                 baseColumnNames="kle_id"
+                                 referencedTableName="kle"
+                                 referencedColumnNames="id"/>
+       
+    </changeSet>
+</databaseChangeLog>

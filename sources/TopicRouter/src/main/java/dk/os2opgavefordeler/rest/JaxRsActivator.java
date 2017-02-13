@@ -1,12 +1,14 @@
 package dk.os2opgavefordeler.rest;
 
-import dk.os2opgavefordeler.distribution.DistributionRuleFilterEndpoint;
-import dk.os2opgavefordeler.orgunit.ImportEndpoint;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
-import java.util.HashSet;
-import java.util.Set;
+
+import dk.os2opgavefordeler.distribution.DistributionRuleFilterEndpoint;
+import dk.os2opgavefordeler.orgunit.ImportEndpoint;
+
 
 /**
  * A class extending {@link Application} and annotated with @ApplicationPath is the Java EE 6
@@ -37,7 +39,6 @@ public class JaxRsActivator extends Application {
         s.add(ImportEndpoint.class);
         s.add(AuditLogEndpoint.class);
         s.add(OUEndpoint.class);
-        s.add(KleEndpoint.class);
         return s;
     }
 

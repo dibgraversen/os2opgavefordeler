@@ -1,14 +1,14 @@
-package dk.os2opgavefordeler.model.rest;
+package dk.os2opgavefordeler.model.presentation;
 
 public class KleExtended {
 
 	private String kleNumber;
-	private String assignmentType;
+	private KleAssignmentType assignmentType;
 
 	public KleExtended() {
 	}
 
-	public KleExtended(String kleNumber, String assignmentType) {
+	public KleExtended(String kleNumber, KleAssignmentType assignmentType) {
 		this.kleNumber = kleNumber;
 		this.assignmentType = assignmentType;
 	}
@@ -21,11 +21,11 @@ public class KleExtended {
 		this.kleNumber = kleNumber;
 	}
 
-	public String getAssignmentType() {
+	public KleAssignmentType getAssignmentType() {
 		return assignmentType;
 	}
 
-	public void setAssignmentType(String assignmentType) {
+	public void setAssignmentType(KleAssignmentType assignmentType) {
 		this.assignmentType = assignmentType;
 	}
 
