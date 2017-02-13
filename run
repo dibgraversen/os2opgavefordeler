@@ -1,4 +1,0 @@
-#!/bin/bash
-mvn clean install -Dmaven.test.skip=true -Denv=dev
-cp sources/TopicRouter/target/TopicRouter.war tmp/deployments
-docker run -p 8080:8080 -p 9990:9990 -v ${PWD}/tmp/deployments:/opt/jboss/wildfly/standalone/deployments/:rw opgf &

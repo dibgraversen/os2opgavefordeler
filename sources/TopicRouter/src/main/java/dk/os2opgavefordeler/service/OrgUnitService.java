@@ -35,6 +35,7 @@ public interface OrgUnitService {
 
 	List<OrgUnitPO> getManagedOrgUnitsPO(long municipalityId, long employmentId);
 	List<OrgUnit> findByName(String name);
+	Optional<OrgUnit> findByBusinessKey(String businessKey);
 
 	List<OrgUnitPO> getToplevelOrgUnitPO(long municipalityId);
 	Optional<OrgUnitPO> getOrgUnitPO(long id);
@@ -45,4 +46,5 @@ public interface OrgUnitService {
 	Optional<Employment> findResponsibleManager(OrgUnit orgUnit);
 
 	Optional<Employment> getActualManager(Long orgId);
+
 }
