@@ -67,31 +67,40 @@ public class OrgUnitWithKLEServiceImpl implements OrgUnitWithKLEService {
 	public OrgUnitWithKLEPO get(long id) {
 		final List<OrgUnit> results = persistence.criteriaFind(OrgUnit.class,
 				(cb, cq, ou) -> cq.where(cb.equal(ou.get(OrgUnit_.id), id)));
+
 		if (!results.isEmpty()) {
 			OrgUnit ouEntity = results.get(0);
-			System.out.println("KLE: " + ouEntity.toString());
-			OrgUnitWithKLEPO ou = new OrgUnitWithKLEPO(ouEntity.getId(), ouEntity.getName(),
-					ouEntity.getParent().isPresent() ? ouEntity.getParent().get().getName() : null);
-			ou.setInterestKLE(ouEntity.getKles(KleAssignmentType.INTEREST).stream().map(Kle::getNumber).collect(Collectors.toList()));
-			ou.setPerformingKLE(ouEntity.getKles(KleAssignmentType.PERFORMING).stream().map(Kle::getNumber).collect(Collectors.toList()));
-			return ou;
+
+			return buildOrgUnitWithKLEPO(ouEntity);
 		}
+
 		return null;
+	}
+
+	private OrgUnitWithKLEPO buildOrgUnitWithKLEPO(OrgUnit ouEntity) {
+                OrgUnitWithKLEPO ou = new OrgUnitWithKLEPO(ouEntity.getId(), ouEntity.getName(), ouEntity.getParent().isPresent() ? ouEntity.getParent().get().getName() : null);
+                ou.setInterestKLE(ouEntity.getKles(KleAssignmentType.INTEREST).stream().map(Kle::getNumber).collect(Collectors.toList()));
+                ou.setPerformingKLE(ouEntity.getKles(KleAssignmentType.PERFORMING).stream().map(Kle::getNumber).collect(Collectors.toList()));
+
+                return ou;
 	}
 
 	@Override
 	public OrgUnitWithKLEPO addKLE(long ouId, String kleNumber, KleAssignmentType assignmentType) {
 		final List<OrgUnit> results = persistence.criteriaFind(OrgUnit.class,
-				(cb, cq, ou) -> cq.where(cb.equal(ou.get(OrgUnit_.id), ouId)));		
+				(cb, cq, ou) -> cq.where(cb.equal(ou.get(OrgUnit_.id), ouId)));
+
 		if (!results.isEmpty()) {
 			OrgUnit orgUnit = results.get(0);
+			// TODO: this does not return null, but throws exception instead
 			Kle kle = kleService.getKle(kleNumber);
+
 			if (kle != null) {
 				orgUnit.addKle(kle, assignmentType);
-				return get(orgUnit.getId());
-			} else {
+				return buildOrgUnitWithKLEPO(orgUnit);
 			}
 		}
+
 		return null;
 	}
 
@@ -99,15 +108,18 @@ public class OrgUnitWithKLEServiceImpl implements OrgUnitWithKLEService {
 	public OrgUnitWithKLEPO removeKLE(long ouId, String kleNumber, KleAssignmentType assignmentType) {
 		final List<OrgUnit> results = persistence.criteriaFind(OrgUnit.class,
 				(cb, cq, ou) -> cq.where(cb.equal(ou.get(OrgUnit_.id), ouId)));
+
 		if (!results.isEmpty()) {
 			OrgUnit orgUnit = results.get(0);
+			// TODO: same as above
 			Kle kle = kleService.getKle(kleNumber);
+
 			if (kle != null) {
 				orgUnit.removeKle(kle, assignmentType);
-				return get(orgUnit.getId());
-			} else {
+                                return buildOrgUnitWithKLEPO(orgUnit);
 			}
 		}
+
 		return null;
 	}
 
