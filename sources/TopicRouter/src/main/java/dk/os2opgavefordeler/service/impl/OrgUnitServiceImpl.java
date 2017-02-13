@@ -406,11 +406,15 @@ public class OrgUnitServiceImpl implements OrgUnitService {
 	}
 	
 	@Override	
-	public List<OrgUnit> findByBusinessKey(String businessKey) {
+	public Optional<OrgUnit> findByBusinessKey(String businessKey) {
 		final List<OrgUnit> results = persistence.criteriaFind(OrgUnit.class,
-			(cb, cq, ou) -> cq.where( cb.like(ou.get(OrgUnit_.businessKey), businessKey))
+				(cb, cq, ou) -> cq.where(cb.equal(ou.get(OrgUnit_.businessKey), businessKey)
+				)
 		);
-		return results;
+
+		return results.isEmpty() ?
+			Optional.empty() :
+			Optional.of(results.get(0));
 	}
 
 //	public List<Employment> getSubordinateManagers(OrgUnit ou) {

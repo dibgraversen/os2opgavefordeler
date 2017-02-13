@@ -1,5 +1,6 @@
 package dk.os2opgavefordeler.rest;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +25,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import javax.ws.rs.*;
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -163,97 +165,60 @@ public class ApiEndpoint extends Endpoint {
 	@GET
 	@Path("/ou/{businessKey}")
 	@Produces(MediaType.APPLICATION_JSON)	
-	public Response lookupOrgUnit(@PathParam("businessKey") String bkey, @Context UriInfo uriInfo) {
-		String token = authService.getAuthentication().getToken();
-
-		if (token == null || token.isEmpty()) {
-			return Response.status(Response.Status.UNAUTHORIZED).build();
-		}		
-		String showExpandedString = uriInfo.getQueryParameters().getFirst("showExpanded");
-		boolean showExpanded =false;
-		if(showExpandedString!=null && showExpandedString.toLowerCase().equals("true")){			
-			showExpanded = true;
-		}			
-		List<OrgUnit> ou;
-		try {
-			ou = orgUnitService.findByBusinessKey(bkey);
-			HashMap<KleAssignmentType,Set<String>> result = new HashMap<>();
-			for (KleAssignmentType assignmentType : KleAssignmentType.values()) {
-				Set<String> listKLE = new TreeSet<>();
-				for (Kle kle : ou.get(0).getKles(assignmentType) ) {
-					listKLE.add(kle.getNumber());
-					if(showExpanded){
-						ImmutableList<Kle> subKLEs = kle.getChildren();
-						if(subKLEs!=null && !subKLEs.isEmpty()){
-							for (Kle sub : subKLEs) {
-								listKLE.add(sub.getNumber());
-								ImmutableList<Kle> subjects = sub.getChildren();
-								if(subjects!=null && !subjects.isEmpty()){
-									for (Kle subject : subjects) {
-										listKLE.add(subject.getNumber());
-									}
-								}
-							}
-						}
-					}
-				}				
-				result.put(assignmentType, listKLE);				
-			}			
-			return Response.ok().entity(result).build();
-		} catch (Exception e) {
-			return Response.status(404).entity("Entity not found for BusinessKey: " + bkey).build();
+	public Response lookupOrgUnit(@PathParam("businessKey") String businessKey,
+			@QueryParam("assignmentType") String assignmentTypeString,
+			@DefaultValue("false") @QueryParam("showExpanded") boolean showExpanded) {	 
+//		String token = authService.getAuthentication().getToken();
+//
+//		if (token == null || token.isEmpty()) {
+//			return Response.status(Response.Status.UNAUTHORIZED).build();
+//		}
+		
+		List<KleAssignmentType> assignmentTypes = new ArrayList<>();
+		if (assignmentTypeString != null) {
+			try {			
+				assignmentTypes.add(KleAssignmentType.fromString(assignmentTypeString));
+			} catch (IllegalArgumentException e) {
+				return Response.status(404).entity("Assignment type does not exist.").build();
+			}
 		}
+		else {
+			assignmentTypes.add(KleAssignmentType.INTEREST);
+			assignmentTypes.add(KleAssignmentType.PERFORMING);
+		}
+			
+		Optional<OrgUnit> ou = orgUnitService.findByBusinessKey(businessKey);			
+		if(!ou.isPresent()){
+			return Response.status(404).entity("Entity not found for BusinessKey: " + businessKey).build();
+		}
+		
+		HashMap<KleAssignmentType,Set<String>> result = new HashMap<>();
+		
+		for (KleAssignmentType assignmentType : KleAssignmentType.values()) {
+			Set<String> listKLE = new TreeSet<>();
+			
+			for (Kle kle : ou.get().getKles(assignmentType) ) {
+				addKle(showExpanded, listKLE, kle);
+			}				
+
+			result.put(assignmentType, listKLE);				
+		}
+		
+		return Response.ok().entity(result).build();
 	}
-	
-	@GET
-	@Path("/ou/{businessKey}/{assignmentType}")
-	@Produces(MediaType.APPLICATION_JSON)	
-	public Response lookupOrgUnit(@PathParam("businessKey") String businessKey,@PathParam("assignmentType") String assignmentTypeString, @Context UriInfo uriInfo) {	 
-		String token = authService.getAuthentication().getToken();
 
-		if (token == null || token.isEmpty()) {
-			return Response.status(Response.Status.UNAUTHORIZED).build();
-		}
-		String showExpandedString = uriInfo.getQueryParameters().getFirst("showExpanded");
-		boolean showExpanded =false;
-		if(showExpandedString!=null && showExpandedString.toLowerCase().equals("true")){			
-			showExpanded = true;
-		}
-		KleAssignmentType assignmentType;
-		try {
-			assignmentType = KleAssignmentType.fromString(assignmentTypeString);
-		} catch (IllegalArgumentException e) {
-			return Response.status(404).entity("Assignment type does not exist.").build();
-		}		
-		List<OrgUnit> ou;
-		try {
-			ou = orgUnitService.findByBusinessKey(businessKey);			
-		} catch (Exception e) {
-			return Response.status(404).entity("Entity not found for Name: " + businessKey).build();
-		}
-		List<Kle> kleList= ou.get(0).getKles(assignmentType);
-		if(!showExpanded){//if not showExpanded we just return a set of kles						
-			Set<String> result = kleList.stream().map(Kle::getNumber).collect(Collectors.toCollection(TreeSet::new));			
-			return Response.ok().entity(result).build();			
-		}else{//otherwise get children of each kle from the list
-			Set<String> result = new TreeSet<>();
-			for (Kle kle : kleList) {
-				result.add(kle.getNumber());
-				ImmutableList<Kle> subKLEs = kle.getChildren();
-				if(subKLEs!=null && !subKLEs.isEmpty()){
-					for (Kle sub : subKLEs) {
-						result.add(sub.getNumber());
-						ImmutableList<Kle> subjects = sub.getChildren();
-						if(subjects!=null && !subjects.isEmpty()){
-							for (Kle subject : subjects) {
-								result.add(subject.getNumber());
-							}
-						}
-					}
+	private void addKle(boolean showExpanded, Set<String> listKLE, Kle kle) {
+		listKLE.add(kle.getNumber());
+
+		if (showExpanded) {
+			ImmutableList<Kle> subKLEs = kle.getChildren();
+			
+			if (subKLEs != null && !subKLEs.isEmpty()) {
+				for (Kle sub : subKLEs) {
+					addKle(showExpanded, listKLE, sub);
 				}
 			}
-			return Response.ok().entity(result).build();
-		}				
+		}
 	}
 
 	@GET
