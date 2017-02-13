@@ -150,6 +150,11 @@ public class ApiEndpoint extends Endpoint {
 	@Path("/ou/{businessKey}")
 	@Produces(MediaType.APPLICATION_JSON)	
 	public Response lookupOrgUnit(@PathParam("businessKey") String bkey, @Context UriInfo uriInfo) {
+		String token = authService.getAuthentication().getToken();
+
+		if (token == null || token.isEmpty()) {
+			return Response.status(Response.Status.UNAUTHORIZED).build();
+		}		
 		String showExpandedString = uriInfo.getQueryParameters().getFirst("showExpanded");
 		boolean showExpanded =false;
 		if(showExpandedString!=null && showExpandedString.toLowerCase().equals("true")){			
@@ -190,6 +195,11 @@ public class ApiEndpoint extends Endpoint {
 	@Path("/ou/{businessKey}/{assignmentType}")
 	@Produces(MediaType.APPLICATION_JSON)	
 	public Response lookupOrgUnit(@PathParam("businessKey") String businessKey,@PathParam("assignmentType") String assignmentTypeString, @Context UriInfo uriInfo) {	 
+		String token = authService.getAuthentication().getToken();
+
+		if (token == null || token.isEmpty()) {
+			return Response.status(Response.Status.UNAUTHORIZED).build();
+		}
 		String showExpandedString = uriInfo.getQueryParameters().getFirst("showExpanded");
 		boolean showExpanded =false;
 		if(showExpandedString!=null && showExpandedString.toLowerCase().equals("true")){			
