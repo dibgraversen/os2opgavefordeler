@@ -1,21 +1,18 @@
 package dk.os2opgavefordeler.rest;
 
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
-import dk.os2opgavefordeler.model.OrgUnit;
-import org.jboss.resteasy.annotations.cache.NoCache;
-import org.slf4j.Logger;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 import javax.enterprise.context.RequestScoped;
-
 import javax.inject.Inject;
-
 import javax.servlet.http.HttpServletRequest;
-
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -26,16 +23,25 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
+import org.jboss.resteasy.annotations.cache.NoCache;
+import org.slf4j.Logger;
+
+import com.google.common.collect.ImmutableList;
+
 import dk.os2opgavefordeler.assigneesearch.Assignee;
 import dk.os2opgavefordeler.assigneesearch.FindAssignedForKleService;
 import dk.os2opgavefordeler.auth.AuthService;
 import dk.os2opgavefordeler.model.Kle;
 import dk.os2opgavefordeler.model.Municipality;
+import dk.os2opgavefordeler.model.OrgUnit;
 import dk.os2opgavefordeler.model.api.DistributionRuleApiResultPO;
 import dk.os2opgavefordeler.model.api.EmploymentApiResultPO;
 import dk.os2opgavefordeler.model.presentation.KleAssignmentType;
-import dk.os2opgavefordeler.model.presentation.OrgUnitWithKLEPO;
-import dk.os2opgavefordeler.service.*;
+import dk.os2opgavefordeler.service.DistributionService;
+import dk.os2opgavefordeler.service.EmploymentService;
+import dk.os2opgavefordeler.service.KleService;
+import dk.os2opgavefordeler.service.MunicipalityService;
+import dk.os2opgavefordeler.service.OrgUnitService;
 
 /**
  * This class supports the endpoints that are part of the external/programmatic API.
@@ -145,14 +151,37 @@ public class ApiEndpoint extends Endpoint {
 	@GET
 	@Path("/ou/{businessKey}")
 	@Produces(MediaType.APPLICATION_JSON)	
-	public Response lookupOrgUnit(@PathParam("businessKey") String bkey) {
+	public Response lookupOrgUnit(@PathParam("businessKey") String bkey, @Context UriInfo uriInfo) {
+		String showExpandedString = uriInfo.getQueryParameters().getFirst("showExpanded");
+		boolean showExpanded =false;
+		if(showExpandedString!=null && showExpandedString.toLowerCase().equals("true")){			
+			showExpanded = true;
+		}			
 		List<OrgUnit> ou;
 		try {
 			ou = orgUnitService.findByBusinessKey(bkey);
-			List<List<Kle>> result = new ArrayList<>();
+			HashMap<KleAssignmentType,Set<String>> result = new HashMap<>();
 			for (KleAssignmentType assignmentType : KleAssignmentType.values()) {
-				result.add(ou.get(0).getKles(assignmentType));
-			}
+				Set<String> listKLE = new TreeSet<>();
+				for (Kle kle : ou.get(0).getKles(assignmentType) ) {
+					listKLE.add(kle.getNumber());
+					if(showExpanded){
+						ImmutableList<Kle> subKLEs = kle.getChildren();
+						if(subKLEs!=null && !subKLEs.isEmpty()){
+							for (Kle sub : subKLEs) {
+								listKLE.add(sub.getNumber());
+								ImmutableList<Kle> subjects = sub.getChildren();
+								if(subjects!=null && !subjects.isEmpty()){
+									for (Kle subject : subjects) {
+										listKLE.add(subject.getNumber());
+									}
+								}
+							}
+						}
+					}
+				}				
+				result.put(assignmentType, listKLE);				
+			}			
 			return Response.ok().entity(result).build();
 		} catch (Exception e) {
 			return Response.status(404).entity("Entity not found for BusinessKey: " + bkey).build();
@@ -162,21 +191,47 @@ public class ApiEndpoint extends Endpoint {
 	@GET
 	@Path("/ou/{businessKey}/{assignmentType}")
 	@Produces(MediaType.APPLICATION_JSON)	
-	public Response lookupOrgUnit(@PathParam("businessKey") String businessKey,@PathParam("assignmentType") String assignmentTypeString) {	 
+	public Response lookupOrgUnit(@PathParam("businessKey") String businessKey,@PathParam("assignmentType") String assignmentTypeString, @Context UriInfo uriInfo) {	 
+		String showExpandedString = uriInfo.getQueryParameters().getFirst("showExpanded");
+		boolean showExpanded =false;
+		if(showExpandedString!=null && showExpandedString.toLowerCase().equals("true")){			
+			showExpanded = true;
+		}
 		KleAssignmentType assignmentType;
 		try {
 			assignmentType = KleAssignmentType.fromString(assignmentTypeString);
 		} catch (IllegalArgumentException e) {
-			return Response.status(404).entity("Assignment type doesn't exist.").build();
+			return Response.status(404).entity("Assignment type does not exist.").build();
 		}		
 		List<OrgUnit> ou;
 		try {
-			ou = orgUnitService.findByBusinessKey(businessKey);	
-			List<Kle> result = ou.get(0).getKles(assignmentType);			
-			return Response.ok().entity(result).build();			
+			ou = orgUnitService.findByBusinessKey(businessKey);			
 		} catch (Exception e) {
 			return Response.status(404).entity("Entity not found for Name: " + businessKey).build();
 		}
+		List<Kle> kleList= ou.get(0).getKles(assignmentType);
+		if(!showExpanded){//if not showExpanded we just return a set of kles						
+			Set<String> result = kleList.stream().map(Kle::getNumber).collect(Collectors.toCollection(TreeSet::new));			
+			return Response.ok().entity(result).build();			
+		}else{//otherwise get children of each kle from the list
+			Set<String> result = new TreeSet<>();
+			for (Kle kle : kleList) {
+				result.add(kle.getNumber());
+				ImmutableList<Kle> subKLEs = kle.getChildren();
+				if(subKLEs!=null && !subKLEs.isEmpty()){
+					for (Kle sub : subKLEs) {
+						result.add(sub.getNumber());
+						ImmutableList<Kle> subjects = sub.getChildren();
+						if(subjects!=null && !subjects.isEmpty()){
+							for (Kle subject : subjects) {
+								result.add(subject.getNumber());
+							}
+						}
+					}
+				}
+			}
+			return Response.ok().entity(result).build();
+		}				
 	}
 
 	@GET
