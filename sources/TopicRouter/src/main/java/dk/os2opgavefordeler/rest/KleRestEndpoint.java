@@ -25,8 +25,7 @@ import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 import dk.os2opgavefordeler.service.KleImportService;
 import org.slf4j.Logger;
 
-//@UserLoggedIn
-@GuestAllowed//For test
+@UserLoggedIn
 @Path("/kle")
 @RequestScoped
 public class KleRestEndpoint extends Endpoint {
