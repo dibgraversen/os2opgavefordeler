@@ -58,10 +58,7 @@ public class OrgUnit implements Serializable, IHasChildren<OrgUnit> {
 
 	@OneToMany(mappedBy = "assignedOrg", cascade = CascadeType.REMOVE)
 	private List<DistributionRuleFilter> responsibleForFilters;
-	
-//	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-//	private List<Kle> kles = new ArrayList<>();
-	
+
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private List<OuKleAssignment> kles = new ArrayList<>();
 
