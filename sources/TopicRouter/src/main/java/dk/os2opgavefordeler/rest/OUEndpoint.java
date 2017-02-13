@@ -101,28 +101,24 @@ public class OUEndpoint extends Endpoint {
 	@Path("/{ouId}/{assignmentType}/{kleNumber}")
 	@Produces(MediaType.TEXT_PLAIN)
 	@KleAssignerRequired
-	public Response deleteKLE(@PathParam("ouId") long ouId,
-			@PathParam("assignmentType") String assignmentTypeString, @PathParam("kleNumber") String kleNumber) {
+	public Response unassignKLE(@PathParam("ouId") long ouId, @PathParam("assignmentType") String assignmentTypeString, @PathParam("kleNumber") String kleNumber) {
 		// Check if ou exists
 		Optional<OrgUnit> ou = ouService.getOrgUnit(ouId);
 		if (!ou.isPresent()) {
 			return Response.status(404).entity("OrgUnit not found for ID: " + ouId).build();
 		}
+
 		// Check if assignment type is correct
 		KleAssignmentType assignmentType;
 		try {
 			assignmentType = KleAssignmentType.fromString(assignmentTypeString);
 		} catch (Exception e) {
-			return Response.status(404).entity("No assignment type with a name: \"" + assignmentTypeString + "\" found")
+			return Response.status(400).entity("No assignment type with a name: \"" + assignmentTypeString + "\" found")
 					.build();
 		}
-		// Check if kle exists
-		try {
-			kleService.getKle(kleNumber);
-		} catch (Exception e) {
-			return Response.status(404).entity("No KLE for number: \"" + kleNumber + "\" found").build();
-		}
+
 		orgUnitService.removeKLE(ouId, kleNumber, assignmentType);
+
 		return Response.ok().build();
 	}
 }
