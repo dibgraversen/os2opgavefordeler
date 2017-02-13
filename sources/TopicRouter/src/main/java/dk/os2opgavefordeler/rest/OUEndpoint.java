@@ -15,6 +15,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import dk.os2opgavefordeler.auth.KleAssignerRequired;
 import dk.os2opgavefordeler.model.OrgUnit;
 import dk.os2opgavefordeler.model.presentation.KleAssignmentType;
 import dk.os2opgavefordeler.model.presentation.OrgUnitTreePO;
@@ -57,8 +58,7 @@ public class OUEndpoint extends Endpoint {
 
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	@Path("/{Id}")
-	// @KleAssignerRequired
+	@Path("/{Id}")	
 	public Response get(@PathParam("Id") long id) {
 		OrgUnitWithKLEPO result = orgUnitService.get(id);
 		if (result != null) {
@@ -71,6 +71,7 @@ public class OUEndpoint extends Endpoint {
 	@POST
 	@Path("/{ouId}/{assignmentType}/{kleNumber}")
 	@Produces(MediaType.TEXT_PLAIN)
+	@KleAssignerRequired
 	public Response assignKLE(@PathParam("ouId") long ouId, @PathParam("assignmentType") String assignmentTypeString,
 			@PathParam("kleNumber") String kleNumber) {
 		// Check if ou exists
@@ -99,6 +100,7 @@ public class OUEndpoint extends Endpoint {
 	@DELETE
 	@Path("/{ouId}/{assignmentType}/{kleNumber}")
 	@Produces(MediaType.TEXT_PLAIN)
+	@KleAssignerRequired
 	public Response deleteKLE(@PathParam("ouId") long ouId,
 			@PathParam("assignmentType") String assignmentTypeString, @PathParam("kleNumber") String kleNumber) {
 		// Check if ou exists
