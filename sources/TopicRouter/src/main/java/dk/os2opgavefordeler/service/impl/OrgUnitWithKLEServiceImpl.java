@@ -81,22 +81,15 @@ public class OrgUnitWithKLEServiceImpl implements OrgUnitWithKLEService {
 
 	@Override
 	public OrgUnitWithKLEPO addKLE(long ouId, String kleNumber, KleAssignmentType assignmentType) {
-		//System.out.print("Inside the addKLE method in the " + OrgUnitWithKLEServiceImpl.class.getName());
-		//System.out.println(" called addKLE(" + ouId + "," + kleNumber + "," + assignmentType + ")");
 		final List<OrgUnit> results = persistence.criteriaFind(OrgUnit.class,
-				(cb, cq, ou) -> cq.where(cb.equal(ou.get(OrgUnit_.id), ouId)));
-		//System.out.println(results.toString());
+				(cb, cq, ou) -> cq.where(cb.equal(ou.get(OrgUnit_.id), ouId)));		
 		if (!results.isEmpty()) {
-			//System.out.println("Result is not empty");
 			OrgUnit orgUnit = results.get(0);
-			//System.out.println("Found OU:" + orgUnit);
 			Kle kle = kleService.getKle(kleNumber);
 			if (kle != null) {
-				//System.out.println("Found KLE:" + kle);
 				orgUnit.addKle(kle, assignmentType);
 				return get(orgUnit.getId());
 			} else {
-				//System.out.println("Kle with given code not found.");
 			}
 		}
 		return null;
@@ -104,22 +97,15 @@ public class OrgUnitWithKLEServiceImpl implements OrgUnitWithKLEService {
 
 	@Override
 	public OrgUnitWithKLEPO removeKLE(long ouId, String kleNumber, KleAssignmentType assignmentType) {
-		//System.out.print("Inside the removeKLE method in the " + OrgUnitWithKLEServiceImpl.class.getName());
-		//System.out.println(" called removeKLE(" + ouId + "," + kleNumber + "," + assignmentType + ")");
 		final List<OrgUnit> results = persistence.criteriaFind(OrgUnit.class,
 				(cb, cq, ou) -> cq.where(cb.equal(ou.get(OrgUnit_.id), ouId)));
-		//System.out.println(results.toString());
 		if (!results.isEmpty()) {
-			//System.out.println("Result is not empty");
 			OrgUnit orgUnit = results.get(0);
-			//System.out.println("Found OU:" + orgUnit);
 			Kle kle = kleService.getKle(kleNumber);
 			if (kle != null) {
-				//System.out.println("Found KLE:" + kle);
 				orgUnit.removeKle(kle, assignmentType);
 				return get(orgUnit.getId());
 			} else {
-				//System.out.println("Kle with given code not found.");
 			}
 		}
 		return null;

@@ -19,6 +19,7 @@ import dk.os2opgavefordeler.model.OrgUnit;
 import dk.os2opgavefordeler.model.presentation.KleAssignmentType;
 import dk.os2opgavefordeler.model.presentation.OrgUnitTreePO;
 import dk.os2opgavefordeler.model.presentation.OrgUnitWithKLEPO;
+import dk.os2opgavefordeler.service.KleService;
 import dk.os2opgavefordeler.service.OrgUnitService;
 import dk.os2opgavefordeler.service.OrgUnitWithKLEService;
 
@@ -28,10 +29,12 @@ public class OUEndpoint extends Endpoint {
 
 	@Inject
 	private OrgUnitWithKLEService orgUnitService;
-	
+
 	@Inject
 	private OrgUnitService ouService;
-	
+
+	@Inject
+	private KleService kleService;
 
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
@@ -40,12 +43,12 @@ public class OUEndpoint extends Endpoint {
 		List<OrgUnitWithKLEPO> result = orgUnitService.getAll(1L);
 		return Response.ok().entity(result).build();
 	}
-	
+
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response tree() {
-		Optional<OrgUnit> result = ouService.getToplevelOrgUnit(1L);		
-		if(result.isPresent()){
+		Optional<OrgUnit> result = ouService.getToplevelOrgUnit(1L);
+		if (result.isPresent()) {
 			OrgUnitTreePO value = new OrgUnitTreePO(result.get());
 			return Response.ok().entity(Arrays.asList(value)).build();
 		}
@@ -67,18 +70,56 @@ public class OUEndpoint extends Endpoint {
 
 	@POST
 	@Path("/{ouId}/{assignmentType}/{kleNumber}")
-	public Response assignKLE(@PathParam("ouId") long ouId,
-			@PathParam("assignmentType") KleAssignmentType assignmentType, @PathParam("kleNumber") String kleNumber) {
-		System.out.println("We hit the endpoint: /" + ouId+"/"+assignmentType+"/"+kleNumber );
+	@Produces(MediaType.TEXT_PLAIN)
+	public Response assignKLE(@PathParam("ouId") long ouId, @PathParam("assignmentType") String assignmentTypeString,
+			@PathParam("kleNumber") String kleNumber) {
+		// Check if ou exists
+		Optional<OrgUnit> ou = ouService.getOrgUnit(ouId);
+		if (!ou.isPresent()) {
+			return Response.status(404).entity("OrgUnit not found for ID: " + ouId).build();
+		}
+		// Check if assignment type is correct
+		KleAssignmentType assignmentType;
+		try {
+			assignmentType = KleAssignmentType.fromString(assignmentTypeString);
+		} catch (Exception e) {
+			return Response.status(404).entity("No assignment type with a name: \"" + assignmentTypeString + "\" found")
+					.build();
+		}
+		// Check if kle exists
+		try {
+			kleService.getKle(kleNumber);
+		} catch (Exception e) {
+			return Response.status(404).entity("No KLE for number: \"" + kleNumber + "\" found").build();
+		}
 		orgUnitService.addKLE(ouId, kleNumber, assignmentType);
-		System.out.println("After kle is added");
 		return Response.ok().build();
 	}
 
 	@DELETE
 	@Path("/{ouId}/{assignmentType}/{kleNumber}")
+	@Produces(MediaType.TEXT_PLAIN)
 	public Response deleteKLE(@PathParam("ouId") long ouId,
-			@PathParam("assignmentType") KleAssignmentType assignmentType,@PathParam("kleNumber") String kleNumber) {
+			@PathParam("assignmentType") String assignmentTypeString, @PathParam("kleNumber") String kleNumber) {
+		// Check if ou exists
+		Optional<OrgUnit> ou = ouService.getOrgUnit(ouId);
+		if (!ou.isPresent()) {
+			return Response.status(404).entity("OrgUnit not found for ID: " + ouId).build();
+		}
+		// Check if assignment type is correct
+		KleAssignmentType assignmentType;
+		try {
+			assignmentType = KleAssignmentType.fromString(assignmentTypeString);
+		} catch (Exception e) {
+			return Response.status(404).entity("No assignment type with a name: \"" + assignmentTypeString + "\" found")
+					.build();
+		}
+		// Check if kle exists
+		try {
+			kleService.getKle(kleNumber);
+		} catch (Exception e) {
+			return Response.status(404).entity("No KLE for number: \"" + kleNumber + "\" found").build();
+		}
 		orgUnitService.removeKLE(ouId, kleNumber, assignmentType);
 		return Response.ok().build();
 	}
