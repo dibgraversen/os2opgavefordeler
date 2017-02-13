@@ -46,4 +46,5 @@ public interface UserService {
 	boolean isAdmin(long userId);
 	boolean isManager(long userId);
 	boolean isMunicipalityAdmin(long userId);
+	boolean isKleAssigner(long id);
 }

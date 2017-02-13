@@ -28,6 +28,8 @@ public class Role implements Serializable {
 	private boolean municipalityAdmin;
 
 	private boolean substitute;
+	
+	private boolean kleAssigner;
 
 	public Role() {
 	}
@@ -39,6 +41,7 @@ public class Role implements Serializable {
 		this.admin = builder.admin;
 		this.municipalityAdmin = builder.municipalityAdmin;
 		this.substitute = builder.substitute;
+		this.kleAssigner = builder.kleAssigner;
 	}
 
 
@@ -64,6 +67,7 @@ public class Role implements Serializable {
 		private boolean admin;
 		private boolean municipalityAdmin;
 		private boolean substitute;
+		private boolean kleAssigner;
 
 		public Role build() {
 			return new Role(this);
@@ -91,6 +95,10 @@ public class Role implements Serializable {
 		}
 		public Builder substitute(boolean substitute) {
 			this.substitute = substitute;
+			return this;
+		}
+		public Builder kleAssigner(boolean kleAssigner) {
+			this.kleAssigner = kleAssigner;
 			return this;
 		}
 	}
@@ -173,6 +181,7 @@ public class Role implements Serializable {
 				", admin=" + admin +
 				", municipalityAdmin=" + municipalityAdmin +
 				", substitute=" + substitute +
+				", kleAssigner=" + kleAssigner +
 				'}';
 	}
 
@@ -185,11 +194,20 @@ public class Role implements Serializable {
 			Objects.equals(manager, role.manager) &&
 			Objects.equals(admin, role.admin) &&
 			Objects.equals(municipalityAdmin, role.municipalityAdmin) &&
+			Objects.equals(kleAssigner, role.kleAssigner) &&
 			Objects.equals(substitute, role.substitute);
 	}
 
 	@Override
 	public int hashCode() {
 		return Objects.hash(employment, manager, admin, municipalityAdmin, substitute);
+	}
+
+	public void setKleAssigner(boolean kleAssigner) {
+		this.kleAssigner = kleAssigner;
+	}
+	
+	public boolean isKleAssigner() {
+		return kleAssigner;
 	}
 }
