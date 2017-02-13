@@ -221,33 +221,22 @@ public class OrgUnit implements Serializable, IHasChildren<OrgUnit> {
 	public void setMunicipality(Municipality municipality) {
 		this.municipality = municipality;
 	}
-	
+
 	public List<Kle> getKles(KleAssignmentType assignmentType) {
-		//Probably shouldn't be in one line
 		return ImmutableList.copyOf(kles.stream().filter(x->x.getAssignmentType().equals(assignmentType)).map(OuKleAssignment::getKle).collect(Collectors.toList()));
 	}
 
-	public OuKleAssignment addKle(Kle kle, KleAssignmentType assignmentType) {
-		System.out.println("Inside the OrgUnit class. Called addKle("+kle+","+assignmentType+")");
-		if(this.kles.stream().anyMatch(x->x.getAssignmentType().equals(assignmentType) && x.getKle().equals(kle))){
-			//Error already exists.. what to do?			
-			System.err.println("Error: Kle with assignment "+assignmentType+" already exists.");
-		}else{
+	public void addKle(Kle kle, KleAssignmentType assignmentType) {
+		if (this.kles.stream().anyMatch(x->x.getAssignmentType().equals(assignmentType) && x.getKle().equals(kle))) {
+			; // do nothing, it is already added
+		} else {
 			OuKleAssignment oka = new OuKleAssignment(this,kle,assignmentType);
-			System.out.println("Created OuKleAssignment "+oka);
 			this.kles.add(oka);
-			System.out.println("Added "+oka+ " to "+ this.kles);
-			return oka;
 		}
-		return null;
 	}
-	
+
 	public void removeKle(Kle kle, KleAssignmentType assignmentType){
-		System.out.println("Inside the OrgUnit class. Called removeKle("+kle+","+assignmentType+")");
-		if(!this.kles.removeIf(x->x.getAssignmentType().equals(assignmentType) && x.getKle().equals(kle))){
-			//Error not found.. what to do?			
-			System.err.println("Error: Kle with assignment "+assignmentType+" already exists.");
-		}				
+		this.kles.removeIf(x->x.getAssignmentType().equals(assignmentType) && x.getKle().equals(kle));
 	}
 
 	@Override
