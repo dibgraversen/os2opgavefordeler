@@ -117,10 +117,14 @@ public class BootstrappingDataProviderSingleton {
 	private void buildUsers() {
 		addUser("Helle Friis Pedersen", "hfp@miracle.dk", miracle, buildRoles());
 		addUser("Hans Ehlert Thomsen", "het@miracle.dk", miracle, buildRoles());
-		addUser("Henrik Løvborg", "hlo@miracle.dk", miracle, buildRole("Henrik Løvborg", "hlo@miracle.dk", true, true, true));
+		addUser("Henrik Løvborg", "hlo@miracle.dk", miracle, buildRole("Henrik Løvborg", "hlo@miracle.dk", true, true, true, true));
 		addUser("Simon Møgelvang Bang", "smb@miracle.dk", miracle, buildRoles());
 		addUser("Sune Marcher", "sum@miracle.dk", miracle, buildRoles());
-		addUser("Rasmus Rosendal", "rro@miracle.dk", miracle, buildRole("Rasmus Rosendal", "rro@miracle.dk", true, true, true));
+		addUser("Rasmus Rosendal", "rro@miracle.dk", miracle, buildRole("Rasmus Rosendal", "rro@miracle.dk", true, true, true, true));
+		
+		addUser("Daniel Torres", "dto@digital-identity.dk", miracle, buildRole("Daniel Torres", "dto@digital-identity.dk", true, true, true, true));
+		addUser("Piotr Suski", "psu@digital-identity.dk", miracle, buildRole("Piotr Suski", "psu@digital-identity.dk", true, true, true, false));
+		
 		List<Role> syddsjursRoles = new ArrayList<>();
 		syddsjursRoles.add(Role.builder().name("Henrik (Syddjurs)").admin(true).municipalityAdmin(true).build());
 		addUser("Henrik", "henrikloevborg@syddjurs.dk", syddjurs, syddsjursRoles);
@@ -133,9 +137,9 @@ public class BootstrappingDataProviderSingleton {
 		return userRepository.save(user);
 	}
 
-	private List<Role> buildRole(String name, String email, boolean admin, boolean manager, boolean municipalityAdmin) {
+	private List<Role> buildRole(String name, String email, boolean admin, boolean manager, boolean municipalityAdmin, boolean kleAssigner){
 		Employment employment = employmentRepository.findByEmail(email);
-		return ImmutableList.of(Role.builder().name(name).employment(employment).admin(admin).manager(manager).municipalityAdmin(municipalityAdmin).build());
+		return ImmutableList.of(Role.builder().name(name).employment(employment).admin(admin).manager(manager).municipalityAdmin(municipalityAdmin).kleAssigner(kleAssigner).build());
 	}
 
 

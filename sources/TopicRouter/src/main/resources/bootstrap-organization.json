@@ -153,6 +153,18 @@
               "email": "rni@miracle.dk",
               "esdhId": "rni"
             },
+            {
+              "businessKey": "E201",
+              "name": "Daniel Torres",
+              "email": "dto@digital-identity.dk",
+              "esdhId": "dto"
+            },
+            {
+              "businessKey": "E202",
+              "name": "Piotr Suski",
+              "email": "psu@digital-identity.dk",
+              "esdhId": "psu"
+            },
 			{
               "businessKey": "E103",
               "name": "Rasmus Rosendal",
