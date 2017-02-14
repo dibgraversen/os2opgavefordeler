@@ -7,7 +7,6 @@
   ],
   "private": true,
   "ignore": [
-//    "**/.*",
     "node_modules",
     "bower_components",
     "src/lib",
@@ -22,6 +21,7 @@
     "angular-ui-alias": "*",
     "angular-ui-router": "~0.2.13",
     "angular-ui-uploader": "https://github.com/helo/ui-uploader.git#1.1.2",
+    "angular-ui-tree": "~2.22.3",
     "bootstrap": "~3.3.4",
     "lodash": "~3.6.0",
     "htmlsave": "~0.0.12",
@@ -42,6 +42,12 @@
     },
     "angular-ui-alias": {
       "main": "src/alias.js"
+    },
+    "angular-ui-tree": {
+      "main": [
+            "dist/angular-ui-tree.js",
+            "dist/angular-ui-tree.css"
+            ]
     },
     "angular-ui-router": {
       "main": "release/angular-ui-router.js"

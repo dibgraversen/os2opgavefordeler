@@ -10,6 +10,7 @@
 		'ui.bootstrap',
 		'ui.router',
 		'ui.uploader',
+		'ui.tree',
 		'app.config'
 	]);
 
