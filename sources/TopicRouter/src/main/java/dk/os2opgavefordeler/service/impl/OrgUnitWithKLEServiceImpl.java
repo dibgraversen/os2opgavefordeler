@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.persistence.NoResultException;
+import javax.persistence.PersistenceException;
 import javax.persistence.TypedQuery;
 
 import org.slf4j.Logger;
@@ -86,41 +87,42 @@ public class OrgUnitWithKLEServiceImpl implements OrgUnitWithKLEService {
 	}
 
 	@Override
-	public OrgUnitWithKLEPO addKLE(long ouId, String kleNumber, KleAssignmentType assignmentType) {
+	public boolean addKLE(long ouId, String kleNumber, KleAssignmentType assignmentType) {
 		final List<OrgUnit> results = persistence.criteriaFind(OrgUnit.class,
 				(cb, cq, ou) -> cq.where(cb.equal(ou.get(OrgUnit_.id), ouId)));
-
+		
+		boolean success=false;
+		
 		if (!results.isEmpty()) {
 			OrgUnit orgUnit = results.get(0);
-			// TODO: this does not return null, but throws exception instead
-			Kle kle = kleService.getKle(kleNumber);
-
-			if (kle != null) {
+			try{
+				Kle kle = kleService.getKle(kleNumber);
 				orgUnit.addKle(kle, assignmentType);
-				return buildOrgUnitWithKLEPO(orgUnit);
+				success= true;
+			}catch(PersistenceException ex){
+				success= false;
 			}
 		}
-
-		return null;
+		return success;
 	}
 
 	@Override
-	public OrgUnitWithKLEPO removeKLE(long ouId, String kleNumber, KleAssignmentType assignmentType) {
+	public boolean removeKLE(long ouId, String kleNumber, KleAssignmentType assignmentType) {
 		final List<OrgUnit> results = persistence.criteriaFind(OrgUnit.class,
 				(cb, cq, ou) -> cq.where(cb.equal(ou.get(OrgUnit_.id), ouId)));
 
+		boolean success=false;
 		if (!results.isEmpty()) {
 			OrgUnit orgUnit = results.get(0);
-			// TODO: same as above
-			Kle kle = kleService.getKle(kleNumber);
-
-			if (kle != null) {
+			try {
+				Kle kle = kleService.getKle(kleNumber);
 				orgUnit.removeKle(kle, assignmentType);
-                                return buildOrgUnitWithKLEPO(orgUnit);
-			}
+				success= true;
+			} catch (PersistenceException e) {
+				success= false;
+			}			
 		}
-
-		return null;
+		return success;
 	}
 
 }
