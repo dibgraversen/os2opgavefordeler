@@ -15,17 +15,23 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import dk.os2opgavefordeler.auth.AuthService;
 import dk.os2opgavefordeler.auth.KleAssignerRequired;
+import dk.os2opgavefordeler.auth.UserLoggedIn;
 import dk.os2opgavefordeler.model.OrgUnit;
+import dk.os2opgavefordeler.model.User;
 import dk.os2opgavefordeler.model.presentation.KleAssignmentType;
 import dk.os2opgavefordeler.model.presentation.OrgUnitTreePO;
 import dk.os2opgavefordeler.model.presentation.OrgUnitWithKLEPO;
+import dk.os2opgavefordeler.repository.UserRepository;
 import dk.os2opgavefordeler.service.KleService;
 import dk.os2opgavefordeler.service.OrgUnitService;
 import dk.os2opgavefordeler.service.OrgUnitWithKLEService;
+import dk.os2opgavefordeler.service.UserService;
 
 @Path("/ou")
 @RequestScoped
+@UserLoggedIn
 public class OUEndpoint extends Endpoint {
 
 	@Inject
@@ -36,24 +42,38 @@ public class OUEndpoint extends Endpoint {
 
 	@Inject
 	private KleService kleService;
+	
+	@Inject
+	private AuthService authService;
+		
+	@Inject
+	private UserRepository userRepository;
 
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/list")
-	public Response list() {
-		List<OrgUnitWithKLEPO> result = orgUnitService.getAll(1L);
+	public Response list() {		
+		List<OrgUnitWithKLEPO> result = orgUnitService.getAll(getMunicipalityId());
 		return Response.ok().entity(result).build();
 	}
 
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response tree() {
-		Optional<OrgUnit> result = ouService.getToplevelOrgUnit(1L);
+	public Response tree() {		
+		Optional<OrgUnit> result = ouService.getToplevelOrgUnit(getMunicipalityId());
 		if (result.isPresent()) {
 			OrgUnitTreePO value = new OrgUnitTreePO(result.get());
 			return Response.ok().entity(Arrays.asList(value)).build();
 		}
 		return Response.status(404).entity("No data found.").build();
+	}
+
+	private long getMunicipalityId() {
+		long municipalityId;
+		String email = authService.getAuthentication().getEmail();
+		User user = userRepository.findByEmail(email);
+		municipalityId = user.getMunicipality().getId();
+		return municipalityId;
 	}
 
 	@GET
