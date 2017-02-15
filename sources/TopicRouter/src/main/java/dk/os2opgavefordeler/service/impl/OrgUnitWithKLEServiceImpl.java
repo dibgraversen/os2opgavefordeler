@@ -29,7 +29,7 @@ import dk.os2opgavefordeler.service.PersistenceService;
 public class OrgUnitWithKLEServiceImpl implements OrgUnitWithKLEService {
 
 	@Inject
-	private Logger logger;
+	private Logger log;
 
 	@Inject
 	private PersistenceService persistence;
@@ -101,6 +101,7 @@ public class OrgUnitWithKLEServiceImpl implements OrgUnitWithKLEService {
 				orgUnit.addKle(kle, assignmentType);
 				success = true;
 			} catch(PersistenceException ex) {
+				log.error("An error occured while adding KLE to OrgUnit.",ex);
 				success = false;
 			}
 		}
@@ -121,7 +122,8 @@ public class OrgUnitWithKLEServiceImpl implements OrgUnitWithKLEService {
 				Kle kle = kleService.getKle(kleNumber);
 				orgUnit.removeKle(kle, assignmentType);
 				success = true;
-			} catch (PersistenceException e) {
+			} catch (PersistenceException ex) {
+				log.error("An error occured while removing KLE from OrgUnit.",ex);
 				success = false;
 			}
 		}

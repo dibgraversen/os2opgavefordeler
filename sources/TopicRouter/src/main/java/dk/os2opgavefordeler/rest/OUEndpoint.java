@@ -15,6 +15,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.slf4j.Logger;
+
 import dk.os2opgavefordeler.auth.AuthService;
 import dk.os2opgavefordeler.auth.KleAssignerRequired;
 import dk.os2opgavefordeler.auth.UserLoggedIn;
@@ -27,12 +29,14 @@ import dk.os2opgavefordeler.repository.UserRepository;
 import dk.os2opgavefordeler.service.KleService;
 import dk.os2opgavefordeler.service.OrgUnitService;
 import dk.os2opgavefordeler.service.OrgUnitWithKLEService;
-import dk.os2opgavefordeler.service.UserService;
 
 @Path("/ou")
 @RequestScoped
 @UserLoggedIn
 public class OUEndpoint extends Endpoint {
+	
+	@Inject
+	private Logger log;
 
 	@Inject
 	private OrgUnitWithKLEService orgUnitService;
@@ -108,7 +112,7 @@ public class OUEndpoint extends Endpoint {
 		KleAssignmentType assignmentType;
 		try {
 			assignmentType = KleAssignmentType.fromString(assignmentTypeString);
-		} catch (Exception e) {
+		} catch (Exception e) {			 
 			return Response.status(400).entity("No assignment type with a name: \"" + assignmentTypeString + "\" found")
 					.build();
 		}
@@ -117,6 +121,7 @@ public class OUEndpoint extends Endpoint {
 		try {
 			kleService.getKle(kleNumber);
 		} catch (Exception e) {
+			log.error("Failed to lookup a KLE from database.",e);
 			return Response.status(400).entity("No KLE for number: \"" + kleNumber + "\" found").build();
 		}
 
