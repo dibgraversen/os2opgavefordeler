@@ -20,4 +20,3 @@ public class KleAssignerAuthorizer {
     return authService.isKleAssigner();
   }
 }
-
