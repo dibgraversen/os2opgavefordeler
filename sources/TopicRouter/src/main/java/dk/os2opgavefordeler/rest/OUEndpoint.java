@@ -22,14 +22,13 @@ import dk.os2opgavefordeler.auth.KleAssignerRequired;
 import dk.os2opgavefordeler.auth.UserLoggedIn;
 import dk.os2opgavefordeler.model.Municipality;
 import dk.os2opgavefordeler.model.OrgUnit;
-import dk.os2opgavefordeler.model.User;
 import dk.os2opgavefordeler.model.presentation.KleAssignmentType;
 import dk.os2opgavefordeler.model.presentation.OrgUnitTreePO;
 import dk.os2opgavefordeler.model.presentation.OrgUnitWithKLEPO;
 import dk.os2opgavefordeler.repository.UserRepository;
 import dk.os2opgavefordeler.service.KleService;
-import dk.os2opgavefordeler.service.OrgUnitWithKLEService;
 import dk.os2opgavefordeler.service.OrgUnitService;
+import dk.os2opgavefordeler.service.OrgUnitWithKLEService;
 
 
 @Path("/ou")
@@ -139,7 +138,7 @@ public class OUEndpoint extends Endpoint {
 	public Response unassignKLE(@PathParam("ouId") long ouId, @PathParam("assignmentType") String assignmentTypeString, @PathParam("kleNumber") String kleNumber) {
 
 		// Check if ou exists
-		Optional<OrgUnit> ou = orgUnitService.getOrgUnit(ouId);
+		Optional<OrgUnit> ou = orgUnitService.getOrgUnit(ouId,getMunicipality());
 		if (!ou.isPresent()) {
 			return Response.status(404).entity("OrgUnit not found for ID: " + ouId).build();
 		}
