@@ -7,11 +7,7 @@ import java.util.List;
 import dk.os2opgavefordeler.model.OrgUnit;
 
 public class OrgUnitTreePO implements Serializable{
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 3159231060766644353L;
-	
 	private long id;
 	private String name;
 	private List<OrgUnitTreePO> children;
@@ -48,6 +44,4 @@ public class OrgUnitTreePO implements Serializable{
 	public void setId(long id) {
 		this.id = id;
 	}
-	
-
 }

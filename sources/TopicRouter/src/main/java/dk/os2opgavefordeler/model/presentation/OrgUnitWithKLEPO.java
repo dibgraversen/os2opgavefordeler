@@ -8,18 +8,15 @@ public class OrgUnitWithKLEPO {
 	private long id;
 	private String name;
 	private String parentName;
-	//Lists of kle names only
 	private List<String> performingKLE;
 	private List<String> interestKLE;
-	
-	public OrgUnitWithKLEPO() {
-	}
 
+	public OrgUnitWithKLEPO() { }
 
 	public OrgUnitWithKLEPO(long id, String name,String parentName) {
 		this();
 		this.id = id;
-		this.name = name;	
+		this.name = name;
 		this.parentName =parentName;
 	}
 
@@ -43,30 +40,23 @@ public class OrgUnitWithKLEPO {
 		return performingKLE;
 	}
 
-
 	public void setPerformingKLE(List<String> performingKLE) {
 		this.performingKLE = performingKLE;
 	}
-
 
 	public List<String> getInterestKLE() {
 		return interestKLE;
 	}
 
-
 	public void setInterestKLE(List<String> interestKLE) {
 		this.interestKLE = interestKLE;
 	}
-
 
 	public String getParentName() {
 		return parentName;
 	}
 
-
 	public void setParentName(String parentName) {
 		this.parentName = parentName;
 	}
-	
-
 }

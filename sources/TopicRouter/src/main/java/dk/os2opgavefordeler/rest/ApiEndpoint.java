@@ -147,49 +147,50 @@ public class ApiEndpoint extends Endpoint {
 
 		return ok(resultPO);
 	}
-	
+
 	@GET
 	@Path("/ou/{businessKey}")
-	@Produces(MediaType.APPLICATION_JSON)	
+	@Produces(MediaType.APPLICATION_JSON)
 	public Response lookupOrgUnit(@PathParam("businessKey") String businessKey,
 			@QueryParam("assignmentType") String assignmentTypeString,
-			@DefaultValue("false") @QueryParam("showExpanded") boolean showExpanded) {	 
-//		String token = authService.getAuthentication().getToken();
-//
-//		if (token == null || token.isEmpty()) {
-//			return Response.status(Response.Status.UNAUTHORIZED).build();
-//		}
-		
+			@DefaultValue("false") @QueryParam("showExpanded") boolean showExpanded) {
+
+		String token = authService.getAuthentication().getToken();
+
+		if (token == null || token.isEmpty()) {
+			return Response.status(Response.Status.UNAUTHORIZED).build();
+		}
+
 		List<KleAssignmentType> assignmentTypes = new ArrayList<>();
 		if (assignmentTypeString != null) {
-			try {			
+			try {
 				assignmentTypes.add(KleAssignmentType.fromString(assignmentTypeString));
 			} catch (IllegalArgumentException e) {
-				return Response.status(404).entity("Assignment type does not exist.").build();
+				return Response.status(400).entity("Assignment type does not exist.").build();
 			}
 		}
 		else {
 			assignmentTypes.add(KleAssignmentType.INTEREST);
 			assignmentTypes.add(KleAssignmentType.PERFORMING);
 		}
-			
-		Optional<OrgUnit> ou = orgUnitService.findByBusinessKey(businessKey);			
+
+		Optional<OrgUnit> ou = orgUnitService.findByBusinessKey(businessKey);
 		if(!ou.isPresent()){
 			return Response.status(404).entity("Entity not found for BusinessKey: " + businessKey).build();
 		}
-		
+
 		HashMap<KleAssignmentType,Set<String>> result = new HashMap<>();
-		
+
 		for (KleAssignmentType assignmentType : KleAssignmentType.values()) {
 			Set<String> listKLE = new TreeSet<>();
-			
+
 			for (Kle kle : ou.get().getKles(assignmentType) ) {
 				addKle(showExpanded, listKLE, kle);
-			}				
+			}
 
-			result.put(assignmentType, listKLE);				
+			result.put(assignmentType, listKLE);
 		}
-		
+
 		return Response.ok().entity(result).build();
 	}
 
@@ -198,7 +199,7 @@ public class ApiEndpoint extends Endpoint {
 
 		if (showExpanded) {
 			ImmutableList<Kle> subKLEs = kle.getChildren();
-			
+
 			if (subKLEs != null && !subKLEs.isEmpty()) {
 				for (Kle sub : subKLEs) {
 					addKle(showExpanded, listKLE, sub);

@@ -74,17 +74,23 @@ public class KleRestEndpoint extends Endpoint {
 	public Response getTree(){
 		List<Kle> groups = kleService.fetchAllKleMainGroups();
 		List<KleRestResultPO> kles = new ArrayList<>();
+
 		for (Kle kle : groups) {
 			List<KleRestResultPO> children = new ArrayList<>();
+
 			for (Kle child : kle.getChildren()) {
 				List<KleRestResultPO> children2 = new ArrayList<>();
+
 				for (Kle child2 : child.getChildren()) {
 					children2.add(new KleRestResultPO(child2.getNumber(),child2.getTitle()));
 				}
+
 				children.add(new KleRestResultPO(child.getNumber(),child.getTitle(), children2));
 			}
+
 			kles.add(new KleRestResultPO(kle.getNumber(),kle.getTitle(), children));
 		}
+
 		return Response.ok().entity(kles).build();
 	}
 
