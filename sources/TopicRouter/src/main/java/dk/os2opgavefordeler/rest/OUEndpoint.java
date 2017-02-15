@@ -27,8 +27,9 @@ import dk.os2opgavefordeler.model.presentation.OrgUnitTreePO;
 import dk.os2opgavefordeler.model.presentation.OrgUnitWithKLEPO;
 import dk.os2opgavefordeler.repository.UserRepository;
 import dk.os2opgavefordeler.service.KleService;
-import dk.os2opgavefordeler.service.OrgUnitService;
 import dk.os2opgavefordeler.service.OrgUnitWithKLEService;
+import dk.os2opgavefordeler.service.OrgUnitService;
+
 
 @Path("/ou")
 @RequestScoped
@@ -39,10 +40,10 @@ public class OUEndpoint extends Endpoint {
 	private Logger log;
 
 	@Inject
-	private OrgUnitWithKLEService orgUnitService;
+	private OrgUnitWithKLEService orgUnitWithKLEService;
 
 	@Inject
-	private OrgUnitService ouService;
+	private OrgUnitService orgUnitService;
 
 	@Inject
 	private KleService kleService;
@@ -57,7 +58,7 @@ public class OUEndpoint extends Endpoint {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/list")
 	public Response list() {
-		List<OrgUnitWithKLEPO> result = orgUnitService.getAll(getMunicipalityId());
+		List<OrgUnitWithKLEPO> result = orgUnitWithKLEService.getAll(getMunicipalityId());
 
 		return Response.ok().entity(result).build();
 	}
@@ -65,7 +66,7 @@ public class OUEndpoint extends Endpoint {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response tree() {
-		Optional<OrgUnit> result = ouService.getToplevelOrgUnit(getMunicipalityId());
+		Optional<OrgUnit> result = orgUnitService.getToplevelOrgUnit(getMunicipalityId());
 
 		if (result.isPresent()) {
 			OrgUnitTreePO value = new OrgUnitTreePO(result.get());
@@ -87,7 +88,7 @@ public class OUEndpoint extends Endpoint {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/{Id}")
 	public Response get(@PathParam("Id") long id) {
-		OrgUnitWithKLEPO result = orgUnitService.get(id);
+		OrgUnitWithKLEPO result = orgUnitWithKLEService.get(id);
 
 		if (result != null) {
 			return Response.ok().entity(result).build();
@@ -103,7 +104,7 @@ public class OUEndpoint extends Endpoint {
 	public Response assignKLE(@PathParam("ouId") long ouId, @PathParam("assignmentType") String assignmentTypeString, @PathParam("kleNumber") String kleNumber) {
 
 		// Check if ou exists
-		Optional<OrgUnit> ou = ouService.getOrgUnit(ouId);
+		Optional<OrgUnit> ou = orgUnitService.getOrgUnit(ouId);
 		if (!ou.isPresent()) {
 			return Response.status(400).entity("OrgUnit not found for ID: " + ouId).build();
 		}
@@ -125,7 +126,7 @@ public class OUEndpoint extends Endpoint {
 			return Response.status(400).entity("No KLE for number: \"" + kleNumber + "\" found").build();
 		}
 
-		boolean result = orgUnitService.addKLE(ouId, kleNumber, assignmentType);
+		boolean result = orgUnitWithKLEService.addKLE(ouId, kleNumber, assignmentType);
 		if (result == false) {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
 		}
@@ -140,7 +141,7 @@ public class OUEndpoint extends Endpoint {
 	public Response unassignKLE(@PathParam("ouId") long ouId, @PathParam("assignmentType") String assignmentTypeString, @PathParam("kleNumber") String kleNumber) {
 
 		// Check if ou exists
-		Optional<OrgUnit> ou = ouService.getOrgUnit(ouId);
+		Optional<OrgUnit> ou = orgUnitService.getOrgUnit(ouId);
 		if (!ou.isPresent()) {
 			return Response.status(404).entity("OrgUnit not found for ID: " + ouId).build();
 		}
@@ -154,7 +155,7 @@ public class OUEndpoint extends Endpoint {
 					.build();
 		}
 
-		boolean result = orgUnitService.removeKLE(ouId, kleNumber, assignmentType);
+		boolean result = orgUnitWithKLEService.removeKLE(ouId, kleNumber, assignmentType);
 		if (result == false) {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
 		}
