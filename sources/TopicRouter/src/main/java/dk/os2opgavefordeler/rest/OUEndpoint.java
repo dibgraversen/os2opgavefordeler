@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import dk.os2opgavefordeler.auth.AuthService;
 import dk.os2opgavefordeler.auth.KleAssignerRequired;
 import dk.os2opgavefordeler.auth.UserLoggedIn;
+import dk.os2opgavefordeler.model.Municipality;
 import dk.os2opgavefordeler.model.OrgUnit;
 import dk.os2opgavefordeler.model.User;
 import dk.os2opgavefordeler.model.presentation.KleAssignmentType;
@@ -58,15 +59,15 @@ public class OUEndpoint extends Endpoint {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/list")
 	public Response list() {
-		List<OrgUnitWithKLEPO> result = orgUnitWithKLEService.getAll(getMunicipalityId());
-
+		List<OrgUnitWithKLEPO> result = orgUnitWithKLEService.getAll(getMunicipality().getId());
+		
 		return Response.ok().entity(result).build();
 	}
 
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response tree() {
-		Optional<OrgUnit> result = orgUnitService.getToplevelOrgUnit(getMunicipalityId());
+		Optional<OrgUnit> result = orgUnitService.getToplevelOrgUnit(getMunicipality().getId());
 
 		if (result.isPresent()) {
 			OrgUnitTreePO value = new OrgUnitTreePO(result.get());
@@ -77,18 +78,15 @@ public class OUEndpoint extends Endpoint {
 		return Response.status(404).entity("No data found.").build();
 	}
 
-	private long getMunicipalityId() {
-		String email = authService.getAuthentication().getEmail();
-		User user = userRepository.findByEmail(email);
-
-		return user.getMunicipality().getId();
+	private Municipality getMunicipality() {
+		return authService.currentUser().getMunicipality();
 	}
 
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/{Id}")
 	public Response get(@PathParam("Id") long id) {
-		OrgUnitWithKLEPO result = orgUnitWithKLEService.get(id);
+		OrgUnitWithKLEPO result = orgUnitWithKLEService.get(id,getMunicipality());
 
 		if (result != null) {
 			return Response.ok().entity(result).build();
@@ -104,7 +102,7 @@ public class OUEndpoint extends Endpoint {
 	public Response assignKLE(@PathParam("ouId") long ouId, @PathParam("assignmentType") String assignmentTypeString, @PathParam("kleNumber") String kleNumber) {
 
 		// Check if ou exists
-		Optional<OrgUnit> ou = orgUnitService.getOrgUnit(ouId);
+		Optional<OrgUnit> ou = orgUnitService.getOrgUnit(ouId,getMunicipality());
 		if (!ou.isPresent()) {
 			return Response.status(400).entity("OrgUnit not found for ID: " + ouId).build();
 		}

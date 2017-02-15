@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 
 import dk.os2opgavefordeler.auth.AuthService;
 import dk.os2opgavefordeler.model.Kle;
+import dk.os2opgavefordeler.model.Municipality;
 import dk.os2opgavefordeler.model.OrgUnit;
 import dk.os2opgavefordeler.model.OrgUnit_;
 import dk.os2opgavefordeler.model.presentation.KleAssignmentType;
@@ -66,9 +67,9 @@ public class OrgUnitWithKLEServiceImpl implements OrgUnitWithKLEService {
 	}
 
 	@Override
-	public OrgUnitWithKLEPO get(long id) {
+	public OrgUnitWithKLEPO get(long id, Municipality municipality) {
 		final List<OrgUnit> results = persistence.criteriaFind(OrgUnit.class,
-				(cb, cq, ou) -> cq.where(cb.equal(ou.get(OrgUnit_.id), id)));
+				(cb, cq, ou) -> cq.where(cb.and(cb.equal(ou.get(OrgUnit_.id), id)),cb.equal(ou.get(OrgUnit_.municipality), municipality)));
 
 		if (!results.isEmpty()) {
 			OrgUnit ouEntity = results.get(0);

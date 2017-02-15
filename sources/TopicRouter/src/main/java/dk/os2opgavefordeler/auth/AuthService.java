@@ -104,7 +104,7 @@ public class AuthService {
 
 	}
 
-	private User currentUser(){
+	public User currentUser(){
 		return userRepository.findByEmail(authenticationHolder.getEmail());
 	}
 
