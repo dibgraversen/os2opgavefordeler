@@ -26,9 +26,7 @@ public class OuKleAssignment {
 	@Column(name="assignmentType", nullable = false)
 	private KleAssignmentType assignmentType;
 	
-	public OuKleAssignment() {
-		// TODO Auto-generated constructor stub
-	}
+	public OuKleAssignment() { }
 
 	public OuKleAssignment(OrgUnit ou, Kle kle, KleAssignmentType assignmentType) {
 		super();
@@ -60,9 +58,4 @@ public class OuKleAssignment {
 	public void setAssignmentType(KleAssignmentType assignmentType) {
 		this.assignmentType = assignmentType;
 	}
-
-	
-	
-	
-	
 }

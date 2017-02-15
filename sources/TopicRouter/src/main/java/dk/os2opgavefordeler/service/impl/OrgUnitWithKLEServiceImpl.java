@@ -39,7 +39,7 @@ public class OrgUnitWithKLEServiceImpl implements OrgUnitWithKLEService {
 
 	@Inject
 	private AuthService authService;
-	
+
 	@Inject
 	private KleService kleService;
 
@@ -48,6 +48,7 @@ public class OrgUnitWithKLEServiceImpl implements OrgUnitWithKLEService {
 		TypedQuery<OrgUnit> query = persistence.getEm().createQuery(
 				"SELECT org FROM OrgUnit org WHERE org.municipality.id = :municipalityId AND org.isActive = true",
 				OrgUnit.class);
+
 		query.setParameter("municipalityId", municipalityId);
 		List<OrgUnitWithKLEPO> result = new ArrayList<>();
 
@@ -90,19 +91,20 @@ public class OrgUnitWithKLEServiceImpl implements OrgUnitWithKLEService {
 	public boolean addKLE(long ouId, String kleNumber, KleAssignmentType assignmentType) {
 		final List<OrgUnit> results = persistence.criteriaFind(OrgUnit.class,
 				(cb, cq, ou) -> cq.where(cb.equal(ou.get(OrgUnit_.id), ouId)));
-		
-		boolean success=false;
-		
+
+		boolean success = false;
+
 		if (!results.isEmpty()) {
 			OrgUnit orgUnit = results.get(0);
-			try{
+			try {
 				Kle kle = kleService.getKle(kleNumber);
 				orgUnit.addKle(kle, assignmentType);
-				success= true;
-			}catch(PersistenceException ex){
-				success= false;
+				success = true;
+			} catch(PersistenceException ex) {
+				success = false;
 			}
 		}
+
 		return success;
 	}
 
@@ -111,18 +113,19 @@ public class OrgUnitWithKLEServiceImpl implements OrgUnitWithKLEService {
 		final List<OrgUnit> results = persistence.criteriaFind(OrgUnit.class,
 				(cb, cq, ou) -> cq.where(cb.equal(ou.get(OrgUnit_.id), ouId)));
 
-		boolean success=false;
+		boolean success = false;
+
 		if (!results.isEmpty()) {
 			OrgUnit orgUnit = results.get(0);
 			try {
 				Kle kle = kleService.getKle(kleNumber);
 				orgUnit.removeKle(kle, assignmentType);
-				success= true;
+				success = true;
 			} catch (PersistenceException e) {
-				success= false;
-			}			
+				success = false;
+			}
 		}
+
 		return success;
 	}
-
 }
