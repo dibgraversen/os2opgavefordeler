@@ -151,6 +151,11 @@ public class OUEndpoint extends Endpoint {
 			return Response.status(400).entity("No assignment type with a name: \"" + assignmentTypeString + "\" found")
 					.build();
 		}
+		
+		//Check if OU contains that kleNumber
+		if(!orgUnitWithKLEService.containsKLE(ou.get(),assignmentType,kleNumber)){
+			return Response.status(400).entity("OU does not contain KLE:"+kleNumber+" for assignmentType:"+assignmentTypeString).build();
+		}
 
 		boolean result = orgUnitWithKLEService.removeKLE(ouId, kleNumber, assignmentType);
 		if (result == false) {
