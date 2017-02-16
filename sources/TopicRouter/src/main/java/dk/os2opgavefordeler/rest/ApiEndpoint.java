@@ -179,6 +179,15 @@ public class ApiEndpoint extends Endpoint {
 			return Response.status(404).entity("Entity not found for BusinessKey: " + businessKey).build();
 		}
 
+		if(!ou.get().getMunicipality().isPresent()){
+			log.error("No Municipality found for OrgUnit: "+ou.get());
+			Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+		}
+		
+		if(!ou.get().getMunicipality().get().equals(authService.currentUser().getMunicipality())){
+			return Response.status(Response.Status.UNAUTHORIZED).build();
+		}
+
 		HashMap<KleAssignmentType,Set<String>> result = new HashMap<>();
 
 		for (KleAssignmentType assignmentType : KleAssignmentType.values()) {
