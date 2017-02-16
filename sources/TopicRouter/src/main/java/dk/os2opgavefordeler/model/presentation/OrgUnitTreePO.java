@@ -10,12 +10,14 @@ public class OrgUnitTreePO implements Serializable{
 	private static final long serialVersionUID = 3159231060766644353L;
 	private long id;
 	private String name;
+	private boolean klesAssigned;
 	private List<OrgUnitTreePO> children;
 
 	public OrgUnitTreePO(OrgUnit from) {
 		children = new ArrayList<>();
 		this.name = from.getName();
 		this.id = from.getId();
+		this.klesAssigned = from.hasKles();
 		for (OrgUnit child :from.getChildren()) {
 			this.children.add(new OrgUnitTreePO(child));
 		}
@@ -43,5 +45,13 @@ public class OrgUnitTreePO implements Serializable{
 
 	public void setId(long id) {
 		this.id = id;
+	}
+
+	public boolean isKlesAssigned() {
+		return klesAssigned;
+	}
+
+	public void setKlesAssigned(boolean klesAssigned) {
+		this.klesAssigned = klesAssigned;
 	}
 }

@@ -7,17 +7,15 @@ import dk.os2opgavefordeler.model.Kle;
 public class OrgUnitWithKLEPO {
 	private long id;
 	private String name;
-	private String parentName;
 	private List<String> performingKLE;
 	private List<String> interestKLE;
 
 	public OrgUnitWithKLEPO() { }
 
-	public OrgUnitWithKLEPO(long id, String name,String parentName) {
+	public OrgUnitWithKLEPO(long id, String name) {
 		this();
 		this.id = id;
 		this.name = name;
-		this.parentName =parentName;
 	}
 
 	public long getId() {
@@ -52,11 +50,4 @@ public class OrgUnitWithKLEPO {
 		this.interestKLE = interestKLE;
 	}
 
-	public String getParentName() {
-		return parentName;
-	}
-
-	public void setParentName(String parentName) {
-		this.parentName = parentName;
-	}
 }
