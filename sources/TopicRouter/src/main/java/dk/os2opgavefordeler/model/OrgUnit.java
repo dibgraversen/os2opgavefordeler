@@ -239,6 +239,10 @@ public class OrgUnit implements Serializable, IHasChildren<OrgUnit> {
 		this.kles.removeIf(x->x.getAssignmentType().equals(assignmentType) && x.getKle().equals(kle));
 	}
 
+	public boolean hasKles() {		
+		return !kles.isEmpty();
+	}
+
 	@Override
 	public String toString() {
 		return MoreObjects.toStringHelper(this)
@@ -349,4 +353,5 @@ public class OrgUnit implements Serializable, IHasChildren<OrgUnit> {
 		result = 31 * result + (municipality != null ? municipality.hashCode() : 0);
 		return result;
 	}
+
 }
