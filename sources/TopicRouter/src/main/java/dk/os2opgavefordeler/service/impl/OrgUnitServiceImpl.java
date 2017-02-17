@@ -420,18 +420,6 @@ public class OrgUnitServiceImpl implements OrgUnitService {
 		);
 		return results;
 	}
-	
-	@Override	
-	public Optional<OrgUnit> findByBusinessKey(String businessKey) {
-		final List<OrgUnit> results = persistence.criteriaFind(OrgUnit.class,
-				(cb, cq, ou) -> cq.where(cb.equal(ou.get(OrgUnit_.businessKey), businessKey)
-				)
-		);
-
-		return results.isEmpty() ?
-			Optional.empty() :
-			Optional.of(results.get(0));
-	}
 
 //	public List<Employment> getSubordinateManagers(OrgUnit ou) {
 //		return ou.flattened().map(OrgUnit::getManager).collect(Collectors.toList());
@@ -524,6 +512,22 @@ public class OrgUnitServiceImpl implements OrgUnitService {
 		Query query = persistence.getEm().createQuery("SELECT m FROM Municipality m WHERE m.name = :name");
 		query.setParameter("name", name);
 		return (Municipality) query.getSingleResult();
+	}
+
+	@Override
+	public Optional<OrgUnit> findByBusinessKeyAndMunicipality(String businessKey, Municipality municipality) {
+		final List<OrgUnit> results = persistence.criteriaFind(OrgUnit.class,
+				(cb, cq, ou) -> cq.where(
+						cb.and(
+								cb.equal(ou.get(OrgUnit_.businessKey), businessKey),
+								cb.equal(ou.get(OrgUnit_.municipality), municipality)
+						)
+				)
+		);
+
+		return results.isEmpty() ?
+			Optional.empty() :
+			Optional.of(results.get(0));
 	}
 
 }
