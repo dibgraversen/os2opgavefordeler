@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 
 import dk.os2opgavefordeler.auth.AuthService;
 import dk.os2opgavefordeler.model.Kle;
+import dk.os2opgavefordeler.model.Municipality;
 import dk.os2opgavefordeler.model.OrgUnit;
 import dk.os2opgavefordeler.model.OrgUnit_;
 import dk.os2opgavefordeler.model.presentation.KleAssignmentType;
@@ -66,9 +67,9 @@ public class OrgUnitWithKLEServiceImpl implements OrgUnitWithKLEService {
 	}
 
 	@Override
-	public OrgUnitWithKLEPO get(long id) {
+	public OrgUnitWithKLEPO get(long id, Municipality municipality) {
 		final List<OrgUnit> results = persistence.criteriaFind(OrgUnit.class,
-				(cb, cq, ou) -> cq.where(cb.equal(ou.get(OrgUnit_.id), id)));
+				(cb, cq, ou) -> cq.where(cb.and(cb.equal(ou.get(OrgUnit_.id), id)),cb.equal(ou.get(OrgUnit_.municipality), municipality)));
 
 		if (!results.isEmpty()) {
 			OrgUnit ouEntity = results.get(0);
@@ -99,6 +100,7 @@ public class OrgUnitWithKLEServiceImpl implements OrgUnitWithKLEService {
 			try {
 				Kle kle = kleService.getKle(kleNumber);
 				orgUnit.addKle(kle, assignmentType);
+				persistence.getEm().persist(orgUnit);
 				success = true;
 			} catch(PersistenceException ex) {
 				log.error("An error occured while adding KLE to OrgUnit.",ex);
@@ -121,6 +123,7 @@ public class OrgUnitWithKLEServiceImpl implements OrgUnitWithKLEService {
 			try {
 				Kle kle = kleService.getKle(kleNumber);
 				orgUnit.removeKle(kle, assignmentType);
+				persistence.getEm().persist(orgUnit);
 				success = true;
 			} catch (PersistenceException ex) {
 				log.error("An error occured while removing KLE from OrgUnit.",ex);
@@ -129,5 +132,10 @@ public class OrgUnitWithKLEServiceImpl implements OrgUnitWithKLEService {
 		}
 
 		return success;
+	}
+
+	@Override
+	public boolean containsKLE(OrgUnit ou, KleAssignmentType assignmentType, String kleNumber) {
+		return ou.getKles(assignmentType).stream().anyMatch(kle->kle.getNumber().equals(kleNumber));
 	}
 }

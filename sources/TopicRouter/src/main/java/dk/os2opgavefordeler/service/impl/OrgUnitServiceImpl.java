@@ -348,6 +348,22 @@ public class OrgUnitServiceImpl implements OrgUnitService {
 			Optional.empty() :
 			Optional.of(results.get(0));
 	}
+	
+
+	@Override
+	public Optional<OrgUnit> getOrgUnit(long id, Municipality municipality) {
+		final List<OrgUnit> results = persistence.criteriaFind(OrgUnit.class,
+				(cb, cq, ou) -> cq.where(
+						cb.and(
+								cb.equal(ou.get(OrgUnit_.id), id)),
+								cb.equal(ou.get(OrgUnit_.municipality), municipality)
+								)
+				);
+
+		return results.isEmpty() ?
+			Optional.empty() :
+			Optional.of(results.get(0));
+	}
 
 	@Override
 	@SuppressWarnings("unchecked")
@@ -509,4 +525,5 @@ public class OrgUnitServiceImpl implements OrgUnitService {
 		query.setParameter("name", name);
 		return (Municipality) query.getSingleResult();
 	}
+
 }
