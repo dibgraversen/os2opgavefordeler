@@ -189,16 +189,10 @@ public class ApiEndpoint extends Endpoint {
 		}
 
 		Municipality municipality = authService.currentUser().getMunicipality();
-		
 		Optional<OrgUnit> ou = orgUnitService.findByBusinessKeyAndMunicipality(businessKey, municipality);
 
 		if(!ou.isPresent()){
 			return Response.status(404).entity("Entity not found for BusinessKey: " + businessKey).build();
-		}
-
-		if(!ou.get().getMunicipality().isPresent()){
-			log.error("No Municipality found for OrgUnit: "+ou.get());
-			Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
 		}
 
 		HashMap<KleAssignmentType,Set<String>> result = new HashMap<>();
