@@ -1,3 +1,8 @@
+<style>
+.hoverDiv {background: #fff;}
+.hoverDiv:hover {background: #f5f5f5;}
+</style>
+
 	<div class="col-md-8 col-md-offset-2">
 		
 		<h1>KLE Opmærkning</h1>
@@ -15,32 +20,34 @@
 			<h2>Org Units</h2>
 
 			<script type="text/ng-template"  id="tree_item_renderer.html">
-			    <a data-ng-click="toogleChildrenVisibility(ou)">{{ou.name}} </a>
+			    <div data-ng-click="toogleChildrenVisibility(ou)">
+			    <span class="glyphicon hover" data-ng-class="ou.expanded ? 'glyphicon-chevron-down' : 'glyphicon-chevron-right'">
+				</span>	
+			    {{ou.name}}
+			     <span ng-show="!ou.klesAssigned" class="glyphicon glyphicon-exclamation-sign" style="color:red" popover-trigger="mouseenter" popover-append-to-body="true" popover="The OrgUnit has no assigned KLE's"></span>
+
+			     </div>
 			
-			    <ul>
-			        <li ng-show="ou.visible" ng-repeat="ou in ou.children" ng-include="'tree_item_renderer.html'"></li>
+			    <ul style="list-style-type: none" >
+			        <li style="list-style-type: none" ng-show="ou.visible" ng-repeat="ou in ou.children" ng-include="'tree_item_renderer.html'"></li>
 			    </ul>
 			</script>
 
 			<ul>
-			    <li data-ng-repeat="ou in ousAsTree" data-ng-include="'tree_item_renderer.html'"></li>
+			    <li style="list-style-type: none" data-ng-repeat="ou in ousAsTree" data-ng-include="'tree_item_renderer.html'"></li>
 			</ul>
 		</div>
-
+		
 		<div data-ng-show="filterStr.length>0"  class="col-md-4">
 			<h2>Org Units</h2>
 				<table class="table table-hover">
 						<thead>
 						<tr>
-							<th>id</th>
 							<th>Navn</th>
 						</tr>
 						</thead>
 						<tbody data-ng-repeat="ou in ous | filter: { name : filterStr }">
-						<h6>{{ou}}</h6>
 							<tr data-ng-class="currentOrgUnit.id === ou.id ? 'success' : ''" data-ng-click="setCurrentOrgUnit(ou.id)">
-								<td>{{ ou.id}} </td>
-								<h6>{{ou}}</h6>
 								<td>
 									{{ ou.name | limitTo: 50 }}
 								</td>					
@@ -51,66 +58,37 @@
 
 		<div class="col-md-8">
 			<h2> {{currentOrgUnit.name}}</h2>
-				<ul class="nav nav-tabs">
-							  <li data-ng-class="{active : tabperforming}">
-							  	<a data-ng-click="openTab('PERFORMING')">Performing</a>
-							  </li>
-							  <li data-ng-class="{active : tabinterest}">
-							  	<a data-ng-click="openTab('INTEREST')">Interest</a>
-							  </li>
-				</ul>
 
-				<div class="tab-content">
-					<div data-ng-show="tabperforming" class="tab-pane" data-ng-class="{active : tabperforming}">
-							<div class="panel-body list-group">
-							<script type="text/ng-template" id="performing_renderer.html">
-									  <div ui-tree-handle >
-									  </div>
+								<script type="text/ng-template" id="tree.html">
+											<div class="hoverDiv">
 
-								  	<input type="checkbox" data-ng-model="node.performing" data-ng-click="modifyKle(node.performing,node,currentOrgUnit,'PERFORMING')">
-								 	 </input>
-									    <a >	
-											<span class="glyphicon hover" data-ng-class="node.expanded ? 'glyphicon-chevron-down' : 'glyphicon-chevron-right'"></span>						
-										</a>
-									<span data-ng-click="toggleChildren(node,this)"> {{::node.number}}  {{::node.serviceText}}		</span>						
-									  <ul ui-tree-nodes="" ng-model="node.children" ng-class="{hidden: collapsed}">
-									    <li ng-repeat="node in node.children" ui-tree-node ng-include="'performing_renderer.html'" class="list-group">
-									    </li>
-									  </ul>
-									  
-							</script>
+											<div class="col-md-1">
+											  	<input type="checkbox" data-ng-model="node.performing" data-ng-change="modifyKle(node.performing,node,currentOrgUnit,'PERFORMING')">
+											 	 </input>
+										 	 </div>
 
-							<div ui-tree data-drag-enabled="false">
-							  <ul ui-tree-nodes="" ng-model="currentKLETree" id="tree-root" class="list-group">
-							    <li ng-repeat="node in currentKLETree" ui-tree-node ng-include="'performing_renderer.html'"></li>
-							  </ul>
-							</div>								  
-						</div>
-					</div>
+										 	 <div class="col-md-1">
+												 <input type="checkbox" data-ng-model="node.interest" data-ng-click="modifyKle(node.interest,node,currentOrgUnit,'INTEREST')">
+											 	 </input>
+										 	 </div>
+									 	 	
+												<div data-ng-click="toggleChildren(node,this)">
+													<div class="glyphicon hover" data-ng-class="node.expanded ? 'glyphicon-chevron-down' : 'glyphicon-chevron-right'" >								</div>
+												 	{{::node.number}}  {{::node.serviceText}}
+												 <div class="clearfix"></div>
+											</div>
 
-					<div data-ng-show="tabinterest" class="tab-pane" data-ng-class="{active : tabinterest}">
-							<div class="panel-body">
-								<script type="text/ng-template" id="interest_renderer.html">
-										  <div ui-tree-handle>
-										  </div>
-
-										  <div ng-click="toggleChildren(node,this)" > 
-										    {{::node.number}}  {{::node.serviceText}} 
-										  </div>
-										  <input type="checkbox" data-ng-model="node.interest" data-ng-click="modifyKle(node.interest,node,currentOrgUnit,'INTEREST')"></input>
-									
-										  <ol ui-tree-nodes="" ng-model="node.children" ng-class="{hidden: collapsed}" >
-										    <li class="list-group-item" ng-repeat="node in node.children" ui-tree-node ng-include="'interest_renderer.html' ">
+										</div>						
+										  <ul style="list-style-type: none; list-style:none;padding-left:0px;" ui-tree-nodes="" ng-model="node.children" ng-class="{hidden: collapsed}">
+										    <li style="list-style-type: none;" ng-repeat="node in node.children" ui-tree-node ng-include="'tree.html'" class="list-item">
 										    </li>
-										  </ol>
-										  
+										  </ul>								  
 								</script>
-
-								<div ui-tree data-drag-enabled="false">
-								  <ol ui-tree-nodes="" ng-model="currentKLETree" id="tree-root">
-								    <li ng-repeat="node in currentKLETree" ui-tree-node ng-include="'interest_renderer.html'"></li>
-								  </ol>
-								</div>								  
-							</div>
-					</div>
+							
+							<div ui-tree data-drag-enabled="false">
+							  <ul style="list-style-type: none; list-style:none;" ui-tree-nodes="" ng-model="currentKLETree.tree" id="tree-root" class="list-group">
+							    <li ng-repeat="node in currentKLETree.tree" ui-tree-node ng-include="'tree.html'"></li>
+							  </ul>
+							</div>	
+													  
 		</div>
