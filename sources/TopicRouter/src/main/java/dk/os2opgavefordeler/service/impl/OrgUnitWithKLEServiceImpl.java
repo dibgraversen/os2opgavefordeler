@@ -1,9 +1,7 @@
 package dk.os2opgavefordeler.service.impl;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -20,6 +18,7 @@ import dk.os2opgavefordeler.model.Municipality;
 import dk.os2opgavefordeler.model.OrgUnit;
 import dk.os2opgavefordeler.model.OrgUnit_;
 import dk.os2opgavefordeler.model.presentation.KleAssignmentType;
+import dk.os2opgavefordeler.model.presentation.OrgUnitListPO;
 import dk.os2opgavefordeler.model.presentation.OrgUnitWithKLEPO;
 import dk.os2opgavefordeler.repository.UserRepository;
 import dk.os2opgavefordeler.service.KleService;
@@ -43,6 +42,27 @@ public class OrgUnitWithKLEServiceImpl implements OrgUnitWithKLEService {
 
 	@Inject
 	private KleService kleService;
+	
+	@Override
+	public List<OrgUnitListPO> getList(long municipalityId) {
+		TypedQuery<OrgUnit> query = persistence.getEm().createQuery(
+				"SELECT org FROM OrgUnit org WHERE org.municipality.id = :municipalityId AND org.isActive = true",
+				OrgUnit.class);
+
+		query.setParameter("municipalityId", municipalityId);
+		List<OrgUnitListPO> result = new ArrayList<>();
+
+		try {
+			final List<OrgUnit> orgUnits = query.getResultList();
+			for (OrgUnit orgUnit : orgUnits) {
+				result.add(new OrgUnitListPO(orgUnit.getId(), orgUnit.getName(), (orgUnit.getParent().isPresent() ? orgUnit.getParent().get().getName() : null), orgUnit.hasKles()));
+			}
+		} catch (NoResultException nre) {
+			; // we just return the empty list
+		}
+
+		return result;
+	}
 
 	@Override
 	public List<OrgUnitWithKLEPO> getAll(long municipalityId) {
@@ -56,8 +76,7 @@ public class OrgUnitWithKLEServiceImpl implements OrgUnitWithKLEService {
 		try {
 			final List<OrgUnit> orgUnits = query.getResultList();
 			for (OrgUnit orgUnit : orgUnits) {
-				result.add(new OrgUnitWithKLEPO(orgUnit.getId(), orgUnit.getName(),
-						orgUnit.getParent().isPresent() ? orgUnit.getParent().get().getName() : null));
+				result.add(new OrgUnitWithKLEPO(orgUnit.getId(), orgUnit.getName()));
 			}
 		} catch (NoResultException nre) {
 			; // we just return the empty list
@@ -81,11 +100,11 @@ public class OrgUnitWithKLEServiceImpl implements OrgUnitWithKLEService {
 	}
 
 	private OrgUnitWithKLEPO buildOrgUnitWithKLEPO(OrgUnit ouEntity) {
-                OrgUnitWithKLEPO ou = new OrgUnitWithKLEPO(ouEntity.getId(), ouEntity.getName(), ouEntity.getParent().isPresent() ? ouEntity.getParent().get().getName() : null);
-                ou.setInterestKLE(ouEntity.getKles(KleAssignmentType.INTEREST).stream().map(Kle::getNumber).collect(Collectors.toList()));
-                ou.setPerformingKLE(ouEntity.getKles(KleAssignmentType.PERFORMING).stream().map(Kle::getNumber).collect(Collectors.toList()));
+		OrgUnitWithKLEPO ou = new OrgUnitWithKLEPO(ouEntity.getId(), ouEntity.getName());
+		ou.setInterestKLE(ouEntity.getKles(KleAssignmentType.INTEREST).stream().map(Kle::getNumber).collect(Collectors.toList()));
+		ou.setPerformingKLE(ouEntity.getKles(KleAssignmentType.PERFORMING).stream().map(Kle::getNumber).collect(Collectors.toList()));
 
-                return ou;
+		return ou;
 	}
 
 	@Override

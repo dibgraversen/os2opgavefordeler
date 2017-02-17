@@ -23,6 +23,7 @@ import dk.os2opgavefordeler.auth.UserLoggedIn;
 import dk.os2opgavefordeler.model.Municipality;
 import dk.os2opgavefordeler.model.OrgUnit;
 import dk.os2opgavefordeler.model.presentation.KleAssignmentType;
+import dk.os2opgavefordeler.model.presentation.OrgUnitListPO;
 import dk.os2opgavefordeler.model.presentation.OrgUnitTreePO;
 import dk.os2opgavefordeler.model.presentation.OrgUnitWithKLEPO;
 import dk.os2opgavefordeler.repository.UserRepository;
@@ -58,7 +59,7 @@ public class OUEndpoint extends Endpoint {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/list")
 	public Response list() {
-		List<OrgUnitWithKLEPO> result = orgUnitWithKLEService.getAll(getMunicipality().getId());
+		List<OrgUnitListPO> result = orgUnitWithKLEService.getList(getMunicipality().getId());
 		
 		return Response.ok().entity(result).build();
 	}

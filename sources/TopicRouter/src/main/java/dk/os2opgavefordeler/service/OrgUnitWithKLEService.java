@@ -6,6 +6,7 @@ import java.util.Optional;
 import dk.os2opgavefordeler.model.Municipality;
 import dk.os2opgavefordeler.model.OrgUnit;
 import dk.os2opgavefordeler.model.presentation.KleAssignmentType;
+import dk.os2opgavefordeler.model.presentation.OrgUnitListPO;
 import dk.os2opgavefordeler.model.presentation.OrgUnitWithKLEPO;
 
 public interface OrgUnitWithKLEService {
@@ -15,5 +16,6 @@ public interface OrgUnitWithKLEService {
 	boolean addKLE(long ouId, String kleNumber, KleAssignmentType assignmentType);
 	boolean removeKLE(long ouId, String kleNumber, KleAssignmentType assignmentType);
 	boolean containsKLE(OrgUnit ou, KleAssignmentType assignmentType, String kleNumber);
+	List<OrgUnitListPO> getList(long municipalityId);
 
 }
