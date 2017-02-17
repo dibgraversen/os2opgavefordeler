@@ -111,7 +111,7 @@ public class OUEndpoint extends Endpoint {
 		KleAssignmentType assignmentType;
 		try {
 			assignmentType = KleAssignmentType.fromString(assignmentTypeString);
-		} catch (Exception e) {			 
+		} catch (Exception e) {
 			return Response.status(400).entity("No assignment type with a name: \"" + assignmentTypeString + "\" found")
 					.build();
 		}
@@ -152,10 +152,11 @@ public class OUEndpoint extends Endpoint {
 			return Response.status(400).entity("No assignment type with a name: \"" + assignmentTypeString + "\" found")
 					.build();
 		}
-		
+
 		//Check if OU contains that kleNumber
 		if(!orgUnitWithKLEService.containsKLE(ou.get(),assignmentType,kleNumber)){
-			return Response.status(400).entity("OU does not contain KLE:"+kleNumber+" for assignmentType:"+assignmentTypeString).build();
+			log.info("Not removing KLE " + kleNumber + " from " + ou.get().getName() + " because it was not assigned previously");
+	                return Response.ok().build();
 		}
 
 		boolean result = orgUnitWithKLEService.removeKLE(ouId, kleNumber, assignmentType);
