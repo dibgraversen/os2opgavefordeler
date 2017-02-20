@@ -14,6 +14,7 @@ public class OrgUnitPO {
 	private String esdhName;
 	private String email;
 	private String phone;
+	private String pNumber;
 	private Municipality municipality;
 
 	private boolean isActive;
@@ -33,6 +34,7 @@ public class OrgUnitPO {
 			this.esdhName = from.getEsdhLabel();
 			this.email = from.getEmail();
 			this.phone = from.getPhone();
+			this.pNumber = from.getpNumber();
 			this.municipality = from.getMunicipality().orElse(null);
 		}
 	}
@@ -68,6 +70,8 @@ public class OrgUnitPO {
 	public String getPhone() {
 		return phone;
 	}
+
+	public String getpNumber() { return pNumber; }
 
 	public long getId() {
 		return id;

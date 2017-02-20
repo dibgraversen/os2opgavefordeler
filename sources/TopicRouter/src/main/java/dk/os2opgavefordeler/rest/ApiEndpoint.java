@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.Optional;
 
 import dk.os2opgavefordeler.model.OrgUnit;
+import dk.os2opgavefordeler.orgunit.OrgUnitDTO;
+import dk.os2opgavefordeler.repository.OrgUnitRepository;
 import org.jboss.resteasy.annotations.cache.NoCache;
 import org.slf4j.Logger;
 
@@ -15,10 +17,7 @@ import javax.inject.Inject;
 
 import javax.servlet.http.HttpServletRequest;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -58,6 +57,9 @@ public class ApiEndpoint extends Endpoint {
 	OrgUnitService orgUnitService;
 
 	@Inject
+	OrgUnitRepository orgUnitRepo;
+
+	@Inject
 	EmploymentService employmentService;
 
 	@Inject
@@ -70,28 +72,15 @@ public class ApiEndpoint extends Endpoint {
 	@Path("/")
 	@Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
 	public Response lookup(@QueryParam("kle") String kleNumber, @Context UriInfo uriInfo, @Context HttpServletRequest request) {
-
 		String email = authService.getAuthentication().getEmail();
-		String token = authService.getAuthentication().getToken();
+		Municipality municipality;
 
-		if (token == null || token.isEmpty()) {
-			return Response.status(Response.Status.UNAUTHORIZED).build();
+		AuthorizeResult authorizeResult = authorize();
+		if(authorizeResult.success){
+			municipality = authorizeResult.municipality;
 		}
-
-		Optional<Municipality> municipalityMaybe = municipalityService.getMunicipalityFromToken(token);
-
-		if (!municipalityMaybe.isPresent()) {
-			return Response.status(Response.Status.UNAUTHORIZED).type(TEXT_PLAIN)
-					.entity("Did not find a municipality based on given authorization.")
-					.build();
-		}
-
-		Municipality municipality = municipalityMaybe.get();
-
-		if (!municipality.isActive()) {
-			return Response.status(PAYMENT_REQUIRED).type(TEXT_PLAIN)
-					.entity("Your subscription is not active and therefor the api cannot be used.")
-					.build();
+		else{
+			return Response.status(authorizeResult.status).type(TEXT_PLAIN).entity(authorizeResult.message).build();
 		}
 
 		Optional<Kle> kleMaybe = kleService.fetchMainGroup(kleNumber, municipality.getId());
@@ -138,6 +127,35 @@ public class ApiEndpoint extends Endpoint {
 		return ok(resultPO);
 	}
 
+
+	@GET
+	@Path("/orgunit/pNumber/{pNumber}")
+	@Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
+	public Response getByPNumber(@PathParam("pNumber") String pNumber){
+		log.info("pNumber = " + pNumber);
+
+		Municipality municipality;
+
+		AuthorizeResult authorizeResult = authorize();
+		if(authorizeResult.success){
+			municipality = authorizeResult.municipality;
+		}
+		else{
+			return Response.status(authorizeResult.status).type(TEXT_PLAIN).entity(authorizeResult.message).build();
+		}
+
+		OrgUnit orgUnit = orgUnitRepo.findByPNumberAndMunicipalityId(pNumber, municipality.getId());
+
+		if(orgUnit != null){
+			OrgUnitDTO result = new OrgUnitDTO(orgUnit);
+			log.info("result = " + result);
+
+			return ok(result);
+		}
+
+		return ok();
+	}
+
 	@GET
 	@Path("/healthcheck")
 	@Produces(MediaType.TEXT_PLAIN + "; charset=UTF-8")
@@ -150,6 +168,46 @@ public class ApiEndpoint extends Endpoint {
 			return ok("We get signal.");
 		} else {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Somebody set up us the bomb.").build();
+		}
+	}
+
+	/**
+	 * Authorizes the incoming call to the endpoint
+	 * @return AuthorizeResult containing the municipality if success, or HTTP error status and message if not success.
+	 */
+	private AuthorizeResult authorize(){
+		String token = authService.getAuthentication().getToken();
+
+		if (token == null || token.isEmpty()) {
+			return new AuthorizeResult(false, null, Response.Status.UNAUTHORIZED, "");
+		}
+
+		Optional<Municipality> municipalityMaybe = municipalityService.getMunicipalityFromToken(token);
+
+		if (!municipalityMaybe.isPresent()) {
+			return new AuthorizeResult(false, null, Response.Status.UNAUTHORIZED, "Did not find a municipality based on given authorization.");
+		}
+
+		Municipality municipality = municipalityMaybe.get();
+
+		if (!municipality.isActive()) {
+			return new AuthorizeResult(false, null, Response.Status.PAYMENT_REQUIRED, "Your subscription is not active and therefor the api cannot be used.");
+		}
+
+		return new AuthorizeResult(true, municipality, null, "");
+	}
+
+	private class AuthorizeResult{
+		private boolean success;
+		private Municipality municipality;
+		private Response.Status status;
+		private String message;
+
+		private AuthorizeResult(boolean success, Municipality municipality, Response.Status status, String message) {
+			this.success = success;
+			this.municipality = municipality;
+			this.status = status;
+			this.message = message;
 		}
 	}
 }

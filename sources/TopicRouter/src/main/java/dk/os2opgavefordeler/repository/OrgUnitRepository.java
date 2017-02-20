@@ -18,6 +18,9 @@ public abstract class OrgUnitRepository extends AbstractEntityRepository<OrgUnit
 	@Query(value = "SELECT ou FROM OrgUnit ou WHERE ou.businessKey = ?1 AND ou.municipality.id = ?2", singleResult = SingleResultType.OPTIONAL)
 	public abstract OrgUnit findByBusinessKeyAndMunicipalityId(String businessKey, long municipalityId);
 
+	@Query(value = "SELECT ou FROM OrgUnit ou WHERE ou.pNumber = ?1 AND ou.municipality.id = ?2")
+	public abstract OrgUnit findByPNumberAndMunicipalityId(String pNumber, long municipalityId);
+
 	@Query(value = "SELECT ou FROM OrgUnit ou WHERE ou.municipality.id = ?1")
 	public abstract List<OrgUnit> findByMunicipality(long municipalityId);
 
