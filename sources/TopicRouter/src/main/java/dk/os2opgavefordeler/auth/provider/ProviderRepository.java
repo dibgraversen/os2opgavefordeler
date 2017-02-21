@@ -23,9 +23,6 @@ public class ProviderRepository {
     @Inject
     private ConfigService configService;
 
-    @Inject
-    private Logger logger;
-
     @PostConstruct
     public void init() {
         String clientId = configService.getClientId();
@@ -37,7 +34,6 @@ public class ProviderRepository {
                 .clientSecret(clientSecret)
                 .build()
         );
-        logger.info("ClientId = "+clientId+", ClientSecret = "+clientSecret);
     }
 
     public Optional<IdentityProvider> findProvider(long id) {
