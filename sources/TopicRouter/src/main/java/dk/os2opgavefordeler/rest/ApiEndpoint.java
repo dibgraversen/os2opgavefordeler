@@ -72,59 +72,44 @@ public class ApiEndpoint extends Endpoint {
 	@Path("/")
 	@Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
 	public Response lookup(@QueryParam("kle") String kleNumber, @Context UriInfo uriInfo, @Context HttpServletRequest request) {
-		String email = authService.getAuthentication().getEmail();
-		Municipality municipality;
-
 		AuthorizeResult authorizeResult = authorize();
 		if(authorizeResult.success){
-			municipality = authorizeResult.municipality;
-		}
-		else{
-			return Response.status(authorizeResult.status).type(TEXT_PLAIN).entity(authorizeResult.message).build();
-		}
+			Municipality municipality = authorizeResult.municipality;
+			Optional<Kle> kleMaybe = kleService.fetchMainGroup(kleNumber, municipality.getId());
+			if (!kleMaybe.isPresent()) {
+				return badRequest("Did not find a Kle based on given number.");
+			}
+			Kle kle = kleMaybe.get();
 
-		Optional<Kle> kleMaybe = kleService.fetchMainGroup(kleNumber, municipality.getId());
+			Map<String, String> parameters = new HashMap<>();
+			for (Map.Entry<String, List<String>> m : uriInfo.getQueryParameters().entrySet()) {
+				parameters.put(m.getKey(), m.getValue().get(0));
+			}
 
-		if (!kleMaybe.isPresent()) {
-			return badRequest("Did not find a Kle based on given number.");
-		}
+			Assignee assignee = findAssignedForKleService.findAssignedForKle(kle, municipality, parameters);
+			if (assignee == null) {
+				return notFound("No one seems to be handling the given kle for municipality.");
+			}
 
-		Kle kle = kleMaybe.get();
-
-		Map<String, String> parameters = new HashMap<>();
-
-		for (Map.Entry<String, List<String>> m : uriInfo.getQueryParameters().entrySet()) {
-			parameters.put(m.getKey(), m.getValue().get(0));
-		}
-
-		Assignee assignee = findAssignedForKleService.findAssignedForKle(kle, municipality, parameters);
-
-		if (assignee == null) {
-			return Response.status(Response.Status.NOT_FOUND).type(TEXT_PLAIN).entity("No one seems to be handling the given kle for municipality.").build();
-		}
-
-		EmploymentApiResultPO manager = new EmploymentApiResultPO(orgUnitService.findResponsibleManager(assignee.getOrgUnit()).orElse(null));
-		EmploymentApiResultPO employee = assignee.getEmployment().map(EmploymentApiResultPO::new).orElse(null);
-
-		Optional<OrgUnit> distributionOrgUnit = assignee.getRule().getAssignedOrg();
-
-		OrgUnit assignedOrg;
-
-		if (distributionOrgUnit.isPresent()) {
-			if (distributionOrgUnit.get().equals(assignee.getOrgUnit())) {
-				assignedOrg = distributionOrgUnit.get();
+			EmploymentApiResultPO manager = new EmploymentApiResultPO(orgUnitService.findResponsibleManager(assignee.getOrgUnit()).orElse(null));
+			EmploymentApiResultPO employee = assignee.getEmployment().map(EmploymentApiResultPO::new).orElse(null);
+			Optional<OrgUnit> distributionOrgUnit = assignee.getRule().getAssignedOrg();
+			OrgUnit assignedOrg;
+			if (distributionOrgUnit.isPresent()) {
+				if (distributionOrgUnit.get().equals(assignee.getOrgUnit())) {
+					assignedOrg = distributionOrgUnit.get();
+				} else {
+					assignedOrg = assignee.getOrgUnit();
+				}
 			} else {
 				assignedOrg = assignee.getOrgUnit();
 			}
-		} else {
-			assignedOrg = assignee.getOrgUnit();
+			DistributionRuleApiResultPO resultPO = new DistributionRuleApiResultPO(assignee.getRule().getKle(), assignedOrg, manager, employee);
+			log.info("API endpoint called by {} for KLE: {} with result: {}", authService.getAuthentication().getEmail(), resultPO.getKle().getNumber(), resultPO.getOrg().getName());
+			return ok(resultPO);
+		}	else {
+			return Response.status(authorizeResult.status).type(TEXT_PLAIN).entity(authorizeResult.message).build();
 		}
-
-		DistributionRuleApiResultPO resultPO = new DistributionRuleApiResultPO(assignee.getRule().getKle(), assignedOrg, manager, employee);
-
-		log.info("API endpoint called by {} for KLE: {} with result: {}", email, resultPO.getKle().getNumber(), resultPO.getOrg().getName());
-
-		return ok(resultPO);
 	}
 
 
@@ -132,28 +117,18 @@ public class ApiEndpoint extends Endpoint {
 	@Path("/orgunit/pNumber/{pNumber}")
 	@Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
 	public Response getByPNumber(@PathParam("pNumber") String pNumber){
-		log.info("pNumber = " + pNumber);
-
-		Municipality municipality;
-
 		AuthorizeResult authorizeResult = authorize();
-		if(authorizeResult.success){
-			municipality = authorizeResult.municipality;
-		}
-		else{
+		if( authorizeResult.success ){
+			Municipality municipality = authorizeResult.municipality;
+			OrgUnit orgUnit = orgUnitRepo.findByPNumberAndMunicipalityId(pNumber, municipality.getId());
+			if(orgUnit != null){
+				return ok(new OrgUnitDTO(orgUnit));
+			} else {
+				return notFound("No org unit found for pnumber");
+			}
+		} else {
 			return Response.status(authorizeResult.status).type(TEXT_PLAIN).entity(authorizeResult.message).build();
 		}
-
-		OrgUnit orgUnit = orgUnitRepo.findByPNumberAndMunicipalityId(pNumber, municipality.getId());
-
-		if(orgUnit != null){
-			OrgUnitDTO result = new OrgUnitDTO(orgUnit);
-			log.info("result = " + result);
-
-			return ok(result);
-		}
-
-		return ok();
 	}
 
 	@GET
