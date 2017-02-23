@@ -62,4 +62,13 @@ public abstract class Endpoint {
 	public Response notFound() {
 		return Response.status(Status.NOT_FOUND).build();
 	}
+
+	/**
+	 * Creates a not found response with given message.
+	 *
+	 * @return a built Response with not found and entity set with message.
+	 */
+	public Response notFound(String message) {
+		return Response.status(Status.NOT_FOUND).entity(message).build();
+	}
 }

@@ -16,8 +16,9 @@ public class ConfigServiceImpl implements ConfigService {
 	private static final String OPEN_ID_CALLBACK_PROPERTY_NAME = "topicrouter.url.openid.callback";
 	private static final String GODMODE_ENABLED_PROPERTY_NAME = "topicrouter.login.godmode.enabled";
 	private static final String EXTENDED_RESPONSIBILITY_ENABLED_PROPERTY_NAME = "topicrouter.extendedresponsibility.enabled";
-	private static final String GOOGLE_LOGIN_ENABLED_PROPERTY_NAME = "topicrouter.login.google.enabled";
 	private static final String ENABLE_AUDIT_LOGGING_PROPERTY_NAME = "topicrouter.auditlog.enabled";
+	private static final String CLIENT_ID = "topicrouter.login.clientid";
+	private static final String CLIENT_SECRET = "topicrouter.login.clientsecret";
 
 	@Override
 	public String getHomeUrl() {
@@ -30,6 +31,16 @@ public class ConfigServiceImpl implements ConfigService {
 	}
 
 	@Override
+	public String getClientId() {
+		return getProperty(CLIENT_ID, "");
+	}
+
+	@Override
+	public String getClientSecret() {
+		return getProperty(CLIENT_SECRET, "");
+	}
+
+	@Override
 	public boolean isGodModeLoginEnabled() {
 		return getProperty(GODMODE_ENABLED_PROPERTY_NAME, false);
 	}
@@ -37,11 +48,6 @@ public class ConfigServiceImpl implements ConfigService {
 	@Override
 	public boolean isExtendedResponsibilityEnabled() {
 		return getProperty(EXTENDED_RESPONSIBILITY_ENABLED_PROPERTY_NAME, false);
-	}
-
-	@Override
-	public boolean enableGoogleLogin() {
-		return getProperty(GOOGLE_LOGIN_ENABLED_PROPERTY_NAME, false);
 	}
 
 	@Override
