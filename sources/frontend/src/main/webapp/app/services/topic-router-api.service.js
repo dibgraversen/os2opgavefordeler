@@ -24,6 +24,7 @@
 			updateSettings: updateSettings,
 			setMunicipalityAdmin: setMunicipalityAdmin,
 			setAdmin: setAdmin,
+			setKleAdmin: setKleAdmin,
 			getOrgUnitsForResponsibility: getOrgUnitsForResponsibility,
 			getOrgUnit: getOrgUnit,
 			getEmployments: getEmployments,
@@ -126,6 +127,10 @@
 
 		function setAdmin(roleId, admin) {
 			return httpPost('/roles/' + roleId + '/admin/' + (admin ? '1' : '0'));
+		}
+
+		function setKleAdmin(roleId, kleAdmin) {
+			return httpPost('/roles/' + roleId + '/kleAdmin/' + (kleAdmin ? '1' : '0'));
 		}
 
 		function getTopicRoutes(role, scope) {

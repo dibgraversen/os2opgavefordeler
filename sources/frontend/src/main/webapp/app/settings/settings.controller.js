@@ -18,6 +18,7 @@
 		$scope.openDeleteUser = openDeleteUser;
 		$scope.toggleActive = toggleActive;
 		$scope.toggleMunicipalityAdmin = toggleMunicipalityAdmin;
+		$scope.toggleKleAdmin = toggleKleAdmin;
 		$scope.toggleAdmin = toggleAdmin;
 		$scope.buildRules = buildRules;
 		$scope.closeAlert = closeAlert;
@@ -191,6 +192,26 @@
 						});
 					}, function(){
 						user.admin = !user.admin;
+
+						addMessage({
+							type: "danger",
+							msg: "Opdatering af bruger fejlede, prøv igen senere."
+						});
+					});
+		}
+
+		function toggleKleAdmin(user) {
+			console.log("bob");
+			user.kleAdmin = !user.kleAdmin;
+
+			topicRouterApi.setKleAdmin(user.roleId, user.kleAdmin)
+					.then(function(response) {
+						addMessage({
+							type: 'success',
+							msg: 'Brugeren blev opdateret.'
+						});
+					}, function(){
+						user.kleAdmin = !user.kleAdmin;
 
 						addMessage({
 							type: "danger",

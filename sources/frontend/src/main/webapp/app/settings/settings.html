@@ -54,6 +54,8 @@
 				      popover-trigger="mouseenter" popover-append-to-body="true"
 				      popover="Hvorvidt brugeren er leder kan ikke sættes manuelt"></span>
 				</th>
+				<th style="width: 70px">Kleadmin</th>
+
 				<th style="width: 100px"></th>
 			</tr>
 		</thead>
@@ -74,6 +76,7 @@
 				<td><input type="checkbox" name="userAdmin" ng-checked="{{ currUser.admin }}" ng-click="toggleAdmin(currUser)"></td>
 				<td><input type="checkbox" name="userMunicipalityAdmin" ng-checked="{{ currUser.municipalityAdmin }}" ng-click="toggleMunicipalityAdmin(currUser)"></td>
 				<td><input type="checkbox" name="userManager" ng-checked="{{ currUser.manager }}" disabled></td>
+				<td><input type="checkbox" name="kleAdmin" ng-checked="{{ currUser.kleAdmin }}" ng-click="toggleKleAdmin(currUser)"></td>
 				<td>
 					<button type="button" class="btn btn-primary" ng-click="openEditUser(currUser)"><span class="glyphicon glyphicon-edit"></span> Rediger</button>
 					<button type="button" class="btn btn-danger" ng-click="openDeleteUser(currUser)"><span class="glyphicon glyphicon-remove"></span> Slet</button>

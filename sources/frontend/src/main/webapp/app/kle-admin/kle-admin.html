@@ -16,18 +16,18 @@
 
 		<div class="clearfix"></div>
 		
-		<div data-ng-show="filterStr.length==0" class="col-md-4">
+		<div data-ng-show="filterStr.length==0" class="col-md-4" style="overflow: auto;">
 			<h2>Org Units</h2>
 
 			<script type="text/ng-template"  id="tree_item_renderer.html">
-			    <div data-ng-click="toogleChildrenVisibility(ou)">
-			    <span class="glyphicon hover" data-ng-class="ou.expanded ? 'glyphicon-chevron-down' : 'glyphicon-chevron-right'">
-				</span>	
+			    <span class="glyphicon hover" data-ng-class="ou.expanded ? 'glyphicon-chevron-down' : 'glyphicon-chevron-right'" data-ng-click="toogleChildrenVisibility(ou)">
+				</span>
+				<span data-ng-click="setCurrentOrgUnit(ou.id)">
 			    {{ou.name}}
+			    </span>
+
 			     <span ng-show="!ou.klesAssigned" class="glyphicon glyphicon-exclamation-sign" style="color:red" popover-trigger="mouseenter" popover-append-to-body="true" popover="The OrgUnit has no assigned KLE's"></span>
 
-			     </div>
-			
 			    <ul style="list-style-type: none" >
 			        <li style="list-style-type: none" ng-show="ou.visible" ng-repeat="ou in ou.children" ng-include="'tree_item_renderer.html'"></li>
 			    </ul>
@@ -38,7 +38,7 @@
 			</ul>
 		</div>
 		
-		<div data-ng-show="filterStr.length>0"  class="col-md-4">
+		<div data-ng-show="filterStr.length>0 && filterStr !== 'tom'"  class="col-md-4">
 			<h2>Org Units</h2>
 				<table class="table table-hover">
 						<thead>
@@ -46,15 +46,39 @@
 							<th>Navn</th>
 						</tr>
 						</thead>
-						<tbody data-ng-repeat="ou in ous | filter: { name : filterStr }">
+						<tbody data-ng-repeat="ou in ous | filter: filterByNameOrParent">
 							<tr data-ng-class="currentOrgUnit.id === ou.id ? 'success' : ''" data-ng-click="setCurrentOrgUnit(ou.id)">
-								<td>
-									{{ ou.name | limitTo: 50 }}
+								<td>								
+									<h5>{{ ou.name | limitTo: 50 }}
+										<small>{{ou.parentName}}</small>
+									</h5>								
 								</td>					
 							</tr>
 						</tbody>
 				</table>
 		</div>
+		
+		<div data-ng-show="filterStr.length>0 && filterStr === 'tom'"  class="col-md-4">
+			<h2>Filtered</h2>
+				<table class="table table-hover">
+						<thead>
+						<tr>
+							<th>Navn</th>
+						</tr>
+						</thead>
+						<tbody data-ng-repeat="ou in ous | filter : filterByContainsKles">
+							<tr data-ng-class="currentOrgUnit.id === ou.id ? 'success' : ''" data-ng-click="setCurrentOrgUnit(ou.id)">
+								<td>
+								<h5>
+									{{ ou.name | limitTo: 50 }}
+									<small>{{ou.parentName}}</small>
+								</h5>
+								</td>								
+							</tr>
+						</tbody>
+				</table>
+		</div>
+		
 
 		<div class="col-md-8">
 			<h2> {{currentOrgUnit.name}}</h2>

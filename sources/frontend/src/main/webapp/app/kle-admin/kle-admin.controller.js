@@ -1,5 +1,7 @@
 		(function () {
-			'use strict';
+			'use strict';	
+
+			//var hasKlesCustomFilter = ;
 
 			angular.module('topicRouter').controller('KleAdminCtrl', KleAdminCtrl);
 
@@ -21,6 +23,8 @@
 				$scope.toogleChildrenVisibility = toogleChildrenVisibility;
 				$scope.modifyKle = modifyKle;
 				$scope.toggleChildren = toggleChildren;
+				$scope.filterByNameOrParent = filterByNameOrParent;
+				$scope.filterByContainsKles = filterByContainsKles;
 
 				activate();
 
@@ -42,6 +46,25 @@
 											});																		
 				}
 
+				function filterByContainsKles(ou){
+					return ou.klesAssigned;
+				}
+
+				function filterByNameOrParent(ou) {
+					var name = ou.name.toLowerCase();
+					var filterStr = $scope.filterStr.toLowerCase();
+					var parent = (ou.parentName ===null) ? "" : ou.parentName.toLowerCase();
+        			
+        			if(_.includes(name, filterStr)){
+        				return true;
+        			}
+        			
+        			if(_.includes(parent, filterStr)){
+        				return true;
+        			}
+        			
+        			return false;
+  				 }
 
 				function setCurrentOrgUnit(ouId){	
 					orgUnitService.getOrgUnit(ouId).then(
@@ -144,13 +167,15 @@
 
 				function updateKlesAssignement(ou, changeValue) {
 							var ouToUpdate = getOuFromTree(ou);
-
+							var ouFromSearchBox = getOuFromSearchBox(ou);
 							if(changeValue === true) {
 								ouToUpdate.klesAssigned = true;
+								ouFromSearchBox.klesAssigned = true;
 							}
 							else {
 								if ((!ou.interestKLE || ou.interestKLE.length===0) && (!ou.performingKLE || ou.performingKLE.length===0)){
 									ouToUpdate.klesAssigned = false;
+									ouFromSearchBox.klesAssigned = false;
 								}
 
 								// if any of the children elements
@@ -165,6 +190,13 @@
 					});
 
 					var result = _.find(flatOuList, function(anOu){
+						return anOu.id===ou.id;
+					});
+					return result;
+				}
+
+				function getOuFromSearchBox(ou){
+					var result = _.find($scope.ous, function(anOu){
 						return anOu.id===ou.id;
 					});
 					return result;
@@ -203,8 +235,6 @@
 						element.visible = !element.visible;
 					});
 					ou.expanded =  (ou.expanded === null) ? false : !ou.expanded;
-
-					setCurrentOrgUnit(ou.id);		
 				}
 
 				function removeFromArray(list,item){
