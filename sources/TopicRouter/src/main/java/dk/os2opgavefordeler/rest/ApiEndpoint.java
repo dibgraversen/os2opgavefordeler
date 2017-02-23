@@ -41,6 +41,12 @@ import dk.os2opgavefordeler.service.*;
 @RequestScoped
 public class ApiEndpoint extends Endpoint {
 
+	private static final String DID_NOT_FIND_A_MUNICIPALITY_BASED_ON_GIVEN_AUTHORIZATION = "Did not find a municipality based on given authorization.";
+	private static final String YOUR_SUBSCRIPTION_IS_NOT_ACTIVE_AND_THEREFOR_THE_API_CANNOT_BE_USED = "Your subscription is not active and therefor the api cannot be used.";
+	private static final String NO_ORG_UNIT_FOUND_FOR_PNUMBER = "No org unit found for pnumber";
+	private static final String NO_ONE_SEEMS_TO_BE_HANDLING_THE_GIVEN_KLE_FOR_MUNICIPALITY = "No one seems to be handling the given kle for municipality.";
+	private static final String DID_NOT_FIND_A_KLE_BASED_ON_GIVEN_NUMBER = "Did not find a Kle based on given number.";
+	
 	@Inject
 	Logger log;
 
@@ -77,7 +83,7 @@ public class ApiEndpoint extends Endpoint {
 			Municipality municipality = authorizeResult.municipality;
 			Optional<Kle> kleMaybe = kleService.fetchMainGroup(kleNumber, municipality.getId());
 			if (!kleMaybe.isPresent()) {
-				return badRequest("Did not find a Kle based on given number.");
+				return badRequest(DID_NOT_FIND_A_KLE_BASED_ON_GIVEN_NUMBER);
 			}
 			Kle kle = kleMaybe.get();
 
@@ -88,7 +94,7 @@ public class ApiEndpoint extends Endpoint {
 
 			Assignee assignee = findAssignedForKleService.findAssignedForKle(kle, municipality, parameters);
 			if (assignee == null) {
-				return notFound("No one seems to be handling the given kle for municipality.");
+				return notFound(NO_ONE_SEEMS_TO_BE_HANDLING_THE_GIVEN_KLE_FOR_MUNICIPALITY);
 			}
 
 			EmploymentApiResultPO manager = new EmploymentApiResultPO(orgUnitService.findResponsibleManager(assignee.getOrgUnit()).orElse(null));
@@ -124,7 +130,7 @@ public class ApiEndpoint extends Endpoint {
 			if(orgUnit != null){
 				return ok(new OrgUnitDTO(orgUnit));
 			} else {
-				return notFound("No org unit found for pnumber");
+				return notFound(NO_ORG_UNIT_FOUND_FOR_PNUMBER);
 			}
 		} else {
 			return Response.status(authorizeResult.status).type(TEXT_PLAIN).entity(authorizeResult.message).build();
@@ -160,13 +166,13 @@ public class ApiEndpoint extends Endpoint {
 		Optional<Municipality> municipalityMaybe = municipalityService.getMunicipalityFromToken(token);
 
 		if (!municipalityMaybe.isPresent()) {
-			return new AuthorizeResult(false, null, Response.Status.UNAUTHORIZED, "Did not find a municipality based on given authorization.");
+			return new AuthorizeResult(false, null, Response.Status.UNAUTHORIZED, DID_NOT_FIND_A_MUNICIPALITY_BASED_ON_GIVEN_AUTHORIZATION);
 		}
 
 		Municipality municipality = municipalityMaybe.get();
 
 		if (!municipality.isActive()) {
-			return new AuthorizeResult(false, null, Response.Status.PAYMENT_REQUIRED, "Your subscription is not active and therefor the api cannot be used.");
+			return new AuthorizeResult(false, null, Response.Status.PAYMENT_REQUIRED, YOUR_SUBSCRIPTION_IS_NOT_ACTIVE_AND_THEREFOR_THE_API_CANNOT_BE_USED);
 		}
 
 		return new AuthorizeResult(true, municipality, null, "");
