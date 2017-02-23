@@ -35,7 +35,7 @@ public class BootstrappingDataProviderSingleton {
 	private static final String MIRACLE_NAME = "Miracle";
 	private static final String SYDDJURS_NAME = "Syddjurs Kommune";
 
-	private boolean buildLight = false;
+	private boolean buildLight = true;
 
 	@Inject
 	private Logger log;
