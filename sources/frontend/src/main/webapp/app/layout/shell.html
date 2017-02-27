@@ -17,7 +17,7 @@
 			<div class="collapse navbar-collapse" ng-class="{'in': !navCollapsed}">
 				<ul class="nav navbar-nav">
 					<li ng-show="user.loggedIn" ng-class="{ active: $state.is('home') }">
-						<a data-toggle="collapse" data-target=".navbar-collapse" ui-sref="home">fordelinger</a>
+						<a data-toggle="collapse" data-target=".navbar-collapse" ui-sref="home">Fordelinger</a>
 					</li>
 					<li ng-show="user.currentRole.admin" ng-class="{ active: $state.is('settings') }">
 						<a data-toggle="collapse" data-target=".navbar-collapse" ui-sref="settings">Administrer system</a>
@@ -26,7 +26,7 @@
 						<a data-toggle="collapse" data-target=".navbar-collapse" ui-sref="municipalityAdmin">Administrer kommune</a>
 					</li>
 					<li ng-show="user.currentRole.kleAssigner" ng-class="{ active: $state.is('kleadmin') }">
-						<a data-toggle="collapse" data-target=".navbar-collapse" ui-sref="kleadmin">organisationsopmærkning</a>
+						<a data-toggle="collapse" data-target=".navbar-collapse" ui-sref="kleadmin">Organisationsopmærkning</a>
 					</li>
 				</ul>
 				<ul ng-show="user.loggedIn" class="nav navbar-nav navbar-right ng-cloak">

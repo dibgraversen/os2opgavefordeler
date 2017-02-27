@@ -47,7 +47,7 @@
 				}
 
 				function filterByContainsKles(ou){
-					return ou.klesAssigned;
+					return !ou.klesAssigned;
 				}
 
 				function filterByNameOrParent(ou) {
@@ -85,6 +85,15 @@
 					for(var i = 0; i < kles.length; i++){
 						kles[i].interest = isKleAssigned($scope.currentOrgUnit,kles[i].number,'INTEREST');
 						kles[i].performing = isKleAssigned($scope.currentOrgUnit,kles[i].number,'PERFORMING');
+						/* jshint loopfunc:true */
+
+						if(kles[i].performing){
+							updateCheckboxStatus(kles[i], kles[i].performing, "performing");
+						}
+						else if(kles[i].interest){
+							updateCheckboxStatus(kles[i], kles[i].interest, "interesting");
+
+						}
 						refreshTree(kles[i].children);
 					}
 				}
@@ -131,19 +140,24 @@
 				}
 
 				function modifyKle(checked,kle,ou,assignment){
-					// var kleFromTree = getKle(kle.number,klesAsList($scope.currentKLETree.tree));
+				    var kleFromTree = getKle(kle.number,klesAsList($scope.currentKLETree.tree));
 					var kleFromDisplay = getKle(kle.number,klesAsList($scope.currentOrgUnit.displayKles));
 
 					if(checked){
 							orgUnitService.addKle(kle,ou,assignment).then(function(){
 							if(assignment==='PERFORMING'){
 								kleFromDisplay.performing = checked;
-								ou.performingKLE.push(kle.number);						
+								
+								updateCheckboxStatus( kleFromDisplay, checked, "performing");
+								updateCheckboxStatus( kleFromTree, checked, "performing");						
 							}
 							else{
 								kleFromDisplay.interest = checked;
 								ou.interestKLE.push(kle.number);
-							}
+								
+								updateCheckboxStatus( kleFromDisplay, checked, "interesting");
+								updateCheckboxStatus( kleFromTree, checked, "interesting");				
+							}										
 
 							updateKlesAssignement(ou, checked);
 						});
@@ -152,17 +166,42 @@
 							orgUnitService.removeKle(kle,ou,assignment).then(function(){
 							if(assignment==='PERFORMING'){
 								kleFromDisplay.performing = checked;
-								removeFromArray(ou.performingKLE, kle.number);			
-						
+								removeFromArray(ou.performingKLE, kle.number);	
+									
+								updateCheckboxStatus( kleFromDisplay, checked, "performing");
+								updateCheckboxStatus( kleFromTree, checked, "performing");						
+								
 							}
 							else{
 								kleFromDisplay.interest = checked;
-								removeFromArray(ou.interestKLE, kle.number);			
-							}
+								removeFromArray(ou.interestKLE, kle.number);	
+
+								updateCheckboxStatus( kleFromDisplay, checked, "interesting");
+								updateCheckboxStatus( kleFromTree, checked, "interesting");
+							}		
 
 							updateKlesAssignement(ou, checked);
 						});
 					}
+				}
+
+				function updateCheckboxStatus(item, status, target){
+					if(item.children === null) {
+						return;
+					}
+					if (target === 'performing'){
+						_.each(item.children, function(anItem) {
+							anItem.performingDisabled = status;
+						});
+					}
+					else {
+						_.each(item.children, function(anotherItem) {
+							anotherItem.interestingDisabled = status;
+						});
+					}
+					_.each(item.children, function(newItem){
+						updateCheckboxStatus(newItem, status, target);
+					});
 				}
 
 				function updateKlesAssignement(ou, changeValue) {

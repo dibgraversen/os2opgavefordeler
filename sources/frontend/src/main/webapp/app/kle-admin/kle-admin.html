@@ -5,52 +5,53 @@
 
 	<div class="col-md-8 col-md-offset-2">
 		
-		<h1>KLE Opmærkning</h1>
-		<div class="col-md-2">
-			<input class="form-control" type="text" data-ng-model="filterStr" placeholder="OrgUnit" />
+		<div class="col-md-3">
+			<input class="form-control" type="text" data-ng-model="filterStr" placeholder="Søg efter enheder" style="width: 100%;" />
 		</div>
-		<div class="col-md-10"> 
+		<div class="col-md-1">
+			<span class="glyphicon glyphicon-question-sign" style="color: black; font-size: 1.5em;" popover-trigger="mouseenter" popover-append-to-body="true"
+			      popover="Angiv navnet på den enhed du ønsker at fremsøge, eller skriv *tom* for at se alle enheder der ikke er opmærket med KLE endnu."
+			      popover-placement="right" />
+		</div>
+		<div class="col-md-8">
 			
 		</div>
+
 		<br><br>
 
 		<div class="clearfix"></div>
 		
 		<div data-ng-show="filterStr.length==0" class="col-md-4" style="overflow: auto;">
-			<h2>Org Units</h2>
+			<h3>Organisationsenheder</h3>
 
 			<script type="text/ng-template"  id="tree_item_renderer.html">
-			    <span class="glyphicon hover" data-ng-class="ou.expanded ? 'glyphicon-chevron-down' : 'glyphicon-chevron-right'" data-ng-click="toogleChildrenVisibility(ou)">
-				</span>
-				<span data-ng-click="setCurrentOrgUnit(ou.id)">
-			    {{ou.name}}
+			    <span style="white-space: nowrap;">
+				    <span class="glyphicon hover" data-ng-class="ou.expanded ? 'glyphicon-chevron-down' : 'glyphicon-chevron-right'" data-ng-click="toogleChildrenVisibility(ou)">
+					</span>
+					<span data-ng-click="setCurrentOrgUnit(ou.id)">
+				    {{ou.name}}
+				    </span>
+				     <span ng-show="!ou.klesAssigned" class="glyphicon glyphicon-exclamation-sign" style="color:red" popover-trigger="mouseenter" popover-append-to-body="true" popover="Enheden er ikke tildelt nogen KLE"></span>
 			    </span>
 
-			     <span ng-show="!ou.klesAssigned" class="glyphicon glyphicon-exclamation-sign" style="color:red" popover-trigger="mouseenter" popover-append-to-body="true" popover="The OrgUnit has no assigned KLE's"></span>
-
-			    <ul style="list-style-type: none" >
+			    <ul style="list-style-type: none; padding-left: 20px !important;" >
 			        <li style="list-style-type: none" ng-show="ou.visible" ng-repeat="ou in ou.children" ng-include="'tree_item_renderer.html'"></li>
 			    </ul>
 			</script>
 
-			<ul>
+			<ul style="padding-left: 0px !important;">
 			    <li style="list-style-type: none" data-ng-repeat="ou in ousAsTree" data-ng-include="'tree_item_renderer.html'"></li>
 			</ul>
 		</div>
 		
-		<div data-ng-show="filterStr.length>0 && filterStr !== 'tom'"  class="col-md-4">
-			<h2>Org Units</h2>
+		<div data-ng-show="filterStr.length>0 && filterStr !== '*tom*'" class="col-md-4">
+			<h3>Organisationsenheder</h3>
 				<table class="table table-hover">
-						<thead>
-						<tr>
-							<th>Navn</th>
-						</tr>
-						</thead>
-						<tbody data-ng-repeat="ou in ous | filter: filterByNameOrParent">
+						<tbody data-ng-repeat="ou in ous | filter: filterByNameOrParent | limitTo:15">
 							<tr data-ng-class="currentOrgUnit.id === ou.id ? 'success' : ''" data-ng-click="setCurrentOrgUnit(ou.id)">
 								<td>								
 									<h5>{{ ou.name | limitTo: 50 }}
-										<small>{{ou.parentName}}</small>
+										<div><small>{{ou.parentName}}</small></div>
 									</h5>								
 								</td>					
 							</tr>
@@ -58,61 +59,67 @@
 				</table>
 		</div>
 		
-		<div data-ng-show="filterStr.length>0 && filterStr === 'tom'"  class="col-md-4">
-			<h2>Filtered</h2>
+		<div data-ng-show="filterStr.length>0 && filterStr === '*tom*'"  class="col-md-4">
+			<h3>Ikke opmærkede enheder</h3>
 				<table class="table table-hover">
-						<thead>
-						<tr>
-							<th>Navn</th>
-						</tr>
-						</thead>
 						<tbody data-ng-repeat="ou in ous | filter : filterByContainsKles">
 							<tr data-ng-class="currentOrgUnit.id === ou.id ? 'success' : ''" data-ng-click="setCurrentOrgUnit(ou.id)">
 								<td>
 								<h5>
 									{{ ou.name | limitTo: 50 }}
-									<small>{{ou.parentName}}</small>
+									<div><small>{{ou.parentName}}</small></div>
 								</h5>
 								</td>								
 							</tr>
 						</tbody>
 				</table>
 		</div>
-		
 
-		<div class="col-md-8">
-			<h2> {{currentOrgUnit.name}}</h2>
+		<div class="col-md-8" style="padding-left: 30px;">
+			<h3>{{currentOrgUnit.name}}</h3>
+				<div class="col-md-2" style="text-align: center; width: 80px !important;">Udfører</div>
+				<div class="col-md-2" style="text-align: center; width: 80px !important;">Indsigt</div>
+				<div class="clearfix"><span style="padding-left: 15px;">KLE</span></div>
+				<hr>
 
-								<script type="text/ng-template" id="tree.html">
-											<div class="hoverDiv">
+				<script type="text/ng-template" id="tree.html">
+							<div class="hoverDiv">
 
-											<div class="col-md-1">
-											  	<input type="checkbox" data-ng-model="node.performing" data-ng-change="modifyKle(node.performing,node,currentOrgUnit,'PERFORMING')">
-											 	 </input>
-										 	 </div>
+							<div class="col-md-2" style="text-align: center; width: 80px !important;">
+							  	<input type="checkbox"
+							  			data-ng-model="node.performing" 
+							  			data-ng-change="modifyKle(node.performing,node,currentOrgUnit,'PERFORMING')"
+							  			data-ng-disabled="node.performingDisabled">
+							 	 </input>
+						 	 </div>
 
-										 	 <div class="col-md-1">
-												 <input type="checkbox" data-ng-model="node.interest" data-ng-click="modifyKle(node.interest,node,currentOrgUnit,'INTEREST')">
-											 	 </input>
-										 	 </div>
-									 	 	
-												<div data-ng-click="toggleChildren(node,this)">
-													<div class="glyphicon hover" data-ng-class="node.expanded ? 'glyphicon-chevron-down' : 'glyphicon-chevron-right'" >								</div>
-												 	{{::node.number}}  {{::node.serviceText}}
-												 <div class="clearfix"></div>
-											</div>
+						 	 <div class="col-md-2" style="text-align: center; width: 80px !important;">
+								 <input type="checkbox"
+								 		data-ng-model="node.interest"
+								 		data-ng-click="modifyKle(node.interest,node,currentOrgUnit,'INTEREST')"
+								 		data-ng-disabled="node.interestingDisabled">
+							 	 </input>
+						 	 </div>
+					 	 	
+								<div data-ng-click="toggleChildren(node,this)">
+									<span style="padding-left: 15px;" data-ng-show="node.number.length == 2">&nbsp;</span>
+									<span style="padding-left: 30px;" data-ng-show="node.number.length == 5">&nbsp;</span>
+									<span style="padding-left: 60px;" data-ng-show="node.number.length == 8">&nbsp;</span>
+									<div class="glyphicon hover" data-ng-show="node.number.length!==8" data-ng-class="(node.expanded) ? 'glyphicon-chevron-down' : 'glyphicon-chevron-right'">								</div>
+								 	{{::node.number}}  {{::node.serviceText}}
+								 <div class="clearfix"></div>
+							</div>
 
-										</div>						
-										  <ul style="list-style-type: none; list-style:none;padding-left:0px;" ui-tree-nodes="" ng-model="node.children" ng-class="{hidden: collapsed}">
-										    <li style="list-style-type: none;" ng-repeat="node in node.children" ui-tree-node ng-include="'tree.html'" class="list-item">
-										    </li>
-										  </ul>								  
-								</script>
-							
-							<div ui-tree data-drag-enabled="false">
-							  <ul style="list-style-type: none; list-style:none;" ui-tree-nodes="" ng-model="currentKLETree.tree" id="tree-root" class="list-group">
-							    <li ng-repeat="node in currentKLETree.tree" ui-tree-node ng-include="'tree.html'"></li>
-							  </ul>
-							</div>	
-													  
+						</div>						
+						  <ul style="list-style-type: none; list-style:none;padding-left:0px;" ui-tree-nodes="" ng-model="node.children" ng-class="{hidden: collapsed}">
+						    <li style="list-style-type: none;" ng-repeat="node in node.children" ui-tree-node ng-include="'tree.html'" class="list-item">
+						    </li>
+						  </ul>								  
+				</script>
+			
+			<div ui-tree data-drag-enabled="false">
+			  <ul style="list-style-type: none; list-style:none;" ui-tree-nodes="" ng-model="currentKLETree.tree" id="tree-root" class="list-group">
+			    <li ng-repeat="node in currentKLETree.tree" ui-tree-node ng-include="'tree.html'"></li>
+			  </ul>
+			</div>
 		</div>
