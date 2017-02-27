@@ -32,6 +32,7 @@ public class UserRolePO {
 	private boolean admin;
 	private boolean municipalityAdmin;
 	private boolean manager;
+	private boolean kleAssigner;
 
 	/**
 	 * Creates a UserRolePO object with values set from the specified user and role
@@ -52,6 +53,7 @@ public class UserRolePO {
 			this.admin = role.isAdmin();
 			this.municipalityAdmin = role.isMunicipalityAdmin();
 			this.manager = role.isManager();
+			this.setKleAssigner(role.isKleAssigner());
 		}
 		else {
 			this.roleSet = false;
@@ -92,5 +94,13 @@ public class UserRolePO {
 
 	public boolean isManager() {
 		return manager;
+	}
+
+	public boolean isKleAssigner() {
+		return kleAssigner;
+	}
+
+	public void setKleAssigner(boolean kleAssigner) {
+		this.kleAssigner = kleAssigner;
 	}
 }
