@@ -90,7 +90,7 @@
 						if(kles[i].performing){
 							updateCheckboxStatus(kles[i], kles[i].performing, "performing");
 						}
-						else if(kles[i].interest){
+						if(kles[i].interest){
 							updateCheckboxStatus(kles[i], kles[i].interest, "interesting");
 
 						}
