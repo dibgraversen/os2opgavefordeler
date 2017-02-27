@@ -209,4 +209,36 @@ public class RoleEndpoint {
 			return Response.status(Response.Status.UNAUTHORIZED).entity(new SimpleMessage("Unauthorized")).build();
 		}
 	}
+
+	@POST
+	@Path("/{roleId}/kleAdmin/{valueId}")
+	@Produces(MediaType.APPLICATION_JSON)
+	@AdminRequired
+	public Response setKleAdmin(@PathParam("roleId") Long roleId, @PathParam("valueId") Long valueId) {
+		if (userService.isAdmin(authService.getAuthentication().getEmail())) {
+			try {
+				Validate.nonZero(roleId, INVALID_ROLE_ID);
+
+				Optional<Role> role = userService.findRoleById(roleId);
+
+				if (role.isPresent()) {
+					Role updatedRole = role.get();
+					updatedRole.setKleAssigner(valueId==1);
+					userService.updateRole(updatedRole);
+
+					return Response.status(Response.Status.OK).entity(new SimpleMessage("OK")).build();
+				}
+				else {
+					log.warn("Role #{} not found", roleId);
+					return Response.status(Response.Status.NOT_FOUND).entity(new SimpleMessage("Role not found")).build();
+				}
+			}
+			catch(BadRequestArgumentException e) {
+				return Response.status(Response.Status.BAD_REQUEST).entity(new SimpleMessage(e.getMessage())).build();
+			}
+		}
+		else {
+			return Response.status(Response.Status.UNAUTHORIZED).entity(new SimpleMessage("Unauthorized")).build();
+		}
+	}
 }
