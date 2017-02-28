@@ -201,17 +201,18 @@
 		}
 
 		function toggleKleAdmin(user) {
-			console.log("bob");
-			user.kleAdmin = !user.kleAdmin;
+			user.kleAssigner = !user.kleAssigner;
+			console.log("setting variable to ", user.kleAssigner);
 
-			topicRouterApi.setKleAdmin(user.roleId, user.kleAdmin)
+			topicRouterApi.setKleAdmin(user.roleId, user.kleAssigner)
 					.then(function(response) {
+
 						addMessage({
 							type: 'success',
 							msg: 'Brugeren blev opdateret.'
 						});
 					}, function(){
-						user.kleAdmin = !user.kleAdmin;
+						user.kleAssigner = !user.kleAssigner;
 
 						addMessage({
 							type: "danger",
