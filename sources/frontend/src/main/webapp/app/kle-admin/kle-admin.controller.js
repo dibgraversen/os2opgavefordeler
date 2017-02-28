@@ -1,13 +1,11 @@
 		(function () {
 			'use strict';	
 
-			//var hasKlesCustomFilter = ;
-
 			angular.module('topicRouter').controller('KleAdminCtrl', KleAdminCtrl);
 
-			KleAdminCtrl.$inject = ['$scope', '$state', '$log', '$interval' , 'topicRouterApi', 'orgUnitService', '$modal'];
+			KleAdminCtrl.$inject = ['$scope', '$state', '$log', '$interval' , 'topicRouterApi', 'orgUnitService', 'treeService', '$modal'];
 
-			function KleAdminCtrl($scope, $state, $log, $interval, topicRouterApi, orgUnitService, $modal) {
+			function KleAdminCtrl($scope, $state, $log, $interval, topicRouterApi, orgUnitService, treeService, $modal) {
 			/* jshint validthis: true */
 				var vm = this;
 				$scope.$log=$log;
@@ -29,10 +27,7 @@
 				activate();
 
 				function activate() {
-					orgUnitService.getKles().then(
-											function(kles){
-												$scope.kles = kles;
-											});
+					orgUnitService.getKles().then( function(kles){ $scope.kles = kles;});
 
 					orgUnitService.getOrgUnits().then(
 											function(ous){
@@ -40,31 +35,8 @@
 												setCurrentOrgUnit($scope.ous[0].id);				
 											});
 
-					orgUnitService.getOrgUnitsAsTree().then(
-											function(tree){
-												$scope.ousAsTree = tree;
-											});																		
+					orgUnitService.getOrgUnitsAsTree().then( function(tree){ $scope.ousAsTree = tree; });																		
 				}
-
-				function filterByContainsKles(ou){
-					return !ou.klesAssigned;
-				}
-
-				function filterByNameOrParent(ou) {
-					var name = ou.name.toLowerCase();
-					var filterStr = $scope.filterStr.toLowerCase();
-					var parent = (ou.parentName ===null) ? "" : ou.parentName.toLowerCase();
-        			
-        			if(_.includes(name, filterStr)){
-        				return true;
-        			}
-        			
-        			if(_.includes(parent, filterStr)){
-        				return true;
-        			}
-        			
-        			return false;
-  				 }
 
 				function setCurrentOrgUnit(ouId){	
 					orgUnitService.getOrgUnit(ouId).then(
@@ -73,7 +45,16 @@
 						    $scope.currentOrgUnit.displayKles = [];
 						    angular.copy($scope.kles, $scope.currentOrgUnit.displayKles);
 							refreshTree($scope.currentOrgUnit.displayKles);
-							initCurrentKleTree();
+							addIndeterminateProperty($scope.currentOrgUnit.displayKles);
+
+							// initialize current kle tree
+							$scope.currentKLETree = { tree : []};
+
+							_.each($scope.currentOrgUnit.displayKles, function(kle){
+								var tmp = JSON.parse(JSON.stringify(kle));
+								tmp.children = null;
+								$scope.currentKLETree.tree.push(tmp);
+							});
 					});		
 				}
 
@@ -98,19 +79,46 @@
 					}
 				}
 
-				function initCurrentKleTree(){
-					$scope.currentKLETree = { tree : []};
+				function addIndeterminateProperty(kle){
+					if(kle === null || kle === undefined){
+						return ;
+					}
 
-					_.each($scope.currentOrgUnit.displayKles, function(kle){
-						var tmp = JSON.parse(JSON.stringify(kle));
-						tmp.children = null;
-						$scope.currentKLETree.tree.push(tmp);
+					for(var	 i = 0; i < kle.length; i++){
+						/* jshint loopfunc:true */
+						kle[i].indeterminatePerforming = childrenContainkles(kle[i].children, "performing");
+						kle[i].indeterminateInterest = childrenContainkles(kle[i].children, "interest");
+						
+						if(kle.children !== null){
+							addIndeterminateProperty(kle[i].children);					
+						}
+					}				
+				}
+
+				function childrenContainkles(children, collumn){
+					var isIndeterminate = false;
+					
+					var fullList = treeService.asList(children);
+
+					_.each(fullList, function(anotherItem){
+						if(collumn === "performing"){
+							if(anotherItem.performing){
+								isIndeterminate = true;
+							}
+						}
+						else {
+							if (anotherItem.interest){
+								isIndeterminate = true;
+							}
+						}
 					});
+					
+					return isIndeterminate;
 				}
 
 				function toggleChildren(kle,scope){
-					var kleFromTree = getKle(kle.number,klesAsList(scope.currentKLETree.tree));
-					var kleFromDisplay = getKle(kle.number,klesAsList(scope.currentOrgUnit.displayKles));
+					var kleFromTree = getKle(kle.number,treeService.asList(scope.currentKLETree.tree));
+					var kleFromDisplay = getKle(kle.number,treeService.asList(scope.currentOrgUnit.displayKles));
 
 					kleFromTree.expanded = (kleFromTree.expanded === null) ? true : !kleFromTree.expanded;				
 					
@@ -140,49 +148,56 @@
 				}
 
 				function modifyKle(checked,kle,ou,assignment){
-				    var kleFromTree = getKle(kle.number,klesAsList($scope.currentKLETree.tree));
-					var kleFromDisplay = getKle(kle.number,klesAsList($scope.currentOrgUnit.displayKles));
-
+				    var kleFromTree = getKle(kle.number,treeService.asList($scope.currentKLETree.tree));
+					var kleFromDisplay = getKle(kle.number,treeService.asList($scope.currentOrgUnit.displayKles));
 					if(checked){
 							orgUnitService.addKle(kle,ou,assignment).then(function(){
 							if(assignment==='PERFORMING'){
 								kleFromDisplay.performing = checked;
 								
 								updateCheckboxStatus( kleFromDisplay, checked, "performing");
-								updateCheckboxStatus( kleFromTree, checked, "performing");						
+								updateCheckboxStatus( kleFromTree, checked, "performing");	
+					
 							}
 							else{
 								kleFromDisplay.interest = checked;
 								ou.interestKLE.push(kle.number);
 								
 								updateCheckboxStatus( kleFromDisplay, checked, "interesting");
-								updateCheckboxStatus( kleFromTree, checked, "interesting");				
+								updateCheckboxStatus( kleFromTree, checked, "interesting");	
+		
 							}										
 
 							updateKlesAssignement(ou, checked);
+								addIndeterminateProperty($scope.currentOrgUnit.displayKles);
+								addIndeterminateProperty($scope.currentKLETree.tree);
 						});
 					}
 					else {
 							orgUnitService.removeKle(kle,ou,assignment).then(function(){
 							if(assignment==='PERFORMING'){
 								kleFromDisplay.performing = checked;
-								removeFromArray(ou.performingKLE, kle.number);	
+								treeService.remove(kle.number,ou.performingKLE);	
 									
 								updateCheckboxStatus( kleFromDisplay, checked, "performing");
-								updateCheckboxStatus( kleFromTree, checked, "performing");						
-								
+								updateCheckboxStatus( kleFromTree, checked, "performing");							
 							}
 							else{
 								kleFromDisplay.interest = checked;
-								removeFromArray(ou.interestKLE, kle.number);	
+								treeService.remove(kle.number,ou.interestKLE);	
 
 								updateCheckboxStatus( kleFromDisplay, checked, "interesting");
 								updateCheckboxStatus( kleFromTree, checked, "interesting");
+
 							}		
 
 							updateKlesAssignement(ou, checked);
+
+								addIndeterminateProperty($scope.currentOrgUnit.displayKles);
+								addIndeterminateProperty($scope.currentKLETree.tree);
 						});
 					}
+				
 				}
 
 				function updateCheckboxStatus(item, status, target){
@@ -205,7 +220,7 @@
 				}
 
 				function updateKlesAssignement(ou, changeValue) {
-							var ouToUpdate = getOuFromTree(ou);
+							var ouToUpdate = treeService.getOuFromTree(ou, $scope.ousAsTree);
 							var ouFromSearchBox = getOuFromSearchBox(ou);
 							if(changeValue === true) {
 								ouToUpdate.klesAssigned = true;
@@ -215,23 +230,8 @@
 								if ((!ou.interestKLE || ou.interestKLE.length===0) && (!ou.performingKLE || ou.performingKLE.length===0)){
 									ouToUpdate.klesAssigned = false;
 									ouFromSearchBox.klesAssigned = false;
-								}
-
-								// if any of the children elements
+								}					
 							}
-				}
-
-				function getOuFromTree(ou){
-					var flatOuList = [];
-
-					_.each($scope.ousAsTree, function(item){
-						flatOuList = _.union(flatten(item,flatOuList));
-					});
-
-					var result = _.find(flatOuList, function(anOu){
-						return anOu.id===ou.id;
-					});
-					return result;
 				}
 
 				function getOuFromSearchBox(ou){
@@ -249,26 +249,7 @@
 											});
 					return filtered[0];
 				}
-
-				function klesAsList(tree){
-					var flat = [];
-					_.each(tree, function(item){
-						flat = _.union(flatten(item,flat));
-					});
-					return flat; 
-				}
-
-				function flatten(kle,listOfChildren){
-					listOfChildren.push(kle);
-
-					if (kle.children !==null) {
-						_.each(kle.children, function(item){
-								flatten(item,listOfChildren);
-						});
-					}
-					return listOfChildren;
-				}
-			
+				
 				function toogleChildrenVisibility(ou){
 					_.each(ou.children, function(element){
 						element.visible = !element.visible;
@@ -276,13 +257,24 @@
 					ou.expanded =  (ou.expanded === null) ? false : !ou.expanded;
 				}
 
-				function removeFromArray(list,item){
-					for (var i=0; i<list.length; i++){
-						if(list[i] == item) {
-							list.splice(i,1);
-							break;
-						}
-					}
+				function filterByContainsKles(ou){
+					return !ou.klesAssigned;
 				}
+
+				function filterByNameOrParent(ou) {
+					var name = ou.name.toLowerCase();
+					var filterStr = $scope.filterStr.toLowerCase();
+					var parent = (ou.parentName ===null) ? "" : ou.parentName.toLowerCase();
+        			
+        			if(_.includes(name, filterStr)){
+        				return true;
+        			}
+        			
+        			if(_.includes(parent, filterStr)){
+        				return true;
+        			}
+        			
+        			return false;
+  				 }
 			}
 		})();

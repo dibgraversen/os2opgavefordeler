@@ -22,6 +22,7 @@
     "angular-ui-router": "~0.2.13",
     "angular-ui-uploader": "https://github.com/helo/ui-uploader.git#1.1.2",
     "angular-ui-tree": "~2.22.3",
+    "angular-ui-indeterminate": "~1.0.0",
     "bootstrap": "~3.3.4",
     "lodash": "~3.6.0",
     "htmlsave": "~0.0.12",
@@ -47,6 +48,11 @@
       "main": [
             "dist/angular-ui-tree.js",
             "dist/angular-ui-tree.css"
+            ]
+    },
+    "angular-ui-indeterminate": {
+      "main": [
+            "dist/indeterminate.js"
             ]
     },
     "angular-ui-router": {

@@ -11,6 +11,7 @@
 		'ui.router',
 		'ui.uploader',
 		'ui.tree',
+		'ui.indeterminate',
 		'app.config'
 	]);
 

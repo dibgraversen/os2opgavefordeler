@@ -87,14 +87,16 @@
 
 							<div class="col-md-2" style="text-align: center; width: 80px !important;">
 							  	<input type="checkbox"
-							  			data-ng-model="node.performing" 
+							  			data-ui-indeterminate="(node.performing===false && node.indeterminatePerforming)"
+							  			data-ng-model="node.performing"					
 							  			data-ng-change="modifyKle(node.performing,node,currentOrgUnit,'PERFORMING')"
-							  			data-ng-disabled="node.performingDisabled">
-							 	</input>
+							  			data-ng-disabled="node.performingDisabled">							  				
+							 	</input>							  		
 							</div>
 
 						 	 <div class="col-md-2" style="text-align: center; width: 80px !important;">
 								 <input type="checkbox"
+								 		data-ui-indeterminate="(node.interest===false && node.indeterminateInterest)"
 								 		data-ng-model="node.interest"
 								 		data-ng-click="modifyKle(node.interest,node,currentOrgUnit,'INTEREST')"
 								 		data-ng-disabled="node.interestingDisabled">
