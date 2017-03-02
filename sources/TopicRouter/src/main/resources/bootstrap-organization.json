@@ -1,5 +1,6 @@
 {
   "businessKey": "K1",
+  "pNumber": "P1",
   "name": "Fantastisk Kommune",
   "email": "fantastisk@kommune.dk",
   "phone": "555-1458",
@@ -31,6 +32,7 @@
   "children": [
     {
       "businessKey": "K2",
+      "pNumber": "P2",
       "name": "Administration",
       "email": "administration@kommune.dk",
       "phone": "555-1422",
@@ -46,6 +48,7 @@
       "children": [
         {
           "businessKey": "K3",
+          "pNumber": "P3",
           "name": "Personale",
           "email": "personale@kommune.dk",
           "phone": "555-1442",
@@ -61,6 +64,7 @@
           "children": [
             {
               "businessKey": "udd",
+              "pNumber": "3-1",
               "name": "Uddannelse",
               "email": "udd@kommune.dk",
               "esdhId": "udd",
@@ -76,6 +80,7 @@
         },
         {
           "businessKey": "K4",
+          "pNumber": "P4",
           "name": "Kaffebestyrer",
           "email": "kaffe@kommune.dk",
           "phone": "555-1358",
@@ -93,6 +98,7 @@
     },
     {
       "businessKey": "K5",
+      "pNumber": "P5",
       "name": "Digitalisering",
       "email": "digitalisering@kommune.dk",
       "phone": "555-2525",
@@ -107,6 +113,7 @@
       "children": [
         {
           "businessKey": "K6",
+          "pNumber": "P6",
           "name": "Services",
           "email": "services@kommune.dk",
           "phone": "555-2424",
@@ -121,6 +128,7 @@
         },
         {
           "businessKey": "K7",
+          "pNumber": "P7",
           "name": "Udvikling",
           "email": "udvikling@kommune.dk",
           "phone": "555-8456",
@@ -156,6 +164,7 @@
           "children": [
             {
               "businessKey": "K8",
+              "pNumber": "P8",
               "name": "Backend",
               "email": "backend@kommune.dk",
               "phone": "555-8989",
@@ -170,6 +179,7 @@
             },
             {
               "businessKey": "K9",
+              "pNumber": "P9",
               "name": "Borgervendt",
               "email": "borger@kommune.dk",
               "phone": "555-7575",
@@ -188,6 +198,7 @@
     },
     {
       "businessKey": "K10",
+      "pNumber": "P10",
       "name": "Kultur",
       "email": "kultur@kommune.dk",
       "phone": "555-8648",
@@ -202,6 +213,7 @@
       "children": [
         {
           "businessKey": "K11",
+          "pNumber": "P11",
           "name": "Berigelse",
           "email": "kultur@kommune.dk",
           "phone": "555-8782",
@@ -216,6 +228,7 @@
         },
         {
           "businessKey": "K12",
+          "pNumber": "P12",
           "name": "Moderne kunst",
           "email": "kultur@kommune.dk",
           "phone": "555-4628",
