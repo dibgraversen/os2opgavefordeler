@@ -76,13 +76,13 @@ public class LogEntry {
         //for JPA
         this.timeStamp = new Date();
         this.friendlyTimeStamp = dateFormat.format(timeStamp);
-        this.kle = null;
-        this.user = null;
-        this.operation = null;
-        this.type = null;
-        this.data = null;
-        this.orgUnit = null;
-        this.employment = null;
+        this.kle = "";
+        this.user = "";
+        this.operation = "";
+        this.type = "";
+        this.data = "";
+        this.orgUnit = "";
+        this.employment = "";
         this.municipality = null;
 
     }
@@ -191,7 +191,20 @@ public class LogEntry {
 
     @Override
     public String toString() {
-        return toJson();
+        return "LogEntry{" +
+            "id=" + id +
+            ", timeStamp=" + timeStamp +
+            ", friendlyTimeStamp='" + friendlyTimeStamp + '\'' +
+            ", kle='" + kle + '\'' +
+            ", user='" + user + '\'' +
+            ", operation='" + operation + '\'' +
+            ", type='" + type + '\'' +
+            ", data='" + data + '\'' +
+            ", orgUnit='" + orgUnit + '\'' +
+            ", employment='" + employment + '\'' +
+            ", municipality=" + municipality +
+            ", dateFormat=" + dateFormat +
+            '}';
     }
 
     public String[] toStringArray() {
