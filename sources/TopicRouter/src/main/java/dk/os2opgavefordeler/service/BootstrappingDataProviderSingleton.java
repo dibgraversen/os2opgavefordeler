@@ -77,7 +77,7 @@ public class BootstrappingDataProviderSingleton {
 	private Municipality syddjurs;
 
 	public void bootstrap() {
-		if( municipalityRepository.findAll().size() > 0 ){
+		if (municipalityRepository.findAll().size() > 0) {
 			log.warn("Bootstrap attempted with municipalities existing, returning without action");
 			return;
 		}
@@ -89,12 +89,14 @@ public class BootstrappingDataProviderSingleton {
 		buildUsers();
 
 		loadBootstrapKle();
-		if(buildLight){
+		if (buildLight) {
 			buildDistributionRulesForMunicipality(miracle, findOrg(DIGITALISERING), findOrg(MODERN_ART));
 		} else {
 			buildAllRules();
 		}
-	}	private void addMunicipalities() {
+	}
+
+	private void addMunicipalities() {
 		if (mService.getMunicipalities().size() == 0) {
 			miracle = addMunicipality(MIRACLE_NAME, "ABC");
 			syddjurs = addMunicipality(SYDDJURS_NAME, "DEF");
@@ -131,7 +133,7 @@ public class BootstrappingDataProviderSingleton {
 		return userRepository.save(user);
 	}
 
-	private List<Role> buildRole(String name, String email, boolean admin, boolean manager, boolean municipalityAdmin){
+	private List<Role> buildRole(String name, String email, boolean admin, boolean manager, boolean municipalityAdmin) {
 		Employment employment = employmentRepository.findByEmail(email);
 		return ImmutableList.of(Role.builder().name(name).employment(employment).admin(admin).manager(manager).municipalityAdmin(municipalityAdmin).build());
 	}
@@ -185,7 +187,7 @@ public class BootstrappingDataProviderSingleton {
 		return null;
 	}
 
-	private void buildAllRules(){
+	private void buildAllRules() {
 		distService.buildRulesForMunicipality(miracle.getId());
 //		distService.buildRulesForMunicipality(syddjurs.getId());
 	}
@@ -259,6 +261,7 @@ public class BootstrappingDataProviderSingleton {
 							)
 							.build()
 			);
+			log.info("rules built.");
 		}
 	}
 
