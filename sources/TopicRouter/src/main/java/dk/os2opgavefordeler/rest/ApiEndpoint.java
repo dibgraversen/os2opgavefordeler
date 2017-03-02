@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import dk.os2opgavefordeler.logging.AuditLogged;
 import dk.os2opgavefordeler.model.OrgUnit;
 import org.jboss.resteasy.annotations.cache.NoCache;
 import org.slf4j.Logger;
@@ -38,6 +39,7 @@ import dk.os2opgavefordeler.service.*;
  *
  * @author hlo@miracle.dk
  */
+@AuditLogged
 @Path("/api")
 @RequestScoped
 public class ApiEndpoint extends Endpoint {

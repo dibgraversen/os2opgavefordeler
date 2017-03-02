@@ -6,13 +6,11 @@ import javax.interceptor.Interceptor;
 import javax.interceptor.InvocationContext;
 import javax.ws.rs.*;
 
-import dk.os2opgavefordeler.auth.AuthService;
+import dk.os2opgavefordeler.LoggedInUser;
 import dk.os2opgavefordeler.model.LogEntry;
-import dk.os2opgavefordeler.model.Municipality;
 import dk.os2opgavefordeler.model.User;
 import dk.os2opgavefordeler.service.AuditLogService;
-import dk.os2opgavefordeler.service.MunicipalityService;
-import dk.os2opgavefordeler.service.UserService;
+import dk.os2opgavefordeler.service.ConfigService;
 import org.slf4j.Logger;
 
 import java.lang.annotation.Annotation;
@@ -21,7 +19,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Created by rro on 02-02-2017.
+ * @author rro@miracle.dk
  */
 @AuditLogged
 @Interceptor
@@ -33,41 +31,32 @@ public class AuditLoggingInterceptor {
 	@Inject
 	private Logger logger;
 
-	@Inject
-	private AuthService authService;
+	@Inject @LoggedInUser
+	User currentUser;
 
 	@Inject
-	private UserService userService;
+	ConfigService configService;
 
-	@Inject
-	MunicipalityService municipalityService;
-
-	/**
-	 * Intercepts a method call, and generates audit logging.
-	 * @param ic
-	 * @return
-	 * @throws Exception
-	 */
 	@AroundInvoke
-	private Object intercept(InvocationContext ic) throws Exception{
-
-		User user = userService.findByEmail(authService.getAuthentication().getEmail()).get();
-
+	private Object intercept(InvocationContext ic) throws Exception {
+		LogEntry logEntry = new LogEntry();
 		Method method = ic.getMethod();
-		String methodName = extractMethodName(method.toGenericString());
-
-		String operationTypeString = "Unable to identify operation type";
-		Annotation methodRestAnnotation = getRestAnnotation(method);
-		if(methodRestAnnotation != null){
-			operationTypeString = extractMethodName(methodRestAnnotation.toString());
+		Operation operation = getOperation(method);
+		if( notTraceLogging(operation) || traceLoggingEnabled() ){
+			populateLogEntry(logEntry, ic, method, operation);
+			auditLogService.saveLogEntry(logEntry);
 		}
-
-		String parameters = buildParameterString(ic);
-
-		LogEntry logEntry = new LogEntry("", user.getEmail(), operationTypeString, methodName, parameters, "", "", user.getMunicipality());
-		auditLogService.saveLogEntry(logEntry);
-
 		return ic.proceed();
+	}
+
+	private void populateLogEntry(LogEntry logEntry, InvocationContext ic, Method method, Operation operation){
+		logEntry.setType(extractMethodName(method.toGenericString()));
+		logEntry.setData(buildParameterString(ic));
+		logEntry.setOperation(operation.name());
+		if(currentUser != null){
+			logEntry.setUser(currentUser.getEmail());
+			logEntry.setMunicipality(currentUser.getMunicipality());
+		}
 	}
 
 	/**
@@ -117,12 +106,24 @@ public class AuditLoggingInterceptor {
 		return result;
 	}
 
+	private Operation getOperation(Method method){
+		Operation result = Operation.GET;
+		Annotation methodRestAnnotation = getRestAnnotation(method);
+		if(methodRestAnnotation != null){
+			result = Operation.fromString(extractMethodName(methodRestAnnotation.toString()));
+			if(result == null){
+				logger.warn("did not find operation for: {}", methodRestAnnotation.toString());
+			}
+		}
+		return result;
+	}
+
 	/**
 	 * Extracts the actual name from either endpoint method full path or REST method annotation full path.
-	 * @param input string to extract from
 	 * @return the actual name.
 	 */
 	private String extractMethodName(String input){
+
 		String result = "";
 		String restStringPattern = "(.*)\\.(.*)\\(.*\\)";
 
@@ -135,5 +136,34 @@ public class AuditLoggingInterceptor {
 		}
 
 		return result;
+	}
+
+	private boolean notTraceLogging(Operation operation){
+		return operation != Operation.GET;
+	}
+
+	private boolean traceLoggingEnabled(){
+		return configService.isAuditTraceEnabled();
+	}
+
+	private enum Operation {
+		GET("GET"),
+		PUT("PUT"),
+		POST("POST"),
+		DELETE("DELETE");
+		private String name;
+
+		Operation(String name){
+			this.name = name;
+		}
+
+		public static Operation fromString(String operationName) {
+			for (Operation op : Operation.values()) {
+				if (op.name.equalsIgnoreCase(operationName)) {
+					return op;
+				}
+			}
+			return null;
+		}
 	}
 }

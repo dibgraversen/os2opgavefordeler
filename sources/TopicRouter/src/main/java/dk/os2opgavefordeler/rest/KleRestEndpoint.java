@@ -12,6 +12,7 @@ import java.util.function.Consumer;
 
 import dk.os2opgavefordeler.auth.AdminRequired;
 import dk.os2opgavefordeler.auth.UserLoggedIn;
+import dk.os2opgavefordeler.logging.AuditLogged;
 import dk.os2opgavefordeler.model.Kle;
 import dk.os2opgavefordeler.service.KleService;
 import org.jboss.resteasy.annotations.cache.NoCache;
@@ -21,6 +22,7 @@ import dk.os2opgavefordeler.service.KleImportService;
 import org.slf4j.Logger;
 
 @UserLoggedIn
+@AuditLogged
 @Path("/kle")
 @RequestScoped
 public class KleRestEndpoint extends Endpoint {

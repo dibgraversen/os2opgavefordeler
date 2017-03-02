@@ -4,6 +4,7 @@ import dk.os2opgavefordeler.auth.AdminRequired;
 import dk.os2opgavefordeler.auth.AuthService;
 import dk.os2opgavefordeler.auth.UserLoggedIn;
 import dk.os2opgavefordeler.auth.openid.OpenIdAuthenticationFlow;
+import dk.os2opgavefordeler.logging.AuditLogged;
 import dk.os2opgavefordeler.model.Role;
 import dk.os2opgavefordeler.model.presentation.SimpleMessage;
 import dk.os2opgavefordeler.model.presentation.SubstitutePO;
@@ -23,6 +24,7 @@ import java.util.List;
 import java.util.Optional;
 
 @UserLoggedIn
+@AuditLogged
 @Path("/roles")
 public class RoleEndpoint {
 

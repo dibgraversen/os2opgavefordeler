@@ -5,6 +5,7 @@ import com.google.common.base.Strings;
 import dk.os2opgavefordeler.auth.AuthService;
 import dk.os2opgavefordeler.auth.MunicipalityAdminRequired;
 import dk.os2opgavefordeler.auth.UserLoggedIn;
+import dk.os2opgavefordeler.logging.AuditLogged;
 import dk.os2opgavefordeler.repository.UserRepository;
 import dk.os2opgavefordeler.model.Employment;
 import dk.os2opgavefordeler.model.Municipality;
@@ -36,6 +37,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @UserLoggedIn
+@AuditLogged
 @Path("/org-units")
 @RequestScoped
 public class OrgUnitEndpoint extends Endpoint {

@@ -31,6 +31,7 @@ import java.util.List;
  * @author hlo@miracle.dk
  */
 @UserLoggedIn
+@AuditLogged
 @Path("/municipalities")
 public class MunicipalityEndpoint extends Endpoint {
 
