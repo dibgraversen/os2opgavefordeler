@@ -1,7 +1,10 @@
-FROM jboss/wildfly:9.0.2.Final
-
 # build this docker image with
 # docker build -t opgf .
+
+FROM jboss/wildfly:9.0.2.Final
+
+# Add mgmt user
+RUN /opt/jboss/wildfly/bin/add-user.sh admin admin --silent
 
 # Add the jboss-cli commands for postgres
 ADD environment/docker/commands.cli /tmp/system_properties.cli
