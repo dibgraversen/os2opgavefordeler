@@ -2,13 +2,18 @@ package dk.os2opgavefordeler.auth;
 
 import javax.enterprise.context.ApplicationScoped;
 
+import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
+import javax.persistence.NoResultException;
 
+import dk.os2opgavefordeler.LoggedInUser;
 import dk.os2opgavefordeler.service.UserService;
-import org.apache.commons.lang3.StringUtils;
 
 import dk.os2opgavefordeler.repository.UserRepository;
 import dk.os2opgavefordeler.model.User;
+import org.slf4j.Logger;
+
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 /**
  * Authentication service
@@ -25,13 +30,16 @@ public class AuthService {
 	@Inject
 	private UserService userService;
 
+	@Inject
+	Logger logger;
+
 	/**
 	 * Checks whether the uses has been authenticated
 	 *
 	 * @return true if the user has been authenticated.
 	 */
 	public boolean isAuthenticated() {
-		return StringUtils.isNotEmpty(authenticationHolder.getEmail());
+		return emailFound();
 	}
 
 	/**
@@ -97,8 +105,19 @@ public class AuthService {
 
 	}
 
-	private User currentUser(){
-		return userRepository.findByEmail(authenticationHolder.getEmail());
+	@Produces @LoggedInUser
+	public User currentUser(){
+		try	{
+			return userRepository.findByEmail(authenticationHolder.getEmail());
+		} catch (NoResultException nre){
+			if(emailFound()){
+				logger.warn("No user found for: {}", authenticationHolder.getEmail());
+			}
+			return new User();
+		}
 	}
 
+	private boolean emailFound(){
+		return isNotEmpty(authenticationHolder.getEmail());
+	}
 }
