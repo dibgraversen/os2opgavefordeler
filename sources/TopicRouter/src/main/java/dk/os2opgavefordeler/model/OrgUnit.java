@@ -26,6 +26,7 @@ public class OrgUnit implements Serializable, IHasChildren<OrgUnit> {
 	private String esdhId;
 	private String esdhLabel;
 	private String phone;
+	private String pNumber;
 
 	@ManyToOne
 	private OrgUnit parent;
@@ -61,6 +62,7 @@ public class OrgUnit implements Serializable, IHasChildren<OrgUnit> {
 		this.businessKey = builder.businessKey;
 		this.email = builder.email;
 		this.phone = builder.phone;
+		this.pNumber = builder.pNumber;
 		if(builder.employees != null) {
 			this.employees = builder.employees;
 			this.employees.stream().forEach(emp -> emp.setEmployedIn(this));
@@ -164,6 +166,10 @@ public class OrgUnit implements Serializable, IHasChildren<OrgUnit> {
 		this.phone = phone;
 	}
 
+	public String getpNumber() { return pNumber; }
+
+	public void setpNumber(String pNumber) { this.pNumber = pNumber; }
+
 	public Optional<OrgUnit> getParent() {
 		return Optional.ofNullable(parent);
 	}
@@ -209,6 +215,7 @@ public class OrgUnit implements Serializable, IHasChildren<OrgUnit> {
 				.add("name", name)
 				.add("email", email)
 				.add("phone", phone)
+				.add("pNumber", pNumber)
 				.add("businessKey", businessKey)
 				.add("municipality", municipality)
 				.toString();
@@ -229,6 +236,7 @@ public class OrgUnit implements Serializable, IHasChildren<OrgUnit> {
 		private String esdhId;
 		private String esdhLabel;
 		private String phone;
+		private String pNumber;
 
 		private Employment manager;
 		private List<Employment> employees = new ArrayList<>();
@@ -265,6 +273,10 @@ public class OrgUnit implements Serializable, IHasChildren<OrgUnit> {
 		}
 		public Builder phone(String phone) {
 			this.phone = phone;
+			return this;
+		}
+		public Builder pNumber(String pNumber){
+			this.pNumber = pNumber;
 			return this;
 		}
 		public Builder manager(Employment manager) {

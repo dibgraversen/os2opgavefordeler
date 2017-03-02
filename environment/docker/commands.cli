@@ -9,11 +9,14 @@
 
 #stop-embedded-server
 
-# enable google auth
-# /system-property=topicrouter.login.google.enabled:add(value=true)
-
 # disable trace logging
 /system-property=topicrouter.auditlog.trace.enabled:add(value=false)
 
 # enable God mode
 /system-property=topicrouter.login.godmode.enabled:add(value=true)
+
+# set client id
+/system-property=topicrouter.login.clientid:add(value="opgavefordeler")
+
+# set client secret
+/system-property=topicrouter.login.clientsecret:add(value="secret")

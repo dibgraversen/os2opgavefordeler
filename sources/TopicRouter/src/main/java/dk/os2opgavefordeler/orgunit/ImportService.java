@@ -114,6 +114,7 @@ public class ImportService {
 		orgUnit.setEsdhLabel(orgUnitDTO.esdhLabel);
 		orgUnit.setEmail(orgUnitDTO.email);
 		orgUnit.setPhone(orgUnitDTO.phone);
+		orgUnit.setpNumber(orgUnitDTO.pNumber);
 
 		orgRepo.saveAndFlushAndRefresh(orgUnit);
 
