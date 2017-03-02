@@ -16,6 +16,7 @@ import javax.enterprise.context.RequestScoped;
 
 import javax.inject.Inject;
 
+import javax.persistence.NoResultException;
 import javax.servlet.http.HttpServletRequest;
 
 import javax.ws.rs.*;
@@ -43,11 +44,12 @@ import dk.os2opgavefordeler.service.*;
 @RequestScoped
 public class ApiEndpoint extends Endpoint {
 
-	private static final String DID_NOT_FIND_A_MUNICIPALITY_BASED_ON_GIVEN_AUTHORIZATION = "Did not find a municipality based on given authorization.";
-	private static final String YOUR_SUBSCRIPTION_IS_NOT_ACTIVE_AND_THEREFOR_THE_API_CANNOT_BE_USED = "Your subscription is not active and therefor the api cannot be used.";
-	private static final String NO_ORG_UNIT_FOUND_FOR_PNUMBER = "No org unit found for pnumber";
-	private static final String NO_ONE_SEEMS_TO_BE_HANDLING_THE_GIVEN_KLE_FOR_MUNICIPALITY = "No one seems to be handling the given kle for municipality.";
-	private static final String DID_NOT_FIND_A_KLE_BASED_ON_GIVEN_NUMBER = "Did not find a Kle based on given number.";
+	private static String NOT_AUTHORIZED = "Not authorized";
+	private static String DID_NOT_FIND_A_MUNICIPALITY_BASED_ON_GIVEN_AUTHORIZATION = "Did not find a municipality based on given authorization.";
+	private static String YOUR_SUBSCRIPTION_IS_NOT_ACTIVE_AND_THEREFOR_THE_API_CANNOT_BE_USED = "Your subscription is not active and therefor the api cannot be used.";
+	private static String NO_ORG_UNIT_FOUND_FOR_PNUMBER = "No org unit found for pnumber";
+	private static String NO_ONE_SEEMS_TO_BE_HANDLING_THE_GIVEN_KLE_FOR_MUNICIPALITY = "No one seems to be handling the given kle for municipality.";
+	private static String DID_NOT_FIND_A_KLE_BASED_ON_GIVEN_NUMBER = "Did not find a Kle based on given number.";
 	
 	@Inject
 	Logger log;
@@ -80,9 +82,8 @@ public class ApiEndpoint extends Endpoint {
 	@Path("/")
 	@Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
 	public Response lookup(@QueryParam("kle") String kleNumber, @Context UriInfo uriInfo, @Context HttpServletRequest request) {
-		AuthorizeResult authorizeResult = authorize();
-		if(authorizeResult.success){
-			Municipality municipality = authorizeResult.municipality;
+		try {
+			Municipality municipality = authorize();
 			Optional<Kle> kleMaybe = kleService.fetchMainGroup(kleNumber, municipality.getId());
 			if (!kleMaybe.isPresent()) {
 				return badRequest(DID_NOT_FIND_A_KLE_BASED_ON_GIVEN_NUMBER);
@@ -115,8 +116,9 @@ public class ApiEndpoint extends Endpoint {
 			DistributionRuleApiResultPO resultPO = new DistributionRuleApiResultPO(assignee.getRule().getKle(), assignedOrg, manager, employee);
 			log.info("API endpoint called by {} for KLE: {} with result: {}", authService.getAuthentication().getEmail(), resultPO.getKle().getNumber(), resultPO.getOrg().getName());
 			return ok(resultPO);
-		}	else {
-			return Response.status(authorizeResult.status).type(TEXT_PLAIN).entity(authorizeResult.message).build();
+		}	catch (UnauthorizedException uae){
+			log.warn("rejected api call with reason: {}", uae.getReason());
+			return uae.getResponse();
 		}
 	}
 
@@ -125,17 +127,16 @@ public class ApiEndpoint extends Endpoint {
 	@Path("/orgunit/pNumber/{pNumber}")
 	@Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
 	public Response getByPNumber(@PathParam("pNumber") String pNumber){
-		AuthorizeResult authorizeResult = authorize();
-		if( authorizeResult.success ){
-			Municipality municipality = authorizeResult.municipality;
+		try {
+			Municipality municipality = authorize();
 			OrgUnit orgUnit = orgUnitRepo.findByPNumberAndMunicipalityId(pNumber, municipality.getId());
-			if(orgUnit != null){
-				return ok(new OrgUnitDTO(orgUnit));
-			} else {
-				return notFound(NO_ORG_UNIT_FOUND_FOR_PNUMBER);
-			}
-		} else {
-			return Response.status(authorizeResult.status).type(TEXT_PLAIN).entity(authorizeResult.message).build();
+			return ok(new OrgUnitDTO(orgUnit, OrgUnitDTO.Option.DO_NOT_INCLUDE_CHILDREN));
+		} catch (NoResultException nre) {
+			log.info("did not find org unit for pnumber: {}", pNumber);
+			return notFound(NO_ORG_UNIT_FOUND_FOR_PNUMBER);
+		} catch (UnauthorizedException e) {
+			log.warn("rejected api call with reason: "+e.getReason());
+			return e.getResponse();
 		}
 	}
 
@@ -158,39 +159,38 @@ public class ApiEndpoint extends Endpoint {
 	 * Authorizes the incoming call to the endpoint
 	 * @return AuthorizeResult containing the municipality if success, or HTTP error status and message if not success.
 	 */
-	private AuthorizeResult authorize(){
+	private Municipality authorize() throws UnauthorizedException {
 		String token = authService.getAuthentication().getToken();
-
 		if (token == null || token.isEmpty()) {
-			return new AuthorizeResult(false, null, Response.Status.UNAUTHORIZED, "");
+			throw new UnauthorizedException(Response.Status.UNAUTHORIZED, NOT_AUTHORIZED);
 		}
-
 		Optional<Municipality> municipalityMaybe = municipalityService.getMunicipalityFromToken(token);
-
 		if (!municipalityMaybe.isPresent()) {
-			return new AuthorizeResult(false, null, Response.Status.UNAUTHORIZED, DID_NOT_FIND_A_MUNICIPALITY_BASED_ON_GIVEN_AUTHORIZATION);
+			throw new UnauthorizedException(Response.Status.UNAUTHORIZED, DID_NOT_FIND_A_MUNICIPALITY_BASED_ON_GIVEN_AUTHORIZATION);
 		}
 
 		Municipality municipality = municipalityMaybe.get();
-
 		if (!municipality.isActive()) {
-			return new AuthorizeResult(false, null, Response.Status.PAYMENT_REQUIRED, YOUR_SUBSCRIPTION_IS_NOT_ACTIVE_AND_THEREFOR_THE_API_CANNOT_BE_USED);
+			throw new UnauthorizedException(Response.Status.PAYMENT_REQUIRED, YOUR_SUBSCRIPTION_IS_NOT_ACTIVE_AND_THEREFOR_THE_API_CANNOT_BE_USED);
 		}
-
-		return new AuthorizeResult(true, municipality, null, "");
+		return municipality;
 	}
 
-	private class AuthorizeResult{
-		private boolean success;
-		private Municipality municipality;
-		private Response.Status status;
-		private String message;
+	private class UnauthorizedException extends Exception {
+		Response response;
+		private String reason;
 
-		private AuthorizeResult(boolean success, Municipality municipality, Response.Status status, String message) {
-			this.success = success;
-			this.municipality = municipality;
-			this.status = status;
-			this.message = message;
+		UnauthorizedException(Response.Status status, String reason) {
+			response = Response.status(status).type(TEXT_PLAIN).entity(reason).build();
+			this.reason = reason;
+		}
+
+		public Response getResponse() {
+			return response;
+		}
+
+		String getReason() {
+			return reason;
 		}
 	}
 }
