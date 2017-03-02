@@ -42,7 +42,7 @@ public class AuditLoggingInterceptor {
 		LogEntry logEntry = new LogEntry();
 		Method method = ic.getMethod();
 		Operation operation = getOperation(method);
-		if( notTraceLogging(operation) || traceLoggingEnabled() ){
+		if( notTraceOperation(operation) || traceLoggingEnabled() ){
 			populateLogEntry(logEntry, ic, method, operation);
 			auditLogService.saveLogEntry(logEntry);
 		}
@@ -138,7 +138,7 @@ public class AuditLoggingInterceptor {
 		return result;
 	}
 
-	private boolean notTraceLogging(Operation operation){
+	private boolean notTraceOperation(Operation operation){
 		return operation != Operation.GET;
 	}
 
