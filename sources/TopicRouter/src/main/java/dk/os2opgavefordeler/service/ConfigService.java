@@ -8,4 +8,5 @@ public interface ConfigService {
 	boolean enableGoogleLogin();
 	boolean isAuditLogEnabled();
 	boolean isExtendedResponsibilityEnabled();
+	boolean isAuditTraceEnabled();
 }

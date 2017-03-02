@@ -18,6 +18,7 @@ public class ConfigServiceImpl implements ConfigService {
 	private static final String EXTENDED_RESPONSIBILITY_ENABLED_PROPERTY_NAME = "topicrouter.extendedresponsibility.enabled";
 	private static final String GOOGLE_LOGIN_ENABLED_PROPERTY_NAME = "topicrouter.login.google.enabled";
 	private static final String ENABLE_AUDIT_LOGGING_PROPERTY_NAME = "topicrouter.auditlog.enabled";
+	private static final String AUDIT_TRACE_ENABLED_NAME = "topicrouter.auditlog.trace.enabled";
 
 	@Override
 	public String getHomeUrl() {
@@ -49,12 +50,17 @@ public class ConfigServiceImpl implements ConfigService {
 		return getProperty(ENABLE_AUDIT_LOGGING_PROPERTY_NAME, true);
 	}
 
+	@Override
+	public boolean isAuditTraceEnabled() {
+		return getProperty(AUDIT_TRACE_ENABLED_NAME, false);
+	}
+
 	private String getProperty(String property, String defaultValue) {
 		return getProperty(property, defaultValue, s -> s);
 	}
 
 	private boolean getProperty(String property, boolean defaultValue) {
-		return getProperty(property, defaultValue, s -> Boolean.valueOf(s));
+		return getProperty(property, defaultValue, Boolean::valueOf);
 	}
 
 	private <T> T getProperty(String property, T defaultValue, Function<String, T> converter) {
