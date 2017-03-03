@@ -1,6 +1,7 @@
 package dk.os2opgavefordeler.service;
 
 import dk.os2opgavefordeler.model.Employment;
+import dk.os2opgavefordeler.model.Municipality;
 import dk.os2opgavefordeler.model.OrgUnit;
 import dk.os2opgavefordeler.model.presentation.OrgUnitPO;
 
@@ -28,6 +29,7 @@ public interface OrgUnitService {
 	 * @return fetched orgUnit, or Optional.empty if not found.
 	 */
 	Optional<OrgUnit> getOrgUnit(long id);
+	Optional<OrgUnit> getOrgUnit(long id, Municipality municipality);
 
 	Optional<OrgUnit> getToplevelOrgUnit(long municipalityId);
 
@@ -45,4 +47,8 @@ public interface OrgUnitService {
 	Optional<Employment> findResponsibleManager(OrgUnit orgUnit);
 
 	Optional<Employment> getActualManager(Long orgId);
+
+	Optional<OrgUnit> findByBusinessKeyAndMunicipality(String businessKey, Municipality municipality);
+
+
 }

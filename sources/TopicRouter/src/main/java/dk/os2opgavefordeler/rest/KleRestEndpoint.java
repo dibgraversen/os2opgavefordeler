@@ -6,11 +6,18 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
+import dk.os2opgavefordeler.auth.AdminRequired;
+import dk.os2opgavefordeler.auth.GuestAllowed;
+import dk.os2opgavefordeler.auth.UserLoggedIn;
 import dk.os2opgavefordeler.model.Kle;
+import dk.os2opgavefordeler.model.presentation.KlePO;
+import dk.os2opgavefordeler.model.presentation.KleRestResultPO;
 import dk.os2opgavefordeler.service.KleService;
 import org.jboss.resteasy.annotations.cache.NoCache;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
@@ -18,6 +25,7 @@ import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 import dk.os2opgavefordeler.service.KleImportService;
 import org.slf4j.Logger;
 
+@UserLoggedIn
 @Path("/kle")
 @RequestScoped
 public class KleRestEndpoint extends Endpoint {
@@ -58,6 +66,33 @@ public class KleRestEndpoint extends Endpoint {
 
 		return ok(out.toString());
 	}
+	
+	
+	@GET
+	@Path("/tree")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getTree(){
+		List<Kle> groups = kleService.fetchAllKleMainGroups();
+		List<KleRestResultPO> kles = new ArrayList<>();
+
+		for (Kle kle : groups) {
+			List<KleRestResultPO> children = new ArrayList<>();
+
+			for (Kle child : kle.getChildren()) {
+				List<KleRestResultPO> children2 = new ArrayList<>();
+
+				for (Kle child2 : child.getChildren()) {
+					children2.add(new KleRestResultPO(child2.getNumber(),child2.getTitle()));
+				}
+
+				children.add(new KleRestResultPO(child.getNumber(),child.getTitle(), children2));
+			}
+
+			kles.add(new KleRestResultPO(kle.getNumber(),kle.getTitle(), children));
+		}
+
+		return Response.ok().entity(kles).build();
+	}
 
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
@@ -69,10 +104,12 @@ public class KleRestEndpoint extends Endpoint {
 			Response.status(Response.Status.NOT_FOUND).build();
 	}
 
+	// TODO verify functionality
 	@POST @NoCache
 	@Path("/import")
 	@Produces("text/plain")
 	@Consumes(MediaType.MULTIPART_FORM_DATA)
+	@AdminRequired
 	public Response importXml(@MultipartForm KleXmlUploadData request) {
 		// XML is mandatory, XSD is optional.
 		final InputStream xml = request.getXml();

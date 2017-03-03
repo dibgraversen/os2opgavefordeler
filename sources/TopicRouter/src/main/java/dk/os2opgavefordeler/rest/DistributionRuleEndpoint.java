@@ -1,6 +1,9 @@
 package dk.os2opgavefordeler.rest;
 
+import dk.os2opgavefordeler.auth.AdminRequired;
 import dk.os2opgavefordeler.auth.AuthService;
+import dk.os2opgavefordeler.auth.MunicipalityAdminRequired;
+import dk.os2opgavefordeler.auth.UserLoggedIn;
 import dk.os2opgavefordeler.logging.AuditLogger;
 import dk.os2opgavefordeler.model.*;
 import dk.os2opgavefordeler.model.presentation.DistributionRulePO;
@@ -20,9 +23,11 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+@UserLoggedIn
 @Path("/distribution-rules")
 @RequestScoped
 public class DistributionRuleEndpoint extends Endpoint {
+
 	@Inject
 	Logger log;
 
@@ -50,8 +55,6 @@ public class DistributionRuleEndpoint extends Endpoint {
 	@Inject
 	private AuditLogger auditLogger;
 
-	private static final String NOT_LOGGED_IN = "Der er ikke en gyldig session.";
-	private static final String NOT_AUTHORIZED = "Not authorized";
 	private static final String USER_NOT_FOUND = "Bruger ikke fundet.";
 	private static final String INVALID_MUNICIPALITY_ID = "Denne bruger er ikke tilknyttet aktiv kommune.";
 	private static final String NO_ORGUNIT_FOUND_FOR_USER = "Bruger er ikke knyttet til afdeling, derfor kan der ikke findes fordelingsregler.";
@@ -123,10 +126,6 @@ public class DistributionRuleEndpoint extends Endpoint {
 		if(!validUpdateTypes.contains(type)){
 			log.warn("invalid update type given. Type: "+type);
 			return badRequest("Invalid type given as parameter.");
-		}
-		if (!authService.isAuthenticated()) {
-			log.warn("returning from not authenticated");
-			return Response.status(Response.Status.UNAUTHORIZED).entity(NOT_LOGGED_IN).build();
 		}
 		Optional<User> user = userService.findByEmail(authService.getAuthentication().getEmail());
 		if(!user.isPresent()){
@@ -248,6 +247,7 @@ public class DistributionRuleEndpoint extends Endpoint {
 
 	@GET
 	@Path("/buildRules")
+	@AdminRequired
 	public Response buildRulesForMunicipality(@QueryParam("municipalityId") long municipalityId) {
 		if (municipalityId < 0) {
 			log.info("buildRules - bad request[{}]", municipalityId);
@@ -275,6 +275,7 @@ public class DistributionRuleEndpoint extends Endpoint {
 	@POST
 	@Path("/text/names")
 	@Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
+	@MunicipalityAdminRequired
 	public Response updateTextFilterName(@QueryParam("municipalityId") long municipalityId, FilterNamePO filterNamePO) {
 		if (municipalityId < 0) {
 			log.info("#getFilterNames with no municipalityId");
@@ -288,6 +289,7 @@ public class DistributionRuleEndpoint extends Endpoint {
 	@DELETE
 	@Path("/text/names/{filterNameId}")
 	@Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
+	@MunicipalityAdminRequired
 	public Response deleteTextFilterName(@PathParam("filterNameId") Long filterNameId, @QueryParam("municipalityId") long municipalityId) {
 		if (municipalityId < 0) {
 			log.info("#deleteFilterName with no municipalityId");
@@ -303,6 +305,7 @@ public class DistributionRuleEndpoint extends Endpoint {
 	@DELETE
 	@Path("/date/names/{filterNameId}")
 	@Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
+	@MunicipalityAdminRequired
 	public Response deleteDateFilterName(@PathParam("filterNameId") Long filterNameId, @QueryParam("municipalityId") long municipalityId) {
 		if (municipalityId < 0) {
 			log.info("#deleteFilterName with no municipalityId");
@@ -331,6 +334,7 @@ public class DistributionRuleEndpoint extends Endpoint {
 	@POST
 	@Path("/text/names/default/{filterNameId}")
 	@Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
+	@MunicipalityAdminRequired
 	public Response setDefaultFilterNameText(@PathParam("filterNameId") Long filterNameId, @QueryParam("municipalityId") long municipalityId) {
 		if (municipalityId < 0) {
 			log.info("#setDefaultFilterNameText with no municipalityId");
@@ -359,6 +363,7 @@ public class DistributionRuleEndpoint extends Endpoint {
 	@POST
 	@Path("/date/names")
 	@Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
+	@MunicipalityAdminRequired
 	public Response updateDateFilterName(@QueryParam("municipalityId") long municipalityId, FilterNamePO filterNamePO) {
 		if (municipalityId < 0) {
 			log.info("#getFilterNames with no municipalityId");
@@ -385,6 +390,7 @@ public class DistributionRuleEndpoint extends Endpoint {
 	@POST
 	@Path("/date/names/default/{filterNameId}")
 	@Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
+	@MunicipalityAdminRequired
 	public Response setDefaultFilterNameDate(@PathParam("filterNameId") Long filterNameId, @QueryParam("municipalityId") long municipalityId) {
 		if (municipalityId < 0) {
 			log.info("#setDefaultFilterNameText with no municipalityId");

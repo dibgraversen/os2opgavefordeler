@@ -1,15 +1,27 @@
 package dk.os2opgavefordeler.model;
 
-import com.google.common.base.MoreObjects;
-import com.google.common.collect.ImmutableList;
-
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.validation.constraints.NotNull;
+
+import com.google.common.base.MoreObjects;
+import com.google.common.collect.ImmutableList;
+
+import dk.os2opgavefordeler.model.presentation.KleAssignmentType;
 
 @Entity
 public class OrgUnit implements Serializable, IHasChildren<OrgUnit> {
@@ -46,6 +58,8 @@ public class OrgUnit implements Serializable, IHasChildren<OrgUnit> {
 	@OneToMany(mappedBy = "assignedOrg", cascade = CascadeType.REMOVE)
 	private List<DistributionRuleFilter> responsibleForFilters;
 
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	private List<OuKleAssignment> kles = new ArrayList<>();
 
 	public OrgUnit() {
 		children = new ArrayList<>();
@@ -202,6 +216,27 @@ public class OrgUnit implements Serializable, IHasChildren<OrgUnit> {
 		this.municipality = municipality;
 	}
 
+	public List<Kle> getKles(KleAssignmentType assignmentType) {
+		return ImmutableList.copyOf(kles.stream().filter(x->x.getAssignmentType().equals(assignmentType)).map(OuKleAssignment::getKle).collect(Collectors.toList()));
+	}
+
+	public void addKle(Kle kle, KleAssignmentType assignmentType) {
+		if (this.kles.stream().anyMatch(x->x.getAssignmentType().equals(assignmentType) && x.getKle().equals(kle))) {
+			; // do nothing, it is already added
+		} else {
+			OuKleAssignment oka = new OuKleAssignment(this,kle,assignmentType);
+			this.kles.add(oka);
+		}
+	}
+
+	public void removeKle(Kle kle, KleAssignmentType assignmentType){
+		this.kles.removeIf(x->x.getAssignmentType().equals(assignmentType) && x.getKle().equals(kle));
+	}
+
+	public boolean hasKles() {		
+		return !kles.isEmpty();
+	}
+
 	@Override
 	public String toString() {
 		return MoreObjects.toStringHelper(this)
@@ -211,6 +246,7 @@ public class OrgUnit implements Serializable, IHasChildren<OrgUnit> {
 				.add("phone", phone)
 				.add("businessKey", businessKey)
 				.add("municipality", municipality)
+				.add("kles", kles)
 				.toString();
 	}
 
@@ -305,4 +341,5 @@ public class OrgUnit implements Serializable, IHasChildren<OrgUnit> {
 		result = 31 * result + (municipality != null ? municipality.hashCode() : 0);
 		return result;
 	}
+
 }

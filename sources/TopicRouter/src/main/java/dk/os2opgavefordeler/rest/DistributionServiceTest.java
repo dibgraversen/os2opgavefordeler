@@ -27,8 +27,8 @@ import java.util.stream.Stream;
  * some research + setup (especially on the Jenkins server). So for now, this is implemented as a REST service and a
  * homebrew mini testing framework.
  */
-@Path("/test")
-@RequestScoped
+//@Path("/test")
+//@RequestScoped
 public class DistributionServiceTest {
 	public static final int ORG_NONEXISTING = 42;
 	public static final int ORG_1 = 1;
