@@ -1,6 +1,6 @@
 <style>
 .hoverDiv {background: #fff;}
-.hoverDiv:hover {background: #f5f5f5;}
+.hoverDiv:hover {background: #E8E8E8 ;}
 </style>
 
 	<div class="col-md-8 col-md-offset-2">
@@ -83,33 +83,37 @@
 				<hr>
 
 				<script type="text/ng-template" id="tree.html">
-							<div class="hoverDiv">
+							<div class="hoverDiv" >
 
-							<div class="col-md-2" style="text-align: center; width: 80px !important;">
-							  	<input type="checkbox"
-							  			data-ui-indeterminate="(node.performing===false && node.indeterminatePerforming)"
-							  			data-ng-model="node.performing"					
-							  			data-ng-change="modifyKle(node.performing,node,currentOrgUnit,'PERFORMING')"
-							  			data-ng-disabled="node.performingDisabled">							  				
-							 	</input>							  		
-							</div>
+								<div class="col-md-2" style="text-align: center; width: 80px !important;">
+								  	<input type="checkbox"
+								  			data-ng-mousedown="ieIndeterminateCheckboxFix($event);"
+								  			data-ui-indeterminate="(node.performing===false && node.indeterminatePerforming)"
+								  			data-ng-model="node.performing"					
+								  			data-ng-change="modifyKle(node.performing,node,currentOrgUnit,'PERFORMING')"
+								  			data-ng-disabled="node.performingDisabled">							  				
+								 	</input>							  		
+								</div>
 
-						 	 <div class="col-md-2" style="text-align: center; width: 80px !important;">
-								 <input type="checkbox"
-								 		data-ui-indeterminate="(node.interest===false && node.indeterminateInterest)"
-								 		data-ng-model="node.interest"
-								 		data-ng-click="modifyKle(node.interest,node,currentOrgUnit,'INTEREST')"
-								 		data-ng-disabled="node.interestingDisabled">
-							 	 </input>
-						 	 </div>
-					 	 	
+							 	 <div class="col-md-2" style="text-align: center; width: 80px !important;">
+									 <input type="checkbox"
+									 		data-ng-mousedown="ieIndeterminateCheckboxFix($event);"
+									 		data-ui-indeterminate="(node.interest===false && node.indeterminateInterest)"
+									 		data-ng-model="node.interest"
+									 		data-ng-click="modifyKle(node.interest,node,currentOrgUnit,'INTEREST')"
+									 		data-ng-disabled="node.interestingDisabled">
+								 	 </input>
+							 	 </div>
+						 	 	
 								<div data-ng-click="toggleChildren(node,this)">
 									<span style="padding-left: 15px;" data-ng-show="node.number.length == 2">&nbsp;</span>
 									<span style="padding-left: 30px;" data-ng-show="node.number.length == 5">&nbsp;</span>
 									<span style="padding-left: 60px;" data-ng-show="node.number.length == 8">&nbsp;</span>
-									<div class="glyphicon hover" data-ng-show="node.number.length!==8" data-ng-class="(node.expanded) ? 'glyphicon-chevron-down' : 'glyphicon-chevron-right'">								</div>
+									<div class="glyphicon hover" data-ng-show="node.number.length!==8" data-ng-class="(node.expanded) ? 'glyphicon-chevron-down' : 'glyphicon-chevron-right'">								
+									</div>
 								 	{{::node.number}}  {{::node.serviceText}}
-								 <div class="clearfix"></div>
+									<div class="clearfix"></div>
+								</div>
 							</div>
 
 						</div>						
@@ -125,3 +129,4 @@
 			  </ul>
 			</div>
 		</div>
+    </div>

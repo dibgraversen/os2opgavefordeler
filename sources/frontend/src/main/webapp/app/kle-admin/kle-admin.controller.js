@@ -23,7 +23,7 @@
 				$scope.toggleChildren = toggleChildren;
 				$scope.filterByNameOrParent = filterByNameOrParent;
 				$scope.filterByContainsKles = filterByContainsKles;
-
+				$scope.ieIndeterminateCheckboxFix = ieIndeterminateCheckboxFix;
 				activate();
 
 				function activate() {
@@ -44,8 +44,9 @@
 							$scope.currentOrgUnit = ou;
 						    $scope.currentOrgUnit.displayKles = [];
 						    angular.copy($scope.kles, $scope.currentOrgUnit.displayKles);
+
 							refreshTree($scope.currentOrgUnit.displayKles);
-							addIndeterminateProperty($scope.currentOrgUnit.displayKles);
+						    addIndeterminateProperty($scope.currentOrgUnit.displayKles);
 
 							// initialize current kle tree
 							$scope.currentKLETree = { tree : []};
@@ -86,6 +87,7 @@
 					for(var	 i = 0; i < kle.length; i++){
 						/* jshint loopfunc:true */
 						kle[i].indeterminatePerforming = childrenContainkles(kle[i].children, "performing");
+
 						kle[i].indeterminateInterest = childrenContainkles(kle[i].children, "interest");
 						
 						if(kle.children !== null){
@@ -118,13 +120,20 @@
 				function toggleChildren(kle,scope){
 					var kleFromTree = getKle(kle.number,treeService.asList(scope.currentKLETree.tree));
 					var kleFromDisplay = getKle(kle.number,treeService.asList(scope.currentOrgUnit.displayKles));
+					addIndeterminateProperty($scope.currentKLETree.kleFromDisplay);
 
 					kleFromTree.expanded = (kleFromTree.expanded === null) ? true : !kleFromTree.expanded;				
-					
+
+					if(childrenContainkles(kleFromDisplay, "performing")){
+
+					}
+
+
 					if(kleFromTree.expanded === true) {
 						var childrenList = JSON.parse(JSON.stringify(kleFromDisplay.children));
-						
+					
 						// delete all children 
+
 						_.each(childrenList, function(item) {
 							item.children = null;
 						});
@@ -134,6 +143,7 @@
 					else if(kleFromTree.expanded === false ){
 						kleFromTree.children = null;
 					}
+
 				}
 
 				function isKleAssigned(ou, kleNumber,assignmentType){
@@ -149,6 +159,7 @@
 				function modifyKle(checked,kle,ou,assignment){
 				    var kleFromTree = getKle(kle.number,treeService.asList($scope.currentKLETree.tree));
 					var kleFromDisplay = getKle(kle.number,treeService.asList($scope.currentOrgUnit.displayKles));
+
 					if(checked){
 							orgUnitService.addKle(kle,ou,assignment).then(function(){
 							if(assignment==='PERFORMING'){
@@ -167,7 +178,7 @@
 		
 							}										
 
-							updateKlesAssignement(ou, checked);
+								updateKlesAssignement(ou, checked);
 								addIndeterminateProperty($scope.currentOrgUnit.displayKles);
 								addIndeterminateProperty($scope.currentKLETree.tree);
 						});
@@ -189,11 +200,11 @@
 								updateCheckboxStatus( kleFromTree, checked, "interesting");
 
 							}		
+							
 
 							updateKlesAssignement(ou, checked);
-
-								addIndeterminateProperty($scope.currentOrgUnit.displayKles);
-								addIndeterminateProperty($scope.currentKLETree.tree);
+							addIndeterminateProperty($scope.currentOrgUnit.displayKles);
+							addIndeterminateProperty($scope.currentKLETree.tree);
 						});
 					}
 				
@@ -270,5 +281,23 @@
         			
         			return false;
   				 }
+
+  				 function ieIndeterminateCheckboxFix (event) {
+				 	var checkbox = event.target;
+
+				 	if(navigator.userAgent.indexOf('MSIE')!==-1 || navigator.appVersion.indexOf('Trident/') > 0){
+  					 /* Microsoft Internet Explorer detected in. */
+
+	  					if(checkbox.type.toLowerCase() == 'checkbox'){
+							if(checkbox.indeterminate){
+								checkbox.checked = true;
+								var anEvent = document.createEvent("HTMLEvents");
+								anEvent.initEvent("change",true,false);
+								checkbox.dispatchEvent(anEvent);
+								console.log("Event Triggered");
+							}			
+						}
+					}			
+				}
 			}
 		})();

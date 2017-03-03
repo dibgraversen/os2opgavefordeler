@@ -54,7 +54,7 @@
 							<tr>
 								<td>{{ kle.number }}</td>
 								<td popover-trigger="mouseenter" popover="{{ kle.name }}" popover-append-to-body="true">
-									{{ kle.name | limitTo: 40 }}{{ kle.name.length > 40 ? '&hellip;' : ''}}
+									{{ kle.name | limitTo: 40 }} {{ kle.name.length > 40 ? '&hellip;' : ''}}
 								</td>
 								<td style="overflow: hidden; white-space: nowrap"
 										popover-trigger="mouseenter" popover="{{ kle.serviceText }}" popover-append-to-body="true">
