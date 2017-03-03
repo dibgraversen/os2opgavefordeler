@@ -58,24 +58,23 @@
 					});		
 				}
 
-				function refreshTree(kles){
-					if(kles === null || kles === "undefined"){
+				function refreshTree(nodes){
+					if(nodes === null || nodes === "undefined"){
 						return ;
 					}
 
-					for(var i = 0; i < kles.length; i++){
-						kles[i].interest = isKleAssigned($scope.currentOrgUnit,kles[i].number,'INTEREST');
-						kles[i].performing = isKleAssigned($scope.currentOrgUnit,kles[i].number,'PERFORMING');
+					for(var i = 0; i < nodes.length; i++){
+						nodes[i].interest = isKleAssigned($scope.currentOrgUnit,nodes[i].number,'INTEREST');
+						nodes[i].performing = isKleAssigned($scope.currentOrgUnit,nodes[i].number,'PERFORMING');
 						/* jshint loopfunc:true */
 
-						if(kles[i].performing){
-							updateCheckboxStatus(kles[i], kles[i].performing, "performing");
+						if(nodes[i].performing){
+							updateCheckboxStatus(nodes[i], nodes[i].performing, "performing");
 						}
-						if(kles[i].interest){
-							updateCheckboxStatus(kles[i], kles[i].interest, "interesting");
-
+						if(nodes[i].interest){
+							updateCheckboxStatus(nodes[i], nodes[i].interest, "interesting");
 						}
-						refreshTree(kles[i].children);
+						refreshTree(nodes[i].children);
 					}
 				}
 
@@ -221,7 +220,10 @@
 
 				function updateKlesAssignement(ou, changeValue) {
 							var ouToUpdate = treeService.getOuFromTree(ou, $scope.ousAsTree);
-							var ouFromSearchBox = getOuFromSearchBox(ou);
+							var ouFromSearchBox = _.find($scope.ous, function(anOu){
+													return anOu.id===ou.id;
+												});
+
 							if(changeValue === true) {
 								ouToUpdate.klesAssigned = true;
 								ouFromSearchBox.klesAssigned = true;
@@ -233,14 +235,6 @@
 								}					
 							}
 				}
-
-				function getOuFromSearchBox(ou){
-					var result = _.find($scope.ous, function(anOu){
-						return anOu.id===ou.id;
-					});
-					return result;
-				}
-
 
 				function getKle(kleNumber,list){
 					var filtered = _.filter(list, 
