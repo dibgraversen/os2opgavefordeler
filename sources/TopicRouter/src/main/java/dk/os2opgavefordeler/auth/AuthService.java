@@ -122,7 +122,8 @@ public class AuthService {
 			}
 			return new User();
 		}
-
+	}
+	
 	private boolean emailFound(){
 		return isNotEmpty(authenticationHolder.getEmail());
 	}

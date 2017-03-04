@@ -5,32 +5,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
-import dk.os2opgavefordeler.logging.AuditLogged;
-import dk.os2opgavefordeler.model.OrgUnit;
-import dk.os2opgavefordeler.orgunit.OrgUnitDTO;
-import dk.os2opgavefordeler.repository.OrgUnitRepository;
-import org.jboss.resteasy.annotations.cache.NoCache;
-import org.slf4j.Logger;
-
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.stream.Collectors;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
-
 import javax.persistence.NoResultException;
-import javax.servlet.http.HttpServletRequest;
-
-import javax.ws.rs.*;
-import javax.servlet.http.HttpServletRequest;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.stream.Collectors;
-
-import javax.enterprise.context.RequestScoped;
-import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -51,12 +31,15 @@ import com.google.common.collect.ImmutableList;
 import dk.os2opgavefordeler.assigneesearch.Assignee;
 import dk.os2opgavefordeler.assigneesearch.FindAssignedForKleService;
 import dk.os2opgavefordeler.auth.AuthService;
+import dk.os2opgavefordeler.logging.AuditLogged;
 import dk.os2opgavefordeler.model.Kle;
 import dk.os2opgavefordeler.model.Municipality;
 import dk.os2opgavefordeler.model.OrgUnit;
 import dk.os2opgavefordeler.model.api.DistributionRuleApiResultPO;
 import dk.os2opgavefordeler.model.api.EmploymentApiResultPO;
 import dk.os2opgavefordeler.model.presentation.KleAssignmentType;
+import dk.os2opgavefordeler.orgunit.OrgUnitDTO;
+import dk.os2opgavefordeler.repository.OrgUnitRepository;
 import dk.os2opgavefordeler.service.DistributionService;
 import dk.os2opgavefordeler.service.EmploymentService;
 import dk.os2opgavefordeler.service.KleService;
@@ -166,68 +149,6 @@ public class ApiEndpoint extends Endpoint {
 		} catch (UnauthorizedException e) {
 			log.warn("rejected api call with reason: "+e.getReason());
 			return e.getResponse();
-		}
-	}
-
-	@GET
-	@Path("/ou/{businessKey}")
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response lookupOrgUnit(@PathParam("businessKey") String businessKey,
-			@QueryParam("assignmentType") String assignmentTypeString,
-			@DefaultValue("false") @QueryParam("showExpanded") boolean showExpanded) {
-
-		String token = authService.getAuthentication().getToken();
-
-		if (token == null || token.isEmpty()) {
-			return Response.status(Response.Status.UNAUTHORIZED).build();
-		}
-
-		List<KleAssignmentType> assignmentTypes = new ArrayList<>();
-		if (assignmentTypeString != null) {
-			try {
-				assignmentTypes.add(KleAssignmentType.fromString(assignmentTypeString));
-			} catch (IllegalArgumentException e) {
-				return Response.status(400).entity("Assignment type does not exist.").build();
-			}
-		}
-		else {
-			assignmentTypes.add(KleAssignmentType.INTEREST);
-			assignmentTypes.add(KleAssignmentType.PERFORMING);
-		}
-
-		Municipality municipality = authService.currentUser().getMunicipality();
-		Optional<OrgUnit> ou = orgUnitService.findByBusinessKeyAndMunicipality(businessKey, municipality);
-
-		if(!ou.isPresent()){
-			return Response.status(404).entity("Entity not found for BusinessKey: " + businessKey).build();
-		}
-
-		HashMap<KleAssignmentType,Set<String>> result = new HashMap<>();
-
-		for (KleAssignmentType assignmentType : KleAssignmentType.values()) {
-			Set<String> listKLE = new TreeSet<>();
-
-			for (Kle kle : ou.get().getKles(assignmentType) ) {
-				addKle(showExpanded, listKLE, kle);
-			}
-
-			result.put(assignmentType, listKLE);
-		}
-
-		return Response.ok().entity(result).build();
-	}
-
-	private void addKle(boolean showExpanded, Set<String> listKLE, Kle kle) {
-		listKLE.add(kle.getNumber());
-
-		if (showExpanded) {
-			ImmutableList<Kle> subKLEs = kle.getChildren();
-
-			if (subKLEs != null && !subKLEs.isEmpty()) {
-				for (Kle sub : subKLEs) {
-					addKle(showExpanded, listKLE, sub);
-				}
-			}
 		}
 	}
 
