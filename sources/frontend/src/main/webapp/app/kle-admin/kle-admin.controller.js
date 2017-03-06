@@ -120,14 +120,9 @@
 				function toggleChildren(kle,scope){
 					var kleFromTree = getKle(kle.number,treeService.asList(scope.currentKLETree.tree));
 					var kleFromDisplay = getKle(kle.number,treeService.asList(scope.currentOrgUnit.displayKles));
-					addIndeterminateProperty($scope.currentKLETree.kleFromDisplay);
+					//addIndeterminateProperty($scope.currentKLETree.kleFromDisplay);
 
 					kleFromTree.expanded = (kleFromTree.expanded === null) ? true : !kleFromTree.expanded;				
-
-					if(childrenContainkles(kleFromDisplay, "performing")){
-
-					}
-
 
 					if(kleFromTree.expanded === true) {
 						var childrenList = JSON.parse(JSON.stringify(kleFromDisplay.children));
@@ -177,10 +172,6 @@
 								updateCheckboxStatus( kleFromTree, checked, "interesting");	
 		
 							}										
-
-								updateKlesAssignement(ou, checked);
-								addIndeterminateProperty($scope.currentOrgUnit.displayKles);
-								addIndeterminateProperty($scope.currentKLETree.tree);
 						});
 					}
 					else {
@@ -198,16 +189,13 @@
 
 								updateCheckboxStatus( kleFromDisplay, checked, "interesting");
 								updateCheckboxStatus( kleFromTree, checked, "interesting");
-
-							}		
-							
-
-							updateKlesAssignement(ou, checked);
-							addIndeterminateProperty($scope.currentOrgUnit.displayKles);
-							addIndeterminateProperty($scope.currentKLETree.tree);
+							}								
 						});
 					}
-				
+
+					updateKlesAssignement(ou, checked);
+					addIndeterminateProperty($scope.currentOrgUnit.displayKles);
+					addIndeterminateProperty($scope.currentKLETree.tree);
 				}
 
 				function updateCheckboxStatus(item, status, target){

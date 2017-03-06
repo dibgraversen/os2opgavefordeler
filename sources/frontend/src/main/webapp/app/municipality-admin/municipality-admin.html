@@ -43,28 +43,27 @@
 						</p>
 						<table class="table table-hover" style="table-layout: fixed">
 							<thead>
-							<tr>
-								<th style="width: 70px">Nummer</th>
-								<th style="width: 70px">Titel</th>
-								<th style="width: 70px">Beskrivelse</th>
-								<th style="width: 100px"></th>
-							</tr>
+								<tr>
+									<th style="width: 70px">Nummer</th>
+									<th style="width: 70px">Titel</th>
+									<th style="width: 70px">Beskrivelse</th>
+									<th style="width: 100px"></th>
+								</tr>
 							</thead>
 							<tbody ng-repeat="kle in kles">
-							<tr>
-								<td>{{ kle.number }}</td>
-								<td popover-trigger="mouseenter" popover="{{ kle.name }}" popover-append-to-body="true">
-									{{ kle.name | limitTo: 40 }} {{ kle.name.length > 40 ? '&hellip;' : ''}}
-								</td>
-								<td style="overflow: hidden; white-space: nowrap"
-										popover-trigger="mouseenter" popover="{{ kle.serviceText }}" popover-append-to-body="true">
-									{{ kle.serviceText | limitTo: 50 }}{{ kle.serviceText.length > 50 ? '&hellip;' : ''}}
-								</td>
-								<td>
-									<button ng-click="editKle(kle)" class="btn btn-primary"><span class="glyphicon glyphicon-edit"></span> Rediger</button>
-									<button ng-click="deleteKle(kle)" class="btn btn-danger"><span class="glyphicon glyphicon-remove"></span> Slet</button>
-								</td>
-							</tr>
+								<tr>
+									<td>{{ kle.number }}</td>
+									<td popover-trigger="mouseenter" popover="{{ kle.name }}" popover-append-to-body="true">
+										{{ kle.name | limitTo: 40 }} {{ kle.name.length > 40 ? '&hellip;' : ''}}
+									</td>
+									<td style="overflow: hidden; white-space: nowrap" popover-trigger="mouseenter" popover="{{ kle.serviceText }}" popover-append-to-body="true">
+										{{ kle.serviceText | limitTo: 50 }} {{ kle.serviceText.length > 50 ? '&hellip;' : ''}}
+									</td>
+									<td>
+										<button ng-click="editKle(kle)" class="btn btn-primary"><span class="glyphicon glyphicon-edit"></span> Rediger</button>
+										<button ng-click="deleteKle(kle)" class="btn btn-danger"><span class="glyphicon glyphicon-remove"></span> Slet</button>
+									</td>
+								</tr>
 							</tbody>
 						</table>
 						<div class="actions">
