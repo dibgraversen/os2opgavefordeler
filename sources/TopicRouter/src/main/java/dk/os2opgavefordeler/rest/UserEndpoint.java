@@ -3,6 +3,7 @@ package dk.os2opgavefordeler.rest;
 import dk.os2opgavefordeler.auth.AdminRequired;
 import dk.os2opgavefordeler.auth.AuthService;
 import dk.os2opgavefordeler.auth.UserLoggedIn;
+import dk.os2opgavefordeler.logging.AuditLogged;
 import dk.os2opgavefordeler.repository.MunicipalityRepository;
 import dk.os2opgavefordeler.repository.UserRepository;
 import dk.os2opgavefordeler.model.Municipality;
@@ -28,6 +29,7 @@ import java.util.Optional;
  * @author hlo@miracle.dk
  */
 @UserLoggedIn
+@AuditLogged
 @Path("/users")
 public class UserEndpoint {
 	@Inject

@@ -4,6 +4,7 @@ import dk.os2opgavefordeler.auth.AdminRequired;
 import dk.os2opgavefordeler.auth.AuthService;
 import dk.os2opgavefordeler.auth.MunicipalityAdminRequired;
 import dk.os2opgavefordeler.auth.UserLoggedIn;
+import dk.os2opgavefordeler.logging.AuditLogged;
 import dk.os2opgavefordeler.logging.AuditLogger;
 import dk.os2opgavefordeler.model.*;
 import dk.os2opgavefordeler.model.presentation.DistributionRulePO;
@@ -24,6 +25,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @UserLoggedIn
+@AuditLogged
 @Path("/distribution-rules")
 @RequestScoped
 public class DistributionRuleEndpoint extends Endpoint {

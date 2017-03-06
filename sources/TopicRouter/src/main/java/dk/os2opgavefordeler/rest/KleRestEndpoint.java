@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 import dk.os2opgavefordeler.auth.AdminRequired;
 import dk.os2opgavefordeler.auth.GuestAllowed;
 import dk.os2opgavefordeler.auth.UserLoggedIn;
+import dk.os2opgavefordeler.logging.AuditLogged;
 import dk.os2opgavefordeler.model.Kle;
 import dk.os2opgavefordeler.model.presentation.KlePO;
 import dk.os2opgavefordeler.model.presentation.KleRestResultPO;
@@ -26,6 +27,7 @@ import dk.os2opgavefordeler.service.KleImportService;
 import org.slf4j.Logger;
 
 @UserLoggedIn
+@AuditLogged
 @Path("/kle")
 @RequestScoped
 public class KleRestEndpoint extends Endpoint {
