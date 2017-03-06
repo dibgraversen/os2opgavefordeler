@@ -202,7 +202,6 @@
 
 		function toggleKleAdmin(user) {
 			user.kleAssigner = !user.kleAssigner;
-			console.log("setting variable to ", user.kleAssigner);
 
 			topicRouterApi.setKleAdmin(user.roleId, user.kleAssigner)
 					.then(function(response) {

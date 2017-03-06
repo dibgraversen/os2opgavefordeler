@@ -282,7 +282,6 @@
 								var anEvent = document.createEvent("HTMLEvents");
 								anEvent.initEvent("change",true,false);
 								checkbox.dispatchEvent(anEvent);
-								console.log("Event Triggered");
 							}			
 						}
 					}			
