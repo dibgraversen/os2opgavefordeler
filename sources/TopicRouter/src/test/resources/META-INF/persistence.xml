@@ -18,6 +18,7 @@
         <class>dk.os2opgavefordeler.model.Municipality</class>
         <class>dk.os2opgavefordeler.model.UserSettings</class>
         <class>dk.os2opgavefordeler.model.LogEntry</class>
+        <class>dk.os2opgavefordeler.model.OuKleAssignment</class>
 
         <properties>
             <property name="connection.driver_class" value="org.h2.Driver"/>
@@ -42,6 +43,7 @@
         <class>dk.os2opgavefordeler.model.Municipality</class>
         <class>dk.os2opgavefordeler.model.UserSettings</class>
         <class>dk.os2opgavefordeler.model.LogEntry</class>
+        <class>dk.os2opgavefordeler.model.OuKleAssignment</class>
 
         <properties>
             <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/topicrouter"/>
