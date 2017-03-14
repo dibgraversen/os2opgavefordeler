@@ -16,7 +16,12 @@
 				<constraints nullable="false" />
 			</column>
 		</createTable>
-                
+		
+		<createTable tableName="OrgUnit_ou_kle_mapping">
+			<column name="OrgUnit_id" type="bigint"/>
+			<column name="kles_id" type="bigint"/>
+		</createTable>
+		
         <addForeignKeyConstraint constraintName="kle2ou"
                                  baseTableName="ou_kle_mapping"
                                  baseColumnNames="ou_id"
