@@ -187,7 +187,7 @@ public class ApiEndpoint extends Endpoint {
 
 		HashMap<KleAssignmentType,Set<String>> result = new HashMap<>();
 
-		for (KleAssignmentType assignmentType : KleAssignmentType.values()) {
+		for (KleAssignmentType assignmentType : assignmentTypes) {
 			Set<String> listKLE = new TreeSet<>();
 
 			for (Kle kle : ou.get().getKles(assignmentType) ) {
