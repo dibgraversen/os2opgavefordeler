@@ -16,7 +16,7 @@
 				<constraints nullable="false" />
 			</column>
 		</createTable>
-				
+
         <addForeignKeyConstraint constraintName="kle2ou"
                                  baseTableName="ou_kle_mapping"
                                  baseColumnNames="ou_id"

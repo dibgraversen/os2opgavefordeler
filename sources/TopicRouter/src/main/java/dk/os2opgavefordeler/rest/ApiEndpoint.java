@@ -159,45 +159,47 @@ public class ApiEndpoint extends Endpoint {
 			@QueryParam("assignmentType") String assignmentTypeString,
 			@DefaultValue("false") @QueryParam("showExpanded") boolean showExpanded) {
 
-		String token = authService.getAuthentication().getToken();
+		try {
+                	Municipality municipality = authorize();
 
-		if (token == null || token.isEmpty()) {
-			return Response.status(Response.Status.UNAUTHORIZED).build();
-		}
+			List<KleAssignmentType> assignmentTypes = new ArrayList<>();
+			if (assignmentTypeString != null) {
+				try {
+					assignmentTypes.add(KleAssignmentType.fromString(assignmentTypeString));
+				}
+				catch (IllegalArgumentException e) {
 
-		List<KleAssignmentType> assignmentTypes = new ArrayList<>();
-		if (assignmentTypeString != null) {
-			try {
-				assignmentTypes.add(KleAssignmentType.fromString(assignmentTypeString));
-			} catch (IllegalArgumentException e) {
 				return Response.status(400).entity("Assignment type does not exist.").build();
+				}
 			}
-		}
-		else {
-			assignmentTypes.add(KleAssignmentType.INTEREST);
-			assignmentTypes.add(KleAssignmentType.PERFORMING);
-		}
-
-		Municipality municipality = authService.currentUser().getMunicipality();
-		Optional<OrgUnit> ou = orgUnitService.findByBusinessKeyAndMunicipality(businessKey, municipality);
-
-		if(!ou.isPresent()){
-			return Response.status(404).entity("Entity not found for BusinessKey: " + businessKey).build();
-		}
-
-		HashMap<KleAssignmentType,Set<String>> result = new HashMap<>();
-
-		for (KleAssignmentType assignmentType : KleAssignmentType.values()) {
-			Set<String> listKLE = new TreeSet<>();
-
-			for (Kle kle : ou.get().getKles(assignmentType) ) {
-				addKle(showExpanded, listKLE, kle);
+			else {
+				assignmentTypes.add(KleAssignmentType.INTEREST);
+				assignmentTypes.add(KleAssignmentType.PERFORMING);
 			}
 
-			result.put(assignmentType, listKLE);
-		}
+			Optional<OrgUnit> ou = orgUnitService.findByBusinessKeyAndMunicipality(businessKey, municipality);
 
-		return Response.ok().entity(result).build();
+			if (!ou.isPresent()) {
+				return Response.status(404).entity("Entity not found for BusinessKey: " + businessKey).build();
+			}
+
+			HashMap<KleAssignmentType,Set<String>> result = new HashMap<>();
+			for (KleAssignmentType assignmentType : assignmentTypes) {
+				Set<String> listKLE = new TreeSet<>();
+
+				for (Kle kle : ou.get().getKles(assignmentType) ) {
+					addKle(showExpanded, listKLE, kle);
+				}
+
+				result.put(assignmentType, listKLE);
+			}
+
+                        return ok(result);
+                }
+		catch (UnauthorizedException uae){
+                        log.warn("rejected api call with reason: {}", uae.getReason());
+                        return uae.getResponse();
+                }
 	}
 
 	private void addKle(boolean showExpanded, Set<String> listKLE, Kle kle) {
