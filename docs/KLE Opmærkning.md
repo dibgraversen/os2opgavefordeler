@@ -95,7 +95,7 @@ Og så modtager man følgende svar
 
 Og man kan bede om at få foldet KLE tildelinger ud på emne-niveau, ved at lave følgende kald
 
-	/api/ou/bc5fed00-1bdd-4daf-9e6b-d9c80ed6db0e?assignmentType=PERFORMING&amp;showExpanded=true
+	/api/ou/bc5fed00-1bdd-4daf-9e6b-d9c80ed6db0e?assignmentType=PERFORMING&showExpanded=true
 
 Hvilket vil give følgende resultat
 
