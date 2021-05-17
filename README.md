@@ -14,7 +14,6 @@ for OS2 - Offentligt digitaliseringsfællesskab (http://os2.eu).
 Copyright (c) 2016, OS2 - Offentligt digitaliseringsfællesskab.
 
 
-
 OS2Opgavefordeler is free software; you may use, study, modify and
 
 distribute it under the terms of version 2.0 of the Mozilla Public
